@@ -96,8 +96,9 @@ const RemoteBuilder = () => {
   const deleteRemote = async (id: string) => {};
   const getActiveDevices = () => devices.filter((d: any) => d.isActive);
   const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
-  const getRemotesForDevice = (deviceId: string) => remotes.filter((r: any) => r.deviceId === deviceId);
-  const canDeleteRemote = (id: string) => ({ canDelete: true, reason: '' });
+  const getRemotesForDevice = (deviceId: string) =>
+    remotes.filter((r: any) => r.deviceId === deviceId);
+  const canDeleteRemote = (id: string) => ({ canDelete: true, reason: "" });
   const getRemoteUsageCount = (id: string) => 0;
 
   const fileInputRef = useRef<HTMLInputElement>(null);

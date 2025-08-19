@@ -1,5 +1,5 @@
-import Remote from '../models/Remote.js';
-import { v4 as uuidv4 } from 'uuid';
+import Remote from "../models/Remote.js";
+import { v4 as uuidv4 } from "uuid";
 
 const remoteModel = new Remote();
 
@@ -9,29 +9,29 @@ const remoteModel = new Remote();
  */
 export const getRemotes = async (req, res) => {
   try {
-    const { 
-      page = 1, 
-      limit = 20, 
-      search, 
+    const {
+      page = 1,
+      limit = 20,
+      search,
       device_id,
       layout,
       manufacturer,
-      sort = 'usage_count_desc'
+      sort = "usage_count_desc",
     } = req.query;
 
     const offset = (page - 1) * limit;
-    
+
     // Если есть параметры поиска, используем search метод
     if (search || device_id || layout || manufacturer) {
-      const filters = { 
+      const filters = {
         deviceId: device_id,
         layout,
         manufacturer,
-        limit: parseInt(limit)
+        limit: parseInt(limit),
       };
-      
+
       const remotes = await remoteModel.search(search, filters);
-      
+
       return res.json({
         success: true,
         data: remotes,
@@ -39,31 +39,34 @@ export const getRemotes = async (req, res) => {
           page: parseInt(page),
           limit: parseInt(limit),
           total: remotes.length,
-          hasMore: remotes.length === parseInt(limit)
+          hasMore: remotes.length === parseInt(limit),
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
     // Обычный список с пагинацией
     // Parse sort field correctly
-    let sortBy = 'created_at';
-    if (sort.startsWith('usage_count')) {
-      sortBy = 'usage_count';
-    } else if (sort.startsWith('name')) {
-      sortBy = 'name';
-    } else if (sort.startsWith('created_at')) {
-      sortBy = 'created_at';
-    } else if (sort.startsWith('manufacturer')) {
-      sortBy = 'manufacturer';
+    let sortBy = "created_at";
+    if (sort.startsWith("usage_count")) {
+      sortBy = "usage_count";
+    } else if (sort.startsWith("name")) {
+      sortBy = "name";
+    } else if (sort.startsWith("created_at")) {
+      sortBy = "created_at";
+    } else if (sort.startsWith("manufacturer")) {
+      sortBy = "manufacturer";
     }
 
-    const result = await remoteModel.findAll({}, {
-      offset,
-      limit: parseInt(limit),
-      sortBy: sortBy,
-      sortOrder: sort.includes('desc') ? 'DESC' : 'ASC'
-    });
+    const result = await remoteModel.findAll(
+      {},
+      {
+        offset,
+        limit: parseInt(limit),
+        sortBy: sortBy,
+        sortOrder: sort.includes("desc") ? "DESC" : "ASC",
+      },
+    );
 
     res.json({
       success: true,
@@ -73,18 +76,17 @@ export const getRemotes = async (req, res) => {
         limit: parseInt(limit),
         total: result.total,
         totalPages: Math.ceil(result.total / limit),
-        hasMore: (page * limit) < result.total
+        hasMore: page * limit < result.total,
       },
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in getRemotes:', error);
+    console.error("Error in getRemotes:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при получении пультов',
+      error: "Ошибка при получении пультов",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -101,24 +103,23 @@ export const getRemoteById = async (req, res) => {
     if (!remote) {
       return res.status(404).json({
         success: false,
-        error: 'Пульт не найден',
-        timestamp: new Date().toISOString()
+        error: "Пульт не найден",
+        timestamp: new Date().toISOString(),
       });
     }
 
     res.json({
       success: true,
       data: remote,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in getRemoteById:', error);
+    console.error("Error in getRemoteById:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при получении пульта',
+      error: "Ошибка при получении пульта",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -133,7 +134,7 @@ export const createRemote = async (req, res) => {
       id: uuidv4(),
       ...req.body,
       created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     // Валидация данных
@@ -141,9 +142,9 @@ export const createRemote = async (req, res) => {
     if (validationErrors.length > 0) {
       return res.status(400).json({
         success: false,
-        error: 'Ошибки валидации',
+        error: "Ошибки валидации",
         details: validationErrors,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -152,27 +153,26 @@ export const createRemote = async (req, res) => {
     res.status(201).json({
       success: true,
       data: newRemote,
-      message: 'Пульт создан успешно',
-      timestamp: new Date().toISOString()
+      message: "Пульт создан успешно",
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in createRemote:', error);
-    
+    console.error("Error in createRemote:", error);
+
     // Проверка на дублирование
-    if (error.code === '23505') {
+    if (error.code === "23505") {
       return res.status(409).json({
         success: false,
-        error: 'Пульт с таким ID уже существует',
-        timestamp: new Date().toISOString()
+        error: "Пульт с таким ID уже существует",
+        timestamp: new Date().toISOString(),
       });
     }
 
     res.status(500).json({
       success: false,
-      error: 'Ошибка при создании пульта',
+      error: "Ошибка при создании пульта",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -186,7 +186,7 @@ export const updateRemote = async (req, res) => {
     const { id } = req.params;
     const updateData = {
       ...req.body,
-      updated_at: new Date().toISOString()
+      updated_at: new Date().toISOString(),
     };
 
     // Валидация данных для обновления
@@ -194,9 +194,9 @@ export const updateRemote = async (req, res) => {
     if (validationErrors.length > 0) {
       return res.status(400).json({
         success: false,
-        error: 'Ошибки валидации',
+        error: "Ошибки валидации",
         details: validationErrors,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
 
@@ -205,25 +205,24 @@ export const updateRemote = async (req, res) => {
     if (!updatedRemote) {
       return res.status(404).json({
         success: false,
-        error: 'Пульт не найден',
-        timestamp: new Date().toISOString()
+        error: "Пульт не найден",
+        timestamp: new Date().toISOString(),
       });
     }
 
     res.json({
       success: true,
       data: updatedRemote,
-      message: 'Пульт обновлен успешно',
-      timestamp: new Date().toISOString()
+      message: "Пульт обновлен успешно",
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in updateRemote:', error);
+    console.error("Error in updateRemote:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при обновлении пульта',
+      error: "Ошибка при обновлении пульта",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -240,25 +239,24 @@ export const deleteRemote = async (req, res) => {
     if (!deletedRemote) {
       return res.status(404).json({
         success: false,
-        error: 'Пульт не найден',
-        timestamp: new Date().toISOString()
+        error: "Пульт не найден",
+        timestamp: new Date().toISOString(),
       });
     }
 
     res.json({
       success: true,
       data: deletedRemote,
-      message: 'Пульт удален успешно',
-      timestamp: new Date().toISOString()
+      message: "Пульт удален успешно",
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in deleteRemote:', error);
+    console.error("Error in deleteRemote:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при удалении пульта',
+      error: "Ошибка при удалении пульта",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -276,16 +274,15 @@ export const getRemotesByDevice = async (req, res) => {
       success: true,
       data: remotes,
       total: remotes.length,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in getRemotesByDevice:', error);
+    console.error("Error in getRemotesByDevice:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при получении пультов устройства',
+      error: "Ошибка при получении пультов устройства",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -302,24 +299,23 @@ export const getDefaultRemoteForDevice = async (req, res) => {
     if (!remote) {
       return res.status(404).json({
         success: false,
-        error: 'Пульт по умолчанию не найден для этого устройства',
-        timestamp: new Date().toISOString()
+        error: "Пульт по умолчанию не найден для этого устройства",
+        timestamp: new Date().toISOString(),
       });
     }
 
     res.json({
       success: true,
       data: remote,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in getDefaultRemoteForDevice:', error);
+    console.error("Error in getDefaultRemoteForDevice:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при получении пульта по умолчанию',
+      error: "Ошибка при получении пульта по умолчанию",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -336,16 +332,15 @@ export const setRemoteAsDefault = async (req, res) => {
     res.json({
       success: true,
       message: result.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in setRemoteAsDefault:', error);
+    console.error("Error in setRemoteAsDefault:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при установке пульта по умолчанию',
+      error: "Ошибка при установке пульта по умолчанию",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -364,17 +359,16 @@ export const duplicateRemote = async (req, res) => {
     res.status(201).json({
       success: true,
       data: duplicatedRemote,
-      message: 'Пульт дублирован успешно',
-      timestamp: new Date().toISOString()
+      message: "Пульт дублирован успешно",
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in duplicateRemote:', error);
+    console.error("Error in duplicateRemote:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при дублировании пуль��а',
+      error: "Ошибка при дублировании пуль��а",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -391,25 +385,24 @@ export const incrementRemoteUsage = async (req, res) => {
     if (!result) {
       return res.status(404).json({
         success: false,
-        error: 'Пульт не найден',
-        timestamp: new Date().toISOString()
+        error: "Пульт не найден",
+        timestamp: new Date().toISOString(),
       });
     }
 
     res.json({
       success: true,
       data: { usage_count: result.usage_count },
-      message: 'Счетчик использования обновлен',
-      timestamp: new Date().toISOString()
+      message: "Счетчик использования обновлен",
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in incrementRemoteUsage:', error);
+    console.error("Error in incrementRemoteUsage:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при обновлении счетчика использования',
+      error: "Ошибка при обновлении счетчика использования",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -427,16 +420,15 @@ export const getRemoteStats = async (req, res) => {
     res.json({
       success: true,
       data: stats,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
-
   } catch (error) {
-    console.error('Error in getRemoteStats:', error);
+    console.error("Error in getRemoteStats:", error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при получении статистики пультов',
+      error: "Ошибка при получении статистики пультов",
       details: error.message,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 };
@@ -452,5 +444,5 @@ export default {
   setRemoteAsDefault,
   duplicateRemote,
   incrementRemoteUsage,
-  getRemoteStats
+  getRemoteStats,
 };

@@ -22,7 +22,9 @@ if (process.env.DATABASE_URL) {
   // Use DATABASE_URL if provided (Neon/Heroku style)
   dbConfig = {
     connectionString: process.env.DATABASE_URL,
-    ssl: process.env.DATABASE_URL.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+    ssl: process.env.DATABASE_URL.includes("neon.tech")
+      ? { rejectUnauthorized: false }
+      : false,
 
     // Настройки pool соединений
     max: 20, // максимал��ное количество соединений в pool
@@ -174,7 +176,6 @@ export async function transaction(callback) {
 
 // Функция создания базы данных (если не существует)
 export async function createDatabase() {
-
   const adminConfig = {
     ...dbConfig,
     database: "postgres", // подключаемся к системной БД для создания новой

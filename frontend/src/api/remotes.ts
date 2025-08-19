@@ -7,9 +7,17 @@ export interface RemoteFilters {
   limit?: number;
   search?: string;
   device_id?: string;
-  layout?: 'standard' | 'compact' | 'smart' | 'custom';
+  layout?: "standard" | "compact" | "smart" | "custom";
   manufacturer?: string;
-  sort?: 'name_asc' | 'name_desc' | 'usage_count_asc' | 'usage_count_desc' | 'created_at_asc' | 'created_at_desc' | 'manufacturer_asc' | 'manufacturer_desc';
+  sort?:
+    | "name_asc"
+    | "name_desc"
+    | "usage_count_asc"
+    | "usage_count_desc"
+    | "created_at_asc"
+    | "created_at_desc"
+    | "manufacturer_asc"
+    | "manufacturer_desc";
 }
 
 export interface RemoteCreateData {
@@ -18,7 +26,7 @@ export interface RemoteCreateData {
   model: string;
   device_id?: string | null;
   description?: string;
-  layout?: 'standard' | 'compact' | 'smart' | 'custom';
+  layout?: "standard" | "compact" | "smart" | "custom";
   color_scheme?: string;
   image_url?: string;
   image_data?: string;
@@ -80,21 +88,22 @@ export const remotesApi = {
   async getAll(filters: RemoteFilters = {}) {
     try {
       const params = new URLSearchParams();
-      
-      if (filters.page) params.append('page', filters.page.toString());
-      if (filters.limit) params.append('limit', filters.limit.toString());
-      if (filters.search) params.append('search', filters.search);
-      if (filters.device_id) params.append('device_id', filters.device_id);
-      if (filters.layout) params.append('layout', filters.layout);
-      if (filters.manufacturer) params.append('manufacturer', filters.manufacturer);
-      if (filters.sort) params.append('sort', filters.sort);
+
+      if (filters.page) params.append("page", filters.page.toString());
+      if (filters.limit) params.append("limit", filters.limit.toString());
+      if (filters.search) params.append("search", filters.search);
+      if (filters.device_id) params.append("device_id", filters.device_id);
+      if (filters.layout) params.append("layout", filters.layout);
+      if (filters.manufacturer)
+        params.append("manufacturer", filters.manufacturer);
+      if (filters.sort) params.append("sort", filters.sort);
 
       const queryString = params.toString();
-      const url = queryString ? `/remotes?${queryString}` : '/remotes';
-      
+      const url = queryString ? `/remotes?${queryString}` : "/remotes";
+
       return await apiClient.get(url);
     } catch (error) {
-      throw handleApiError(error, 'Failed to fetch remotes');
+      throw handleApiError(error, "Failed to fetch remotes");
     }
   },
 
@@ -115,10 +124,10 @@ export const remotesApi = {
    */
   async create(data: RemoteCreateData): Promise<Remote> {
     try {
-      const response = await apiClient.post('/remotes', data);
+      const response = await apiClient.post("/remotes", data);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, 'Failed to create remote');
+      throw handleApiError(error, "Failed to create remote");
     }
   },
 
@@ -154,7 +163,10 @@ export const remotesApi = {
       const response = await apiClient.get(`/remotes/device/${deviceId}`);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, `Failed to fetch remotes for device ${deviceId}`);
+      throw handleApiError(
+        error,
+        `Failed to fetch remotes for device ${deviceId}`,
+      );
     }
   },
 
@@ -163,10 +175,15 @@ export const remotesApi = {
    */
   async getDefaultForDevice(deviceId: string): Promise<Remote> {
     try {
-      const response = await apiClient.get(`/remotes/device/${deviceId}/default`);
+      const response = await apiClient.get(
+        `/remotes/device/${deviceId}/default`,
+      );
       return response.data;
     } catch (error) {
-      throw handleApiError(error, `Failed to fetch default remote for device ${deviceId}`);
+      throw handleApiError(
+        error,
+        `Failed to fetch default remote for device ${deviceId}`,
+      );
     }
   },
 
@@ -177,7 +194,10 @@ export const remotesApi = {
     try {
       await apiClient.post(`/remotes/${remoteId}/set-default/${deviceId}`);
     } catch (error) {
-      throw handleApiError(error, `Failed to set remote ${remoteId} as default for device ${deviceId}`);
+      throw handleApiError(
+        error,
+        `Failed to set remote ${remoteId} as default for device ${deviceId}`,
+      );
     }
   },
 
@@ -210,24 +230,32 @@ export const remotesApi = {
    */
   async getStats(deviceId?: string): Promise<RemoteStats> {
     try {
-      const url = deviceId ? `/remotes/stats?device_id=${deviceId}` : '/remotes/stats';
+      const url = deviceId
+        ? `/remotes/stats?device_id=${deviceId}`
+        : "/remotes/stats";
       const response = await apiClient.get(url);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, 'Failed to fetch remote stats');
+      throw handleApiError(error, "Failed to fetch remote stats");
     }
   },
 
   /**
    * Поиск пультов
    */
-  async search(query: string, filters: Omit<RemoteFilters, 'search'> = {}): Promise<Remote[]> {
+  async search(
+    query: string,
+    filters: Omit<RemoteFilters, "search"> = {},
+  ): Promise<Remote[]> {
     try {
       return await this.getAll({ ...filters, search: query });
     } catch (error) {
-      throw handleApiError(error, `Failed to search remotes with query: ${query}`);
+      throw handleApiError(
+        error,
+        `Failed to search remotes with query: ${query}`,
+      );
     }
-  }
+  },
 };
 
 export default remotesApi;

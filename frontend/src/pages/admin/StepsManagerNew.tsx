@@ -111,9 +111,8 @@ const StepsManagerNew = () => {
       // Load remotes
       const remotesResponse = await remotesApi.getAll();
       setRemotes(remotesResponse || []);
-
     } catch (error) {
-      console.error('Error loading initial data:', error);
+      console.error("Error loading initial data:", error);
     } finally {
       setLoading(false);
     }
@@ -212,10 +211,18 @@ const StepsManagerNew = () => {
   };
 
   // Сохранение отметки TV интерфейса для шага
-  const saveTVInterfaceMarkForStep = async (stepId: string, tvInterfaceId: string, formData: any) => {
+  const saveTVInterfaceMarkForStep = async (
+    stepId: string,
+    tvInterfaceId: string,
+    formData: any,
+  ) => {
     try {
       // Create a TV interface mark based on the step's TV area data
-      if (formData.tvAreaRect && formData.tvAreaRect.width > 0 && formData.tvAreaRect.height > 0) {
+      if (
+        formData.tvAreaRect &&
+        formData.tvAreaRect.width > 0 &&
+        formData.tvAreaRect.height > 0
+      ) {
         // Rectangle area marking
         const markData = {
           tv_interface_id: tvInterfaceId,
@@ -225,7 +232,10 @@ const StepsManagerNew = () => {
           mark_type: "area" as const,
           shape: "rectangle" as const,
           position: { x: formData.tvAreaRect.x, y: formData.tvAreaRect.y },
-          size: { width: formData.tvAreaRect.width, height: formData.tvAreaRect.height },
+          size: {
+            width: formData.tvAreaRect.width,
+            height: formData.tvAreaRect.height,
+          },
           color: "#3b82f6",
           border_color: "#2563eb",
           border_width: 2,
@@ -238,7 +248,10 @@ const StepsManagerNew = () => {
         };
 
         await tvInterfaceMarksAPI.create(markData);
-      } else if (formData.tvAreaPosition.x > 0 && formData.tvAreaPosition.y > 0) {
+      } else if (
+        formData.tvAreaPosition.x > 0 &&
+        formData.tvAreaPosition.y > 0
+      ) {
         // Point marking
         const markData = {
           tv_interface_id: tvInterfaceId,
@@ -286,23 +299,25 @@ const StepsManagerNew = () => {
 
   const getAvailableProblems = () => {
     if (formData.deviceId) {
-      return (problems || []).filter(p => p.deviceId === formData.deviceId && p.status === "published");
+      return (problems || []).filter(
+        (p) => p.deviceId === formData.deviceId && p.status === "published",
+      );
     }
     return (problems || []).filter((p) => p.status === "published");
   };
 
   const getAvailableRemotes = () => {
     if (formData.deviceId) {
-      return (remotes || []).filter(r => r.deviceId === formData.deviceId);
+      return (remotes || []).filter((r) => r.deviceId === formData.deviceId);
     }
-    return (remotes || []).filter(r => r.isActive);
+    return (remotes || []).filter((r) => r.isActive);
   };
 
   const getFilteredRemotes = () => {
     if (filterDevice === "all") {
-      return (remotes || []).filter(r => r.isActive);
+      return (remotes || []).filter((r) => r.isActive);
     }
-    return (remotes || []).filter(r => r.deviceId === filterDevice);
+    return (remotes || []).filter((r) => r.deviceId === filterDevice);
   };
 
   const getAvailableTVInterfaces = () => {
@@ -325,7 +340,8 @@ const StepsManagerNew = () => {
     try {
       const deviceSteps = steps.filter(
         (s) =>
-          s.deviceId === formData.deviceId && s.problemId === formData.problemId,
+          s.deviceId === formData.deviceId &&
+          s.problemId === formData.problemId,
       );
       const maxStepNumber =
         deviceSteps.length > 0
@@ -338,11 +354,25 @@ const StepsManagerNew = () => {
         title: formData.title,
         description: formData.description,
         instruction: formData.instruction,
-        tvInterfaceId: formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
+        tvInterfaceId:
+          formData.tvInterfaceId === "none"
+            ? undefined
+            : formData.tvInterfaceId,
         remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
-        buttonPosition: (formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0) ? undefined : formData.buttonPosition,
-        tvAreaPosition: (formData.tvAreaPosition.x === 0 && formData.tvAreaPosition.y === 0) ? undefined : formData.tvAreaPosition,
-        tvAreaRect: (!formData.tvAreaRect || formData.tvAreaRect.width === 0 || formData.tvAreaRect.height === 0) ? undefined : formData.tvAreaRect,
+        buttonPosition:
+          formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
+            ? undefined
+            : formData.buttonPosition,
+        tvAreaPosition:
+          formData.tvAreaPosition.x === 0 && formData.tvAreaPosition.y === 0
+            ? undefined
+            : formData.tvAreaPosition,
+        tvAreaRect:
+          !formData.tvAreaRect ||
+          formData.tvAreaRect.width === 0 ||
+          formData.tvAreaRect.height === 0
+            ? undefined
+            : formData.tvAreaRect,
         stepNumber: maxStepNumber + 1,
         hint: formData.hint,
         requiredAction: formData.requiredAction,
@@ -353,8 +383,16 @@ const StepsManagerNew = () => {
       const createdStep = await stepsApi.create(stepData);
 
       // If step has TV interface markings, save them
-      if (createdStep && formData.tvInterfaceId !== "none" && (formData.tvAreaPosition.x > 0 || formData.tvAreaRect?.width > 0)) {
-        await saveTVInterfaceMarkForStep(createdStep.id, formData.tvInterfaceId, formData);
+      if (
+        createdStep &&
+        formData.tvInterfaceId !== "none" &&
+        (formData.tvAreaPosition.x > 0 || formData.tvAreaRect?.width > 0)
+      ) {
+        await saveTVInterfaceMarkForStep(
+          createdStep.id,
+          formData.tvInterfaceId,
+          formData,
+        );
       }
 
       // Reload steps
@@ -374,11 +412,23 @@ const StepsManagerNew = () => {
       title: formData.title,
       description: formData.description,
       instruction: formData.instruction,
-      tvInterfaceId: formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
+      tvInterfaceId:
+        formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
       remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
-      buttonPosition: (formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0) ? undefined : formData.buttonPosition,
-      tvAreaPosition: (formData.tvAreaPosition.x === 0 && formData.tvAreaPosition.y === 0) ? undefined : formData.tvAreaPosition,
-      tvAreaRect: (!formData.tvAreaRect || formData.tvAreaRect.width === 0 || formData.tvAreaRect.height === 0) ? undefined : formData.tvAreaRect,
+      buttonPosition:
+        formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
+          ? undefined
+          : formData.buttonPosition,
+      tvAreaPosition:
+        formData.tvAreaPosition.x === 0 && formData.tvAreaPosition.y === 0
+          ? undefined
+          : formData.tvAreaPosition,
+      tvAreaRect:
+        !formData.tvAreaRect ||
+        formData.tvAreaRect.width === 0 ||
+        formData.tvAreaRect.height === 0
+          ? undefined
+          : formData.tvAreaRect,
       hint: formData.hint,
       requiredAction: formData.requiredAction,
     };
@@ -387,10 +437,17 @@ const StepsManagerNew = () => {
       await stepsApi.update(selectedStep.id, updatedData);
 
       // If step has TV interface markings, update them
-      if (formData.tvInterfaceId !== "none" && (formData.tvAreaPosition.x > 0 || formData.tvAreaRect?.width > 0)) {
+      if (
+        formData.tvInterfaceId !== "none" &&
+        (formData.tvAreaPosition.x > 0 || formData.tvAreaRect?.width > 0)
+      ) {
         // Delete existing marks for this step and create new ones
         await tvInterfaceMarksAPI.deleteByStepId(selectedStep.id);
-        await saveTVInterfaceMarkForStep(selectedStep.id, formData.tvInterfaceId, formData);
+        await saveTVInterfaceMarkForStep(
+          selectedStep.id,
+          formData.tvInterfaceId,
+          formData,
+        );
       }
 
       // Reload steps
@@ -533,7 +590,11 @@ const StepsManagerNew = () => {
   };
 
   // Drag-based rectangle selection on TV canvas
-  const tvDragState = useRef<{ startX: number; startY: number; dragging: boolean }>({ startX: 0, startY: 0, dragging: false });
+  const tvDragState = useRef<{
+    startX: number;
+    startY: number;
+    dragging: boolean;
+  }>({ startX: 0, startY: 0, dragging: false });
 
   const handleTVMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isPickingTVArea || !tvCanvasRef.current) return;
@@ -544,11 +605,20 @@ const StepsManagerNew = () => {
     const x = (event.clientX - rect.left) * scaleX;
     const y = (event.clientY - rect.top) * scaleY;
     tvDragState.current = { startX: x, startY: y, dragging: true };
-    setFormData((prev) => ({ ...prev, tvAreaPosition: { x, y }, tvAreaRect: { x, y, width: 0, height: 0 } }));
+    setFormData((prev) => ({
+      ...prev,
+      tvAreaPosition: { x, y },
+      tvAreaRect: { x, y, width: 0, height: 0 },
+    }));
   };
 
   const handleTVMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
-    if (!isPickingTVArea || !tvCanvasRef.current || !tvDragState.current.dragging) return;
+    if (
+      !isPickingTVArea ||
+      !tvCanvasRef.current ||
+      !tvDragState.current.dragging
+    )
+      return;
     const canvas = tvCanvasRef.current;
     const rect = canvas.getBoundingClientRect();
     const scaleX = canvas.width / rect.width;
@@ -559,7 +629,12 @@ const StepsManagerNew = () => {
     const startY = tvDragState.current.startY;
     const width = Math.max(1, Math.abs(x - startX));
     const height = Math.max(1, Math.abs(y - startY));
-    const rectData = { x: Math.min(startX, x), y: Math.min(startY, y), width, height };
+    const rectData = {
+      x: Math.min(startX, x),
+      y: Math.min(startY, y),
+      width,
+      height,
+    };
     setFormData((prev) => ({ ...prev, tvAreaRect: rectData }));
   };
 
@@ -636,7 +711,7 @@ const StepsManagerNew = () => {
   };
 
   const getActiveDevices = () => {
-    return (devices || []).filter(d => d.isActive);
+    return (devices || []).filter((d) => d.isActive);
   };
 
   const getTVInterfaceName = (tvInterfaceId: string) => {
@@ -826,7 +901,9 @@ const StepsManagerNew = () => {
             )}
 
             {/* Выбранная область (прямоугольник) или точка (fallback) */}
-            {formData.tvAreaRect && formData.tvAreaRect.width > 0 && formData.tvAreaRect.height > 0 ? (
+            {formData.tvAreaRect &&
+            formData.tvAreaRect.width > 0 &&
+            formData.tvAreaRect.height > 0 ? (
               <div
                 className="absolute border-2 border-blue-500 bg-blue-500/20 pointer-events-none z-10"
                 style={{
@@ -837,7 +914,8 @@ const StepsManagerNew = () => {
                 }}
               />
             ) : (
-              formData.tvAreaPosition.x > 0 && formData.tvAreaPosition.y > 0 && (
+              formData.tvAreaPosition.x > 0 &&
+              formData.tvAreaPosition.y > 0 && (
                 <div
                   className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse shadow-lg pointer-events-none z-10"
                   style={{
@@ -864,7 +942,9 @@ const StepsManagerNew = () => {
                 className="w-full"
               >
                 <Target className="h-4 w-4 mr-2" />
-                {isPickingTVArea ? "Завершить выделение" : "Выбрать область (перетащите мышью)"}
+                {isPickingTVArea
+                  ? "Завершить выделение"
+                  : "Выбрать область (перетащите мышью)"}
               </Button>
 
               {isPickingTVArea && (
@@ -872,7 +952,8 @@ const StepsManagerNew = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Потяните мышью по экрану ТВ, чтобы выделить прямоугольную область
+                      Потяните мышью по экрану ТВ, чтобы выделить прямоугольную
+                      область
                     </p>
                   </AlertDescription>
                 </Alert>
@@ -883,13 +964,20 @@ const StepsManagerNew = () => {
                   <Alert className="border-green-200 bg-green-50 dark:bg-green-900/20">
                     <Target className="h-4 w-4" />
                     <AlertDescription>
-                      {formData.tvAreaRect && formData.tvAreaRect.width > 0 && formData.tvAreaRect.height > 0 ? (
+                      {formData.tvAreaRect &&
+                      formData.tvAreaRect.width > 0 &&
+                      formData.tvAreaRect.height > 0 ? (
                         <p className="text-sm text-green-700 dark:text-green-300">
-                          Область на ТВ: ({Math.round(formData.tvAreaRect.x)}, {Math.round(formData.tvAreaRect.y)}) — {Math.round(formData.tvAreaRect.width)}×{Math.round(formData.tvAreaRect.height)}
+                          Область на ТВ: ({Math.round(formData.tvAreaRect.x)},{" "}
+                          {Math.round(formData.tvAreaRect.y)}) —{" "}
+                          {Math.round(formData.tvAreaRect.width)}×
+                          {Math.round(formData.tvAreaRect.height)}
                         </p>
                       ) : (
                         <p className="text-sm text-green-700 dark:text-green-300">
-                          Позиция на ТВ: ({Math.round(formData.tvAreaPosition.x)}, {Math.round(formData.tvAreaPosition.y)})
+                          Позиция на ТВ: (
+                          {Math.round(formData.tvAreaPosition.x)},{" "}
+                          {Math.round(formData.tvAreaPosition.y)})
                         </p>
                       )}
                     </AlertDescription>

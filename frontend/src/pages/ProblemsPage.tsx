@@ -186,9 +186,7 @@ const ProblemsPage = () => {
                     <div className="text-2xl font-bold text-white">
                       {problems.length}
                     </div>
-                    <div className="text-gray-400 text-sm">
-                      типов проблем
-                    </div>
+                    <div className="text-gray-400 text-sm">типов проблем</div>
                   </div>
                 </div>
               </CardContent>
@@ -207,7 +205,8 @@ const ProblemsPage = () => {
                     Нет доступных проблем
                   </h3>
                   <p className="text-gray-400 mb-6">
-                    Для данной модели приставки пока нет настроенных решений проблем
+                    Для данной модели приставки пока нет настроенных решений
+                    проблем
                   </p>
                   <Button
                     variant="outline"
@@ -302,7 +301,8 @@ const ProblemsPage = () => {
                     Не нашли свою проблему?
                   </h3>
                   <p className="text-gray-300 mb-4">
-                    Свяжитесь с нашей службой поддержки для получения персональной помощи
+                    Свяжитесь с нашей службой поддержки для получения
+                    персональной помощи
                   </p>
                   <Button
                     variant="outline"

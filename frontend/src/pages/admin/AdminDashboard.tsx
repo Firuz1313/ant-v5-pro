@@ -50,7 +50,7 @@ const AdminDashboard = () => {
   const getEntityStats = (entity: string) => ({ total: 0, active: 0 });
   const getActiveSessions = () => [];
   const refreshData = async () => {};
-  const exportData = async (options: any) => ({ downloadUrl: '' });
+  const exportData = async (options: any) => ({ downloadUrl: "" });
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("week");
@@ -58,11 +58,11 @@ const AdminDashboard = () => {
   // Statistics - using real API data
   const deviceStats = {
     total: devices.length,
-    active: devices.filter((d: any) => d.isActive).length
+    active: devices.filter((d: any) => d.isActive).length,
   };
   const problemStats = {
     total: problems.length,
-    active: problems.filter((p: any) => p.status === 'published').length
+    active: problems.filter((p: any) => p.status === "published").length,
   };
   const stepStats = getEntityStats("steps");
   const remoteStats = getEntityStats("remotes");

@@ -95,10 +95,7 @@ function App() {
         />
 
         {/* Legacy redirect - old problems page */}
-        <Route
-          path="/problems"
-          element={<Navigate to="/devices" replace />}
-        />
+        <Route path="/problems" element={<Navigate to="/devices" replace />} />
 
         {/* Admin Routes */}
         <Route

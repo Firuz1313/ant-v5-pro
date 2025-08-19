@@ -314,9 +314,12 @@ const StepsManager = () => {
   const getActiveDevices = () => devices.filter((d: any) => d.isActive);
   const getActiveRemotes = () => remotes.filter((r: any) => r.isActive);
   const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
-  const getProblemsForDevice = (deviceId: string) => problems.filter((p: any) => p.deviceId === deviceId);
-  const getRemotesForDevice = (deviceId: string) => remotes.filter((r: any) => r.deviceId === deviceId);
-  const getDefaultRemoteForDevice = (deviceId: string) => remotes.find((r: any) => r.deviceId === deviceId && r.isDefault);
+  const getProblemsForDevice = (deviceId: string) =>
+    problems.filter((p: any) => p.deviceId === deviceId);
+  const getRemotesForDevice = (deviceId: string) =>
+    remotes.filter((r: any) => r.deviceId === deviceId);
+  const getDefaultRemoteForDevice = (deviceId: string) =>
+    remotes.find((r: any) => r.deviceId === deviceId && r.isDefault);
   const { toast } = useToast();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);

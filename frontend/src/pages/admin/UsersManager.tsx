@@ -68,16 +68,26 @@ const UsersManager = () => {
   });
 
   const roles = [
-    { value: "admin", label: "Администратор", color: "bg-red-100 text-red-800" },
+    {
+      value: "admin",
+      label: "Администратор",
+      color: "bg-red-100 text-red-800",
+    },
     { value: "editor", label: "Редактор", color: "bg-blue-100 text-blue-800" },
-    { value: "viewer", label: "Наблюдатель", color: "bg-gray-100 text-gray-800" },
+    {
+      value: "viewer",
+      label: "Наблюдатель",
+      color: "bg-gray-100 text-gray-800",
+    },
   ];
 
   const filteredUsers = users.filter((user) => {
-    const matchesSearch = user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         user.email.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      user.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesRole = filterRole === "all" || user.role === filterRole;
-    const matchesStatus = filterStatus === "all" || user.status === filterStatus;
+    const matchesStatus =
+      filterStatus === "all" || user.status === filterStatus;
     return matchesSearch && matchesRole && matchesStatus;
   });
 
@@ -87,7 +97,7 @@ const UsersManager = () => {
       ...formData,
       status: "active",
       lastLogin: "Никогда",
-      createdAt: new Date().toISOString().split('T')[0],
+      createdAt: new Date().toISOString().split("T")[0],
     };
     setUsers([...users, newUser]);
     setIsCreateDialogOpen(false);
@@ -96,11 +106,9 @@ const UsersManager = () => {
 
   const handleEdit = () => {
     if (!selectedUser) return;
-    
+
     const updatedUsers = users.map((user) =>
-      user.id === selectedUser.id
-        ? { ...user, ...formData }
-        : user
+      user.id === selectedUser.id ? { ...user, ...formData } : user,
     );
     setUsers(updatedUsers);
     setIsEditDialogOpen(false);
@@ -115,14 +123,17 @@ const UsersManager = () => {
 
   const handleToggleStatus = (userId: string) => {
     if (userId === "1") return; // Prevent deactivating the main admin
-    
+
     const updatedUsers = users.map((user) =>
       user.id === userId
         ? {
             ...user,
-            status: user.status === "active" ? "inactive" : "active" as User["status"],
+            status:
+              user.status === "active"
+                ? "inactive"
+                : ("active" as User["status"]),
           }
-        : user
+        : user,
     );
     setUsers(updatedUsers);
   };
@@ -146,14 +157,14 @@ const UsersManager = () => {
   };
 
   const getRoleInfo = (role: string) => {
-    return roles.find(r => r.value === role) || roles[2];
+    return roles.find((r) => r.value === role) || roles[2];
   };
 
   const getInitials = (name: string) => {
     return name
-      .split(' ')
-      .map(word => word[0])
-      .join('')
+      .split(" ")
+      .map((word) => word[0])
+      .join("")
       .toUpperCase()
       .slice(0, 2);
   };
@@ -187,31 +198,39 @@ const UsersManager = () => {
                 <Input
                   id="name"
                   value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })
+                  onChange={(e) =>
+                    setFormData({ ...formData, name: e.target.value })
                   }
                   placeholder="Введите имя пользователя"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="email">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   placeholder="user@antsupport.com"
                 />
               </div>
-              
+
               <div>
                 <Label htmlFor="role">Роль</Label>
-                <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value as User["role"] })}>
+                <Select
+                  value={formData.role}
+                  onValueChange={(value) =>
+                    setFormData({ ...formData, role: value as User["role"] })
+                  }
+                >
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
-                    {roles.map(role => (
+                    {roles.map((role) => (
                       <SelectItem key={role.value} value={role.value}>
                         {role.label}
                       </SelectItem>
@@ -221,10 +240,16 @@ const UsersManager = () => {
               </div>
 
               <div className="flex justify-end space-x-2">
-                <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+                <Button
+                  variant="outline"
+                  onClick={() => setIsCreateDialogOpen(false)}
+                >
                   Отмена
                 </Button>
-                <Button onClick={handleCreate} disabled={!formData.name || !formData.email}>
+                <Button
+                  onClick={handleCreate}
+                  disabled={!formData.name || !formData.email}
+                >
                   Создать
                 </Button>
               </div>
@@ -250,7 +275,7 @@ const UsersManager = () => {
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -259,14 +284,14 @@ const UsersManager = () => {
                   Активных
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {users.filter(u => u.status === "active").length}
+                  {users.filter((u) => u.status === "active").length}
                 </p>
               </div>
               <UserCheck className="h-8 w-8 text-green-600" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -275,14 +300,14 @@ const UsersManager = () => {
                   Администраторов
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {users.filter(u => u.role === "admin").length}
+                  {users.filter((u) => u.role === "admin").length}
                 </p>
               </div>
               <Shield className="h-8 w-8 text-red-600" />
             </div>
           </CardContent>
         </Card>
-        
+
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -291,7 +316,7 @@ const UsersManager = () => {
                   Неактивных
                 </p>
                 <p className="text-2xl font-bold text-gray-900 dark:text-white">
-                  {users.filter(u => u.status === "inactive").length}
+                  {users.filter((u) => u.status === "inactive").length}
                 </p>
               </div>
               <UserX className="h-8 w-8 text-gray-600" />
@@ -322,7 +347,7 @@ const UsersManager = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все роли</SelectItem>
-                  {roles.map(role => (
+                  {roles.map((role) => (
                     <SelectItem key={role.value} value={role.value}>
                       {role.label}
                     </SelectItem>
@@ -352,13 +377,16 @@ const UsersManager = () => {
         <CardContent>
           <div className="space-y-4">
             {filteredUsers.map((user) => (
-              <div key={user.id} className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg">
+              <div
+                key={user.id}
+                className="flex items-center justify-between p-4 border border-gray-200 dark:border-gray-700 rounded-lg"
+              >
                 <div className="flex items-center space-x-4">
                   <Avatar>
                     <AvatarImage src={user.avatar} />
                     <AvatarFallback>{getInitials(user.name)}</AvatarFallback>
                   </Avatar>
-                  
+
                   <div className="flex-1">
                     <div className="flex items-center space-x-2 mb-1">
                       <h3 className="font-semibold text-gray-900 dark:text-white">
@@ -367,11 +395,15 @@ const UsersManager = () => {
                       <Badge className={getRoleInfo(user.role).color}>
                         {getRoleInfo(user.role).label}
                       </Badge>
-                      <Badge variant={user.status === "active" ? "default" : "secondary"}>
+                      <Badge
+                        variant={
+                          user.status === "active" ? "default" : "secondary"
+                        }
+                      >
                         {user.status === "active" ? "Активный" : "Неактивный"}
                       </Badge>
                     </div>
-                    
+
                     <div className="flex items-center space-x-4 text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex items-center">
                         <Mail className="h-3 w-3 mr-1" />
@@ -384,7 +416,7 @@ const UsersManager = () => {
                     </div>
                   </div>
                 </div>
-                
+
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button variant="ghost" size="icon">
@@ -397,7 +429,9 @@ const UsersManager = () => {
                       Редактировать
                     </DropdownMenuItem>
                     {user.id !== "1" && (
-                      <DropdownMenuItem onClick={() => handleToggleStatus(user.id)}>
+                      <DropdownMenuItem
+                        onClick={() => handleToggleStatus(user.id)}
+                      >
                         {user.status === "active" ? (
                           <>
                             <UserX className="h-4 w-4 mr-2" />
@@ -412,7 +446,7 @@ const UsersManager = () => {
                       </DropdownMenuItem>
                     )}
                     {user.id !== "1" && (
-                      <DropdownMenuItem 
+                      <DropdownMenuItem
                         onClick={() => handleDelete(user.id)}
                         className="text-red-600"
                       >
@@ -440,30 +474,39 @@ const UsersManager = () => {
               <Input
                 id="edit-name"
                 value={formData.name}
-                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, name: e.target.value })
+                }
                 placeholder="Введите имя пользователя"
               />
             </div>
-            
+
             <div>
               <Label htmlFor="edit-email">Email</Label>
               <Input
                 id="edit-email"
                 type="email"
                 value={formData.email}
-                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, email: e.target.value })
+                }
                 placeholder="user@antsupport.com"
               />
             </div>
-            
+
             <div>
               <Label htmlFor="edit-role">Роль</Label>
-              <Select value={formData.role} onValueChange={(value) => setFormData({ ...formData, role: value as User["role"] })}>
+              <Select
+                value={formData.role}
+                onValueChange={(value) =>
+                  setFormData({ ...formData, role: value as User["role"] })
+                }
+              >
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {roles.map(role => (
+                  {roles.map((role) => (
                     <SelectItem key={role.value} value={role.value}>
                       {role.label}
                     </SelectItem>
@@ -473,10 +516,16 @@ const UsersManager = () => {
             </div>
 
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsEditDialogOpen(false)}
+              >
                 Отмена
               </Button>
-              <Button onClick={handleEdit} disabled={!formData.name || !formData.email}>
+              <Button
+                onClick={handleEdit}
+                disabled={!formData.name || !formData.email}
+              >
                 Сохранить
               </Button>
             </div>
@@ -492,7 +541,8 @@ const UsersManager = () => {
               Пользователи не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменить фильтры поиска или добавьте нового пользователя.
+              Попробуйте изменить фильтры поиска или добавьте нового
+              пользователя.
             </p>
           </CardContent>
         </Card>

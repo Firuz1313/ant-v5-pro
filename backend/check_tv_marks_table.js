@@ -1,23 +1,23 @@
-import { query } from './src/utils/database.js';
+import { query } from "./src/utils/database.js";
 
 async function checkTVMarksTable() {
-    try {
-        console.log('Checking tv_interface_marks table...');
-        
-        // Check if table exists
-        const tableCheck = await query(`
+  try {
+    console.log("Checking tv_interface_marks table...");
+
+    // Check if table exists
+    const tableCheck = await query(`
             SELECT EXISTS (
                 SELECT FROM information_schema.tables 
                 WHERE table_schema = 'public' 
                 AND table_name = 'tv_interface_marks'
             );
         `);
-        
-        if (!tableCheck.rows[0].exists) {
-            console.log('❌ tv_interface_marks table does not exist');
-            console.log('🔧 Creating tv_interface_marks table...');
-            
-            await query(`
+
+    if (!tableCheck.rows[0].exists) {
+      console.log("❌ tv_interface_marks table does not exist");
+      console.log("🔧 Creating tv_interface_marks table...");
+
+      await query(`
                 CREATE TABLE tv_interface_marks (
                     id VARCHAR(255) PRIMARY KEY,
                     tv_interface_id VARCHAR(255) NOT NULL REFERENCES tv_interfaces(id) ON DELETE CASCADE,
@@ -57,35 +57,34 @@ async function checkTVMarksTable() {
                     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
                 );
             `);
-            
-            // Create indexes
-            await query(`
+
+      // Create indexes
+      await query(`
                 CREATE INDEX idx_tv_interface_marks_tv_interface_id ON tv_interface_marks(tv_interface_id);
                 CREATE INDEX idx_tv_interface_marks_step_id ON tv_interface_marks(step_id);
                 CREATE INDEX idx_tv_interface_marks_mark_type ON tv_interface_marks(mark_type);
                 CREATE INDEX idx_tv_interface_marks_active ON tv_interface_marks(is_active);
             `);
-            
-            console.log('✅ tv_interface_marks table created successfully');
-        } else {
-            console.log('✅ tv_interface_marks table exists');
-            
-            // Check columns
-            const columns = await query(`
+
+      console.log("✅ tv_interface_marks table created successfully");
+    } else {
+      console.log("✅ tv_interface_marks table exists");
+
+      // Check columns
+      const columns = await query(`
                 SELECT column_name, data_type 
                 FROM information_schema.columns 
                 WHERE table_name = 'tv_interface_marks' 
                 ORDER BY ordinal_position;
             `);
-            
-            console.log('Table columns:', columns.rows);
-        }
-        
-    } catch (error) {
-        console.error('❌ Error:', error);
-    } finally {
-        process.exit(0);
+
+      console.log("Table columns:", columns.rows);
     }
+  } catch (error) {
+    console.error("❌ Error:", error);
+  } finally {
+    process.exit(0);
+  }
 }
 
 checkTVMarksTable();

@@ -59,12 +59,17 @@ interface Device {
 }
 
 const DeviceManager = () => {
-  const { data: devices = [], isLoading: loading, error, refetch } = useDevices();
+  const {
+    data: devices = [],
+    isLoading: loading,
+    error,
+    refetch,
+  } = useDevices();
   const { data: problems = [] } = useProblems();
 
   // Helper function to get problems count for device
   const getProblemsForDevice = (deviceId: string) => {
-    return (problems || []).filter(p => p.deviceId === deviceId);
+    return (problems || []).filter((p) => p.deviceId === deviceId);
   };
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -231,7 +236,12 @@ const DeviceManager = () => {
   };
 
   const handleClearAllDevices = async () => {
-    if (!confirm('Вы уверены, что хотите удалить ВСЕ устройства? Это действие нельзя отменить!')) return;
+    if (
+      !confirm(
+        "Вы уверены, что хотите удалить ВСЕ устройства? Это действие нельзя отменить!",
+      )
+    )
+      return;
 
     try {
       // Удаляем все устройства по одному
@@ -240,10 +250,10 @@ const DeviceManager = () => {
       }
 
       await refetch(); // Обновляем список
-      alert('Все устройства удалены!');
+      alert("Все устройства удалены!");
     } catch (error) {
-      console.error('Error clearing devices:', error);
-      alert('Ошибка при удалении устройств');
+      console.error("Error clearing devices:", error);
+      alert("Ошибка при удалении устройств");
     }
   };
 

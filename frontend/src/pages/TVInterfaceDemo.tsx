@@ -1,16 +1,22 @@
-import React, { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import TVDisplay from '@/components/TVDisplay';
-import { TVInterface } from '@/types/tvInterface';
-import { tvInterfacesAPI } from '@/api/tvInterfaces';
-import { useDevices } from '@/hooks/useDevices';
-import { Monitor, RefreshCw } from 'lucide-react';
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import TVDisplay from "@/components/TVDisplay";
+import { TVInterface } from "@/types/tvInterface";
+import { tvInterfacesAPI } from "@/api/tvInterfaces";
+import { useDevices } from "@/hooks/useDevices";
+import { Monitor, RefreshCw } from "lucide-react";
 
 const TVInterfaceDemo = () => {
   const { devices } = useDevices();
-  const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
+  const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [tvInterfaces, setTVInterfaces] = useState<TVInterface[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
@@ -27,18 +33,18 @@ const TVInterfaceDemo = () => {
         setTVInterfaces(response.data);
       }
     } catch (error) {
-      console.error('Error loading TV interfaces:', error);
+      console.error("Error loading TV interfaces:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   // Фильтруем интерфейсы для выбранного устройства
-  const interfacesForDevice = selectedDeviceId 
-    ? tvInterfaces.filter(iface => iface.deviceId === selectedDeviceId)
+  const interfacesForDevice = selectedDeviceId
+    ? tvInterfaces.filter((iface) => iface.deviceId === selectedDeviceId)
     : [];
 
-  const selectedDevice = devices.find(d => d.id === selectedDeviceId);
+  const selectedDevice = devices.find((d) => d.id === selectedDeviceId);
 
   return (
     <div className="container mx-auto py-8 space-y-6">
@@ -65,7 +71,10 @@ const TVInterfaceDemo = () => {
               <label className="text-sm font-medium mb-2 block">
                 Выберите устройство
               </label>
-              <Select value={selectedDeviceId} onValueChange={setSelectedDeviceId}>
+              <Select
+                value={selectedDeviceId}
+                onValueChange={setSelectedDeviceId}
+              >
                 <SelectTrigger>
                   <SelectValue placeholder="Выберите устройство" />
                 </SelectTrigger>
@@ -79,13 +88,15 @@ const TVInterfaceDemo = () => {
               </Select>
             </div>
 
-            <Button 
-              onClick={loadTVInterfaces} 
+            <Button
+              onClick={loadTVInterfaces}
               disabled={isLoading}
               className="w-full"
               variant="outline"
             >
-              <RefreshCw className={`h-4 w-4 mr-2 ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCw
+                className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
+              />
               Обновить интерфейсы
             </Button>
 
@@ -93,9 +104,15 @@ const TVInterfaceDemo = () => {
               <div className="pt-4 border-t">
                 <h3 className="font-medium mb-2">Информация об устройстве</h3>
                 <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-                  <div><strong>Название:</strong> {selectedDevice.name}</div>
-                  <div><strong>Бренд:</strong> {selectedDevice.brand}</div>
-                  <div><strong>Модель:</strong> {selectedDevice.model}</div>
+                  <div>
+                    <strong>Название:</strong> {selectedDevice.name}
+                  </div>
+                  <div>
+                    <strong>Бренд:</strong> {selectedDevice.brand}
+                  </div>
+                  <div>
+                    <strong>Модель:</strong> {selectedDevice.model}
+                  </div>
                 </div>
               </div>
             )}
@@ -107,7 +124,7 @@ const TVInterfaceDemo = () => {
                 </h3>
                 <div className="space-y-2">
                   {interfacesForDevice.map((iface) => (
-                    <div 
+                    <div
                       key={iface.id}
                       className="text-sm p-2 bg-gray-50 dark:bg-gray-800 rounded"
                     >
@@ -118,7 +135,7 @@ const TVInterfaceDemo = () => {
                         </div>
                       )}
                       <div className="text-xs text-gray-500 mt-1">
-                        {iface.isActive ? '✅ Активен' : '❌ Неактивен'}
+                        {iface.isActive ? "✅ Активен" : "❌ Неактивен"}
                       </div>
                     </div>
                   ))}
@@ -152,23 +169,23 @@ const TVInterfaceDemo = () => {
                 isLoading={isLoading}
               />
             </div>
-            
+
             <div className="mt-4 text-sm text-gray-600 dark:text-gray-400">
               {selectedDeviceId ? (
                 interfacesForDevice.length > 0 ? (
                   <>
-                    Отображается интерфейс для устройства: <strong>{selectedDevice?.name}</strong>
+                    Отображается интерфейс для устройства:{" "}
+                    <strong>{selectedDevice?.name}</strong>
                     <br />
-                    {interfacesForDevice.some(i => i.screenshotData) 
-                      ? 'Найден кастомный скриншот интерфейса'
-                      : 'Используется стандартный интерфейс (нет загруженного скриншота)'
-                    }
+                    {interfacesForDevice.some((i) => i.screenshotData)
+                      ? "Найден кастомный скриншот интерфейса"
+                      : "Используется стандартный интерфейс (нет загруженного скриншота)"}
                   </>
                 ) : (
-                  'Для выбранного устройства нет созданных интерфейсов. Отображается стандартный экран.'
+                  "Для выбранного устройства нет созданных интерфейсов. Отображается стандартный экран."
                 )
               ) : (
-                'Выберите ус��ройство для п��осмотра интерфейса'
+                "Выберите ус��ройство для п��осмотра интерфейса"
               )}
             </div>
           </CardContent>
@@ -191,13 +208,22 @@ const TVInterfaceDemo = () => {
                 <li>Сохраните интерфейс</li>
               </ul>
             </div>
-            
+
             <div>
               <strong>2. Просмотр на странице диагностики:</strong>
               <ul className="list-disc list-inside ml-4 mt-1 space-y-1">
-                <li>Созданные интерфейсы автоматически отображаются на странице диагност��ки</li>
-                <li>Если для устройства есть активный интерфейс со скриншотом, он будет показан вместо стандартного экрана</li>
-                <li>Поддерживается fallback на стандартные экраны, если нет кастомного интерфейса</li>
+                <li>
+                  Созданные интерфейсы автоматически отображаются на странице
+                  диагност��ки
+                </li>
+                <li>
+                  Если для устройства есть активный интерфейс со скриншотом, он
+                  будет показан вместо стандартного экрана
+                </li>
+                <li>
+                  Поддерживается fallback на стандартные экраны, если нет
+                  кастомного интерфейса
+                </li>
               </ul>
             </div>
 

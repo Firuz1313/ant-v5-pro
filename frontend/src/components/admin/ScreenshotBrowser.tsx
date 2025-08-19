@@ -1,25 +1,25 @@
-import React, { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { 
-  Image as ImageIcon, 
-  Search, 
-  Upload, 
+import React, { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Badge } from "@/components/ui/badge";
+import {
+  Image as ImageIcon,
+  Search,
+  Upload,
   Check,
   X,
   FolderOpen,
   Grid3X3,
-  List
-} from 'lucide-react';
+  List,
+} from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-} from '@/components/ui/dialog';
-import { cn } from '@/lib/utils';
+} from "@/components/ui/dialog";
+import { cn } from "@/lib/utils";
 
 interface ScreenshotBrowserProps {
   open: boolean;
@@ -42,27 +42,32 @@ const ScreenshotBrowser: React.FC<ScreenshotBrowserProps> = ({
   open,
   onOpenChange,
   onSelectScreenshot,
-  currentDeviceId
+  currentDeviceId,
 }) => {
   // Screenshots state - would be loaded from API in real implementation
   const [screenshots, setScreenshots] = useState<Screenshot[]>([]);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filterType, setFilterType] = useState('all');
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterType, setFilterType] = useState("all");
+  const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
+  const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(
+    null,
+  );
 
   // Filter screenshots
-  const filteredScreenshots = screenshots.filter(screenshot => {
-    const matchesSearch = screenshot.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDevice = !currentDeviceId || screenshot.deviceId === currentDeviceId;
-    const matchesType = filterType === 'all' || screenshot.type === filterType;
-    
+  const filteredScreenshots = screenshots.filter((screenshot) => {
+    const matchesSearch = screenshot.name
+      .toLowerCase()
+      .includes(searchTerm.toLowerCase());
+    const matchesDevice =
+      !currentDeviceId || screenshot.deviceId === currentDeviceId;
+    const matchesType = filterType === "all" || screenshot.type === filterType;
+
     return matchesSearch && matchesDevice && matchesType;
   });
 
   const handleSelectScreenshot = () => {
     if (selectedScreenshot) {
-      const screenshot = screenshots.find(s => s.id === selectedScreenshot);
+      const screenshot = screenshots.find((s) => s.id === selectedScreenshot);
       if (screenshot) {
         onSelectScreenshot(screenshot.url);
         onOpenChange(false);
@@ -73,7 +78,7 @@ const ScreenshotBrowser: React.FC<ScreenshotBrowserProps> = ({
 
   const handleUpload = () => {
     // This would trigger a file upload dialog
-    console.log('Upload screenshot functionality would go here');
+    console.log("Upload screenshot functionality would go here");
   };
 
   return (
@@ -114,17 +119,17 @@ const ScreenshotBrowser: React.FC<ScreenshotBrowserProps> = ({
 
               <div className="flex border border-gray-300 rounded-md">
                 <Button
-                  variant={viewMode === 'grid' ? 'default' : 'outline'}
+                  variant={viewMode === "grid" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setViewMode('grid')}
+                  onClick={() => setViewMode("grid")}
                   className="rounded-r-none"
                 >
                   <Grid3X3 className="h-4 w-4" />
                 </Button>
                 <Button
-                  variant={viewMode === 'list' ? 'default' : 'outline'}
+                  variant={viewMode === "list" ? "default" : "outline"}
                   size="sm"
-                  onClick={() => setViewMode('list')}
+                  onClick={() => setViewMode("list")}
                   className="rounded-l-none"
                 >
                   <List className="h-4 w-4" />
@@ -145,9 +150,8 @@ const ScreenshotBrowser: React.FC<ScreenshotBrowserProps> = ({
                 <FolderOpen className="h-12 w-12 text-gray-400 mx-auto mb-4" />
                 <p className="text-gray-500 mb-4">
                   {screenshots.length === 0
-                    ? 'Скриншоты не найдены. Загрузите первый скриншот.'
-                    : 'Скриншоты не найдены по вашему запросу.'
-                  }
+                    ? "Скриншоты не найдены. Загрузите первый скриншот."
+                    : "Скриншоты не найдены по вашему запросу."}
                 </p>
                 <Button onClick={handleUpload} variant="outline">
                   <Upload className="h-4 w-4 mr-2" />
@@ -155,11 +159,13 @@ const ScreenshotBrowser: React.FC<ScreenshotBrowserProps> = ({
                 </Button>
               </div>
             ) : (
-              <div className={cn(
-                viewMode === 'grid' 
-                  ? 'grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4'
-                  : 'space-y-2'
-              )}>
+              <div
+                className={cn(
+                  viewMode === "grid"
+                    ? "grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+                    : "space-y-2",
+                )}
+              >
                 {filteredScreenshots.map((screenshot) => (
                   <Card
                     key={screenshot.id}
@@ -168,11 +174,11 @@ const ScreenshotBrowser: React.FC<ScreenshotBrowserProps> = ({
                       selectedScreenshot === screenshot.id
                         ? "ring-2 ring-blue-500 shadow-lg"
                         : "hover:ring-1 hover:ring-gray-300",
-                      viewMode === 'list' && "flex flex-row"
+                      viewMode === "list" && "flex flex-row",
                     )}
                     onClick={() => setSelectedScreenshot(screenshot.id)}
                   >
-                    {viewMode === 'grid' ? (
+                    {viewMode === "grid" ? (
                       <>
                         <div className="aspect-video bg-gray-100 rounded-t-lg flex items-center justify-center overflow-hidden">
                           <img
@@ -234,17 +240,13 @@ const ScreenshotBrowser: React.FC<ScreenshotBrowserProps> = ({
           {/* Action Buttons */}
           <div className="flex justify-between items-center pt-4 border-t">
             <p className="text-sm text-gray-500">
-              {filteredScreenshots.length === 0 
-                ? 'Скриншоты не найдены'
-                : `Найдено скриншотов: ${filteredScreenshots.length}`
-              }
+              {filteredScreenshots.length === 0
+                ? "Скриншоты не найдены"
+                : `Найдено скриншотов: ${filteredScreenshots.length}`}
             </p>
-            
+
             <div className="flex gap-2">
-              <Button
-                variant="outline"
-                onClick={() => onOpenChange(false)}
-              >
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
                 <X className="h-4 w-4 mr-2" />
                 Отмена
               </Button>

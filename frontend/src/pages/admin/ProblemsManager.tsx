@@ -310,7 +310,12 @@ const ProblemsManager = () => {
   };
 
   const handleClearAllProblems = async () => {
-    if (!confirm('Вы уверены, что хотите удалить ВСЕ проблемы? Это действие нельзя отменить!')) return;
+    if (
+      !confirm(
+        "Вы уверены, что хотите удалить ВСЕ проблемы? Это действие нельзя отменить!",
+      )
+    )
+      return;
 
     try {
       // Удаляем все проблемы по одной
@@ -318,10 +323,10 @@ const ProblemsManager = () => {
         await deleteProblem(problem.id);
       }
 
-      alert('Все проблемы удалены!');
+      alert("Все проблемы удалены!");
     } catch (error) {
-      console.error('Error clearing problems:', error);
-      alert('Ошибка при удалении проблем');
+      console.error("Error clearing problems:", error);
+      alert("Ошибка при удалении проблем");
     }
   };
 

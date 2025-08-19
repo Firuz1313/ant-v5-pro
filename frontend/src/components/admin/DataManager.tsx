@@ -53,8 +53,11 @@ interface ImportProgress {
 const DataManager = () => {
   // Mock functions for removed static functionality
   const changeLogs: any[] = [];
-  const exportData = async (options: any) => ({ downloadUrl: '' });
-  const importData = async (file: File, options: any) => ({ importedCount: 0, failedCount: 0 });
+  const exportData = async (options: any) => ({ downloadUrl: "" });
+  const importData = async (file: File, options: any) => ({
+    importedCount: 0,
+    failedCount: 0,
+  });
   const clearCache = () => {};
   const refreshData = async () => {};
 

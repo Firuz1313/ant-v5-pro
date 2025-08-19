@@ -25,11 +25,11 @@ const DiagnosticPage = () => {
     deviceId: string;
     problemId: string;
   }>();
-  
+
   // API hooks
   const { devices, loading: devicesLoading } = useDevices();
   const { problems, loading: problemsLoading } = useProblems({ deviceId });
-  
+
   // Local state
   const [currentStepNumber, setCurrentStepNumber] = useState(1);
   const [manualProgress, setManualProgress] = useState(false);
@@ -38,19 +38,22 @@ const DiagnosticPage = () => {
   const [loading, setLoading] = useState(true);
 
   // Derived state
-  const device = devices?.find(d => d.id === deviceId);
-  const problem = problems?.find(p => p.id === problemId);
-  const currentStepData = steps.find(step => step.stepNumber === currentStepNumber);
-  const progress = steps.length > 0 ? (currentStepNumber / steps.length) * 100 : 0;
+  const device = devices?.find((d) => d.id === deviceId);
+  const problem = problems?.find((p) => p.id === problemId);
+  const currentStepData = steps.find(
+    (step) => step.stepNumber === currentStepNumber,
+  );
+  const progress =
+    steps.length > 0 ? (currentStepNumber / steps.length) * 100 : 0;
 
   // Load steps and remote when component mounts
   useEffect(() => {
     const loadData = async () => {
       if (!problemId || !deviceId) return;
-      
+
       try {
         setLoading(true);
-        
+
         // Load steps for the problem
         const stepsResponse = await stepsApi.getByProblem(problemId);
         setSteps(stepsResponse || []);
@@ -67,11 +70,11 @@ const DiagnosticPage = () => {
               setRemote(deviceRemotes[0]);
             }
           } catch (err) {
-            console.log('No remotes found for device');
+            console.log("No remotes found for device");
           }
         }
       } catch (error) {
-        console.error('Error loading diagnostic data:', error);
+        console.error("Error loading diagnostic data:", error);
       } finally {
         setLoading(false);
       }
@@ -181,11 +184,15 @@ const DiagnosticPage = () => {
                   <Tv className="h-5 w-5 text-blue-400 mr-2" />
                   <h3 className="font-semibold text-white">Экран ТВ</h3>
                 </div>
-                
+
                 {currentStepData?.tvInterfaceId ? (
-                  <TVInterfaceDisplay 
+                  <TVInterfaceDisplay
                     tvInterfaceId={currentStepData.tvInterfaceId}
-                    highlightAreas={currentStepData.highlightTVArea ? [currentStepData.highlightTVArea] : []}
+                    highlightAreas={
+                      currentStepData.highlightTVArea
+                        ? [currentStepData.highlightTVArea]
+                        : []
+                    }
                   />
                 ) : (
                   <TVDisplay />
@@ -200,14 +207,16 @@ const DiagnosticPage = () => {
                   <Lightbulb className="h-5 w-5 text-yellow-400 mr-2" />
                   <h3 className="font-semibold text-white">Инструкция</h3>
                 </div>
-                
+
                 {currentStepData ? (
                   <div className="text-white space-y-3">
-                    <h4 className="font-medium text-lg">{currentStepData.title}</h4>
+                    <h4 className="font-medium text-lg">
+                      {currentStepData.title}
+                    </h4>
                     <p className="text-blue-100 leading-relaxed">
                       {currentStepData.instruction}
                     </p>
-                    
+
                     {currentStepData.hint && (
                       <div className="bg-blue-500/20 p-3 rounded-lg">
                         <p className="text-blue-200 text-sm">
@@ -239,9 +248,9 @@ const DiagnosticPage = () => {
                   <div className="h-5 w-5 bg-red-500 rounded-full mr-2"></div>
                   <h3 className="font-semibold text-white">Пульт управления</h3>
                 </div>
-                
+
                 {remote ? (
-                  <RemoteControl 
+                  <RemoteControl
                     remote={remote}
                     highlightButton={currentStepData?.highlightRemoteButton}
                     onButtonClick={handleManualProgress}

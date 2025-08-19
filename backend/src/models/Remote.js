@@ -1,14 +1,14 @@
-import BaseModel from './BaseModel.js';
+import BaseModel from "./BaseModel.js";
 
 /**
  * Remote Model - Модель пультов дистанционного управления
- * 
+ *
  * Управляет интерактивными моделями пультов ДУ для различных устройств.
  * Поддерживает SVG-графику, кликабельные зоны и кнопки.
  */
 class Remote extends BaseModel {
   constructor() {
-    super('remotes');
+    super("remotes");
   }
 
   /**
@@ -19,36 +19,36 @@ class Remote extends BaseModel {
 
     // Обязательные поля при создании
     if (!isUpdate) {
-      if (!data.name) errors.push('Название пульта обязательно');
-      if (!data.manufacturer) errors.push('Производитель обязателен');
-      if (!data.model) errors.push('Модель обязательна');
+      if (!data.name) errors.push("Название пульта обязательно");
+      if (!data.manufacturer) errors.push("Производитель обязателен");
+      if (!data.model) errors.push("Модель обязательна");
     }
 
     // Валидация layout
-    const validLayouts = ['standard', 'compact', 'smart', 'custom'];
+    const validLayouts = ["standard", "compact", "smart", "custom"];
     if (data.layout && !validLayouts.includes(data.layout)) {
-      errors.push(`Layout должен быть одним из: ${validLayouts.join(', ')}`);
+      errors.push(`Layout должен быть одним из: ${validLayouts.join(", ")}`);
     }
 
     // Валидация dimensions (должен быть объект с width/height)
     if (data.dimensions) {
-      if (typeof data.dimensions !== 'object') {
-        errors.push('Dimensions должен быть объектом');
+      if (typeof data.dimensions !== "object") {
+        errors.push("Dimensions должен быть объектом");
       } else {
         if (!data.dimensions.width || !data.dimensions.height) {
-          errors.push('Dimensions должен содержать width и height');
+          errors.push("Dimensions должен содержать width и height");
         }
       }
     }
 
     // Валидация buttons (должен быть массив)
     if (data.buttons && !Array.isArray(data.buttons)) {
-      errors.push('Buttons должен быть массивом');
+      errors.push("Buttons должен быть массивом");
     }
 
     // Валидация zones (должен быть массив)
     if (data.zones && !Array.isArray(data.zones)) {
-      errors.push('Zones должен быть массивом');
+      errors.push("Zones должен быть массивом");
     }
 
     return errors;
@@ -63,12 +63,12 @@ class Remote extends BaseModel {
         `SELECT * FROM ${this.tableName} 
          WHERE device_id = $1 AND is_active = true 
          ORDER BY is_default DESC, usage_count DESC, name`,
-        [deviceId]
+        [deviceId],
       );
-      
+
       return this.formatResponse(result.rows);
     } catch (error) {
-      throw this.handleError(error, 'getByDevice');
+      throw this.handleError(error, "getByDevice");
     }
   }
 
@@ -81,12 +81,12 @@ class Remote extends BaseModel {
         `SELECT * FROM ${this.tableName} 
          WHERE device_id = $1 AND is_default = true AND is_active = true 
          LIMIT 1`,
-        [deviceId]
+        [deviceId],
       );
-      
+
       return result.rows[0] ? this.formatResponse(result.rows[0]) : null;
     } catch (error) {
-      throw this.handleError(error, 'getDefaultForDevice');
+      throw this.handleError(error, "getDefaultForDevice");
     }
   }
 
@@ -101,7 +101,7 @@ class Remote extends BaseModel {
           `UPDATE ${this.tableName} 
            SET is_default = false, updated_at = NOW() 
            WHERE device_id = $1`,
-          [deviceId]
+          [deviceId],
         );
 
         // Устанавливаем default для выбранного пульта
@@ -109,13 +109,13 @@ class Remote extends BaseModel {
           `UPDATE ${this.tableName} 
            SET is_default = true, updated_at = NOW() 
            WHERE id = $1 AND device_id = $2`,
-          [remoteId, deviceId]
+          [remoteId, deviceId],
         );
       });
 
-      return { success: true, message: 'Пульт установлен как default' };
+      return { success: true, message: "Пульт установлен как default" };
     } catch (error) {
-      throw this.handleError(error, 'setAsDefault');
+      throw this.handleError(error, "setAsDefault");
     }
   }
 
@@ -131,12 +131,12 @@ class Remote extends BaseModel {
              updated_at = NOW() 
          WHERE id = $1 AND is_active = true 
          RETURNING usage_count`,
-        [remoteId]
+        [remoteId],
       );
 
       return result.rows[0] || null;
     } catch (error) {
-      throw this.handleError(error, 'incrementUsage');
+      throw this.handleError(error, "incrementUsage");
     }
   }
 
@@ -147,7 +147,7 @@ class Remote extends BaseModel {
     try {
       const original = await this.findById(remoteId);
       if (!original) {
-        throw new Error('Пульт для дублирования не найден');
+        throw new Error("Пульт для дублирования не найден");
       }
 
       const duplicateData = {
@@ -159,12 +159,12 @@ class Remote extends BaseModel {
         last_used: null,
         created_at: undefined,
         updated_at: undefined,
-        ...newData
+        ...newData,
       };
 
       return await this.create(duplicateData);
     } catch (error) {
-      throw this.handleError(error, 'duplicate');
+      throw this.handleError(error, "duplicate");
     }
   }
 
@@ -183,17 +183,17 @@ class Remote extends BaseModel {
         FROM ${this.tableName} 
         WHERE is_active = true
       `;
-      
+
       const params = [];
       if (deviceId) {
-        query += ' AND device_id = $1';
+        query += " AND device_id = $1";
         params.push(deviceId);
       }
 
       const result = await this.query(query, params);
       return result.rows[0];
     } catch (error) {
-      throw this.handleError(error, 'getUsageStats');
+      throw this.handleError(error, "getUsageStats");
     }
   }
 
@@ -235,7 +235,7 @@ class Remote extends BaseModel {
         paramCounter++;
       }
 
-      query += ' ORDER BY r.usage_count DESC, r.name';
+      query += " ORDER BY r.usage_count DESC, r.name";
 
       if (filters.limit) {
         query += ` LIMIT $${paramCounter}`;
@@ -245,7 +245,7 @@ class Remote extends BaseModel {
       const result = await this.query(query, params);
       return this.formatResponse(result.rows);
     } catch (error) {
-      throw this.handleError(error, 'search');
+      throw this.handleError(error, "search");
     }
   }
 
@@ -254,7 +254,7 @@ class Remote extends BaseModel {
    */
   formatResponse(data) {
     if (Array.isArray(data)) {
-      return data.map(item => this.formatResponse(item));
+      return data.map((item) => this.formatResponse(item));
     }
 
     if (!data) return data;
@@ -262,14 +262,20 @@ class Remote extends BaseModel {
     return {
       ...data,
       // Парсим JSON поля
-      dimensions: typeof data.dimensions === 'string' ? 
-        JSON.parse(data.dimensions) : data.dimensions,
-      buttons: typeof data.buttons === 'string' ? 
-        JSON.parse(data.buttons) : data.buttons,
-      zones: typeof data.zones === 'string' ? 
-        JSON.parse(data.zones) : data.zones,
-      metadata: typeof data.metadata === 'string' ? 
-        JSON.parse(data.metadata) : data.metadata,
+      dimensions:
+        typeof data.dimensions === "string"
+          ? JSON.parse(data.dimensions)
+          : data.dimensions,
+      buttons:
+        typeof data.buttons === "string"
+          ? JSON.parse(data.buttons)
+          : data.buttons,
+      zones:
+        typeof data.zones === "string" ? JSON.parse(data.zones) : data.zones,
+      metadata:
+        typeof data.metadata === "string"
+          ? JSON.parse(data.metadata)
+          : data.metadata,
       // Преобразуем числовые поля
       usage_count: parseInt(data.usage_count) || 0,
     };
