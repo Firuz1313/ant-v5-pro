@@ -73,7 +73,7 @@ interface DiagnosticStep {
   instruction: string;
   highlightRemoteButton?: string;
   highlightTVArea?: string;
-  tvInterfaceId?: string; // Обновлено для работы с ��астоя��ими интерфейсами
+  tvInterfaceId?: string; // Обновлено для работы с настоя��ими интерфейсами
   requiredAction?: string;
   hint?: string;
   remoteId?: string;
@@ -119,7 +119,7 @@ const StepsManagerNew = () => {
     }
   };
 
-  // Состояние для ТВ интерф��йсов
+  // Состояние для ТВ интерфейсов
   const [tvInterfaces, setTVInterfaces] = useState<TVInterfaceAPI[]>([]);
   const [selectedTVInterface, setSelectedTVInterface] =
     useState<TVInterfaceAPI | null>(null);
@@ -370,35 +370,32 @@ const StepsManagerNew = () => {
   const handleEdit = async () => {
     if (!selectedStep) return;
 
-    const updatedFormData = {
-      ...formData,
-      highlightRemoteButton:
-        formData.highlightRemoteButton === "none"
-          ? undefined
-          : formData.highlightRemoteButton,
-      highlightTVArea:
-        formData.highlightTVArea === "none"
-          ? undefined
-          : formData.highlightTVArea,
-      tvInterfaceId:
-        formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
+    const updatedData = {
+      title: formData.title,
+      description: formData.description,
+      instruction: formData.instruction,
+      tvInterfaceId: formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
       remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
-      buttonPosition:
-        formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
-          ? undefined
-          : formData.buttonPosition,
-      tvAreaPosition:
-        formData.tvAreaPosition.x === 0 && formData.tvAreaPosition.y === 0
-          ? undefined
-          : formData.tvAreaPosition,
-      tvAreaRect:
-        !formData.tvAreaRect || formData.tvAreaRect.width === 0 || formData.tvAreaRect.height === 0
-          ? undefined
-          : formData.tvAreaRect,
+      buttonPosition: (formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0) ? undefined : formData.buttonPosition,
+      tvAreaPosition: (formData.tvAreaPosition.x === 0 && formData.tvAreaPosition.y === 0) ? undefined : formData.tvAreaPosition,
+      tvAreaRect: (!formData.tvAreaRect || formData.tvAreaRect.width === 0 || formData.tvAreaRect.height === 0) ? undefined : formData.tvAreaRect,
+      hint: formData.hint,
+      requiredAction: formData.requiredAction,
     };
 
     try {
-      await updateStep(selectedStep.id, updatedFormData);
+      await stepsApi.update(selectedStep.id, updatedData);
+
+      // If step has TV interface markings, update them
+      if (formData.tvInterfaceId !== "none" && (formData.tvAreaPosition.x > 0 || formData.tvAreaRect?.width > 0)) {
+        // Delete existing marks for this step and create new ones
+        await tvInterfaceMarksAPI.deleteByStepId(selectedStep.id);
+        await saveTVInterfaceMarkForStep(selectedStep.id, formData.tvInterfaceId, formData);
+      }
+
+      // Reload steps
+      await loadInitialData();
+
       setIsEditDialogOpen(false);
       setSelectedStep(null);
       resetForm();
@@ -796,7 +793,7 @@ const StepsManagerNew = () => {
                   <div className="text-center text-gray-500">
                     <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
                     <p className="text-lg font-medium">
-                      ��зображение интерфейса не загружено
+                      Изображение интерфейса не загружено
                     </p>
                     <p className="text-sm">
                       Загрузите изображение в разделе "Интерфейсы ТВ"
@@ -1522,7 +1519,7 @@ const StepsManagerNew = () => {
               Шаги не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменит�� фильтры поиска или создайте новый шаг.
+              Попр��буйте изменит�� фильтры поиска или создайте новый шаг.
             </p>
           </CardContent>
         </Card>
