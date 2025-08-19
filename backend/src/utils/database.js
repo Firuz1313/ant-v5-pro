@@ -27,7 +27,7 @@ if (process.env.DATABASE_URL) {
     // Настройки pool соединений
     max: 20, // максимальное количество соединений в pool
     min: 2, // минимальное количество соединений
-    idleTimeoutMillis: 30000, // время простоя перед закрытием ��оединения
+    idleTimeoutMillis: 30000, // время простоя перед закрытием ���оединения
     connectionTimeoutMillis: 10000, // таймаут подключения
     maxUses: 7500, // максимальное количество использований соединения
   };
@@ -174,9 +174,6 @@ export async function transaction(callback) {
 
 // Функция создания базы данных (если не существует)
 export async function createDatabase() {
-  if (USE_MOCK_DB && mockDb) {
-    return await mockDb.createDatabase();
-  }
 
   const adminConfig = {
     ...dbConfig,
@@ -198,7 +195,7 @@ export async function createDatabase() {
     if (checkResult.rows.length === 0) {
       console.log(`📊 Создание базы данных: ${dbConfig.database}`);
       await client.query(`CREATE DATABASE "${dbConfig.database}"`);
-      console.log("✅ База данных создана ��спешно");
+      console.log("��� База данных создана ��спешно");
     } else {
       console.log(`📊 База данных ${dbConfig.database} уже существует`);
     }
@@ -207,11 +204,7 @@ export async function createDatabase() {
     // Fallback to mock database
     if (!USE_MOCK_DB) {
       console.log("🔧 Falling back to mock database...");
-      process.env.USE_MOCK_DB = "true";
-      if (!mockDb) {
-        mockDb = await import("./mockDatabase.js");
-      }
-      return await mockDb.createDatabase();
+      console.error("❌ Failed to create PostgreSQL database");
     }
     throw error;
   } finally {
@@ -322,7 +315,7 @@ export async function closePool() {
   try {
     console.log("🔄 Закрытие пула соединений PostgreSQL...");
     await pool.end();
-    console.log("✅ Пул соединений закрыт");
+    console.log("✅ Пул со��динений закрыт");
   } catch (error) {
     console.error("❌ Ошибка закрытия п��ла:", error.message);
   }
@@ -365,7 +358,7 @@ export async function cleanupOldData(daysToKeep = 90) {
       deletedLogs: logsResult.rowCount,
     };
   } catch (error) {
-    console.error("❌ Ошибка очистки данных:", error.message);
+    console.error("❌ Ошибка очис��ки данных:", error.message);
     throw error;
   }
 }
