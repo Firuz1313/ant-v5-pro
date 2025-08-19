@@ -121,10 +121,6 @@ export async function testConnection() {
 
 // Функция выполнения запроса с логированием
 export async function query(text, params = []) {
-  if (USE_MOCK_DB && mockDb) {
-    return await mockDb.query(text, params);
-  }
-
   const start = Date.now();
   let client;
 
@@ -378,7 +374,7 @@ export async function cleanupOldData(daysToKeep = 90) {
       [cutoffDate],
     );
 
-    console.log(`✅ Удалено сессий: ${sessionsResult.rowCount}`);
+    console.log(`✅ Удале��о сессий: ${sessionsResult.rowCount}`);
     console.log(`✅ Удалено логов: ${logsResult.rowCount}`);
 
     // Обновляем статистику
