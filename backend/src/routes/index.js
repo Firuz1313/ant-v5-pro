@@ -5,7 +5,6 @@ import stepRoutes from "./stepRoutes.js";
 import sessionRoutes from "./sessionRoutes.js";
 import tvInterfaceRoutes from "./tvInterfaceRoutes.js";
 import tvInterfaceMarkRoutes from "./tvInterfaceMarkRoutes.js";
-import cleanupRoutes from "./cleanupRoutes.js";
 
 const router = express.Router();
 
@@ -214,7 +213,6 @@ router.use(`${API_V1_PREFIX}/steps`, stepRoutes);
 router.use(`${API_V1_PREFIX}/sessions`, sessionRoutes);
 router.use(`${API_V1_PREFIX}/tv-interfaces`, tvInterfaceRoutes);
 router.use(`${API_V1_PREFIX}/tv-interface-marks`, tvInterfaceMarkRoutes);
-router.use(`${API_V1_PREFIX}/cleanup`, cleanupRoutes);
 
 // Обработчик для несуществующих эндпоинтов API
 router.use("*", (req, res) => {
