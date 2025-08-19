@@ -107,7 +107,7 @@ class TVInterface extends BaseModel {
           d.model as device_model
         FROM ${this.tableName} ti
         LEFT JOIN devices d ON ti.device_id = d.id
-        WHERE ti.device_id = $1 AND ti.deleted_at IS NULL AND ti.is_active = true
+        WHERE ti.device_id = $1 AND ti.is_active = true
         ORDER BY ti.created_at DESC
       `;
 
@@ -194,7 +194,7 @@ class TVInterface extends BaseModel {
         updated_at: new Date().toISOString(),
       };
 
-      // Обновляем только переданные поля
+      // Обновляем только переданные пол��
       if (data.name !== undefined) updateData.name = data.name.trim();
       if (data.description !== undefined)
         updateData.description = data.description?.trim() || "";
@@ -232,7 +232,7 @@ class TVInterface extends BaseModel {
           d.model as device_model
         FROM ${this.tableName} ti
         LEFT JOIN devices d ON ti.device_id = d.id
-        WHERE ti.id = $1 AND ti.deleted_at IS NULL
+        WHERE ti.id = $1 AND ti.is_active = true
       `;
 
       const result = await this.query(query, [id]);
@@ -326,7 +326,7 @@ class TVInterface extends BaseModel {
           COUNT(CASE WHEN is_active = false THEN 1 END) as inactive,
           COUNT(DISTINCT device_id) as devices_with_interfaces
         FROM ${this.tableName} 
-        WHERE deleted_at IS NULL
+        WHERE is_active = true
       `;
 
       const result = await this.query(query);
