@@ -40,7 +40,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { useData } from "@/contexts/DataContext";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
+import { devicesApi, problemsApi } from "@/api";
 
 interface Device {
   id: string;
@@ -57,13 +59,13 @@ interface Device {
 }
 
 const DeviceManager = () => {
-  const {
-    devices,
-    createDevice,
-    updateDevice,
-    deleteDevice,
-    getProblemsForDevice,
-  } = useData();
+  const { devices, loading, error, refetch } = useDevices();
+  const { problems } = useProblems();
+
+  // Helper function to get problems count for device
+  const getProblemsForDevice = (deviceId: string) => {
+    return (problems || []).filter(p => p.deviceId === deviceId);
+  };
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -254,7 +256,7 @@ const DeviceManager = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Добавить новую приставку</DialogTitle>
+                <DialogTitle>Добавить новую п��иставку</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
