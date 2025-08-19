@@ -1012,7 +1012,7 @@ const RemoteBuilder = () => {
                 <SelectContent>
                   <SelectItem value="all">Все приставки</SelectItem>
                   <SelectItem value="universal">Универсальные</SelectItem>
-                  {devices.map((device) => (
+                  {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
                     </SelectItem>
@@ -1052,7 +1052,7 @@ const RemoteBuilder = () => {
                   <CardTitle className="text-lg">{remote.name}</CardTitle>
                   <div className="flex items-center space-x-1">
                     {remote.isDefault && (
-                      <Badge variant="default">По умолчанию</Badge>
+                      <Badge variant="default">По ум��лчанию</Badge>
                     )}
                     <Badge variant={remote.isActive ? "default" : "secondary"}>
                       {remote.isActive ? "Активный" : "Неактивный"}
@@ -1275,7 +1275,7 @@ const RemoteBuilder = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="universal">Универсальный</SelectItem>
-                    {devices.map((device) => (
+                    {activeDevices.map((device) => (
                       <SelectItem key={device.id} value={device.id}>
                         {device.name}
                       </SelectItem>
