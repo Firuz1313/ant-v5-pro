@@ -19,10 +19,8 @@ import { devicesApi } from "./devices";
 import { problemsApi } from "./problems";
 import { stepsApi } from "./steps";
 import { sessionsApi } from "./sessions";
-import { cleanupAPI } from "./cleanup";
-
 // Re-export API services
-export { devicesApi, problemsApi, stepsApi, sessionsApi, cleanupAPI };
+export { devicesApi, problemsApi, stepsApi, sessionsApi };
 
 // Export types for consumers
 export type { ApiClientConfig, RequestOptions } from "./client";
@@ -105,7 +103,6 @@ export const api = {
   problems: problemsApi,
   steps: stepsApi,
   sessions: sessionsApi,
-  cleanup: cleanupAPI,
   health: checkApiHealth,
   info: getApiInfo,
   docs: getApiDocs,
