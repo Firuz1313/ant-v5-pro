@@ -1,4 +1,4 @@
-mport pkg from "pg";
+import pkg from "pg";
 import dotenv from "dotenv";
 import fs from "fs";
 import path from "path";
@@ -90,7 +90,7 @@ export async function testConnection() {
       version: result.rows[0].postgres_version,
     };
   } catch (error) {
-    console.error("❌ Ошибка подключения к PostgreSQL:", error.message);
+    console.error("❌ Ошибка подключ��ния к PostgreSQL:", error.message);
 
     // Fallback to mock database
     if (!USE_MOCK_DB) {
@@ -270,7 +270,7 @@ export async function runMigrations() {
 
     for (const filename of migrationFiles) {
       if (executedMigrations.has(filename)) {
-        console.log(`⏭️  Миграция ${filename} уже выполнена, пропускаем`);
+        console.log(`⏭️  Миграция ${filename} уже выполне��а, пропускаем`);
         continue;
       }
 
