@@ -12,129 +12,7 @@ import {
   incrementRemoteUsage,
   getRemoteStats
 } from '../controllers/remoteController.js';
-import { validateRequest } from '../middleware/validateRequest.js';
-
 const router = express.Router();
-
-// Схемы валидации
-const createRemoteSchema = Joi.object({
-  name: Joi.string().max(255).required(),
-  manufacturer: Joi.string().max(255).required(),
-  model: Joi.string().max(255).required(),
-  device_id: Joi.string().max(255).allow(null).optional(),
-  description: Joi.string().allow('', null).optional(),
-  layout: Joi.string().valid('standard', 'compact', 'smart', 'custom').default('standard'),
-  color_scheme: Joi.string().max(50).default('dark'),
-  image_url: Joi.string().max(500).allow('', null).optional(),
-  image_data: Joi.string().allow('', null).optional(),
-  svg_data: Joi.string().allow('', null).optional(),
-  dimensions: Joi.object({
-    width: Joi.number().positive().required(),
-    height: Joi.number().positive().required()
-  }).default({ width: 200, height: 500 }),
-  buttons: Joi.array().items(Joi.object({
-    id: Joi.string().required(),
-    name: Joi.string().required(),
-    x: Joi.number().required(),
-    y: Joi.number().required(),
-    width: Joi.number().positive().required(),
-    height: Joi.number().positive().required(),
-    type: Joi.string().optional(),
-    action: Joi.string().optional(),
-    svg_path: Joi.string().allow('', null).optional(),
-    key_code: Joi.string().allow('', null).optional()
-  })).default([]),
-  zones: Joi.array().items(Joi.object({
-    id: Joi.string().required(),
-    name: Joi.string().required(),
-    x: Joi.number().required(),
-    y: Joi.number().required(),
-    width: Joi.number().positive().required(),
-    height: Joi.number().positive().required(),
-    color: Joi.string().optional(),
-    description: Joi.string().allow('', null).optional()
-  })).default([]),
-  is_default: Joi.boolean().default(false),
-  is_active: Joi.boolean().default(true),
-  metadata: Joi.object().default({})
-});
-
-const updateRemoteSchema = Joi.object({
-  name: Joi.string().max(255).optional(),
-  manufacturer: Joi.string().max(255).optional(),
-  model: Joi.string().max(255).optional(),
-  device_id: Joi.string().max(255).allow(null).optional(),
-  description: Joi.string().allow('', null).optional(),
-  layout: Joi.string().valid('standard', 'compact', 'smart', 'custom').optional(),
-  color_scheme: Joi.string().max(50).optional(),
-  image_url: Joi.string().max(500).allow('', null).optional(),
-  image_data: Joi.string().allow('', null).optional(),
-  svg_data: Joi.string().allow('', null).optional(),
-  dimensions: Joi.object({
-    width: Joi.number().positive().required(),
-    height: Joi.number().positive().required()
-  }).optional(),
-  buttons: Joi.array().items(Joi.object({
-    id: Joi.string().required(),
-    name: Joi.string().required(),
-    x: Joi.number().required(),
-    y: Joi.number().required(),
-    width: Joi.number().positive().required(),
-    height: Joi.number().positive().required(),
-    type: Joi.string().optional(),
-    action: Joi.string().optional(),
-    svg_path: Joi.string().allow('', null).optional(),
-    key_code: Joi.string().allow('', null).optional()
-  })).optional(),
-  zones: Joi.array().items(Joi.object({
-    id: Joi.string().required(),
-    name: Joi.string().required(),
-    x: Joi.number().required(),
-    y: Joi.number().required(),
-    width: Joi.number().positive().required(),
-    height: Joi.number().positive().required(),
-    color: Joi.string().optional(),
-    description: Joi.string().allow('', null).optional()
-  })).optional(),
-  is_default: Joi.boolean().optional(),
-  is_active: Joi.boolean().optional(),
-  metadata: Joi.object().optional()
-});
-
-const duplicateRemoteSchema = Joi.object({
-  name: Joi.string().max(255).optional(),
-  device_id: Joi.string().max(255).allow(null).optional(),
-  description: Joi.string().allow('', null).optional()
-});
-
-const querySchema = Joi.object({
-  page: Joi.number().integer().min(1).default(1),
-  limit: Joi.number().integer().min(1).max(100).default(20),
-  search: Joi.string().max(255).allow('').optional(),
-  device_id: Joi.string().max(255).optional(),
-  layout: Joi.string().valid('standard', 'compact', 'smart', 'custom').optional(),
-  manufacturer: Joi.string().max(255).optional(),
-  sort: Joi.string().valid(
-    'name_asc', 'name_desc',
-    'usage_count_asc', 'usage_count_desc',
-    'created_at_asc', 'created_at_desc',
-    'manufacturer_asc', 'manufacturer_desc'
-  ).default('usage_count_desc')
-});
-
-// Валидация параметров
-const idParamSchema = Joi.object({
-  id: Joi.string().required()
-});
-
-const deviceIdParamSchema = Joi.object({
-  deviceId: Joi.string().required()
-});
-
-const setDefaultParamSchema = Joi.object({
-  id: Joi.string().required(),
-  deviceId: Joi.string().required()
-});
 
 /**
  * @route GET /api/v1/remotes
@@ -145,7 +23,7 @@ router.get('/', validateRequest({ query: querySchema }), getRemotes);
 
 /**
  * @route GET /api/v1/remotes/stats
- * @desc Получение статистики использования пультов
+ * @desc Получен��е статистики использования пультов
  * @access Public
  */
 router.get('/stats', getRemoteStats);
