@@ -119,7 +119,7 @@ const StepsManagerNew = () => {
     }
   };
 
-  // Состояние для ТВ интерфейсов
+  // Состояни�� для ТВ интерфейсов
   const [tvInterfaces, setTVInterfaces] = useState<TVInterfaceAPI[]>([]);
   const [selectedTVInterface, setSelectedTVInterface] =
     useState<TVInterfaceAPI | null>(null);
@@ -228,23 +228,23 @@ const StepsManagerNew = () => {
 
   const getAvailableProblems = () => {
     if (formData.deviceId) {
-      return getProblemsForDevice(formData.deviceId);
+      return (problems || []).filter(p => p.deviceId === formData.deviceId && p.status === "published");
     }
-    return problems.filter((p) => p.status === "published");
+    return (problems || []).filter((p) => p.status === "published");
   };
 
   const getAvailableRemotes = () => {
     if (formData.deviceId) {
-      return getRemotesForDevice(formData.deviceId);
+      return (remotes || []).filter(r => r.deviceId === formData.deviceId);
     }
-    return getActiveRemotes();
+    return (remotes || []).filter(r => r.isActive);
   };
 
   const getFilteredRemotes = () => {
     if (filterDevice === "all") {
-      return getActiveRemotes();
+      return (remotes || []).filter(r => r.isActive);
     }
-    return getRemotesForDevice(filterDevice);
+    return (remotes || []).filter(r => r.deviceId === filterDevice);
   };
 
   const getAvailableTVInterfaces = () => {
@@ -419,7 +419,7 @@ const StepsManagerNew = () => {
       tvAreaPosition: step.tvAreaPosition || { x: 0, y: 0 },
     });
 
-    // Загрузить интерфейсы для текущего ус��ро��ства
+    // Загрузить интерфейсы для текущего устро��ства
     if (step.deviceId) {
       loadTVInterfacesForDevice(step.deviceId);
     }
@@ -800,7 +800,7 @@ const StepsManagerNew = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Потяните мыш��ю по экрану ТВ, чтобы выделить прямоугольную область
+                      Потяните мышью по экрану ТВ, чтобы выделить прямоугольную область
                     </p>
                   </AlertDescription>
                 </Alert>
@@ -1377,7 +1377,7 @@ const StepsManagerNew = () => {
                               className="text-red-600"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Уд��лить
+                              Уд����лить
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
