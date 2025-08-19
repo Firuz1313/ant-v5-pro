@@ -13,11 +13,18 @@ import {
 } from "lucide-react";
 import { useState, useEffect } from "react";
 import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
 
 const DeviceSelection = () => {
   const navigate = useNavigate();
-  const { devices, loading, error } = useDevices();
+  const { data: devices = [] } = useDevices();
+  const { data: problems = [] } = useProblems();
   const [animatedIcons, setAnimatedIcons] = useState<boolean[]>([]);
+
+  // Helper function to get problems count for device
+  const getProblemsForDevice = (deviceId: string) => {
+    return problems.filter((p: any) => p.deviceId === deviceId);
+  };
 
   useEffect(() => {
     // Создаем анимацию для floating icons
