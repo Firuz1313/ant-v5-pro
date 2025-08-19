@@ -52,13 +52,16 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import { useData } from "@/contexts/DataContext";
 import {
   tvInterfacesAPI,
   TVInterfaceAPI,
   ClickableArea,
   HighlightArea,
 } from "@/api/tvInterfaces";
+import { tvInterfaceMarksAPI, TVInterfaceMark } from "@/api/tvInterfaceMarks";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
+import { stepsApi, remotesApi } from "@/api";
 
 interface DiagnosticStep {
   id: string;
@@ -83,22 +86,14 @@ interface DiagnosticStep {
 }
 
 const StepsManagerNew = () => {
-  const {
-    steps,
-    createStep,
-    updateStep,
-    deleteStep,
-    reorderSteps,
-    problems,
-    devices,
-    remotes,
-    getActiveDevices,
-    getActiveRemotes,
-    getRemoteById,
-    getProblemsForDevice,
-    getRemotesForDevice,
-    getDefaultRemoteForDevice,
-  } = useData();
+  // API hooks
+  const { devices } = useDevices();
+  const { problems } = useProblems();
+
+  // Local state for steps and remotes
+  const [steps, setSteps] = useState<DiagnosticStep[]>([]);
+  const [remotes, setRemotes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
   // Состояние для ТВ интерфейсов
   const [tvInterfaces, setTVInterfaces] = useState<TVInterfaceAPI[]>([]);
