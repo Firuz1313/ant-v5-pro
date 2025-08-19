@@ -46,10 +46,11 @@ export const getRemotes = async (req, res) => {
     }
 
     // Обычный список с пагинацией
-    const result = await remoteModel.getAll({
+    const result = await remoteModel.findAll({}, {
       offset,
       limit: parseInt(limit),
-      orderBy: sort.replace('_', ' ').replace('desc', 'DESC').replace('asc', 'ASC')
+      sortBy: sort.split('_')[0],
+      sortOrder: sort.includes('desc') ? 'DESC' : 'ASC'
     });
 
     res.json({
@@ -83,7 +84,7 @@ export const getRemotes = async (req, res) => {
 export const getRemoteById = async (req, res) => {
   try {
     const { id } = req.params;
-    const remote = await remoteModel.getById(id);
+    const remote = await remoteModel.findById(id);
 
     if (!remote) {
       return res.status(404).json({
@@ -278,7 +279,7 @@ export const getRemotesByDevice = async (req, res) => {
 };
 
 /**
- * Получение пул��та по умолчанию для устройства
+ * Получение пульта по умолчанию для устройства
  * GET /api/v1/remotes/device/:deviceId/default
  */
 export const getDefaultRemoteForDevice = async (req, res) => {
