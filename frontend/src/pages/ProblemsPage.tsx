@@ -39,10 +39,10 @@ const ProblemsPage = () => {
   const navigate = useNavigate();
   const { deviceId } = useParams<{ deviceId: string }>();
 
-  const { devices } = useDevices();
-  const { problems } = useProblems({ deviceId });
+  const { data: devices = [] } = useDevices();
+  const { data: problems = [] } = useProblems();
 
-  const device = devices?.find(d => d.id === deviceId);
+  const device = devices.find((d: any) => d.id === deviceId);
 
   const handleProblemSelect = (problemId: string) => {
     navigate(`/diagnostic/${deviceId}/${problemId}`);
