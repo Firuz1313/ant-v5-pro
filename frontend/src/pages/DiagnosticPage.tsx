@@ -6,7 +6,9 @@ import { Progress } from "@/components/ui/progress";
 import TVDisplay from "@/components/TVDisplay";
 import TVInterfaceDisplay from "@/components/TVInterfaceDisplay";
 import RemoteControl from "@/components/RemoteControl";
-import { useData } from "@/contexts/DataContext";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
+import { remotesApi, stepsApi } from "@/api";
 import {
   ArrowLeft,
   ArrowRight,
@@ -14,6 +16,7 @@ import {
   AlertCircle,
   Lightbulb,
   Tv,
+  Loader2,
 } from "lucide-react";
 
 const DiagnosticPage = () => {
@@ -22,46 +25,60 @@ const DiagnosticPage = () => {
     deviceId: string;
     problemId: string;
   }>();
-  // Using new API hooks instead of DataContext
+  
+  // API hooks
+  const { devices, loading: devicesLoading } = useDevices();
+  const { problems, loading: problemsLoading } = useProblems({ deviceId });
+  
+  // Local state
   const [currentStepNumber, setCurrentStepNumber] = useState(1);
   const [manualProgress, setManualProgress] = useState(false);
+  const [steps, setSteps] = useState([]);
+  const [remote, setRemote] = useState(null);
+  const [loading, setLoading] = useState(true);
 
-  const device = deviceId ? getDeviceById(deviceId) : null;
-  const steps = problemId ? getStepsForProblem(problemId) : [];
-  const currentStepData = steps.find(
-    (step) => step.stepNumber === currentStepNumber,
-  );
-  const progress =
-    steps.length > 0 ? (currentStepNumber / steps.length) * 100 : 0;
+  // Derived state
+  const device = devices?.find(d => d.id === deviceId);
+  const problem = problems?.find(p => p.id === problemId);
+  const currentStepData = steps.find(step => step.stepNumber === currentStepNumber);
+  const progress = steps.length > 0 ? (currentStepNumber / steps.length) * 100 : 0;
 
-  // Get the remote for this step, or fallback to device default remote
-  const stepRemote = currentStepData?.remoteId
-    ? getRemoteById(currentStepData.remoteId)
-    : null;
-  const deviceDefaultRemote = deviceId
-    ? getDefaultRemoteForDevice(deviceId)
-    : null;
-  const remote = stepRemote || deviceDefaultRemote;
-
-  const problem = problemId ? problems.find((p) => p.id === problemId) : null;
-
+  // Load steps and remote when component mounts
   useEffect(() => {
-    if (!deviceId || !problemId || steps.length === 0) {
-      navigate("/devices");
-    }
-  }, [deviceId, problemId, steps.length, navigate]);
+    const loadData = async () => {
+      if (!problemId || !deviceId) return;
+      
+      try {
+        setLoading(true);
+        
+        // Load steps for the problem
+        const stepsResponse = await stepsApi.getByProblem(problemId);
+        setSteps(stepsResponse || []);
 
-  const handleNextStep = () => {
-    if (currentStepNumber < steps.length) {
-      setCurrentStepNumber(currentStepNumber + 1);
-      setManualProgress(true);
-    } else {
-      // All steps completed, go to success page
-      const sessionId =
-        Date.now().toString(36) + Math.random().toString(36).substr(2);
-      navigate(`/success/${deviceId}/${sessionId}?problemId=${problemId}`);
-    }
-  };
+        // Load default remote for device
+        try {
+          const defaultRemote = await remotesApi.getDefaultForDevice(deviceId);
+          setRemote(defaultRemote);
+        } catch (error) {
+          // If no default remote, try to get any remote for the device
+          try {
+            const deviceRemotes = await remotesApi.getByDevice(deviceId);
+            if (deviceRemotes && deviceRemotes.length > 0) {
+              setRemote(deviceRemotes[0]);
+            }
+          } catch (err) {
+            console.log('No remotes found for device');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading diagnostic data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [problemId, deviceId]);
 
   const handlePrevStep = () => {
     if (currentStepNumber > 1) {
@@ -69,22 +86,56 @@ const DiagnosticPage = () => {
     }
   };
 
+  const handleNextStep = () => {
+    if (currentStepNumber < steps.length) {
+      setCurrentStepNumber(currentStepNumber + 1);
+    } else {
+      navigate(`/success/${deviceId}/${problemId}`);
+    }
+  };
+
   const handleBack = () => {
     navigate(`/problems/${deviceId}`);
   };
 
-  const getProblemTitle = () => {
-    return problem?.title || "Диагностика проблемы";
+  const handleManualProgress = () => {
+    setManualProgress(true);
+    setTimeout(() => setManualProgress(false), 2000);
   };
 
-  if (!device || !currentStepData) {
+  if (devicesLoading || problemsLoading || loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600">
         <div className="text-center text-white">
-          <AlertCircle className="h-16 w-16 mx-auto mb-4 text-yellow-400" />
-          <h2 className="text-2xl font-bold mb-4">Данные не найдены</h2>
-          <Button onClick={() => navigate("/devices")}>
-            Вернуться к выбору приставки
+          <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
+          <p>Загрузка диагностики...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (!device || !problem) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600">
+        <div className="text-center text-white">
+          <AlertCircle className="h-8 w-8 mx-auto mb-4" />
+          <p>Устройство или проблема не найдены</p>
+          <Button onClick={handleBack} className="mt-4" variant="outline">
+            Вернуться назад
+          </Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (steps.length === 0) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600">
+        <div className="text-center text-white">
+          <AlertCircle className="h-8 w-8 mx-auto mb-4" />
+          <p>Шаги диагностики не найдены</p>
+          <Button onClick={handleBack} className="mt-4" variant="outline">
+            Вернуться назад
           </Button>
         </div>
       </div>
@@ -92,124 +143,147 @@ const DiagnosticPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900 relative overflow-hidden flex flex-col">
-      {/* Header */}
-      <header className="w-full px-4 pt-6 pb-2 flex flex-col items-center">
-        <div className="max-w-7xl w-full flex flex-col items-center">
-          <span className="text-2xl font-bold text-white mb-1 text-center">
-            {device.name} - {getProblemTitle()}
-          </span>
-          <div className="text-xs text-gray-400 -mt-1 mb-2">
+    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
+      <div className="container mx-auto px-4 py-6">
+        {/* Header */}
+        <div className="flex items-center justify-between mb-6">
+          <Button
+            onClick={handleBack}
+            variant="ghost"
+            className="text-white hover:bg-white/10"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Назад
+          </Button>
+          <div className="text-center text-white">
+            <h1 className="text-xl font-semibold">{device.name}</h1>
+            <p className="text-blue-200 text-sm">{problem.title}</p>
+          </div>
+          <div className="w-20"></div>
+        </div>
+
+        {/* Progress */}
+        <div className="mb-6">
+          <div className="text-white text-sm mb-2 text-center">
             Шаг {currentStepNumber} из {steps.length}
           </div>
+          <Progress value={progress} className="h-2" />
         </div>
-      </header>
 
-      {/* Main Content: TV + Remote */}
-      <div className="flex-1 flex flex-row items-start justify-center w-full max-w-7xl mx-auto px-4 gap-8 mt-2" style={{minHeight:0}}>
-        {/* TV */}
-        <div className="flex-1 flex items-center justify-end max-w-4xl min-w-0">
-          {currentStepData?.tvInterfaceId ? (
-            <TVInterfaceDisplay
-              tvInterfaceId={currentStepData.tvInterfaceId}
-              stepId={currentStepData.id}
-              currentStepNumber={currentStepNumber}
-              tvAreaPosition={currentStepData?.tvAreaPosition}
-              tvAreaRect={currentStepData?.tvAreaRect}
-              showAllMarks={true}
-              highlightActiveMarks={true}
-              showHints={true}
-              enableAnimations={true}
-              className="w-full h-full"
-            />
-          ) : (
-            <TVDisplay
-              deviceId={device?.id}
-              interfaceScreen={currentStepData?.highlightTVArea || 'home'}
-              tvInterfaceId={currentStepData?.tvInterfaceId}
-              className="w-full"
-              isConnected={true}
-              isLoading={false}
-            />
-          )}
-        </div>
-        {/* Remote */}
-        <div className="flex items-center justify-start" style={{width:'200px', minWidth:'160px', maxWidth:'220px'}}>
-          {remote ? (
-            remote.imageData ? (
-              <div className="relative bg-gray-800 rounded-xl p-2 shadow-2xl w-full">
-                <img
-                  src={remote.imageData}
-                  alt={remote.name}
-                  className="w-full h-auto object-contain rounded-lg"
-                  style={{maxHeight:'420px'}}
-                />
-                {/* Button Position Indicator */}
-                {currentStepData?.buttonPosition && (
-                  <div
-                    className="absolute w-6 h-6 bg-red-500 rounded-full border-4 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse shadow-lg"
-                    style={{
-                      left: `${(currentStepData.buttonPosition.x / remote.dimensions.width) * 100}%`,
-                      top: `${(currentStepData.buttonPosition.y / remote.dimensions.height) * 100}%`,
-                    }}
-                  >
-                    <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+        {/* Main Content */}
+        <div className="grid lg:grid-cols-2 gap-6">
+          {/* Left side - TV Display and Instructions */}
+          <div className="space-y-6">
+            {/* TV Display */}
+            <Card className="bg-black/50 border-gray-700">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <Tv className="h-5 w-5 text-blue-400 mr-2" />
+                  <h3 className="font-semibold text-white">Экран ТВ</h3>
+                </div>
+                
+                {currentStepData?.tvInterfaceId ? (
+                  <TVInterfaceDisplay 
+                    tvInterfaceId={currentStepData.tvInterfaceId}
+                    highlightAreas={currentStepData.highlightTVArea ? [currentStepData.highlightTVArea] : []}
+                  />
+                ) : (
+                  <TVDisplay />
+                )}
+              </CardContent>
+            </Card>
+
+            {/* Instructions */}
+            <Card className="bg-white/10 border-gray-700">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <Lightbulb className="h-5 w-5 text-yellow-400 mr-2" />
+                  <h3 className="font-semibold text-white">Инструкция</h3>
+                </div>
+                
+                {currentStepData ? (
+                  <div className="text-white space-y-3">
+                    <h4 className="font-medium text-lg">{currentStepData.title}</h4>
+                    <p className="text-blue-100 leading-relaxed">
+                      {currentStepData.instruction}
+                    </p>
+                    
+                    {currentStepData.hint && (
+                      <div className="bg-blue-500/20 p-3 rounded-lg">
+                        <p className="text-blue-200 text-sm">
+                          💡 {currentStepData.hint}
+                        </p>
+                      </div>
+                    )}
+
+                    {currentStepData.warningText && (
+                      <div className="bg-yellow-500/20 p-3 rounded-lg">
+                        <p className="text-yellow-200 text-sm">
+                          ⚠️ {currentStepData.warningText}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-white">Инструкция не найдена</p>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right side - Remote Control */}
+          <div>
+            <Card className="bg-black/50 border-gray-700">
+              <CardContent className="p-6">
+                <div className="flex items-center mb-4">
+                  <div className="h-5 w-5 bg-red-500 rounded-full mr-2"></div>
+                  <h3 className="font-semibold text-white">Пульт управления</h3>
+                </div>
+                
+                {remote ? (
+                  <RemoteControl 
+                    remote={remote}
+                    highlightButton={currentStepData?.highlightRemoteButton}
+                    onButtonClick={handleManualProgress}
+                  />
+                ) : (
+                  <div className="text-center text-gray-400 py-8">
+                    <p>Пульт не найден</p>
                   </div>
                 )}
-                {/* Remote Name Badge */}
-                <div className="absolute -bottom-2 left-1/2 transform -translate-x-1/2">
-                  <span className="text-xs bg-gray-700 text-white px-2 py-1 rounded-full">
-                    {remote.name}
-                  </span>
-                </div>
-              </div>
-            ) : (
-              <RemoteControl
-                highlightButton={currentStepData?.highlightRemoteButton}
-                remoteId={remote.id}
-                showButtonPosition={currentStepData?.buttonPosition}
-                className="pointer-events-none"
-              />
-            )
-          ) : (
-            <div className="bg-gray-800/50 rounded-xl p-6 text-center w-full">
-              <div className="text-gray-400 mb-2">
-                <Tv className="h-8 w-8 mx-auto mb-2" />
-                <p className="text-sm">Пульт не требуется</p>
-                <p className="text-xs">д��я этого шага</p>
-              </div>
-            </div>
-          )}
+              </CardContent>
+            </Card>
+          </div>
         </div>
-      </div>
 
-      {/* Нижняя панель: кнопки и подсказка */}
-      <div className="fixed bottom-0 left-0 w-full bg-gradient-to-t from-slate-900/95 to-slate-900/60 border-t border-white/10 z-50 flex items-center justify-between px-4 py-3" style={{maxHeight:'64px'}}>
-        <Button
-          variant="outline"
-          onClick={handlePrevStep}
-          disabled={currentStepNumber === 1}
-          className="border-white/20 text-white hover:bg-white/10 min-w-[100px]"
-        >
-          <ArrowLeft className="h-4 w-4 mr-2" />
-          Назад
-        </Button>
-        {/* Подсказка */}
-        <div className="flex-1 flex justify-center">
-          {currentStepData?.hint && (
-            <div className="flex items-center bg-yellow-500/10 border border-yellow-500/20 rounded-lg px-4 py-2 max-w-xl text-sm text-yellow-100">
-              <Lightbulb className="h-5 w-5 text-yellow-400 mr-2" />
-              <span className="truncate"><strong>Подсказка:</strong> {currentStepData.hint}</span>
-            </div>
-          )}
+        {/* Navigation */}
+        <div className="flex justify-between items-center mt-8">
+          <Button
+            onClick={handlePrevStep}
+            disabled={currentStepNumber <= 1}
+            variant="outline"
+            className="bg-white/10 border-gray-600 text-white hover:bg-white/20"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Предыдущий шаг
+          </Button>
+
+          <Button
+            onClick={handleNextStep}
+            className="bg-blue-600 hover:bg-blue-700 text-white"
+          >
+            {currentStepNumber < steps.length ? "Следующий шаг" : "Завершить"}
+            <ArrowRight className="h-4 w-4 ml-2" />
+          </Button>
         </div>
-        <Button
-          onClick={handleNextStep}
-          className="bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 min-w-[100px]"
-        >
-          {currentStepNumber === steps.length ? "Завершить" : "Далее"}
-          <ArrowRight className="h-4 w-4 ml-2" />
-        </Button>
+
+        {/* Manual Progress Indicator */}
+        {manualProgress && (
+          <div className="fixed bottom-4 right-4 bg-green-500 text-white px-4 py-2 rounded-lg shadow-lg flex items-center">
+            <CheckCircle className="h-4 w-4 mr-2" />
+            Действие выполнено!
+          </div>
+        )}
       </div>
     </div>
   );
