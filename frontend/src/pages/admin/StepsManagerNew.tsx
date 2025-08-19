@@ -119,7 +119,7 @@ const StepsManagerNew = () => {
     }
   };
 
-  // Состояни�� для ТВ интерфейсов
+  // Состояние для ТВ интерфейсов
   const [tvInterfaces, setTVInterfaces] = useState<TVInterfaceAPI[]>([]);
   const [selectedTVInterface, setSelectedTVInterface] =
     useState<TVInterfaceAPI | null>(null);
@@ -191,7 +191,7 @@ const StepsManagerNew = () => {
   // Сохранение отметок TV интерфейса
   const saveTVInterfaceMarks = async (marks: TVInterfaceMark[]) => {
     try {
-      // Здесь можно реализовать ло��ику сохранения всех отметок
+      // Здесь можно реализ��вать ло��ику сохранения всех отметок
       // Для простоты сейчас просто обновляем локальное состояние
 
       // Если есть выбранный шаг, связываем отметки с эт��м шагом
@@ -264,49 +264,44 @@ const StepsManagerNew = () => {
   };
 
   const handleCreate = async () => {
-    const deviceSteps = steps.filter(
-      (s) =>
-        s.deviceId === formData.deviceId && s.problemId === formData.problemId,
-    );
-    const maxStepNumber =
-      deviceSteps.length > 0
-        ? Math.max(...deviceSteps.map((s) => s.stepNumber))
-        : 0;
-
-    const newStep: DiagnosticStep = {
-      id: `step-${formData.deviceId}-${formData.problemId}-${Date.now()}`,
-      ...formData,
-      highlightRemoteButton:
-        formData.highlightRemoteButton === "none"
-          ? undefined
-          : formData.highlightRemoteButton,
-      highlightTVArea:
-        formData.highlightTVArea === "none"
-          ? undefined
-          : formData.highlightTVArea,
-      tvInterfaceId:
-        formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
-      remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
-      buttonPosition:
-        formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
-          ? undefined
-          : formData.buttonPosition,
-      tvAreaPosition:
-        formData.tvAreaPosition.x === 0 && formData.tvAreaPosition.y === 0
-          ? undefined
-          : formData.tvAreaPosition,
-      tvAreaRect:
-        !formData.tvAreaRect || formData.tvAreaRect.width === 0 || formData.tvAreaRect.height === 0
-          ? undefined
-          : formData.tvAreaRect,
-      stepNumber: maxStepNumber + 1,
-      isActive: true,
-      createdAt: new Date().toISOString().split("T")[0],
-      updatedAt: new Date().toISOString().split("T")[0],
-    };
-
     try {
-      await createStep(newStep);
+      const deviceSteps = steps.filter(
+        (s) =>
+          s.deviceId === formData.deviceId && s.problemId === formData.problemId,
+      );
+      const maxStepNumber =
+        deviceSteps.length > 0
+          ? Math.max(...deviceSteps.map((s) => s.stepNumber))
+          : 0;
+
+      const stepData = {
+        deviceId: formData.deviceId,
+        problemId: formData.problemId,
+        title: formData.title,
+        description: formData.description,
+        instruction: formData.instruction,
+        tvInterfaceId: formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
+        remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
+        buttonPosition: (formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0) ? undefined : formData.buttonPosition,
+        tvAreaPosition: (formData.tvAreaPosition.x === 0 && formData.tvAreaPosition.y === 0) ? undefined : formData.tvAreaPosition,
+        tvAreaRect: (!formData.tvAreaRect || formData.tvAreaRect.width === 0 || formData.tvAreaRect.height === 0) ? undefined : formData.tvAreaRect,
+        stepNumber: maxStepNumber + 1,
+        hint: formData.hint,
+        requiredAction: formData.requiredAction,
+        isActive: true,
+      };
+
+      // Create step via API
+      const createdStep = await stepsApi.create(stepData);
+
+      // If step has TV interface markings, save them
+      if (createdStep && formData.tvInterfaceId !== "none" && (formData.tvAreaPosition.x > 0 || formData.tvAreaRect?.width > 0)) {
+        await saveTVInterfaceMarkForStep(createdStep.id, formData.tvInterfaceId, formData);
+      }
+
+      // Reload steps
+      await loadInitialData();
+
       setIsCreateDialogOpen(false);
       resetForm();
     } catch (error) {
@@ -1377,7 +1372,7 @@ const StepsManagerNew = () => {
                               className="text-red-600"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              Уд����лить
+                              Уд��лить
                             </DropdownMenuItem>
                           </DropdownMenuContent>
                         </DropdownMenu>
