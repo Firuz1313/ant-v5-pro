@@ -108,7 +108,7 @@ const Index = () => {
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <Zap className="h-7 w-7 text-white" />
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">5 мин</div>
+                <div className="text-3xl font-bold text-white mb-2">-</div>
                 <div className="text-sm text-gray-300">
                   Среднее время решения
                 </div>
@@ -120,7 +120,7 @@ const Index = () => {
                 <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <Clock className="h-7 w-7 text-white" />
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">24/7</div>
+                <div className="text-3xl font-bold text-white mb-2">-</div>
                 <div className="text-sm text-gray-300">Доступность</div>
               </CardContent>
             </Card>
@@ -174,7 +174,7 @@ const Index = () => {
                   <Shield className="h-10 w-10 text-white" />
                 </div>
                 <h4 className="text-xl font-semibold text-white mb-3">
-                  Надежность
+                  Надеж��ость
                 </h4>
                 <p className="text-gray-300">
                   Проверенные решения от профессиональных техников с многолетним
@@ -189,7 +189,7 @@ const Index = () => {
                   Быстрота
                 </h4>
                 <p className="text-gray-300">
-                  Среднее время решения проблемы составляет всего 5 минут
+                  Система диагностики работает быстро и эффективно
                 </p>
               </div>
               <div className="text-center">
@@ -197,7 +197,7 @@ const Index = () => {
                   <BarChart3 className="h-10 w-10 text-white" />
                 </div>
                 <h4 className="text-xl font-semibold text-white mb-3">
-                  Эффективность
+                  Эффек��ивность
                 </h4>
                 <p className="text-gray-300">
                   Комплексный подход к решению проб��ем без вызова техника
