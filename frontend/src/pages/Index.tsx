@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useData } from "@/contexts/DataContext";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
 import {
   PlayCircle,
   Tv,
@@ -20,10 +21,17 @@ import {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { devices, problems, getEntityStats } = useData();
+  const { devices } = useDevices();
+  const { problems } = useProblems();
 
-  const deviceStats = getEntityStats("devices");
-  const problemStats = getEntityStats("problems");
+  const deviceStats = {
+    active: devices?.filter(d => d.isActive).length || 0,
+    total: devices?.length || 0
+  };
+  const problemStats = {
+    total: problems?.length || 0,
+    active: problems?.filter(p => p.status === "published").length || 0
+  };
 
   const handleStartDiagnostic = () => {
     navigate("/devices");
@@ -124,9 +132,9 @@ const Index = () => {
               Поддерживаемые устройства
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {devices
-                .filter((d) => d.isActive)
-                .map((device) => (
+              {(devices || [])
+              .filter((d) => d.isActive)
+              .map((device) => (
                   <Card
                     key={device.id}
                     className="bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:scale-105 transition-all duration-300 cursor-pointer"
@@ -205,7 +213,7 @@ const Index = () => {
                 Конструктор интерфейсов ТВ
               </h3>
               <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Создавайте и управляйте интерфейсами ТВ-приставок для точной диагностики.
+                Создавайте и управляйте интерфейсами Т��-приставок для точной диагностики.
                 Загружайте скриншоты, отмечайте интерактивные области и интегрируйте с процессом диагностики.
               </p>
             </div>
