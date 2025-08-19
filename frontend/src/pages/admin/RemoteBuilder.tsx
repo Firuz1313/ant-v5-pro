@@ -49,7 +49,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import RemoteControl from "@/components/RemoteControl";
-import { useData } from "@/contexts/DataContext";
+import { useDevices } from "@/hooks/useDevices";
 
 interface RemoteButton {
   id: string;
@@ -85,17 +85,20 @@ interface RemoteTemplate {
 }
 
 const RemoteBuilder = () => {
-  const {
-    remotes,
-    createRemote,
-    updateRemote,
-    deleteRemote,
-    getActiveDevices,
-    getDeviceById,
-    getRemotesForDevice,
-    canDeleteRemote,
-    getRemoteUsageCount,
-  } = useData();
+  const { data: devices = [] } = useDevices();
+
+  // Temporarily using empty arrays for removed static data
+  const remotes: RemoteTemplate[] = [];
+
+  // Mock functions for removed static functionality
+  const createRemote = async (remote: any) => {};
+  const updateRemote = async (id: string, data: any) => {};
+  const deleteRemote = async (id: string) => {};
+  const getActiveDevices = () => devices.filter((d: any) => d.isActive);
+  const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
+  const getRemotesForDevice = (deviceId: string) => remotes.filter((r: any) => r.deviceId === deviceId);
+  const canDeleteRemote = (id: string) => ({ canDelete: true, reason: '' });
+  const getRemoteUsageCount = (id: string) => 0;
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -144,7 +147,7 @@ const RemoteBuilder = () => {
     fontSize: 12,
   });
 
-  const devices = getActiveDevices();
+  const activeDevices = getActiveDevices();
 
   const layouts = [
     { value: "standard", label: "Стандартный" },
