@@ -48,12 +48,13 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { useData } from "@/contexts/DataContext";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
 import { tvInterfacesAPI } from "@/api/tvInterfaces";
 import { TVInterface, tvInterfaceUtils } from "@/types/tvInterface";
 import TVInterfaceAreaEditor from "@/components/admin/TVInterfaceAreaEditor";
 
-// Мемоизированный компонент формы для предот��ращения потери фокуса
+// Мемоизированный комп��нент формы для предот��ращения потери фокуса
 const StepFormFieldsComponent = React.memo(
   ({
     isEdit = false,
@@ -164,7 +165,7 @@ const StepFormFieldsComponent = React.memo(
 
       <div>
         <Label htmlFor={isEdit ? "edit-tvInterfaceId" : "tvInterfaceId"}>
-          Созданный интерфейс
+          Созданны�� интерфейс
         </Label>
         <div className="flex space-x-2">
           <Select
@@ -298,22 +299,24 @@ interface DiagnosticStep {
 }
 
 const StepsManager = () => {
-  const {
-    steps,
-    createStep,
-    updateStep,
-    deleteStep,
-    reorderSteps,
-    problems,
-    devices,
-    remotes,
-    getActiveDevices,
-    getActiveRemotes,
-    getRemoteById,
-    getProblemsForDevice,
-    getRemotesForDevice,
-    getDefaultRemoteForDevice,
-  } = useData();
+  const { data: devices = [] } = useDevices();
+  const { data: problems = [] } = useProblems();
+
+  // Temporarily using empty arrays for removed static data
+  const steps: DiagnosticStep[] = [];
+  const remotes: any[] = [];
+
+  // Mock functions for removed static functionality
+  const createStep = async (step: DiagnosticStep) => {};
+  const updateStep = async (id: string, data: any) => {};
+  const deleteStep = async (id: string) => {};
+  const reorderSteps = async (problemId: string, stepIds: string[]) => {};
+  const getActiveDevices = () => devices.filter((d: any) => d.isActive);
+  const getActiveRemotes = () => remotes.filter((r: any) => r.isActive);
+  const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
+  const getProblemsForDevice = (deviceId: string) => problems.filter((p: any) => p.deviceId === deviceId);
+  const getRemotesForDevice = (deviceId: string) => remotes.filter((r: any) => r.deviceId === deviceId);
+  const getDefaultRemoteForDevice = (deviceId: string) => remotes.find((r: any) => r.deviceId === deviceId && r.isDefault);
   const { toast } = useToast();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
