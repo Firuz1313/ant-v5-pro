@@ -27,6 +27,11 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
+// Trust proxy for production deployment (required for rate limiting with X-Forwarded-For)
+if (NODE_ENV === 'production' || process.env.FLY_APP_NAME) {
+  app.set('trust proxy', true);
+}
+
 // Настройка CORS
 const corsOptions = {
   origin: function (origin, callback) {
