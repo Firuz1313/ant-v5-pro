@@ -51,44 +51,8 @@ interface User {
 }
 
 const UsersManager = () => {
-  const [users, setUsers] = useState<User[]>([
-    {
-      id: "1",
-      name: "Администратор",
-      email: "admin@antsupport.com",
-      role: "admin",
-      status: "active",
-      lastLogin: "2024-01-20",
-      createdAt: "2024-01-15",
-    },
-    {
-      id: "2",
-      name: "Иван Петров",
-      email: "ivan.petrov@antsupport.com",
-      role: "editor",
-      status: "active",
-      lastLogin: "2024-01-19",
-      createdAt: "2024-01-16",
-    },
-    {
-      id: "3",
-      name: "Мария Сидорова",
-      email: "maria.sidorova@antsupport.com",
-      role: "editor",
-      status: "inactive",
-      lastLogin: "2024-01-15",
-      createdAt: "2024-01-17",
-    },
-    {
-      id: "4",
-      name: "Алексей Кузнецов",
-      email: "alexey.kuznetsov@antsupport.com",
-      role: "viewer",
-      status: "active",
-      lastLogin: "2024-01-18",
-      createdAt: "2024-01-18",
-    },
-  ]);
+  // Removed static users data - now uses empty array
+  const [users, setUsers] = useState<User[]>([]);
 
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
