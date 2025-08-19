@@ -13,7 +13,7 @@ dotenv.config();
 
 const { Pool, Client } = pkg;
 
-// PostgreSQL connection only - no mock database
+// PostgreSQL connection configuration
 
 // Конфигурация подключения к PostgreSQL
 let dbConfig;
@@ -25,7 +25,7 @@ if (process.env.DATABASE_URL) {
     ssl: process.env.DATABASE_URL.includes('neon.tech') ? { rejectUnauthorized: false } : false,
 
     // Настройки pool соединений
-    max: 20, // максимальное количество соединений в pool
+    max: 20, // максимал��ное количество соединений в pool
     min: 2, // минимальное количество соединений
     idleTimeoutMillis: 30000, // время простоя перед закрытием ���оединения
     connectionTimeoutMillis: 10000, // таймаут подключения
@@ -46,7 +46,7 @@ if (process.env.DATABASE_URL) {
     min: 5, // минимальное количество соединений
     idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
     connectionTimeoutMillis: 5000, // таймаут подключения
-    maxUses: 7500, // максимальное количество использований соединения
+    maxUses: 7500, // максимальное количеств�� использований соединения
   };
 }
 
@@ -201,11 +201,6 @@ export async function createDatabase() {
     }
   } catch (error) {
     console.error("❌ Ошибка создания базы данных:", error.message);
-    // Fallback to mock database
-    if (!USE_MOCK_DB) {
-      console.log("🔧 Falling back to mock database...");
-      console.error("❌ Failed to create PostgreSQL database");
-    }
     throw error;
   } finally {
     if (client) {
