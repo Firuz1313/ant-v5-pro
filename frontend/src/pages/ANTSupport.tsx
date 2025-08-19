@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { useData } from "@/contexts/DataContext";
 import {
   Tv,
   Settings,
@@ -54,7 +53,7 @@ const features = [
 ];
 
 const devices = [
-  { name: "OpenBox", users: "2.3M+", status: "активен" },
+  { name: "OpenBox", users: "2.3M+", status: "акти��ен" },
   { name: "OpenBox Gold", users: "1.8M+", status: "активен" },
   { name: "Uclan", users: "1.2M+", status: "активен" },
   { name: "HDBox", users: "950K+", status: "активен" },
@@ -62,7 +61,12 @@ const devices = [
 
 const ANTSupport = () => {
   const navigate = useNavigate();
-  const { siteSettings } = useData();
+
+  // Static site settings (can be moved to config later)
+  const siteSettings = {
+    siteName: "ANT Support",
+    siteDescription: "Профессиональные решения для цифрового ТВ. Быстрая диагностика, интерактивные инструкции и поддержка всех популярных моделей приставок."
+  };
 
   const handleGetStarted = () => {
     navigate("/problems");
