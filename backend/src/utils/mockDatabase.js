@@ -1,4 +1,4 @@
-// Mock database implementation for development environments where PostgreSQL is not available
+/ Mock database implementation for development environments where PostgreSQL is not available
 import fs from "fs";
 import path from "path";
 import { fileURLToPath } from "url";
