@@ -46,7 +46,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { useData } from "@/contexts/DataContext";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
 
 const iconMap = {
   Signal,
@@ -77,15 +78,15 @@ interface Problem {
 }
 
 const ProblemsManager = () => {
-  const {
-    problems,
-    createProblem,
-    updateProblem,
-    deleteProblem,
-    devices,
-    getActiveDevices,
-    getStepsForProblem,
-  } = useData();
+  const { data: devices = [] } = useDevices();
+  const { data: problems = [] } = useProblems();
+
+  // Mock functions for removed static functionality
+  const createProblem = async (problem: any) => {};
+  const updateProblem = async (id: string, data: any) => {};
+  const deleteProblem = async (id: string) => {};
+  const getActiveDevices = () => devices.filter((d: any) => d.isActive);
+  const getStepsForProblem = (problemId: string) => [];
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -521,7 +522,7 @@ const ProblemsManager = () => {
 
               <Select value={filterCategory} onValueChange={setFilterCategory}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Категория" />
+                  <SelectValue placeholder="Катег��рия" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все категории</SelectItem>
