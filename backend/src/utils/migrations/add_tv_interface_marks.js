@@ -1,4 +1,4 @@
-/**
+**
  * Migration: Create tv_interface_marks table
  * Adds support for marking points and zones on TV interface images
  */
