@@ -73,7 +73,7 @@ interface DiagnosticStep {
   instruction: string;
   highlightRemoteButton?: string;
   highlightTVArea?: string;
-  tvInterfaceId?: string; // Обновлено для работы с настоя��ими интерфейсами
+  tvInterfaceId?: string; // Обновле��о для работы с настоя��ими интерфейсами
   requiredAction?: string;
   hint?: string;
   remoteId?: string;
@@ -186,7 +186,7 @@ const StepsManagerNew = () => {
     }
   };
 
-  // Загрузка отметок для TV ��нтерфейса
+  // Загрузка отметок для TV ����терфейса
 
   // Сохранение отметок TV интерфейса
   const saveTVInterfaceMarks = async (marks: TVInterfaceMark[]) => {
@@ -406,7 +406,14 @@ const StepsManagerNew = () => {
 
   const handleDelete = async (stepId: string) => {
     try {
-      await deleteStep(stepId);
+      // Delete TV interface marks for this step first
+      await tvInterfaceMarksAPI.deleteByStepId(stepId);
+
+      // Delete the step
+      await stepsApi.delete(stepId);
+
+      // Reload steps
+      await loadInitialData();
     } catch (error) {
       console.error("Error deleting step:", error);
     }
@@ -417,9 +424,12 @@ const StepsManagerNew = () => {
     if (!step) return;
 
     try {
-      await updateStep(stepId, {
+      await stepsApi.update(stepId, {
         isActive: !step.isActive,
       });
+
+      // Reload steps
+      await loadInitialData();
     } catch (error) {
       console.error("Error toggling step status:", error);
     }
@@ -867,7 +877,7 @@ const StepsManagerNew = () => {
                         </p>
                       ) : (
                         <p className="text-sm text-green-700 dark:text-green-300">
-                          Позиция на ТВ: ({Math.round(formData.tvAreaPosition.x)}, {Math.round(formData.tvAreaPosition.y)})
+                          Позиц��я на ТВ: ({Math.round(formData.tvAreaPosition.x)}, {Math.round(formData.tvAreaPosition.y)})
                         </p>
                       )}
                     </AlertDescription>
@@ -1136,7 +1146,7 @@ const StepsManagerNew = () => {
             Управление шагами
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание шагов диагностики с привязкой к приставкам, проблемам и
+            Создание шагов ди��гностики с привязкой к приставкам, проблемам и
             интерфейсам ТВ
           </p>
         </div>
@@ -1234,7 +1244,7 @@ const StepsManagerNew = () => {
                   <SelectValue placeholder="Пульт" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все пульты</SelectItem>
+                  <SelectItem value="all">Все пул��ты</SelectItem>
                   <SelectItem value="none">Без пульта</SelectItem>
                   {getFilteredRemotes().map((remote) => {
                     const device = devices.find(
@@ -1519,7 +1529,7 @@ const StepsManagerNew = () => {
               Шаги не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попр��буйте изменит�� фильтры поиска или создайте новый шаг.
+              Попробуйте изменит�� фильтры поиска или создайте но��ый шаг.
             </p>
           </CardContent>
         </Card>
