@@ -27,7 +27,7 @@ if (process.env.DATABASE_URL) {
     // Настройки pool соединений
     max: 20, // максимальное количество соединений в pool
     min: 2, // минимальное количество соединений
-    idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
+    idleTimeoutMillis: 30000, // время простоя перед закрытием ��оединения
     connectionTimeoutMillis: 10000, // таймаут подключения
     maxUses: 7500, // максимальное количество использований соединения
   };
@@ -44,7 +44,7 @@ if (process.env.DATABASE_URL) {
     // Настройки pool соединений
     max: 20, // максимальное количество соединений в pool
     min: 5, // минимальное количество соединений
-    idleTimeoutMillis: 30000, // время простоя перед закрытием соединени��
+    idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
     connectionTimeoutMillis: 5000, // таймаут подключения
     maxUses: 7500, // максимальное количество использований соединения
   };
@@ -85,7 +85,7 @@ export async function testConnection() {
       "SELECT NOW() as current_time, version() as postgres_version",
     );
 
-    console.log("✅ Подключение к PostgreSQL успеш��о");
+    console.log("✅ Подключение к PostgreSQL успешно");
     console.log(`🕐 Время сервера: ${result.rows[0].current_time}`);
     console.log(
       `📋 Версия PostgreSQL: ${result.rows[0].postgres_version.split(" ")[0]}`,
@@ -140,16 +140,6 @@ export async function query(text, params = []) {
     console.error(`❌ SQL Error after ${duration}ms:`, error.message);
     console.error("🔍 Query:", text);
     console.error("🔍 Parameters:", params);
-
-    // Fallback to mock database
-    if (!USE_MOCK_DB) {
-      console.log("🔧 Falling back to mock database...");
-      process.env.USE_MOCK_DB = "true";
-      if (!mockDb) {
-        mockDb = await import("./mockDatabase.js");
-      }
-      return await mockDb.query(text, params);
-    }
 
     throw error;
   } finally {
@@ -331,7 +321,7 @@ export async function getDatabaseStats() {
   }
 }
 
-// Функция безопасного закрытия всех соединений
+// Функци�� безопасного закрытия всех соединений
 export async function closePool() {
   try {
     console.log("🔄 Закрытие пула соединений PostgreSQL...");
@@ -446,7 +436,7 @@ export async function searchText(
   }
 }
 
-// Экспорт pool для прямого использования в случае необходимости
+// Экспорт pool для прямого использования в с��учае необходимости
 export { pool };
 
 export default {
