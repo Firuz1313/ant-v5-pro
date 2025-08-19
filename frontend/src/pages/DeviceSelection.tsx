@@ -11,13 +11,12 @@ import {
   Sparkles,
   Heart,
 } from "lucide-react";
-import { useData } from "@/contexts/DataContext";
 import { useState, useEffect } from "react";
+import { useDevices } from "@/hooks/useDevices";
 
 const DeviceSelection = () => {
   const navigate = useNavigate();
-  const { getActiveDevices, getProblemsForDevice } = useData();
-  const devices = getActiveDevices();
+  const { devices, loading, error } = useDevices();
   const [animatedIcons, setAnimatedIcons] = useState<boolean[]>([]);
 
   useEffect(() => {
