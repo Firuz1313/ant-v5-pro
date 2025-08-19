@@ -73,7 +73,7 @@ interface DiagnosticStep {
   instruction: string;
   highlightRemoteButton?: string;
   highlightTVArea?: string;
-  tvInterfaceId?: string; // Обновле��о для работы с настоя��ими интерфейсами
+  tvInterfaceId?: string; // Обновлено для работы с настоя��ими интерфейсами
   requiredAction?: string;
   hint?: string;
   remoteId?: string;
@@ -186,7 +186,7 @@ const StepsManagerNew = () => {
     }
   };
 
-  // Загрузка отметок для TV ����терфейса
+  // Загрузка отметок для TV ��нтерфейса
 
   // Сохранение отметок TV интерфейса
   const saveTVInterfaceMarks = async (marks: TVInterfaceMark[]) => {
@@ -618,13 +618,25 @@ const StepsManagerNew = () => {
   );
 
   const getDeviceName = (deviceId: string) => {
-    const device = devices.find((d) => d.id === deviceId);
+    const device = (devices || []).find((d) => d.id === deviceId);
     return device?.name || "Неизвестная приставка";
   };
 
   const getProblemTitle = (problemId: string) => {
-    const problem = problems.find((p) => p.id === problemId);
+    const problem = (problems || []).find((p) => p.id === problemId);
     return problem?.title || "Неизвестная проблема";
+  };
+
+  const getRemoteById = (remoteId: string) => {
+    return (remotes || []).find((r) => r.id === remoteId);
+  };
+
+  const getDefaultRemoteForDevice = (deviceId: string) => {
+    return (remotes || []).find((r) => r.deviceId === deviceId && r.isDefault);
+  };
+
+  const getActiveDevices = () => {
+    return (devices || []).filter(d => d.isActive);
   };
 
   const getTVInterfaceName = (tvInterfaceId: string) => {
@@ -873,11 +885,11 @@ const StepsManagerNew = () => {
                     <AlertDescription>
                       {formData.tvAreaRect && formData.tvAreaRect.width > 0 && formData.tvAreaRect.height > 0 ? (
                         <p className="text-sm text-green-700 dark:text-green-300">
-                          Область на ТВ: ({Math.round(formData.tvAreaRect.x)}, {Math.round(formData.tvAreaRect.y)}) — {Math.round(formData.tvAreaRect.width)}×{Math.round(formData.tvAreaRect.height)}
+                          Область на ТВ: ({Math.round(formData.tvAreaRect.x)}, {Math.round(formData.tvAreaRect.y)}) �� {Math.round(formData.tvAreaRect.width)}×{Math.round(formData.tvAreaRect.height)}
                         </p>
                       ) : (
                         <p className="text-sm text-green-700 dark:text-green-300">
-                          Позиц��я на ТВ: ({Math.round(formData.tvAreaPosition.x)}, {Math.round(formData.tvAreaPosition.y)})
+                          Позиция на ТВ: ({Math.round(formData.tvAreaPosition.x)}, {Math.round(formData.tvAreaPosition.y)})
                         </p>
                       )}
                     </AlertDescription>
@@ -1107,7 +1119,7 @@ const StepsManagerNew = () => {
           id={isEdit ? "edit-hint" : "hint"}
           value={formData.hint}
           onChange={(e) => handleFieldChange("hint", e.target.value)}
-          placeholder="Дополнительна�� подсказка для пользоват���ля"
+          placeholder="Дополнител��на�� подсказка для пользоват���ля"
         />
       </div>
 
@@ -1146,7 +1158,7 @@ const StepsManagerNew = () => {
             Управление шагами
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание шагов ди��гностики с привязкой к приставкам, проблемам и
+            Создание шагов диагностики с привязкой к приставкам, проблемам и
             интерфейсам ТВ
           </p>
         </div>
@@ -1244,7 +1256,7 @@ const StepsManagerNew = () => {
                   <SelectValue placeholder="Пульт" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все пул��ты</SelectItem>
+                  <SelectItem value="all">Все пульты</SelectItem>
                   <SelectItem value="none">Без пульта</SelectItem>
                   {getFilteredRemotes().map((remote) => {
                     const device = devices.find(
@@ -1529,7 +1541,7 @@ const StepsManagerNew = () => {
               Шаги не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменит�� фильтры поиска или создайте но��ый шаг.
+              Попробуйте изменит�� фильтры поиска или создайте новый шаг.
             </p>
           </CardContent>
         </Card>
