@@ -103,6 +103,7 @@ export const api = {
   problems: problemsApi,
   steps: stepsApi,
   sessions: sessionsApi,
+  remotes: remotesApi,
   health: checkApiHealth,
   info: getApiInfo,
   docs: getApiDocs,
