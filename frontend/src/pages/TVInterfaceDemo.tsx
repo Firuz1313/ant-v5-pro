@@ -3,13 +3,13 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import TVDisplay from '@/components/TVDisplay';
-import { useData } from '@/contexts/DataContext';
 import { TVInterface } from '@/types/tvInterface';
 import { tvInterfacesAPI } from '@/api/tvInterfaces';
+import { useDevices } from '@/hooks/useDevices';
 import { Monitor, RefreshCw } from 'lucide-react';
 
 const TVInterfaceDemo = () => {
-  const { devices } = useData();
+  const { devices } = useDevices();
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>('');
   const [tvInterfaces, setTVInterfaces] = useState<TVInterface[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -70,7 +70,7 @@ const TVInterfaceDemo = () => {
                   <SelectValue placeholder="Выберите устройство" />
                 </SelectTrigger>
                 <SelectContent>
-                  {devices.map((device) => (
+                  {(devices || []).map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
                     </SelectItem>
@@ -168,7 +168,7 @@ const TVInterfaceDemo = () => {
                   'Для выбранного устройства нет созданных интерфейсов. Отображается стандартный экран.'
                 )
               ) : (
-                'Выберите устройство для п��осмотра интерфейса'
+                'Выберите ус��ройство для п��осмотра интерфейса'
               )}
             </div>
           </CardContent>
