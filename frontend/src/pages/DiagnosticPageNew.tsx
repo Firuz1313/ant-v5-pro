@@ -7,9 +7,11 @@ import { Badge } from "@/components/ui/badge";
 import TVDisplay from "@/components/TVDisplay";
 import TVInterfaceDisplay from "@/components/TVInterfaceDisplay";
 import RemoteControl from "@/components/RemoteControl";
-import { useData } from "@/contexts/DataContext";
 import { tvInterfacesAPI, TVInterfaceAPI } from "@/api/tvInterfaces";
 import { TVInterfaceMark } from "@/api/tvInterfaceMarks";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
+import { stepsApi, remotesApi } from "@/api";
 import {
   ArrowLeft,
   ArrowRight,
@@ -52,13 +54,14 @@ const DiagnosticPageNew = () => {
     problemId: string;
   }>();
   
-  const {
-    getDeviceById,
-    getStepsForProblem,
-    getRemoteById,
-    getDefaultRemoteForDevice,
-    problems,
-  } = useData();
+  // API hooks
+  const { devices } = useDevices();
+  const { problems } = useProblems();
+
+  // Local state
+  const [steps, setSteps] = useState<DiagnosticStep[]>([]);
+  const [remote, setRemote] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
   // Состояние
   const [currentStepNumber, setCurrentStepNumber] = useState(1);
@@ -78,7 +81,7 @@ const DiagnosticPageNew = () => {
   const progress = steps.length > 0 ? (currentStepNumber / steps.length) * 100 : 0;
   const problem = problemId ? problems.find((p) => p.id === problemId) : null;
 
-  // Получение пульта для текущего шага
+  // Получение пульта для текущего ��ага
   const stepRemote = currentStepData?.remoteId
     ? getRemoteById(currentStepData.remoteId)
     : null;
