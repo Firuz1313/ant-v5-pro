@@ -29,7 +29,8 @@ const NODE_ENV = process.env.NODE_ENV || 'development';
 
 // Trust proxy for production deployment (required for rate limiting with X-Forwarded-For)
 if (NODE_ENV === 'production' || process.env.FLY_APP_NAME) {
-  app.set('trust proxy', true);
+  // Trust first proxy (Fly.io) for accurate IP detection
+  app.set('trust proxy', 1);
 }
 
 // Настройка CORS
