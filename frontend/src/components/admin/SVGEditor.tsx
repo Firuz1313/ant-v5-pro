@@ -20,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Slider } from "@/components/ui/slider";
-import { useData } from "@/contexts/DataContext";
+// Removed useData import - no longer using DataContext
 import {
   Palette,
   MousePointer,
@@ -85,7 +85,10 @@ interface SVGProject {
 }
 
 const SVGEditor = () => {
-  const { remotes, devices, updateRemote } = useData();
+  // Mock functions for removed static functionality
+  const remotes: any[] = [];
+  const devices: any[] = [];
+  const updateRemote = async (id: string, data: any) => {};
 
   const svgRef = useRef<SVGSVGElement>(null);
   const [project, setProject] = useState<SVGProject>({

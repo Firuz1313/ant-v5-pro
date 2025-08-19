@@ -18,7 +18,7 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-import { useData } from "@/contexts/DataContext";
+// Removed useData import - no longer using DataContext
 
 interface RemoteControlProps {
   highlightButton?: string;
@@ -37,7 +37,9 @@ const RemoteControl = ({
   className,
   showButtonPosition,
 }: RemoteControlProps) => {
-  const { getRemoteById, getDefaultRemote } = useData();
+  // Mock functions for removed static functionality
+  const getRemoteById = (id: string) => null;
+  const getDefaultRemote = () => null;
 
   // Get the specific remote or fall back to default
   const remote = remoteId ? getRemoteById(remoteId) : getDefaultRemote();

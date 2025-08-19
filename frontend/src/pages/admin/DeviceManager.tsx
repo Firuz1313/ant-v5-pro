@@ -40,7 +40,9 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
-import { useData } from "@/contexts/DataContext";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
+import { devicesApi, problemsApi } from "@/api";
 
 interface Device {
   id: string;
@@ -58,12 +60,17 @@ interface Device {
 
 const DeviceManager = () => {
   const {
-    devices,
-    createDevice,
-    updateDevice,
-    deleteDevice,
-    getProblemsForDevice,
-  } = useData();
+    data: devices = [],
+    isLoading: loading,
+    error,
+    refetch,
+  } = useDevices();
+  const { data: problems = [] } = useProblems();
+
+  // Helper function to get problems count for device
+  const getProblemsForDevice = (deviceId: string) => {
+    return (problems || []).filter((p) => p.deviceId === deviceId);
+  };
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -123,7 +130,7 @@ const DeviceManager = () => {
   ];
 
   const filteredDevices = devices.filter(
-    (device) =>
+    (device: any) =>
       device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       device.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
       device.model.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -146,10 +153,11 @@ const DeviceManager = () => {
 
   const handleCreate = async () => {
     try {
-      await createDevice({
+      await devicesApi.create({
         ...formData,
         isActive: true,
       });
+      await refetch();
       setIsCreateDialogOpen(false);
       resetForm();
     } catch (error) {
@@ -161,7 +169,8 @@ const DeviceManager = () => {
     if (!selectedDevice) return;
 
     try {
-      await updateDevice(selectedDevice.id, formData);
+      await devicesApi.update(selectedDevice.id, formData);
+      await refetch();
       setIsEditDialogOpen(false);
       setSelectedDevice(null);
       resetForm();
@@ -179,7 +188,8 @@ const DeviceManager = () => {
       return;
     }
     try {
-      await deleteDevice(deviceId);
+      await devicesApi.delete(deviceId);
+      await refetch();
     } catch (error) {
       console.error("Error deleting device:", error);
       alert("Ошибка при удалении приставки");
@@ -225,6 +235,28 @@ const DeviceManager = () => {
     });
   };
 
+  const handleClearAllDevices = async () => {
+    if (
+      !confirm(
+        "Вы уверены, что хотите удалить ВСЕ устройства? Это действие нельзя отменить!",
+      )
+    )
+      return;
+
+    try {
+      // Удаляем все устройства по одному
+      for (const device of devices) {
+        await devicesApi.deleteDevice(device.id, true); // force delete
+      }
+
+      await refetch(); // Обновляем список
+      alert("Все устройства удалены!");
+    } catch (error) {
+      console.error("Error clearing devices:", error);
+      alert("Ошибка при удалении устройств");
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -234,10 +266,18 @@ const DeviceManager = () => {
             Управление приставками
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание и настройка моделей ТВ-приставок для системы поддержки
+            Создание и настройка моделей ТВ-��риставок для системы поддержки
           </p>
         </div>
         <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            onClick={handleClearAllDevices}
+            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Очистить всё
+          </Button>
           <Button variant="outline">
             <Upload className="h-4 w-4 mr-2" />
             Импорт
@@ -254,7 +294,7 @@ const DeviceManager = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Добавить новую приставку</DialogTitle>
+                <DialogTitle>Добавить новую п��иставку</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -302,7 +342,7 @@ const DeviceManager = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Описание приставки"
+                    placeholder="Описание п��иставки"
                   />
                 </div>
 
@@ -411,7 +451,7 @@ const DeviceManager = () => {
                   </div>
                   <div className="flex items-center space-x-1">
                     <Badge variant={device.isActive ? "default" : "secondary"}>
-                      {device.isActive ? "Активна" : "Неактивна"}
+                      {device.isActive ? "А��тивна" : "Неактивна"}
                     </Badge>
                   </div>
                 </div>
@@ -546,7 +586,7 @@ const DeviceManager = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Описание приставки"
+                placeholder="Описани�� приставки"
               />
             </div>
 

@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useData } from "@/contexts/DataContext";
+// Removed useData import - no longer using DataContext
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -13,12 +13,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
   Settings,
   Globe,
@@ -34,44 +29,54 @@ import {
 } from "lucide-react";
 
 const SystemSettings = () => {
-  const { siteSettings, updateSiteSettings } = useData();
+  // Mock site settings functionality
+  const siteSettings = {
+    siteName: "ANT Support",
+    siteDescription: "Система диагностики ТВ-приставок",
+    defaultLanguage: "ru",
+    theme: "dark",
+    primaryColor: "#3b82f6",
+    accentColor: "#10b981",
+    logoUrl: "",
+  };
+  const updateSiteSettings = async (settings: any) => {};
 
   const [settings, setSettings] = useState({
     // General Settings from context
     ...siteSettings,
     timezone: "Europe/Moscow",
     maintenanceMode: false,
-    
+
     // Diagnostic Settings
     autoAdvanceSteps: true,
     showHints: true,
     maxDiagnosticTime: 30,
     enableFeedback: true,
     requireUserInfo: false,
-    
+
     // Notification Settings
     emailNotifications: true,
     systemAlerts: true,
     userActivityLogs: true,
     diagnosticReports: true,
-    
+
     // Security Settings
     sessionTimeout: 60,
     passwordMinLength: 8,
     requireTwoFactor: false,
     apiRateLimit: 100,
-    
+
     // Appearance Settings
     theme: "dark",
     primaryColor: "#3b82f6",
     accentColor: "#10b981",
     logoUrl: "",
-    
+
     // Backup Settings
     autoBackup: true,
     backupFrequency: "daily",
     backupRetention: 30,
-    
+
     // Performance Settings
     cacheEnabled: true,
     compressionEnabled: true,
@@ -83,10 +88,10 @@ const SystemSettings = () => {
   const handleSave = async () => {
     setIsLoading(true);
     // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
+    await new Promise((resolve) => setTimeout(resolve, 1000));
 
-    // Update site settings in context
-    updateSiteSettings({
+    // Mock update - site settings functionality removed
+    await updateSiteSettings({
       ...siteSettings,
       siteName: settings.siteName,
       siteDescription: settings.siteDescription,
@@ -136,7 +141,7 @@ const SystemSettings = () => {
   };
 
   const updateSetting = (key: string, value: any) => {
-    setSettings(prev => ({ ...prev, [key]: value }));
+    setSettings((prev) => ({ ...prev, [key]: value }));
   };
 
   return (
@@ -192,10 +197,15 @@ const SystemSettings = () => {
                     onChange={(e) => updateSetting("siteName", e.target.value)}
                   />
                 </div>
-                
+
                 <div className="space-y-2">
                   <Label htmlFor="defaultLanguage">Язык по умолчанию</Label>
-                  <Select value={settings.defaultLanguage} onValueChange={(value) => updateSetting("defaultLanguage", value)}>
+                  <Select
+                    value={settings.defaultLanguage}
+                    onValueChange={(value) =>
+                      updateSetting("defaultLanguage", value)
+                    }
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -214,7 +224,9 @@ const SystemSettings = () => {
                 <Textarea
                   id="siteDescription"
                   value={settings.siteDescription}
-                  onChange={(e) => updateSetting("siteDescription", e.target.value)}
+                  onChange={(e) =>
+                    updateSetting("siteDescription", e.target.value)
+                  }
                   placeholder="Введите описание сайта"
                 />
               </div>
@@ -222,14 +234,23 @@ const SystemSettings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <Label htmlFor="timezone">Часовой пояс</Label>
-                  <Select value={settings.timezone} onValueChange={(value) => updateSetting("timezone", value)}>
+                  <Select
+                    value={settings.timezone}
+                    onValueChange={(value) => updateSetting("timezone", value)}
+                  >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Europe/Moscow">Москва (UTC+3)</SelectItem>
-                      <SelectItem value="Asia/Dushanbe">Душанбе (UTC+5)</SelectItem>
-                      <SelectItem value="Asia/Tashkent">Ташкент (UTC+5)</SelectItem>
+                      <SelectItem value="Europe/Moscow">
+                        Москва (UTC+3)
+                      </SelectItem>
+                      <SelectItem value="Asia/Dushanbe">
+                        Душанбе (UTC+5)
+                      </SelectItem>
+                      <SelectItem value="Asia/Tashkent">
+                        Ташкент (UTC+5)
+                      </SelectItem>
                       <SelectItem value="UTC">UTC</SelectItem>
                     </SelectContent>
                   </Select>
@@ -241,7 +262,9 @@ const SystemSettings = () => {
                     <Switch
                       id="maintenanceMode"
                       checked={settings.maintenanceMode}
-                      onCheckedChange={(checked) => updateSetting("maintenanceMode", checked)}
+                      onCheckedChange={(checked) =>
+                        updateSetting("maintenanceMode", checked)
+                      }
                     />
                   </div>
                   <p className="text-sm text-gray-500">
@@ -266,52 +289,73 @@ const SystemSettings = () => {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="autoAdvanceSteps">Автопереход между шагами</Label>
+                    <Label htmlFor="autoAdvanceSteps">
+                      Автопереход между шагами
+                    </Label>
                     <Switch
                       id="autoAdvanceSteps"
                       checked={settings.autoAdvanceSteps}
-                      onCheckedChange={(checked) => updateSetting("autoAdvanceSteps", checked)}
+                      onCheckedChange={(checked) =>
+                        updateSetting("autoAdvanceSteps", checked)
+                      }
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <Label htmlFor="showHints">Показывать подсказки</Label>
                     <Switch
                       id="showHints"
                       checked={settings.showHints}
-                      onCheckedChange={(checked) => updateSetting("showHints", checked)}
+                      onCheckedChange={(checked) =>
+                        updateSetting("showHints", checked)
+                      }
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="enableFeedback">Включить обратную связь</Label>
+                    <Label htmlFor="enableFeedback">
+                      Включить обратную связь
+                    </Label>
                     <Switch
                       id="enableFeedback"
                       checked={settings.enableFeedback}
-                      onCheckedChange={(checked) => updateSetting("enableFeedback", checked)}
+                      onCheckedChange={(checked) =>
+                        updateSetting("enableFeedback", checked)
+                      }
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
-                    <Label htmlFor="requireUserInfo">Требовать информацию о пользователе</Label>
+                    <Label htmlFor="requireUserInfo">
+                      Требовать информацию о пользователе
+                    </Label>
                     <Switch
                       id="requireUserInfo"
                       checked={settings.requireUserInfo}
-                      onCheckedChange={(checked) => updateSetting("requireUserInfo", checked)}
+                      onCheckedChange={(checked) =>
+                        updateSetting("requireUserInfo", checked)
+                      }
                     />
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="maxDiagnosticTime">Максимальное время диагностики (мин)</Label>
+                    <Label htmlFor="maxDiagnosticTime">
+                      Максимальное время диагностики (мин)
+                    </Label>
                     <Input
                       id="maxDiagnosticTime"
                       type="number"
                       min="5"
                       max="120"
                       value={settings.maxDiagnosticTime}
-                      onChange={(e) => updateSetting("maxDiagnosticTime", parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateSetting(
+                          "maxDiagnosticTime",
+                          parseInt(e.target.value),
+                        )
+                      }
                     />
                   </div>
                 </div>
@@ -333,49 +377,71 @@ const SystemSettings = () => {
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="emailNotifications">Email уведомления</Label>
-                    <p className="text-sm text-gray-500">Отправлять уведомления по email</p>
+                    <Label htmlFor="emailNotifications">
+                      Email уведомления
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Отправлять уведомления по email
+                    </p>
                   </div>
                   <Switch
                     id="emailNotifications"
                     checked={settings.emailNotifications}
-                    onCheckedChange={(checked) => updateSetting("emailNotifications", checked)}
+                    onCheckedChange={(checked) =>
+                      updateSetting("emailNotifications", checked)
+                    }
                   />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <Label htmlFor="systemAlerts">Системные оповещения</Label>
-                    <p className="text-sm text-gray-500">Уведомления о системных событиях</p>
+                    <p className="text-sm text-gray-500">
+                      Уведомления о системных событиях
+                    </p>
                   </div>
                   <Switch
                     id="systemAlerts"
                     checked={settings.systemAlerts}
-                    onCheckedChange={(checked) => updateSetting("systemAlerts", checked)}
+                    onCheckedChange={(checked) =>
+                      updateSetting("systemAlerts", checked)
+                    }
                   />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="userActivityLogs">Логи активности пользователей</Label>
-                    <p className="text-sm text-gray-500">Записывать действия пользователей</p>
+                    <Label htmlFor="userActivityLogs">
+                      Логи активности пользователей
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Записывать действия пользователей
+                    </p>
                   </div>
                   <Switch
                     id="userActivityLogs"
                     checked={settings.userActivityLogs}
-                    onCheckedChange={(checked) => updateSetting("userActivityLogs", checked)}
+                    onCheckedChange={(checked) =>
+                      updateSetting("userActivityLogs", checked)
+                    }
                   />
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
-                    <Label htmlFor="diagnosticReports">Отчеты диагностики</Label>
-                    <p className="text-sm text-gray-500">Ежедневные отчеты о диагностике</p>
+                    <Label htmlFor="diagnosticReports">
+                      Отчеты диагностики
+                    </Label>
+                    <p className="text-sm text-gray-500">
+                      Ежедневные отчеты о диагностике
+                    </p>
                   </div>
                   <Switch
                     id="diagnosticReports"
                     checked={settings.diagnosticReports}
-                    onCheckedChange={(checked) => updateSetting("diagnosticReports", checked)}
+                    onCheckedChange={(checked) =>
+                      updateSetting("diagnosticReports", checked)
+                    }
                   />
                 </div>
               </div>
@@ -403,45 +469,67 @@ const SystemSettings = () => {
                       min="15"
                       max="480"
                       value={settings.sessionTimeout}
-                      onChange={(e) => updateSetting("sessionTimeout", parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateSetting(
+                          "sessionTimeout",
+                          parseInt(e.target.value),
+                        )
+                      }
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="passwordMinLength">Минимальная длина пароля</Label>
+                    <Label htmlFor="passwordMinLength">
+                      Минимальная длина пароля
+                    </Label>
                     <Input
                       id="passwordMinLength"
                       type="number"
                       min="6"
                       max="32"
                       value={settings.passwordMinLength}
-                      onChange={(e) => updateSetting("passwordMinLength", parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateSetting(
+                          "passwordMinLength",
+                          parseInt(e.target.value),
+                        )
+                      }
                     />
                   </div>
                 </div>
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="apiRateLimit">Лимит API запросов в минуту</Label>
+                    <Label htmlFor="apiRateLimit">
+                      Лимит API запросов в минуту
+                    </Label>
                     <Input
                       id="apiRateLimit"
                       type="number"
                       min="10"
                       max="1000"
                       value={settings.apiRateLimit}
-                      onChange={(e) => updateSetting("apiRateLimit", parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateSetting("apiRateLimit", parseInt(e.target.value))
+                      }
                     />
                   </div>
-                  
+
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="requireTwoFactor">Двухфакторная аутентификация</Label>
-                      <p className="text-sm text-gray-500">Обязательно для всех пользователей</p>
+                      <Label htmlFor="requireTwoFactor">
+                        Двухфакторная аутентификация
+                      </Label>
+                      <p className="text-sm text-gray-500">
+                        Обязательно для всех пользователей
+                      </p>
                     </div>
                     <Switch
                       id="requireTwoFactor"
                       checked={settings.requireTwoFactor}
-                      onCheckedChange={(checked) => updateSetting("requireTwoFactor", checked)}
+                      onCheckedChange={(checked) =>
+                        updateSetting("requireTwoFactor", checked)
+                      }
                     />
                   </div>
                 </div>
@@ -464,7 +552,10 @@ const SystemSettings = () => {
                 <div className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="theme">Тема</Label>
-                    <Select value={settings.theme} onValueChange={(value) => updateSetting("theme", value)}>
+                    <Select
+                      value={settings.theme}
+                      onValueChange={(value) => updateSetting("theme", value)}
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -475,7 +566,7 @@ const SystemSettings = () => {
                       </SelectContent>
                     </Select>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="primaryColor">Основной цвет</Label>
                     <div className="flex items-center space-x-2">
@@ -483,12 +574,16 @@ const SystemSettings = () => {
                         id="primaryColor"
                         type="color"
                         value={settings.primaryColor}
-                        onChange={(e) => updateSetting("primaryColor", e.target.value)}
+                        onChange={(e) =>
+                          updateSetting("primaryColor", e.target.value)
+                        }
                         className="w-16 h-10"
                       />
                       <Input
                         value={settings.primaryColor}
-                        onChange={(e) => updateSetting("primaryColor", e.target.value)}
+                        onChange={(e) =>
+                          updateSetting("primaryColor", e.target.value)
+                        }
                         placeholder="#3b82f6"
                       />
                     </div>
@@ -503,17 +598,21 @@ const SystemSettings = () => {
                         id="accentColor"
                         type="color"
                         value={settings.accentColor}
-                        onChange={(e) => updateSetting("accentColor", e.target.value)}
+                        onChange={(e) =>
+                          updateSetting("accentColor", e.target.value)
+                        }
                         className="w-16 h-10"
                       />
                       <Input
                         value={settings.accentColor}
-                        onChange={(e) => updateSetting("accentColor", e.target.value)}
+                        onChange={(e) =>
+                          updateSetting("accentColor", e.target.value)
+                        }
                         placeholder="#10b981"
                       />
                     </div>
                   </div>
-                  
+
                   <div className="space-y-2">
                     <Label htmlFor="logoUrl">URL логотипа</Label>
                     <Input
@@ -543,19 +642,32 @@ const SystemSettings = () => {
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div>
-                      <Label htmlFor="autoBackup">Автоматическое резервное копирование</Label>
-                      <p className="text-sm text-gray-500">Создавать резервные копии автоматически</p>
+                      <Label htmlFor="autoBackup">
+                        Автоматическое резервное копирование
+                      </Label>
+                      <p className="text-sm text-gray-500">
+                        Создавать резервные копии автоматически
+                      </p>
                     </div>
                     <Switch
                       id="autoBackup"
                       checked={settings.autoBackup}
-                      onCheckedChange={(checked) => updateSetting("autoBackup", checked)}
+                      onCheckedChange={(checked) =>
+                        updateSetting("autoBackup", checked)
+                      }
                     />
                   </div>
-                  
+
                   <div className="space-y-2">
-                    <Label htmlFor="backupFrequency">Частота резервного копирования</Label>
-                    <Select value={settings.backupFrequency} onValueChange={(value) => updateSetting("backupFrequency", value)}>
+                    <Label htmlFor="backupFrequency">
+                      Частота резервного копирования
+                    </Label>
+                    <Select
+                      value={settings.backupFrequency}
+                      onValueChange={(value) =>
+                        updateSetting("backupFrequency", value)
+                      }
+                    >
                       <SelectTrigger>
                         <SelectValue />
                       </SelectTrigger>
@@ -571,17 +683,24 @@ const SystemSettings = () => {
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="backupRetention">Хранить резервные копии (дни)</Label>
+                    <Label htmlFor="backupRetention">
+                      Хранить резервные копии (дни)
+                    </Label>
                     <Input
                       id="backupRetention"
                       type="number"
                       min="1"
                       max="365"
                       value={settings.backupRetention}
-                      onChange={(e) => updateSetting("backupRetention", parseInt(e.target.value))}
+                      onChange={(e) =>
+                        updateSetting(
+                          "backupRetention",
+                          parseInt(e.target.value),
+                        )
+                      }
                     />
                   </div>
-                  
+
                   <div className="flex space-x-2">
                     <Button variant="outline" className="flex-1">
                       <Upload className="h-4 w-4 mr-2" />

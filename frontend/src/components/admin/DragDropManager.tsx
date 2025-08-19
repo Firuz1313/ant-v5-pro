@@ -19,7 +19,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useData } from "@/contexts/DataContext";
+// Removed useData import - no longer using DataContext
 import {
   GripVertical,
   Move,
@@ -73,18 +73,17 @@ interface BulkOperation {
 }
 
 const DragDropManager = () => {
-  const {
-    devices,
-    problems,
-    steps,
-    remotes,
-    bulkUpdateDevices,
-    bulkDeleteProblems,
-    duplicateProblem,
-    reorderSteps,
-    updateProblem,
-    updateStep,
-  } = useData();
+  // Mock data and functions for removed static functionality
+  const devices: any[] = [];
+  const problems: any[] = [];
+  const steps: any[] = [];
+  const remotes: any[] = [];
+  const bulkUpdateDevices = async (deviceIds: string[], data: any) => {};
+  const bulkDeleteProblems = async (problemIds: string[]) => {};
+  const duplicateProblem = async (problemId: string) => {};
+  const reorderSteps = async (problemId: string, stepIds: string[]) => {};
+  const updateProblem = async (id: string, data: any) => {};
+  const updateStep = async (id: string, data: any) => {};
 
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
   const [draggedItem, setDraggedItem] = useState<DragItem | null>(null);
@@ -692,7 +691,7 @@ const DragDropManager = () => {
                 <li>
                   • Перетащите проблемы на устройства для смены принадлежности
                 </li>
-                <li>• Выберите несколько элементов для массовых операций</li>
+                <li>• Выберите несколько элементов для массов��х операций</li>
                 <li>
                   • Используйте фильтры для быстрого поиска нужных элементов
                 </li>

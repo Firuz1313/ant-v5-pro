@@ -38,33 +38,13 @@ const SuccessPage = () => {
   }, []);
 
   const getProblemTitle = (id: string) => {
-    const titles: Record<string, string> = {
-      "no-signal": "Проблема с сигналом решена!",
-      "no-power": "Проблема с питанием решена!",
-      "no-image": "Проблема с изображением решена!",
-      "no-sound": "Проблема со звуком решена!",
-      "wifi-issues": "Проблема с Wi-Fi решена!",
-      "channels-missing": "Проблема с каналами решена!",
-      "remote-not-working": "Проблема с пультом решена!",
-    };
-    return titles[id || ""] || "Проблема решена!";
+    // Removed static titles - now uses generic message
+    return "Проблема решена!";
   };
 
   const getSolutionMessage = (id: string) => {
-    const messages: Record<string, string> = {
-      "no-signal":
-        "Ваша ТВ-приставка успешно подключена и настроена. Сигнал восстановлен!",
-      "no-power":
-        "Питание приставки восстановлено. Устройство работает нормально!",
-      "no-image": "Изображение появилось. Настройки дисплея оптимизированы!",
-      "no-sound": "Звук восстановлен. Все аудио настройки работают корректно!",
-      "wifi-issues":
-        "Подключение к Wi-Fi установлено. Интернет работает стабильно!",
-      "channels-missing":
-        "Список каналов обновлен. Все каналы доступны для просмотра!",
-      "remote-not-working": "Пульт управления настроен и работает корректно!",
-    };
-    return messages[id || ""] || "Ваша проблема успешно решена!";
+    // Removed static messages - now uses generic message
+    return "Ваша проблема успешно решена!";
   };
 
   const handleTryAgain = () => {

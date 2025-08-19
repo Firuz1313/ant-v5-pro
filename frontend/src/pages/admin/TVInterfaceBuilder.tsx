@@ -13,9 +13,8 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
-import { useData } from "@/contexts/DataContext";
 import { tvInterfacesAPI } from "@/api/tvInterfaces";
-import { cleanupAPI } from "@/api/cleanup";
+import { useDevices } from "@/hooks/useDevices";
 import {
   TVInterface,
   CreateTVInterfaceData,
@@ -63,7 +62,7 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const TVInterfaceBuilder = () => {
-  const { devices } = useData();
+  const { data: devices = [] } = useDevices();
   const { toast } = useToast();
 
   // State
@@ -374,7 +373,8 @@ const TVInterfaceBuilder = () => {
   const handleCleanupTVInterfaces = async () => {
     setIsLoading(true);
     try {
-      const response = await cleanupAPI.cleanupTVInterfaces();
+      // Cleanup functionality removed
+      const response = { success: false };
       if (response.success) {
         toast({
           title: "Успех",

@@ -2,7 +2,8 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { useData } from "@/contexts/DataContext";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
 import {
   PlayCircle,
   Tv,
@@ -20,10 +21,17 @@ import {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { devices, problems, getEntityStats } = useData();
+  const { data: devices = [] } = useDevices();
+  const { data: problems = [] } = useProblems();
 
-  const deviceStats = getEntityStats("devices");
-  const problemStats = getEntityStats("problems");
+  const deviceStats = {
+    active: devices.filter((d: any) => d.isActive).length || 0,
+    total: devices.length || 0,
+  };
+  const problemStats = {
+    total: problems.length || 0,
+    active: problems.filter((p: any) => p.status === "published").length || 0,
+  };
 
   const handleStartDiagnostic = () => {
     navigate("/devices");
@@ -100,7 +108,7 @@ const Index = () => {
                 <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-purple-700 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <Zap className="h-7 w-7 text-white" />
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">5 мин</div>
+                <div className="text-3xl font-bold text-white mb-2">-</div>
                 <div className="text-sm text-gray-300">
                   Среднее время решения
                 </div>
@@ -112,7 +120,7 @@ const Index = () => {
                 <div className="w-14 h-14 bg-gradient-to-br from-orange-500 to-orange-700 rounded-xl flex items-center justify-center mx-auto mb-4 shadow-lg">
                   <Clock className="h-7 w-7 text-white" />
                 </div>
-                <div className="text-3xl font-bold text-white mb-2">24/7</div>
+                <div className="text-3xl font-bold text-white mb-2">-</div>
                 <div className="text-sm text-gray-300">Доступность</div>
               </CardContent>
             </Card>
@@ -125,8 +133,8 @@ const Index = () => {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {devices
-                .filter((d) => d.isActive)
-                .map((device) => (
+                .filter((d: any) => d.isActive)
+                .map((device: any) => (
                   <Card
                     key={device.id}
                     className="bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:scale-105 transition-all duration-300 cursor-pointer"
@@ -166,7 +174,7 @@ const Index = () => {
                   <Shield className="h-10 w-10 text-white" />
                 </div>
                 <h4 className="text-xl font-semibold text-white mb-3">
-                  Надежность
+                  Надеж��ость
                 </h4>
                 <p className="text-gray-300">
                   Проверенные решения от профессиональных техников с многолетним
@@ -181,7 +189,7 @@ const Index = () => {
                   Быстрота
                 </h4>
                 <p className="text-gray-300">
-                  Среднее время решения проблемы составляет всего 5 минут
+                  Система диагностики работает быстро и эффективно
                 </p>
               </div>
               <div className="text-center">
@@ -189,7 +197,7 @@ const Index = () => {
                   <BarChart3 className="h-10 w-10 text-white" />
                 </div>
                 <h4 className="text-xl font-semibold text-white mb-3">
-                  Эффективность
+                  Эффек��ивность
                 </h4>
                 <p className="text-gray-300">
                   Комплексный подход к решению проб��ем без вызова техника
@@ -205,8 +213,9 @@ const Index = () => {
                 Конструктор интерфейсов ТВ
               </h3>
               <p className="text-xl text-gray-300 max-w-3xl mx-auto">
-                Создавайте и управляйте интерфейсами ТВ-приставок для точной диагностики.
-                Загружайте скриншоты, отмечайте интерактивные области и интегрируйте с процессом диагностики.
+                Создавайте и управляйте интерфейсами Т��-приставок для точной
+                диагностики. Загружайте скриншоты, отмечайте интерактивные
+                области и интегрируйте с процессом диагностики.
               </p>
             </div>
 
@@ -219,7 +228,8 @@ const Index = () => {
                   Создание интерфейсов
                 </h4>
                 <p className="text-gray-300 text-sm">
-                  Загружайте скриншоты интерфейсов ваших ТВ-приставок и создавайте детальные представления
+                  Загружайте скриншоты интерфейсов ваших ТВ-приставок и
+                  создавайте детальные представления
                 </p>
               </div>
 
@@ -231,7 +241,8 @@ const Index = () => {
                   Интерактивные области
                 </h4>
                 <p className="text-gray-300 text-sm">
-                  Отмечайте кликабельные области и зоны подсветки для эффективной диагностики
+                  Отмечайте кликабельные области и зоны подсветки для
+                  эффективной диагностики
                 </p>
               </div>
 
@@ -243,7 +254,8 @@ const Index = () => {
                   Интеграция в диагностику
                 </h4>
                 <p className="text-gray-300 text-sm">
-                  Созданные и��терфейсы автоматически отображаются в процессе диагностики
+                  Созданные и��терфейсы автоматически отображаются в процессе
+                  диагностики
                 </p>
               </div>
             </div>

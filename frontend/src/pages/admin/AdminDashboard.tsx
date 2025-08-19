@@ -3,7 +3,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
-import { useData } from "@/contexts/DataContext";
+import { useDevices } from "@/hooks/useDevices";
+import { useProblems } from "@/hooks/useProblems";
 import {
   BarChart3,
   TrendingUp,
@@ -35,26 +36,34 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const AdminDashboard = () => {
-  const {
-    devices,
-    problems,
-    steps,
-    remotes,
-    sessions,
-    changeLogs,
-    getEntityStats,
-    getActiveSessions,
-    refreshData,
-    exportData,
-    siteSettings,
-  } = useData();
+  const { data: devices = [] } = useDevices();
+  const { data: problems = [] } = useProblems();
+
+  // Temporarily using empty arrays for removed static data
+  const steps: any[] = [];
+  const remotes: any[] = [];
+  const sessions: any[] = [];
+  const changeLogs: any[] = [];
+  const siteSettings = null;
+
+  // Mock functions for removed static functionality
+  const getEntityStats = (entity: string) => ({ total: 0, active: 0 });
+  const getActiveSessions = () => [];
+  const refreshData = async () => {};
+  const exportData = async (options: any) => ({ downloadUrl: "" });
 
   const [isLoading, setIsLoading] = useState(false);
   const [selectedPeriod, setSelectedPeriod] = useState("week");
 
-  // Statistics
-  const deviceStats = getEntityStats("devices");
-  const problemStats = getEntityStats("problems");
+  // Statistics - using real API data
+  const deviceStats = {
+    total: devices.length,
+    active: devices.filter((d: any) => d.isActive).length,
+  };
+  const problemStats = {
+    total: problems.length,
+    active: problems.filter((p: any) => p.status === "published").length,
+  };
   const stepStats = getEntityStats("steps");
   const remoteStats = getEntityStats("remotes");
   const activeSessions = getActiveSessions();

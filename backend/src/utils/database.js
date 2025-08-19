@@ -13,26 +13,44 @@ dotenv.config();
 
 const { Pool, Client } = pkg;
 
-// Check if we should use mock database
-const USE_MOCK_DB =
-  process.env.USE_MOCK_DB === "true" || process.env.NODE_ENV === "mock";
+// PostgreSQL connection configuration
 
 // Конфигурация подключения к PostgreSQL
-const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
-  port: parseInt(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME || "ant_support",
-  user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "password",
-  ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
+let dbConfig;
 
-  // Настройки pool соединений
-  max: 20, // максимальное количество соединений в pool
-  min: 5, // минимальное количество соединений
-  idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
-  connectionTimeoutMillis: 5000, // таймаут подключения
-  maxUses: 7500, // максимальное количество использований соединения
-};
+if (process.env.DATABASE_URL) {
+  // Use DATABASE_URL if provided (Neon/Heroku style)
+  dbConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.DATABASE_URL.includes("neon.tech")
+      ? { rejectUnauthorized: false }
+      : false,
+
+    // Настройки pool соединений
+    max: 20, // максимал��ное количество соединений в pool
+    min: 2, // минимальное количество соединений
+    idleTimeoutMillis: 30000, // время простоя перед закрытием ���оединения
+    connectionTimeoutMillis: 10000, // таймаут подключения
+    maxUses: 7500, // максимальное количество использований соединения
+  };
+} else {
+  // Fallback to individual env vars
+  dbConfig = {
+    host: process.env.DB_HOST || "localhost",
+    port: parseInt(process.env.DB_PORT) || 5432,
+    database: process.env.DB_NAME || "ant_support",
+    user: process.env.DB_USER || "postgres",
+    password: process.env.DB_PASSWORD || "password",
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
+
+    // Настройки pool соединений
+    max: 20, // максимальное количество соединений в pool
+    min: 5, // минимальное количество соединений
+    idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
+    connectionTimeoutMillis: 5000, // таймаут подключения
+    maxUses: 7500, // максимальное количеств�� использований соединения
+  };
+}
 
 // Создание pool соединений
 const pool = new Pool(dbConfig);
@@ -58,19 +76,10 @@ pool.on("release", (client) => {
   }
 });
 
-// Import mock database if needed
-let mockDb = null;
-if (USE_MOCK_DB) {
-  mockDb = await import("./mockDatabase.js");
-  console.log("🔧 Using mock database for development");
-}
+// PostgreSQL only configuration
 
 // Функция проверки подключения к базе данных
 export async function testConnection() {
-  if (USE_MOCK_DB && mockDb) {
-    return await mockDb.testConnection();
-  }
-
   let client;
   try {
     client = await pool.connect();
@@ -90,15 +99,10 @@ export async function testConnection() {
       version: result.rows[0].postgres_version,
     };
   } catch (error) {
-    console.error("❌ Ошибка подключения к PostgreSQL:", error.message);
+    console.error("❌ Ошибка подключ��ния к PostgreSQL:", error.message);
 
-    // Fallback to mock database
-    if (!USE_MOCK_DB) {
-      console.log("🔧 Falling back to mock database...");
-      process.env.USE_MOCK_DB = "true";
-      mockDb = await import("./mockDatabase.js");
-      return await mockDb.testConnection();
-    }
+    // PostgreSQL connection failed
+    console.error("❌ Failed to connect to PostgreSQL database");
 
     return {
       success: false,
@@ -113,10 +117,6 @@ export async function testConnection() {
 
 // Функция выполнения запроса с логированием
 export async function query(text, params = []) {
-  if (USE_MOCK_DB && mockDb) {
-    return await mockDb.query(text, params);
-  }
-
   const start = Date.now();
   let client;
 
@@ -143,16 +143,6 @@ export async function query(text, params = []) {
     console.error("🔍 Query:", text);
     console.error("🔍 Parameters:", params);
 
-    // Fallback to mock database
-    if (!USE_MOCK_DB) {
-      console.log("🔧 Falling back to mock database...");
-      process.env.USE_MOCK_DB = "true";
-      if (!mockDb) {
-        mockDb = await import("./mockDatabase.js");
-      }
-      return await mockDb.query(text, params);
-    }
-
     throw error;
   } finally {
     if (client) {
@@ -163,10 +153,6 @@ export async function query(text, params = []) {
 
 // Функция выполнения транзакции
 export async function transaction(callback) {
-  if (USE_MOCK_DB && mockDb) {
-    return await mockDb.transaction(callback);
-  }
-
   let client;
 
   try {
@@ -190,10 +176,6 @@ export async function transaction(callback) {
 
 // Функция создания базы данных (если не существует)
 export async function createDatabase() {
-  if (USE_MOCK_DB && mockDb) {
-    return await mockDb.createDatabase();
-  }
-
   const adminConfig = {
     ...dbConfig,
     database: "postgres", // подключаемся к системной БД для создания новой
@@ -214,21 +196,12 @@ export async function createDatabase() {
     if (checkResult.rows.length === 0) {
       console.log(`📊 Создание базы данных: ${dbConfig.database}`);
       await client.query(`CREATE DATABASE "${dbConfig.database}"`);
-      console.log("✅ База данных создана успешно");
+      console.log("��� База данных создана ��спешно");
     } else {
       console.log(`📊 База данных ${dbConfig.database} уже существует`);
     }
   } catch (error) {
     console.error("❌ Ошибка создания базы данных:", error.message);
-    // Fallback to mock database
-    if (!USE_MOCK_DB) {
-      console.log("🔧 Falling back to mock database...");
-      process.env.USE_MOCK_DB = "true";
-      if (!mockDb) {
-        mockDb = await import("./mockDatabase.js");
-      }
-      return await mockDb.createDatabase();
-    }
     throw error;
   } finally {
     if (client) {
@@ -270,7 +243,7 @@ export async function runMigrations() {
 
     for (const filename of migrationFiles) {
       if (executedMigrations.has(filename)) {
-        console.log(`⏭️  Миграция ${filename} уже выполнена, пропускаем`);
+        console.log(`⏭️  Миграция ${filename} уже выполне��а, пропускаем`);
         continue;
       }
 
@@ -333,14 +306,14 @@ export async function getDatabaseStats() {
   }
 }
 
-// Функция безопасного закрытия всех соединений
+// Функци�� безопасного закрытия всех соединений
 export async function closePool() {
   try {
     console.log("🔄 Закрытие пула соединений PostgreSQL...");
     await pool.end();
-    console.log("✅ Пул соединений закрыт");
+    console.log("✅ Пул со��динений закрыт");
   } catch (error) {
-    console.error("❌ Ошибка закрытия пула:", error.message);
+    console.error("❌ Ошибка закрытия п��ла:", error.message);
   }
 }
 
@@ -381,7 +354,7 @@ export async function cleanupOldData(daysToKeep = 90) {
       deletedLogs: logsResult.rowCount,
     };
   } catch (error) {
-    console.error("❌ Ошибка очистки данных:", error.message);
+    console.error("❌ Ошибка очис��ки данных:", error.message);
     throw error;
   }
 }
@@ -448,7 +421,7 @@ export async function searchText(
   }
 }
 
-// Экспорт pool для прямого использования в случае необходимости
+// Экспорт pool для прямого использования в с��учае необходимости
 export { pool };
 
 export default {
