@@ -14,25 +14,42 @@ dotenv.config();
 const { Pool, Client } = pkg;
 
 // Check if we should use mock database
-const USE_MOCK_DB =
-  process.env.USE_MOCK_DB === "true" || process.env.NODE_ENV === "mock";
+const USE_MOCK_DB = process.env.USE_MOCK_DATABASE === "true" || process.env.NODE_ENV === "mock";
 
 // Конфигурация подключения к PostgreSQL
-const dbConfig = {
-  host: process.env.DB_HOST || "localhost",
-  port: parseInt(process.env.DB_PORT) || 5432,
-  database: process.env.DB_NAME || "ant_support",
-  user: process.env.DB_USER || "postgres",
-  password: process.env.DB_PASSWORD || "password",
-  ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
+let dbConfig;
 
-  // Настройки pool соединений
-  max: 20, // максимальное количество соединений в pool
-  min: 5, // минимальное количество соединений
-  idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
-  connectionTimeoutMillis: 5000, // таймаут подключения
-  maxUses: 7500, // максимальное количество использований соединения
-};
+if (process.env.DATABASE_URL) {
+  // Use DATABASE_URL if provided (Neon/Heroku style)
+  dbConfig = {
+    connectionString: process.env.DATABASE_URL,
+    ssl: process.env.DATABASE_URL.includes('neon.tech') ? { rejectUnauthorized: false } : false,
+
+    // Настройки pool соединений
+    max: 20, // максимальное количество соединений в pool
+    min: 2, // минимальное количество соединений
+    idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
+    connectionTimeoutMillis: 10000, // таймаут подключения
+    maxUses: 7500, // максимальное количество использований соединения
+  };
+} else {
+  // Fallback to individual env vars
+  dbConfig = {
+    host: process.env.DB_HOST || "localhost",
+    port: parseInt(process.env.DB_PORT) || 5432,
+    database: process.env.DB_NAME || "ant_support",
+    user: process.env.DB_USER || "postgres",
+    password: process.env.DB_PASSWORD || "password",
+    ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
+
+    // Настройки pool соединений
+    max: 20, // максимальное количество соединений в pool
+    min: 5, // минимальное количество соединений
+    idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
+    connectionTimeoutMillis: 5000, // таймаут подключения
+    maxUses: 7500, // максимальное количество использований соединения
+  };
+}
 
 // Создание pool соединений
 const pool = new Pool(dbConfig);
@@ -340,7 +357,7 @@ export async function closePool() {
     await pool.end();
     console.log("✅ Пул соединений закрыт");
   } catch (error) {
-    console.error("❌ Ошибка закрытия пула:", error.message);
+    console.error("❌ Ошибка закрытия п��ла:", error.message);
   }
 }
 
