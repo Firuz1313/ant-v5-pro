@@ -46,7 +46,7 @@ class TVInterface extends BaseModel {
           d.model as device_model
         FROM ${this.tableName} ti
         LEFT JOIN devices d ON ti.device_id = d.id
-        WHERE ti.deleted_at IS NULL
+        WHERE ti.is_active = true
       `;
 
       const params = [];
