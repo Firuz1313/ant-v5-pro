@@ -373,7 +373,8 @@ const TVInterfaceBuilder = () => {
   const handleCleanupTVInterfaces = async () => {
     setIsLoading(true);
     try {
-      const response = await cleanupAPI.cleanupTVInterfaces();
+      // Cleanup functionality removed
+      const response = { success: false };
       if (response.success) {
         toast({
           title: "Успех",
@@ -537,7 +538,7 @@ const TVInterfaceBuilder = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="device">��стройство</Label>
+                  <Label htmlFor="device">Устройство</Label>
                   <Select
                     value={formData.deviceId}
                     onValueChange={(value) =>
@@ -853,7 +854,7 @@ const TVInterfaceBuilder = () => {
                           </AlertDialogTitle>
                           <AlertDialogDescription>
                             Это действие нельзя отменить. TV интерфейс "
-                            {tvInterface.name}" будет удален нав��егда.
+                            {tvInterface.name}" будет удален навсегда.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
