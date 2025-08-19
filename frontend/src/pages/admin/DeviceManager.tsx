@@ -59,8 +59,8 @@ interface Device {
 }
 
 const DeviceManager = () => {
-  const { devices, loading, error, refetch } = useDevices();
-  const { problems } = useProblems();
+  const { data: devices = [], isLoading: loading, error, refetch } = useDevices();
+  const { data: problems = [] } = useProblems();
 
   // Helper function to get problems count for device
   const getProblemsForDevice = (deviceId: string) => {
@@ -125,7 +125,7 @@ const DeviceManager = () => {
   ];
 
   const filteredDevices = devices.filter(
-    (device) =>
+    (device: any) =>
       device.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       device.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
       device.model.toLowerCase().includes(searchTerm.toLowerCase()),
@@ -234,7 +234,7 @@ const DeviceManager = () => {
     if (!confirm('Вы уверены, что хотите удалить ВСЕ устройства? Это действие нельзя отменить!')) return;
 
     try {
-      // ��даляем все устройства по одному
+      // Удаляем все устройства по одному
       for (const device of devices) {
         await devicesApi.deleteDevice(device.id, true); // force delete
       }
@@ -441,7 +441,7 @@ const DeviceManager = () => {
                   </div>
                   <div className="flex items-center space-x-1">
                     <Badge variant={device.isActive ? "default" : "secondary"}>
-                      {device.isActive ? "Активна" : "Неактивна"}
+                      {device.isActive ? "А��тивна" : "Неактивна"}
                     </Badge>
                   </div>
                 </div>
@@ -576,7 +576,7 @@ const DeviceManager = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Описание приставки"
+                placeholder="Описани�� приставки"
               />
             </div>
 
@@ -654,7 +654,7 @@ const DeviceManager = () => {
           <CardContent className="p-12 text-center">
             <Tv className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Приставки ��е найдены
+              Приставки не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
               Попробуйте изменить поисковый запрос или создайте новую приставку.
