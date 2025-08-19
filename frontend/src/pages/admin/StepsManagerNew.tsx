@@ -73,7 +73,7 @@ interface DiagnosticStep {
   instruction: string;
   highlightRemoteButton?: string;
   highlightTVArea?: string;
-  tvInterfaceId?: string; // Обновлено для работы с настоя��ими интерфейсами
+  tvInterfaceId?: string; // Обновлено для работы с ��астоя��ими интерфейсами
   requiredAction?: string;
   hint?: string;
   remoteId?: string;
@@ -119,7 +119,7 @@ const StepsManagerNew = () => {
     }
   };
 
-  // Состояние для ТВ интерфейсов
+  // Состояние для ТВ интерф��йсов
   const [tvInterfaces, setTVInterfaces] = useState<TVInterfaceAPI[]>([]);
   const [selectedTVInterface, setSelectedTVInterface] =
     useState<TVInterfaceAPI | null>(null);
@@ -208,6 +208,64 @@ const StepsManagerNew = () => {
       console.log("TV interface marks saved:", marks);
     } catch (error) {
       console.error("Error saving TV interface marks:", error);
+    }
+  };
+
+  // Сохранение отметки TV интерфейса для шага
+  const saveTVInterfaceMarkForStep = async (stepId: string, tvInterfaceId: string, formData: any) => {
+    try {
+      // Create a TV interface mark based on the step's TV area data
+      if (formData.tvAreaRect && formData.tvAreaRect.width > 0 && formData.tvAreaRect.height > 0) {
+        // Rectangle area marking
+        const markData = {
+          tv_interface_id: tvInterfaceId,
+          step_id: stepId,
+          name: `Область для "${formData.title}"`,
+          description: `Интерактивная область для шага: ${formData.description}`,
+          mark_type: "area" as const,
+          shape: "rectangle" as const,
+          position: { x: formData.tvAreaRect.x, y: formData.tvAreaRect.y },
+          size: { width: formData.tvAreaRect.width, height: formData.tvAreaRect.height },
+          color: "#3b82f6",
+          border_color: "#2563eb",
+          border_width: 2,
+          opacity: 0.3,
+          is_clickable: true,
+          is_highlightable: true,
+          hint_text: formData.hint || "Нажмите на эту область",
+          animation: "pulse" as const,
+          priority: "normal" as const,
+        };
+
+        await tvInterfaceMarksAPI.create(markData);
+      } else if (formData.tvAreaPosition.x > 0 && formData.tvAreaPosition.y > 0) {
+        // Point marking
+        const markData = {
+          tv_interface_id: tvInterfaceId,
+          step_id: stepId,
+          name: `Точка для "${formData.title}"`,
+          description: `Точка взаимодействия для шага: ${formData.description}`,
+          mark_type: "point" as const,
+          shape: "circle" as const,
+          position: formData.tvAreaPosition,
+          size: { width: 20, height: 20 },
+          color: "#ef4444",
+          border_color: "#dc2626",
+          border_width: 2,
+          opacity: 0.8,
+          is_clickable: true,
+          is_highlightable: true,
+          hint_text: formData.hint || "Нажмите здесь",
+          animation: "pulse" as const,
+          priority: "high" as const,
+        };
+
+        await tvInterfaceMarksAPI.create(markData);
+      }
+
+      console.log("TV interface mark saved for step:", stepId);
+    } catch (error) {
+      console.error("Error saving TV interface mark:", error);
     }
   };
 
@@ -738,7 +796,7 @@ const StepsManagerNew = () => {
                   <div className="text-center text-gray-500">
                     <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
                     <p className="text-lg font-medium">
-                      Изображение интерфейса не загружено
+                      ��зображение интерфейса не загружено
                     </p>
                     <p className="text-sm">
                       Загрузите изображение в разделе "Интерфейсы ТВ"
