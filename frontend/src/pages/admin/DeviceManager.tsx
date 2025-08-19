@@ -230,6 +230,23 @@ const DeviceManager = () => {
     });
   };
 
+  const handleClearAllDevices = async () => {
+    if (!confirm('Вы уверены, что хотите удалить ВСЕ устройства? Это действие нельзя отменить!')) return;
+
+    try {
+      // ��даляем все устройства по одному
+      for (const device of devices) {
+        await devicesApi.deleteDevice(device.id, true); // force delete
+      }
+
+      await refetch(); // Обновляем список
+      alert('Все устройства удалены!');
+    } catch (error) {
+      console.error('Error clearing devices:', error);
+      alert('Ошибка при удалении устройств');
+    }
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -243,6 +260,14 @@ const DeviceManager = () => {
           </p>
         </div>
         <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            onClick={handleClearAllDevices}
+            className="text-red-600 hover:text-red-700 hover:bg-red-50"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Очистить всё
+          </Button>
           <Button variant="outline">
             <Upload className="h-4 w-4 mr-2" />
             Импорт
@@ -629,7 +654,7 @@ const DeviceManager = () => {
           <CardContent className="p-12 text-center">
             <Tv className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Приставки не найдены
+              Приставки ��е найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
               Попробуйте изменить поисковый запрос или создайте новую приставку.
