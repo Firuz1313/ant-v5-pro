@@ -91,7 +91,7 @@ class Remote extends BaseModel {
   }
 
   /**
-   * Установ��ть пульт как default для устройства
+   * Установить пульт как default для устройства
    */
   async setAsDefault(remoteId, deviceId) {
     try {
@@ -145,7 +145,7 @@ class Remote extends BaseModel {
    */
   async duplicate(remoteId, newData = {}) {
     try {
-      const original = await this.getById(remoteId);
+      const original = await this.findById(remoteId);
       if (!original) {
         throw new Error('Пульт для дублирования не найден');
       }
@@ -169,7 +169,7 @@ class Remote extends BaseModel {
   }
 
   /**
-   * Получить статистику использования пультов
+   * Получить статистику исполь��ования пультов
    */
   async getUsageStats(deviceId = null) {
     try {
