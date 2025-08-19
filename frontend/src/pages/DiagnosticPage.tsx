@@ -22,13 +22,7 @@ const DiagnosticPage = () => {
     deviceId: string;
     problemId: string;
   }>();
-  const {
-    getDeviceById,
-    getStepsForProblem,
-    getRemoteById,
-    getDefaultRemoteForDevice,
-    problems,
-  } = useData();
+  // Using new API hooks instead of DataContext
   const [currentStepNumber, setCurrentStepNumber] = useState(1);
   const [manualProgress, setManualProgress] = useState(false);
 
