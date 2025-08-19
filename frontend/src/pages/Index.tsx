@@ -21,16 +21,16 @@ import {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { devices } = useDevices();
-  const { problems } = useProblems();
+  const { data: devices = [] } = useDevices();
+  const { data: problems = [] } = useProblems();
 
   const deviceStats = {
-    active: devices?.filter(d => d.isActive).length || 0,
-    total: devices?.length || 0
+    active: devices.filter((d: any) => d.isActive).length || 0,
+    total: devices.length || 0
   };
   const problemStats = {
-    total: problems?.length || 0,
-    active: problems?.filter(p => p.status === "published").length || 0
+    total: problems.length || 0,
+    active: problems.filter((p: any) => p.status === "published").length || 0
   };
 
   const handleStartDiagnostic = () => {
@@ -132,9 +132,9 @@ const Index = () => {
               Поддерживаемые устройства
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {(devices || [])
-              .filter((d) => d.isActive)
-              .map((device) => (
+              {devices
+              .filter((d: any) => d.isActive)
+              .map((device: any) => (
                   <Card
                     key={device.id}
                     className="bg-white/5 backdrop-blur-md border-white/10 hover:bg-white/10 hover:scale-105 transition-all duration-300 cursor-pointer"
