@@ -1,4 +1,4 @@
-import { query, transaction } from "./database.js";
+mport { query, transaction } from "./database.js";
 import { v4 as uuidv4 } from "uuid";
 
 // Функция очистки всех TV интерфейсов
