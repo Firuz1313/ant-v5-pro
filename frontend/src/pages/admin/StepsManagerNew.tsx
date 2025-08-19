@@ -95,6 +95,30 @@ const StepsManagerNew = () => {
   const [remotes, setRemotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  // Load initial data
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+
+      // Load steps
+      const stepsResponse = await stepsApi.getAll();
+      setSteps(stepsResponse || []);
+
+      // Load remotes
+      const remotesResponse = await remotesApi.getAll();
+      setRemotes(remotesResponse || []);
+
+    } catch (error) {
+      console.error('Error loading initial data:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   // Состояние для ТВ интерфейсов
   const [tvInterfaces, setTVInterfaces] = useState<TVInterfaceAPI[]>([]);
   const [selectedTVInterface, setSelectedTVInterface] =
@@ -395,7 +419,7 @@ const StepsManagerNew = () => {
       tvAreaPosition: step.tvAreaPosition || { x: 0, y: 0 },
     });
 
-    // Загрузить интерфейсы для текущего устро��ства
+    // Загрузить интерфейсы для текущего ус��ро��ства
     if (step.deviceId) {
       loadTVInterfacesForDevice(step.deviceId);
     }
@@ -776,7 +800,7 @@ const StepsManagerNew = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Потяните мышью по экрану ТВ, чтобы выделить прямоугольную область
+                      Потяните мыш��ю по экрану ТВ, чтобы выделить прямоугольную область
                     </p>
                   </AlertDescription>
                 </Alert>
