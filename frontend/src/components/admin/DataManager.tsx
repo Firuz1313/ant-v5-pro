@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { useData } from "@/contexts/DataContext";
+// Removed useData import - no longer using DataContext
 import {
   Download,
   Upload,
@@ -51,8 +51,12 @@ interface ImportProgress {
 }
 
 const DataManager = () => {
-  const { exportData, importData, changeLogs, clearCache, refreshData } =
-    useData();
+  // Mock functions for removed static functionality
+  const changeLogs: any[] = [];
+  const exportData = async (options: any) => ({ downloadUrl: '' });
+  const importData = async (file: File, options: any) => ({ importedCount: 0, failedCount: 0 });
+  const clearCache = () => {};
+  const refreshData = async () => {};
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isExportDialogOpen, setIsExportDialogOpen] = useState(false);
@@ -208,7 +212,7 @@ const DataManager = () => {
           <CardHeader>
             <CardTitle className="flex items-center text-lg">
               <Download className="h-5 w-5 mr-2 text-blue-600" />
-              Экспорт данных
+              ��кспорт данных
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -360,7 +364,7 @@ const DataManager = () => {
                   {!importProgress ? (
                     <>
                       <div>
-                        <Label htmlFor="file">Выбрать файл</Label>
+                        <Label htmlFor="file">Выбрать фай��</Label>
                         <div className="mt-2">
                           <Button
                             variant="outline"
@@ -587,7 +591,7 @@ const DataManager = () => {
             </Button>
             <Button variant="outline">
               <Database className="h-4 w-4 mr-2" />
-              Оптимизировать БД
+              Оптимизироват�� БД
             </Button>
             <Button variant="outline">
               <RotateCcw className="h-4 w-4 mr-2" />
