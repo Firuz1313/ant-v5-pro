@@ -148,10 +148,11 @@ const DeviceManager = () => {
 
   const handleCreate = async () => {
     try {
-      await createDevice({
+      await devicesApi.create({
         ...formData,
         isActive: true,
       });
+      await refetch();
       setIsCreateDialogOpen(false);
       resetForm();
     } catch (error) {
@@ -163,7 +164,8 @@ const DeviceManager = () => {
     if (!selectedDevice) return;
 
     try {
-      await updateDevice(selectedDevice.id, formData);
+      await devicesApi.update(selectedDevice.id, formData);
+      await refetch();
       setIsEditDialogOpen(false);
       setSelectedDevice(null);
       resetForm();
@@ -181,7 +183,8 @@ const DeviceManager = () => {
       return;
     }
     try {
-      await deleteDevice(deviceId);
+      await devicesApi.delete(deviceId);
+      await refetch();
     } catch (error) {
       console.error("Error deleting device:", error);
       alert("Ошибка при удалении приставки");
@@ -236,7 +239,7 @@ const DeviceManager = () => {
             Управление приставками
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание и настройка моделей ТВ-приставок для системы поддержки
+            Создание и настройка моделей ТВ-��риставок для системы поддержки
           </p>
         </div>
         <div className="flex space-x-2">
@@ -304,7 +307,7 @@ const DeviceManager = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Описание приставки"
+                    placeholder="Описание п��иставки"
                   />
                 </div>
 
