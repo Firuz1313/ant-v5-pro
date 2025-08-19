@@ -143,10 +143,10 @@ const DiagnosticPageNew = () => {
 
   // Проверка валидности данных
   useEffect(() => {
-    if (!deviceId || !problemId || steps.length === 0) {
+    if (!loading && (!deviceId || !problemId || steps.length === 0)) {
       navigate("/devices");
     }
-  }, [deviceId, problemId, steps.length, navigate]);
+  }, [deviceId, problemId, steps.length, navigate, loading]);
 
   const handleNextStep = () => {
     // Clear mark selections when moving to next step
