@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { useData } from "@/contexts/DataContext";
+// Removed useData import - no longer using DataContext
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -34,7 +34,17 @@ import {
 } from "lucide-react";
 
 const SystemSettings = () => {
-  const { siteSettings, updateSiteSettings } = useData();
+  // Mock site settings functionality
+  const siteSettings = {
+    siteName: "ANT Support",
+    siteDescription: "Система диагностики ТВ-приставок",
+    defaultLanguage: "ru",
+    theme: "dark",
+    primaryColor: "#3b82f6",
+    accentColor: "#10b981",
+    logoUrl: ""
+  };
+  const updateSiteSettings = async (settings: any) => {};
 
   const [settings, setSettings] = useState({
     // General Settings from context
@@ -85,8 +95,8 @@ const SystemSettings = () => {
     // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 1000));
 
-    // Update site settings in context
-    updateSiteSettings({
+    // Mock update - site settings functionality removed
+    await updateSiteSettings({
       ...siteSettings,
       siteName: settings.siteName,
       siteDescription: settings.siteDescription,
