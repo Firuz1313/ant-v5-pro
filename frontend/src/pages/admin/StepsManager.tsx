@@ -54,7 +54,7 @@ import { tvInterfacesAPI } from "@/api/tvInterfaces";
 import { TVInterface, tvInterfaceUtils } from "@/types/tvInterface";
 import TVInterfaceAreaEditor from "@/components/admin/TVInterfaceAreaEditor";
 
-// Мемоизированный комп��нент формы для предот��ращения потери фокуса
+// Мемоизированный компонент формы для предот��ращения потери фокуса
 const StepFormFieldsComponent = React.memo(
   ({
     isEdit = false,
@@ -165,7 +165,7 @@ const StepFormFieldsComponent = React.memo(
 
       <div>
         <Label htmlFor={isEdit ? "edit-tvInterfaceId" : "tvInterfaceId"}>
-          Созданны�� интерфейс
+          Созданный интерфейс
         </Label>
         <div className="flex space-x-2">
           <Select
@@ -513,7 +513,7 @@ const StepsManager = () => {
           }
           toast({
             title: "Интерфейс не найден",
-            description: `TV интерфейс "${tvInterface.name}" больше не существует. Список интерфейсов обновлён.`,
+            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Список интерфейсов обновлён.`,
             variant: "destructive",
           });
           return; // Don't open editor for non-existent interface
@@ -668,7 +668,7 @@ const StepsManager = () => {
 
     try {
       await deleteStep(stepId);
-      // The DataContext should handle step reordering automatically
+      // Step reordering handled automatically
     } catch (error) {
       console.error("Error deleting step:", error);
     }
@@ -712,7 +712,7 @@ const StepsManager = () => {
     });
 
     try {
-      // Use the reorderSteps function from DataContext
+      // Use the reorderSteps function
       const problemStepIds = problemSteps.map((s) => {
         if (s.id === stepId) return problemSteps[newIndex].id;
         if (s.id === problemSteps[newIndex].id) return stepId;
