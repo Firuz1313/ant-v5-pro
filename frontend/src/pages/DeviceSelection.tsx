@@ -201,7 +201,7 @@ const DeviceSelection = () => {
                 </div>
 
                 <h3 className="text-2xl font-bold text-white mb-4">
-                  Профессиональная поддержка 24/7
+                  Профессиональная поддержка
                 </h3>
 
                 <p className="text-gray-300 mb-6 text-lg leading-relaxed max-w-2xl mx-auto">
@@ -213,7 +213,7 @@ const DeviceSelection = () => {
                 <div className="grid grid-cols-3 gap-6 mb-8">
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white mb-1">
-                      99.9%
+                      -
                     </div>
                     <div className="text-sm text-gray-400">
                       Успешных решений
@@ -221,13 +221,13 @@ const DeviceSelection = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white mb-1">
-                      5 мин
+                      -
                     </div>
                     <div className="text-sm text-gray-400">Среднее время</div>
                   </div>
                   <div className="text-center">
                     <div className="text-2xl font-bold text-white mb-1">
-                      24/7
+                      -
                     </div>
                     <div className="text-sm text-gray-400">Поддержка</div>
                   </div>
