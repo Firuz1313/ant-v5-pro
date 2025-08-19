@@ -91,7 +91,7 @@ const ScreenshotBrowser: React.FC<ScreenshotBrowserProps> = ({
   const [selectedScreenshot, setSelectedScreenshot] = useState<string | null>(null);
 
   // Filter screenshots
-  const filteredScreenshots = mockScreenshots.filter(screenshot => {
+  const filteredScreenshots = screenshots.filter(screenshot => {
     const matchesSearch = screenshot.name.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDevice = !currentDeviceId || screenshot.deviceId === currentDeviceId;
     const matchesType = selectedType === 'all' || screenshot.type === selectedType;
@@ -101,7 +101,7 @@ const ScreenshotBrowser: React.FC<ScreenshotBrowserProps> = ({
 
   const handleSelect = () => {
     if (selectedScreenshot) {
-      const screenshot = mockScreenshots.find(s => s.id === selectedScreenshot);
+      const screenshot = screenshots.find(s => s.id === selectedScreenshot);
       if (screenshot) {
         onSelectScreenshot(screenshot.url);
         onOpenChange(false);
