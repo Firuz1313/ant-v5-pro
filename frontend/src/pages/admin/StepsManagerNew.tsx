@@ -479,7 +479,7 @@ const StepsManagerNew = () => {
       tvAreaPosition: step.tvAreaPosition || { x: 0, y: 0 },
     });
 
-    // Загрузить интерфейсы для текущего устро��ства
+    // Загрузить интерфейсы ��ля текущего устро��ства
     if (step.deviceId) {
       loadTVInterfacesForDevice(step.deviceId);
     }
@@ -614,7 +614,7 @@ const StepsManagerNew = () => {
         remoteId: defaultRemote?.id || "none",
       }));
     },
-    [getDefaultRemoteForDevice],
+    [remotes],
   );
 
   const getDeviceName = (deviceId: string) => {
@@ -885,7 +885,7 @@ const StepsManagerNew = () => {
                     <AlertDescription>
                       {formData.tvAreaRect && formData.tvAreaRect.width > 0 && formData.tvAreaRect.height > 0 ? (
                         <p className="text-sm text-green-700 dark:text-green-300">
-                          Область на ТВ: ({Math.round(formData.tvAreaRect.x)}, {Math.round(formData.tvAreaRect.y)}) �� {Math.round(formData.tvAreaRect.width)}×{Math.round(formData.tvAreaRect.height)}
+                          Область на ТВ: ({Math.round(formData.tvAreaRect.x)}, {Math.round(formData.tvAreaRect.y)}) — {Math.round(formData.tvAreaRect.width)}×{Math.round(formData.tvAreaRect.height)}
                         </p>
                       ) : (
                         <p className="text-sm text-green-700 dark:text-green-300">
@@ -969,7 +969,7 @@ const StepsManagerNew = () => {
           id={isEdit ? "edit-description" : "description"}
           value={formData.description}
           onChange={(e) => handleFieldChange("description", e.target.value)}
-          placeholder="Краткое описание шага"
+          placeholder="Краткое описание ��ага"
         />
       </div>
 
@@ -1119,7 +1119,7 @@ const StepsManagerNew = () => {
           id={isEdit ? "edit-hint" : "hint"}
           value={formData.hint}
           onChange={(e) => handleFieldChange("hint", e.target.value)}
-          placeholder="Дополнител��на�� подсказка для пользоват���ля"
+          placeholder="Дополнительна�� подсказка для пользоват���ля"
         />
       </div>
 
