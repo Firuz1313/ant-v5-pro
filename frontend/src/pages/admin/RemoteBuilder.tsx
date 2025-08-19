@@ -865,7 +865,7 @@ const RemoteBuilder = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="universal">Универсальный</SelectItem>
-                        {devices.map((device) => (
+                        {activeDevices.map((device) => (
                           <SelectItem key={device.id} value={device.id}>
                             {device.name}
                           </SelectItem>
