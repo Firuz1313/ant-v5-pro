@@ -46,10 +46,22 @@ export const getRemotes = async (req, res) => {
     }
 
     // Обычный список с пагинацией
+    // Parse sort field correctly
+    let sortBy = 'created_at';
+    if (sort.startsWith('usage_count')) {
+      sortBy = 'usage_count';
+    } else if (sort.startsWith('name')) {
+      sortBy = 'name';
+    } else if (sort.startsWith('created_at')) {
+      sortBy = 'created_at';
+    } else if (sort.startsWith('manufacturer')) {
+      sortBy = 'manufacturer';
+    }
+
     const result = await remoteModel.findAll({}, {
       offset,
       limit: parseInt(limit),
-      sortBy: sort.split('_')[0],
+      sortBy: sortBy,
       sortOrder: sort.includes('desc') ? 'DESC' : 'ASC'
     });
 
@@ -360,7 +372,7 @@ export const duplicateRemote = async (req, res) => {
     console.error('Error in duplicateRemote:', error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при дублировании пульта',
+      error: 'Ошибка при дублировании пуль��а',
       details: error.message,
       timestamp: new Date().toISOString()
     });
