@@ -13,7 +13,6 @@ import {
   getRemoteStats
 } from '../controllers/remoteController.js';
 import { validateRequest } from '../middleware/validateRequest.js';
-import Joi from 'joi';
 
 const router = express.Router();
 
