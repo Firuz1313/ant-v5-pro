@@ -72,23 +72,50 @@ const DiagnosticPageNew = () => {
   const [hoveredMark, setHoveredMark] = useState<TVInterfaceMark | null>(null);
   const [selectedMark, setSelectedMark] = useState<TVInterfaceMark | null>(null);
 
+  // Load data when component mounts
+  useEffect(() => {
+    const loadData = async () => {
+      if (!problemId || !deviceId) return;
+
+      try {
+        setLoading(true);
+
+        // Load steps for the problem
+        const stepsResponse = await stepsApi.getByProblem(problemId);
+        setSteps(stepsResponse || []);
+
+        // Load default remote for device
+        try {
+          const defaultRemote = await remotesApi.getDefaultForDevice(deviceId);
+          setRemote(defaultRemote);
+        } catch (error) {
+          // If no default remote, try to get any remote for the device
+          try {
+            const deviceRemotes = await remotesApi.getByDevice(deviceId);
+            if (deviceRemotes && deviceRemotes.length > 0) {
+              setRemote(deviceRemotes[0]);
+            }
+          } catch (err) {
+            console.log('No remotes found for device');
+          }
+        }
+      } catch (error) {
+        console.error('Error loading diagnostic data:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadData();
+  }, [problemId, deviceId]);
+
   // Данные
-  const device = deviceId ? getDeviceById(deviceId) : null;
-  const steps: DiagnosticStep[] = problemId ? getStepsForProblem(problemId) : [];
+  const device = devices?.find(d => d.id === deviceId);
   const currentStepData = steps.find(
     (step) => step.stepNumber === currentStepNumber,
   );
   const progress = steps.length > 0 ? (currentStepNumber / steps.length) * 100 : 0;
-  const problem = problemId ? problems.find((p) => p.id === problemId) : null;
-
-  // Получение пульта для текущего ��ага
-  const stepRemote = currentStepData?.remoteId
-    ? getRemoteById(currentStepData.remoteId)
-    : null;
-  const deviceDefaultRemote = deviceId
-    ? getDefaultRemoteForDevice(deviceId)
-    : null;
-  const remote = stepRemote || deviceDefaultRemote;
+  const problem = problemId ? problems?.find((p) => p.id === problemId) : null;
 
   // Загрузка ТВ интерфейса для текущего шага
   useEffect(() => {
