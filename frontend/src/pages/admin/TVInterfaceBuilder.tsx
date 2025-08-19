@@ -15,7 +15,6 @@ import { Badge } from "@/components/ui/badge";
 import { useToast } from "@/hooks/use-toast";
 import { useData } from "@/contexts/DataContext";
 import { tvInterfacesAPI } from "@/api/tvInterfaces";
-import { cleanupAPI } from "@/api/cleanup";
 import {
   TVInterface,
   CreateTVInterfaceData,
@@ -538,7 +537,7 @@ const TVInterfaceBuilder = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="device">Устройство</Label>
+                  <Label htmlFor="device">��стройство</Label>
                   <Select
                     value={formData.deviceId}
                     onValueChange={(value) =>
@@ -854,7 +853,7 @@ const TVInterfaceBuilder = () => {
                           </AlertDialogTitle>
                           <AlertDialogDescription>
                             Это действие нельзя отменить. TV интерфейс "
-                            {tvInterface.name}" будет удален навсегда.
+                            {tvInterface.name}" будет удален нав��егда.
                           </AlertDialogDescription>
                         </AlertDialogHeader>
                         <AlertDialogFooter>
