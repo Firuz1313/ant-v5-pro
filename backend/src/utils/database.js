@@ -151,10 +151,6 @@ export async function query(text, params = []) {
 
 // Функция выполнения транзакции
 export async function transaction(callback) {
-  if (USE_MOCK_DB && mockDb) {
-    return await mockDb.transaction(callback);
-  }
-
   let client;
 
   try {
@@ -202,7 +198,7 @@ export async function createDatabase() {
     if (checkResult.rows.length === 0) {
       console.log(`📊 Создание базы данных: ${dbConfig.database}`);
       await client.query(`CREATE DATABASE "${dbConfig.database}"`);
-      console.log("✅ База данных создана успешно");
+      console.log("✅ База данных создана ��спешно");
     } else {
       console.log(`📊 База данных ${dbConfig.database} уже существует`);
     }
