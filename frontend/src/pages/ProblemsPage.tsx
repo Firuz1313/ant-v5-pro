@@ -18,7 +18,8 @@ import {
   ChevronRight,
   Tv,
 } from "lucide-react";
-import { useData } from "@/contexts/DataContext";
+import { useProblems } from "@/hooks/useProblems";
+import { useDevices } from "@/hooks/useDevices";
 
 const iconMap = {
   Signal,
@@ -37,7 +38,11 @@ const iconMap = {
 const ProblemsPage = () => {
   const navigate = useNavigate();
   const { deviceId } = useParams<{ deviceId: string }>();
-  const { getDeviceById, getProblemsForDevice } = useData();
+
+  const { devices } = useDevices();
+  const { problems } = useProblems({ deviceId });
+
+  const device = devices?.find(d => d.id === deviceId);
 
   const device = deviceId ? getDeviceById(deviceId) : null;
   const problems = deviceId ? getProblemsForDevice(deviceId) : [];
