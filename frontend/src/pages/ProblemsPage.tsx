@@ -44,9 +44,6 @@ const ProblemsPage = () => {
 
   const device = devices?.find(d => d.id === deviceId);
 
-  const device = deviceId ? getDeviceById(deviceId) : null;
-  const problems = deviceId ? getProblemsForDevice(deviceId) : [];
-
   const handleProblemSelect = (problemId: string) => {
     navigate(`/diagnostic/${deviceId}/${problemId}`);
   };
