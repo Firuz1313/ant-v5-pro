@@ -13,8 +13,7 @@ dotenv.config();
 
 const { Pool, Client } = pkg;
 
-// Check if we should use mock database
-const USE_MOCK_DB = process.env.USE_MOCK_DATABASE === "true" || process.env.NODE_ENV === "mock";
+// PostgreSQL connection only - no mock database
 
 // Конфигурация подключения к PostgreSQL
 let dbConfig;
@@ -45,7 +44,7 @@ if (process.env.DATABASE_URL) {
     // Настройки pool соединений
     max: 20, // максимальное количество соединений в pool
     min: 5, // минимальное количество соединений
-    idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
+    idleTimeoutMillis: 30000, // время простоя перед закрытием соединени��
     connectionTimeoutMillis: 5000, // таймаут подключения
     maxUses: 7500, // максимальное количество использований соединения
   };
@@ -86,7 +85,7 @@ export async function testConnection() {
       "SELECT NOW() as current_time, version() as postgres_version",
     );
 
-    console.log("✅ Подключение к PostgreSQL успешно");
+    console.log("✅ Подключение к PostgreSQL успеш��о");
     console.log(`🕐 Время сервера: ${result.rows[0].current_time}`);
     console.log(
       `📋 Версия PostgreSQL: ${result.rows[0].postgres_version.split(" ")[0]}`,
@@ -100,13 +99,8 @@ export async function testConnection() {
   } catch (error) {
     console.error("❌ Ошибка подключ��ния к PostgreSQL:", error.message);
 
-    // Fallback to mock database
-    if (!USE_MOCK_DB) {
-      console.log("🔧 Falling back to mock database...");
-      process.env.USE_MOCK_DB = "true";
-      mockDb = await import("./mockDatabase.js");
-      return await mockDb.testConnection();
-    }
+    // PostgreSQL connection failed
+    console.error("❌ Failed to connect to PostgreSQL database");
 
     return {
       success: false,
@@ -374,7 +368,7 @@ export async function cleanupOldData(daysToKeep = 90) {
       [cutoffDate],
     );
 
-    console.log(`✅ Удале��о сессий: ${sessionsResult.rowCount}`);
+    console.log(`✅ Удалено сессий: ${sessionsResult.rowCount}`);
     console.log(`✅ Удалено логов: ${logsResult.rowCount}`);
 
     // Обновляем статистику
