@@ -1,5 +1,5 @@
-import { query, transaction } from '../utils/database.js';
-import { v4 as uuidv4 } from 'uuid';
+import { query, transaction } from "../utils/database.js";
+import { v4 as uuidv4 } from "uuid";
 
 /**
  * Базовая модель с общими методами для всех сущностей
@@ -40,7 +40,7 @@ class BaseModel {
       id: data.id || this.generateId(),
       created_at: this.createTimestamp(),
       updated_at: this.createTimestamp(),
-      is_active: data.is_active !== undefined ? data.is_active : true
+      is_active: data.is_active !== undefined ? data.is_active : true,
     };
 
     return prepared;
@@ -52,7 +52,7 @@ class BaseModel {
   prepareForUpdate(data) {
     const prepared = {
       ...data,
-      updated_at: this.createTimestamp()
+      updated_at: this.createTimestamp(),
     };
 
     // Удаляем поля, которые нельзя обновлять
@@ -71,8 +71,8 @@ class BaseModel {
     const placeholders = columns.map((_, index) => `$${index + 1}`);
 
     const sql = `
-      INSERT INTO ${this.tableName} (${columns.join(', ')})
-      VALUES (${placeholders.join(', ')})
+      INSERT INTO ${this.tableName} (${columns.join(", ")})
+      VALUES (${placeholders.join(", ")})
       RETURNING *
     `;
 
@@ -89,7 +89,7 @@ class BaseModel {
 
     const sql = `
       UPDATE ${this.tableName}
-      SET ${setClause.join(', ')}
+      SET ${setClause.join(", ")}
       WHERE id = $1
       RETURNING *
     `;
@@ -145,22 +145,22 @@ class BaseModel {
 
     // Поиск по тексту (если поддерживается)
     if (filters.search && options.searchFields) {
-      const searchConditions = options.searchFields.map(field => 
-        `${field} ILIKE $${paramIndex}`
+      const searchConditions = options.searchFields.map(
+        (field) => `${field} ILIKE $${paramIndex}`,
       );
-      conditions.push(`(${searchConditions.join(' OR ')})`);
+      conditions.push(`(${searchConditions.join(" OR ")})`);
       values.push(`%${filters.search}%`);
       paramIndex++;
     }
 
     // Добавляем WHERE условия
     if (conditions.length > 0) {
-      sql += ` WHERE ${conditions.join(' AND ')}`;
+      sql += ` WHERE ${conditions.join(" AND ")}`;
     }
 
     // Сортировка
-    const sortBy = options.sortBy || 'created_at';
-    const sortOrder = options.sortOrder || 'DESC';
+    const sortBy = options.sortBy || "created_at";
+    const sortOrder = options.sortOrder || "DESC";
     sql += ` ORDER BY ${sortBy} ${sortOrder}`;
 
     // Пагинация
@@ -189,7 +189,10 @@ class BaseModel {
       const result = await query(sql, values);
       return result.rows[0];
     } catch (error) {
-      console.error(`Ошибка создания записи в ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка создания записи в ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -203,7 +206,10 @@ class BaseModel {
       const result = await query(sql, [id]);
       return result.rows[0] || null;
     } catch (error) {
-      console.error(`Ошибка получения записи из ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка получения записи из ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -217,7 +223,10 @@ class BaseModel {
       const result = await query(sql, values);
       return result.rows;
     } catch (error) {
-      console.error(`Ошибка получения записей из ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка получения записей из ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -231,7 +240,10 @@ class BaseModel {
       const result = await query(sql, values);
       return result.rows[0] || null;
     } catch (error) {
-      console.error(`Ошибка получения записи из ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка получения записи из ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -246,7 +258,10 @@ class BaseModel {
       const result = await query(sql, values);
       return result.rows[0] || null;
     } catch (error) {
-      console.error(`Ошибка обновления записи в ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка обновления записи в ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -265,7 +280,10 @@ class BaseModel {
       const result = await query(sql, [id, this.createTimestamp()]);
       return result.rows[0] || null;
     } catch (error) {
-      console.error(`Ошибка мягкого удаления записи из ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка мягкого удаления записи из ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -279,7 +297,10 @@ class BaseModel {
       const result = await query(sql, [id]);
       return result.rows[0] || null;
     } catch (error) {
-      console.error(`Ошибка удаления записи из ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка удаления записи из ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -307,13 +328,16 @@ class BaseModel {
       }
 
       if (conditions.length > 0) {
-        sql += ` WHERE ${conditions.join(' AND ')}`;
+        sql += ` WHERE ${conditions.join(" AND ")}`;
       }
 
       const result = await query(sql, values);
       return parseInt(result.rows[0].total);
     } catch (error) {
-      console.error(`Ошибка подсчета записей в ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка подсчета записей в ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -325,18 +349,21 @@ class BaseModel {
     try {
       return await transaction(async (client) => {
         const results = [];
-        
+
         for (const data of dataArray) {
           const prepared = this.prepareForInsert(data);
           const { sql, values } = this.buildInsertQuery(prepared);
           const result = await client.query(sql, values);
           results.push(result.rows[0]);
         }
-        
+
         return results;
       });
     } catch (error) {
-      console.error(`Ошибка массового создания записей в ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка массового создания записей в ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -348,7 +375,7 @@ class BaseModel {
     try {
       return await transaction(async (client) => {
         const results = [];
-        
+
         for (const { id, data } of updates) {
           const prepared = this.prepareForUpdate(data);
           const { sql, values } = this.buildUpdateQuery(id, prepared);
@@ -357,11 +384,14 @@ class BaseModel {
             results.push(result.rows[0]);
           }
         }
-        
+
         return results;
       });
     } catch (error) {
-      console.error(`Ошибка массового обновления записей в ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка массового обновления записей в ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -375,7 +405,10 @@ class BaseModel {
       const result = await query(sql, [id]);
       return result.rows[0].exists;
     } catch (error) {
-      console.error(`Ошибка проверки существования записи в ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка проверки существования записи в ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -408,7 +441,10 @@ class BaseModel {
       const result = await query(sql, [id, this.createTimestamp()]);
       return result.rows[0] || null;
     } catch (error) {
-      console.error(`Ошибка восстановления записи в ${this.tableName}:`, error.message);
+      console.error(
+        `Ошибка восстановления записи в ${this.tableName}:`,
+        error.message,
+      );
       throw error;
     }
   }

@@ -43,27 +43,32 @@ export class ApiClient {
 
     // Store the original fetch to bypass FullStory or other fetch wrappers
     // Bind to window to prevent "Illegal invocation" errors
-    this.originalFetch = ((window as any).__originalFetch || window.fetch).bind(window);
+    this.originalFetch = ((window as any).__originalFetch || window.fetch).bind(
+      window,
+    );
 
     // If FullStory hasn't wrapped fetch yet, store the original
-    if (!((window as any).__originalFetch)) {
+    if (!(window as any).__originalFetch) {
       (window as any).__originalFetch = window.fetch.bind(window);
       this.originalFetch = window.fetch.bind(window);
     }
   }
 
-  private async xhrFallback(url: string, options: RequestInit): Promise<Response> {
+  private async xhrFallback(
+    url: string,
+    options: RequestInit,
+  ): Promise<Response> {
     return new Promise((resolve, reject) => {
       console.log(`📡 Using XMLHttpRequest fallback for: ${url}`);
 
       const xhr = new XMLHttpRequest();
-      const method = options.method || 'GET';
+      const method = options.method || "GET";
 
       xhr.open(method, url);
       xhr.timeout = this.timeout;
 
       // Set headers
-      const headers = options.headers as Record<string, string> || {};
+      const headers = (options.headers as Record<string, string>) || {};
       Object.entries(headers).forEach(([key, value]) => {
         xhr.setRequestHeader(key, value);
       });
@@ -72,21 +77,23 @@ export class ApiClient {
         const response = new Response(xhr.responseText, {
           status: xhr.status,
           statusText: xhr.statusText,
-          headers: new Headers()
+          headers: new Headers(),
         });
         resolve(response);
       };
 
       xhr.onerror = () => {
-        reject(new Error(`XHR request failed: ${xhr.status} ${xhr.statusText}`));
+        reject(
+          new Error(`XHR request failed: ${xhr.status} ${xhr.statusText}`),
+        );
       };
 
       xhr.ontimeout = () => {
-        reject(new Error('XHR request timeout'));
+        reject(new Error("XHR request timeout"));
       };
 
       // Send body if present
-      xhr.send(options.body as string || null);
+      xhr.send((options.body as string) || null);
     });
   }
 
@@ -234,7 +241,9 @@ export class ApiClient {
 
         // If body is already used, we can't read it, but we can still provide error info
         if (response.bodyUsed) {
-          console.error(`📡 Response body already consumed - creating fallback response`);
+          console.error(
+            `📡 Response body already consumed - creating fallback response`,
+          );
           responseText = JSON.stringify({
             error: `HTTP ${response.status}`,
             message: `Request failed with status ${response.status}`,
@@ -254,7 +263,10 @@ export class ApiClient {
             try {
               responseText = await response.text();
             } catch (originalError) {
-              console.error(`📡 Failed to read original response:`, originalError);
+              console.error(
+                `📡 Failed to read original response:`,
+                originalError,
+              );
               responseText = JSON.stringify({
                 error: `HTTP ${response.status}`,
                 message: `Failed to read response body`,
@@ -330,23 +342,36 @@ export class ApiClient {
         if (error.name === "AbortError") {
           // Check if this is a timeout during potential database reconnection
           if (retryCount < 2) {
-            console.log(`⏱️ Request timeout (attempt ${retryCount + 1}/2) - retrying due to potential database reconnection...`);
-            await new Promise(resolve => setTimeout(resolve, 2000));
+            console.log(
+              `⏱️ Request timeout (attempt ${retryCount + 1}/2) - retrying due to potential database reconnection...`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2000));
             return this.makeRequest<T>(endpoint, options, retryCount + 1);
           }
-          throw new ApiError("Request timeout - this may be due to database connectivity issues", 408);
+          throw new ApiError(
+            "Request timeout - this may be due to database connectivity issues",
+            408,
+          );
         }
 
         // Handle network connectivity errors with retry logic
-        if (error.message === "Failed to fetch" || error.name === "TypeError" || error.message.includes("Illegal invocation")) {
+        if (
+          error.message === "Failed to fetch" ||
+          error.name === "TypeError" ||
+          error.message.includes("Illegal invocation")
+        ) {
           console.error(`📡 Network error detected - checking connectivity`);
 
           // Check if FullStory is interfering
-          const isFullStoryPresent = error.stack && error.stack.includes('fullstory.com');
-          const isIllegalInvocation = error.message.includes("Illegal invocation");
+          const isFullStoryPresent =
+            error.stack && error.stack.includes("fullstory.com");
+          const isIllegalInvocation =
+            error.message.includes("Illegal invocation");
 
           if (isFullStoryPresent || isIllegalInvocation) {
-            console.error(`📡 Fetch API interference detected - switching to XMLHttpRequest fallback`);
+            console.error(
+              `📡 Fetch API interference detected - switching to XMLHttpRequest fallback`,
+            );
             if (!this.useFallback) {
               this.useFallback = true;
               console.log(`📡 Enabling XHR fallback mode for future requests`);
@@ -358,15 +383,19 @@ export class ApiClient {
           // Retry for network failures (up to 3 retries with exponential backoff)
           if (retryCount < 3) {
             const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 5000); // 1s, 2s, 4s max
-            console.log(`🔄 Retrying network request (attempt ${retryCount + 1}/3) after ${backoffDelay}ms delay...`);
+            console.log(
+              `🔄 Retrying network request (attempt ${retryCount + 1}/3) after ${backoffDelay}ms delay...`,
+            );
             if (this.useFallback) {
               console.log(`📡 Using XMLHttpRequest fallback...`);
             } else if (isFullStoryPresent) {
               console.log(`📡 Attempting to bypass FullStory fetch wrapper...`);
             } else {
-              console.log(`📡 This might be due to database reconnection - please wait...`);
+              console.log(
+                `📡 This might be due to database reconnection - please wait...`,
+              );
             }
-            await new Promise(resolve => setTimeout(resolve, backoffDelay));
+            await new Promise((resolve) => setTimeout(resolve, backoffDelay));
             return this.makeRequest<T>(endpoint, options, retryCount + 1);
           }
 
