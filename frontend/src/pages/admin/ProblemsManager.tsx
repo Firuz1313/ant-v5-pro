@@ -47,7 +47,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useDevices } from "@/hooks/useDevices";
-import { useProblems } from "@/hooks/useProblems";
+import { useProblems, useCreateProblem, useUpdateProblem, useDeleteProblem, useDuplicateProblem } from "@/hooks/useProblems";
 
 const iconMap = {
   Signal,
@@ -80,15 +80,14 @@ interface Problem {
 const ProblemsManager = () => {
   const { data: devicesResponse } = useDevices();
   const { data: problemsResponse } = useProblems();
+  const createProblemMutation = useCreateProblem();
+  const updateProblemMutation = useUpdateProblem();
+  const deleteProblemMutation = useDeleteProblem();
+  const duplicateProblemMutation = useDuplicateProblem();
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
-
-  // Mock functions for removed static functionality
-  const createProblem = async (problem: any) => {};
-  const updateProblem = async (id: string, data: any) => {};
-  const deleteProblem = async (id: string) => {};
   const getActiveDevices = () =>
     devices.filter((d: any) => d.is_active !== false);
   const getStepsForProblem = (problemId: string) => [];
@@ -218,10 +217,13 @@ const ProblemsManager = () => {
 
   const handleCreate = async () => {
     try {
-      await createProblem({
-        ...formData,
-        completedCount: 0,
-        successRate: 100,
+      await createProblemMutation.mutateAsync({
+        deviceId: formData.deviceId,
+        title: formData.title,
+        description: formData.description,
+        category: formData.category,
+        icon: formData.icon,
+        color: formData.color,
         priority: 1,
         estimatedTime: 5,
         difficulty: "beginner",
@@ -232,6 +234,7 @@ const ProblemsManager = () => {
       resetForm();
     } catch (error) {
       console.error("Error creating problem:", error);
+      alert("Ошибка при создании проблемы: " + (error?.message || "Неизвестная ошибка"));
     }
   };
 
@@ -239,12 +242,23 @@ const ProblemsManager = () => {
     if (!selectedProblem) return;
 
     try {
-      await updateProblem(selectedProblem.id, formData);
+      await updateProblemMutation.mutateAsync({
+        id: selectedProblem.id,
+        data: {
+          deviceId: formData.deviceId,
+          title: formData.title,
+          description: formData.description,
+          category: formData.category,
+          icon: formData.icon,
+          color: formData.color,
+        }
+      });
       setIsEditDialogOpen(false);
       setSelectedProblem(null);
       resetForm();
     } catch (error) {
       console.error("Error updating problem:", error);
+      alert("Ошибка при обновлении проблемы: " + (error?.message || "Неизвестная ошибка"));
     }
   };
 
@@ -257,11 +271,15 @@ const ProblemsManager = () => {
       return;
     }
 
+    if (!confirm("Вы уверены, что хотите удалить эту проблему?")) {
+      return;
+    }
+
     try {
-      await deleteProblem(problemId);
+      await deleteProblemMutation.mutateAsync({ id: problemId });
     } catch (error) {
       console.error("Error deleting problem:", error);
-      alert("Ошибка при удалении проблемы");
+      alert("Ошибка при удалении проблемы: " + (error?.message || "Неизвестная ошибка"));
     }
   };
 
@@ -271,27 +289,30 @@ const ProblemsManager = () => {
 
     try {
       const currentStatus = problem.status || problem.is_active;
-      await updateProblem(problemId, {
-        status:
-          currentStatus === "published" || currentStatus === "active"
-            ? "draft"
-            : "published",
+      await updateProblemMutation.mutateAsync({
+        id: problemId,
+        data: {
+          status:
+            currentStatus === "published" || currentStatus === "active"
+              ? "draft"
+              : "published",
+        }
       });
     } catch (error) {
       console.error("Error toggling problem status:", error);
+      alert("Ошибка при изменении статуса проблемы: " + (error?.message || "Неизвестная ошибка"));
     }
   };
 
   const handleDuplicate = async (problem: Problem) => {
     try {
-      await createProblem({
-        ...problem,
-        title: `${problem.title} (копия)`,
-        completedCount: 0,
-        status: "draft",
+      await duplicateProblemMutation.mutateAsync({
+        id: problem.id,
+        targetDeviceId: problem.device_id || problem.deviceId
       });
     } catch (error) {
       console.error("Error duplicating problem:", error);
+      alert("Ошибка при дублировании проблемы: " + (error?.message || "Неизвестная ошибка"));
     }
   };
 
@@ -330,13 +351,13 @@ const ProblemsManager = () => {
     try {
       // Удаляем все проблемы по одной
       for (const problem of problems) {
-        await deleteProblem(problem.id);
+        await deleteProblemMutation.mutateAsync({ id: problem.id, force: true });
       }
 
       alert("Все проблемы удалены!");
     } catch (error) {
       console.error("Error clearing problems:", error);
-      alert("Ошибка при удалении проблем");
+      alert("Ошибка при удалении проблем: " + (error?.message || "Неизвестная ошибка"));
     }
   };
 
@@ -518,9 +539,9 @@ const ProblemsManager = () => {
                   </Button>
                   <Button
                     onClick={handleCreate}
-                    disabled={!formData.title || !formData.deviceId}
+                    disabled={!formData.title || !formData.deviceId || createProblemMutation.isPending}
                   >
-                    Создать
+                    {createProblemMutation.isPending ? "Создание..." : "Создать"}
                   </Button>
                 </div>
               </div>
@@ -838,7 +859,7 @@ const ProblemsManager = () => {
             </div>
 
             <div>
-              <Label htmlFor="edit-color">Цветовая схема</Label>
+              <Label htmlFor="edit-color">Цвет��вая схема</Label>
               <Select
                 value={formData.color}
                 onValueChange={(value) =>
@@ -872,9 +893,9 @@ const ProblemsManager = () => {
               </Button>
               <Button
                 onClick={handleEdit}
-                disabled={!formData.title || !formData.deviceId}
+                disabled={!formData.title || !formData.deviceId || updateProblemMutation.isPending}
               >
-                Сохранить
+                {updateProblemMutation.isPending ? "Сохранение..." : "Сохранить"}
               </Button>
             </div>
           </div>
