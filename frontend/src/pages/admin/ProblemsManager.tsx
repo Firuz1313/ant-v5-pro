@@ -380,11 +380,7 @@ const ProblemsManager = () => {
     try {
       const result = await deleteProblemMutation.mutateAsync({ id: problemId });
       console.log(`✅ Delete successful:`, result);
-
-      // Force refetch of problems
-      setTimeout(() => {
-        window.location.reload();
-      }, 1000);
+      console.log(`🔄 React Query should automatically invalidate and refetch problems list`);
 
     } catch (error) {
       console.error("❌ Error deleting problem:", error);
