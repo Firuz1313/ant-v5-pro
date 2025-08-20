@@ -44,8 +44,8 @@ export const deviceValidation = {
     brand: Joi.string().min(1).max(255),
     model: Joi.string().min(1).max(255),
     description: commonSchemas.text,
-    image_url: commonSchemas.url,
-    logo_url: commonSchemas.url,
+    image_url: Joi.string().uri().max(500).allow('', null).optional(),
+    logo_url: Joi.string().uri().max(500).allow('', null).optional(),
     color: commonSchemas.color,
     order_index: commonSchemas.integer,
     status: Joi.string().valid('active', 'inactive', 'maintenance'),
@@ -293,7 +293,7 @@ export const validateRequest = (schema, source = 'body') => {
       });
     }
     
-    // Заменяем исходные данные на валидированные и очи��енные
+    // Заменяем исходные данные на валидированные и очищенные
     switch (source) {
       case 'body':
         req.body = value;
