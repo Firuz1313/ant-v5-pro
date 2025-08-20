@@ -44,7 +44,7 @@ async function executeSqlFile(filePath) {
 
     const sql = fs.readFileSync(filePath, 'utf8');
     
-    // Разделяем SQL на отдельные команды
+    // Разделяем SQL на отдельны�� команды
     const commands = sql
       .split(';')
       .map(cmd => cmd.trim())
@@ -67,10 +67,10 @@ async function executeSqlFile(filePath) {
  */
 async function checkTablesExist() {
   try {
-    const result = await execDatabase(`
-      SELECT table_name 
-      FROM information_schema.tables 
-      WHERE table_schema = 'public' 
+    const result = await query(`
+      SELECT table_name
+      FROM information_schema.tables
+      WHERE table_schema = 'public'
       AND table_type = 'BASE TABLE'
       ORDER BY table_name;
     `);
@@ -177,7 +177,7 @@ async function initializeDatabase() {
     log.info(`Найдено таблиц: ${existingTables.length}`);
     
     if (existingTables.length === 0) {
-      // Если таблиц нет, выполняем полную инициали��ацию
+      // Если таблиц нет, выполняем ��олную инициали��ацию
       log.info('Таблицы не найдены, выполняем полную инициализацию...');
       await runMigrations();
       await seedDatabase();
@@ -208,7 +208,7 @@ async function initializeDatabase() {
       });
     }
     
-    log.success('База данных успешно инициализирована!');
+    log.success('База данных успешно инициали��ирована!');
     
   } catch (error) {
     log.error(`Ошибка инициализации: ${error.message}`);
