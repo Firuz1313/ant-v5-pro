@@ -12,6 +12,11 @@ const deviceModel = new Device();
  * Контроллер для управления проблемами
  */
 class ProblemController {
+  constructor() {
+    // Простая защита от спама - храним последние создания по IP
+    this.lastCreationsByIP = new Map();
+    this.SPAM_PROTECTION_WINDOW = 5000; // 5 секунд между созданиями с одного IP
+  }
   /**
    * Получение списка проблем
    * GET /api/v1/problems
@@ -248,7 +253,7 @@ class ProblemController {
         });
       }
 
-      // Проверяем существование устройства при изменении
+      // Проверяем существование устройства при измене��ии
       if (
         updateData.device_id &&
         updateData.device_id !== existingProblem.device_id
@@ -357,7 +362,7 @@ class ProblemController {
         message:
           force === "true"
             ? "Проблема удалена безвозвратно"
-            : "Проблема архивирована",
+            : "Проблема архивирова��а",
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
@@ -405,7 +410,7 @@ class ProblemController {
       if (!searchTerm || searchTerm.trim().length < 2) {
         return res.status(400).json({
           success: false,
-          error: "Поисковый запрос должен содержать минимум 2 символа",
+          error: "Поисковый з��прос должен содержать минимум 2 символа",
           errorType: "VALIDATION_ERROR",
           timestamp: new Date().toISOString(),
         });
