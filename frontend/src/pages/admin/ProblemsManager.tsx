@@ -166,7 +166,7 @@ const ProblemsManager = () => {
     },
     {
       value: "from-indigo-500 to-indigo-600",
-      label: "Индиго",
+      label: "Инди��о",
       preview: "bg-indigo-500",
     },
     {
@@ -218,14 +218,14 @@ const ProblemsManager = () => {
   const handleCreate = async () => {
     try {
       await createProblemMutation.mutateAsync({
-        deviceId: formData.deviceId,
+        device_id: formData.deviceId,
         title: formData.title,
         description: formData.description,
         category: formData.category,
         icon: formData.icon,
         color: formData.color,
         priority: 1,
-        estimatedTime: 5,
+        estimated_time: 5,
         difficulty: "beginner",
         tags: [],
         status: "published",
@@ -402,7 +402,7 @@ const ProblemsManager = () => {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="deviceId">Приставка</Label>
+                  <Label htmlFor="deviceId">При��тавка</Label>
                   <Select
                     value={formData.deviceId}
                     onValueChange={(value) =>
@@ -859,7 +859,7 @@ const ProblemsManager = () => {
             </div>
 
             <div>
-              <Label htmlFor="edit-color">Цвет��вая схема</Label>
+              <Label htmlFor="edit-color">Цветовая схема</Label>
               <Select
                 value={formData.color}
                 onValueChange={(value) =>
