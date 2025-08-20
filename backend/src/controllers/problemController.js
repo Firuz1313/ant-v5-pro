@@ -265,16 +265,27 @@ class ProblemController {
       }
 
       // Проверяем уникальность названия при изменении
-      if (updateData.title && updateData.title !== existingProblem.title) {
-        const deviceIdToCheck =
-          updateData.device_id || existingProblem.device_id;
-        const duplicateProblem = await problemModel.findOne({
-          title: updateData.title,
-          device_id: deviceIdToCheck,
-          is_active: true,
-        });
+      if (updateData.title && updateData.title.trim().toLowerCase() !== existingProblem.title.trim().toLowerCase()) {
+        const deviceIdToCheck = updateData.device_id || existingProblem.device_id;
+        const normalizedTitle = updateData.title.trim().toLowerCase();
 
-        if (duplicateProblem && duplicateProblem.id !== id) {
+        console.log(`🔍 Проверка уникальности при обновлении: "${updateData.title}" для устройства: ${deviceIdToCheck}`);
+
+        // Используем SQL запрос для case-insensitive поиска
+        const checkSql = `
+          SELECT id, title, status, created_at
+          FROM problems
+          WHERE LOWER(TRIM(title)) = $1
+            AND device_id = $2
+            AND is_active = true
+            AND id != $3
+          LIMIT 1
+        `;
+
+        const checkResult = await problemModel.query(checkSql, [normalizedTitle, deviceIdToCheck, id]);
+        const duplicateProblem = checkResult.rows[0];
+
+        if (duplicateProblem) {
           return res.status(409).json({
             success: false,
             error:
