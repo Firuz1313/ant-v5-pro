@@ -52,7 +52,7 @@ async function executeSqlFile(filePath) {
 
     for (const command of commands) {
       if (command.trim()) {
-        await execDatabase(command);
+        await query(command);
       }
     }
 
