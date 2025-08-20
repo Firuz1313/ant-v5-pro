@@ -39,8 +39,12 @@ const ProblemsPage = () => {
   const navigate = useNavigate();
   const { deviceId } = useParams<{ deviceId: string }>();
 
-  const { data: devices = [] } = useDevices();
-  const { data: problems = [] } = useProblems();
+  const { data: devicesResponse } = useDevices();
+  const { data: problemsResponse } = useProblems();
+
+  // Извлекаем массивы данных из ответа API
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   const device = devices.find((d: any) => d.id === deviceId);
 
