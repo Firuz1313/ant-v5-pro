@@ -87,7 +87,7 @@ const ProblemsManager = () => {
   const { data: devicesResponse } = useDevices();
   const { data: problemsResponse } = useProblems(1, 20, { admin: true });
 
-  // Извлекаем массивы данных из ответа API
+  // Извлекаем массивы данных из отв��та API
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
 
@@ -456,6 +456,35 @@ const ProblemsManager = () => {
       color: "from-yellow-500 to-yellow-600",
       deviceId: "",
     });
+  };
+
+  const handleActivateAllProblems = async () => {
+    if (
+      !confirm(
+        "Вы уверены, что хотите активировать ВСЕ проблемы? Все проблемы будут переведены в статус 'published'.",
+      )
+    )
+      return;
+
+    try {
+      console.log("🔄 Массовая активация проблем...");
+
+      // Активируем все проблемы по одной
+      for (const problem of problems) {
+        await updateProblemMutation.mutateAsync({
+          id: problem.id,
+          data: {
+            status: "published",
+            is_active: true,
+          },
+        });
+      }
+
+      alert(`Все проблемы (${problems.length}) успешно активированы!`);
+    } catch (error) {
+      console.error("Ошибка при активации проблем:", error);
+      alert("Ошибка при активации проблем: " + (error as any)?.message);
+    }
   };
 
   const handleClearAllProblems = async () => {
@@ -1064,7 +1093,7 @@ const ProblemsManager = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Подробное описание проблемы"
+                placeholder="Подр��бное описание проблемы"
               />
             </div>
 
