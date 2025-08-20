@@ -86,7 +86,7 @@ CREATE INDEX IF NOT EXISTS idx_diagnostic_steps_active_only ON diagnostic_steps(
 CREATE INDEX IF NOT EXISTS idx_remotes_active_only ON remotes(id) WHERE is_active = true;
 CREATE INDEX IF NOT EXISTS idx_tv_interfaces_active_only ON tv_interfaces(id) WHERE is_active = true;
 
--- Индексы для аналитики и отчетности
+-- Индексы д��я аналитики и отчетности
 CREATE INDEX IF NOT EXISTS idx_diagnostic_sessions_analytics ON diagnostic_sessions(device_id, problem_id, success, start_time) WHERE is_active = true;
 CREATE INDEX IF NOT EXISTS idx_session_steps_analytics ON session_steps(session_id, completed, result) WHERE result IS NOT NULL;
 CREATE INDEX IF NOT EXISTS idx_problems_analytics ON problems(device_id, category, completed_count, success_rate) WHERE is_active = true;
@@ -110,4 +110,4 @@ ANALYZE step_actions;
 ANALYZE change_logs;
 ANALYZE site_settings;
 
-PRINT 'Migration 002: Индексы для оптимизации созданы успешно';
+-- Migration 002: Индексы для оптимизации созданы успешно
