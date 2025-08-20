@@ -52,6 +52,44 @@ export class ApiClient {
     }
   }
 
+  private async xhrFallback(url: string, options: RequestInit): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      console.log(`📡 Using XMLHttpRequest fallback for: ${url}`);
+
+      const xhr = new XMLHttpRequest();
+      const method = options.method || 'GET';
+
+      xhr.open(method, url);
+      xhr.timeout = this.timeout;
+
+      // Set headers
+      const headers = options.headers as Record<string, string> || {};
+      Object.entries(headers).forEach(([key, value]) => {
+        xhr.setRequestHeader(key, value);
+      });
+
+      xhr.onload = () => {
+        const response = new Response(xhr.responseText, {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: new Headers()
+        });
+        resolve(response);
+      };
+
+      xhr.onerror = () => {
+        reject(new Error(`XHR request failed: ${xhr.status} ${xhr.statusText}`));
+      };
+
+      xhr.ontimeout = () => {
+        reject(new Error('XHR request timeout'));
+      };
+
+      // Send body if present
+      xhr.send(options.body as string || null);
+    });
+  }
+
   private buildUrl(endpoint: string, params?: Record<string, any>): string {
     let fullUrl: string;
 
