@@ -122,6 +122,22 @@ class ProblemController {
   async createProblem(req, res, next) {
     try {
       const problemData = req.body;
+      const clientIP = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'];
+
+      // Простая защита от спама
+      const now = Date.now();
+      const lastCreation = this.lastCreationsByIP.get(clientIP);
+
+      if (lastCreation && (now - lastCreation) < this.SPAM_PROTECTION_WINDOW) {
+        console.warn(`⚠️  Обнаружена попытка спама от IP: ${clientIP}. Последнее создание: ${new Date(lastCreation).toISOString()}`);
+        return res.status(429).json({
+          success: false,
+          error: "Слишком частые запросы на создание проблем. Подождите несколько секунд.",
+          errorType: "RATE_LIMIT",
+          retryAfter: Math.ceil((this.SPAM_PROTECTION_WINDOW - (now - lastCreation)) / 1000),
+          timestamp: new Date().toISOString(),
+        });
+      }
 
       // Проверяем существование устройства
       if (problemData.device_id) {
@@ -253,7 +269,7 @@ class ProblemController {
         });
       }
 
-      // Проверяем существование устройства при измене��ии
+      // Проверяем существование устройства при изменении
       if (
         updateData.device_id &&
         updateData.device_id !== existingProblem.device_id
@@ -362,7 +378,7 @@ class ProblemController {
         message:
           force === "true"
             ? "Проблема удалена безвозвратно"
-            : "Проблема архивирова��а",
+            : "Проблема архивирована",
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
@@ -410,7 +426,7 @@ class ProblemController {
       if (!searchTerm || searchTerm.trim().length < 2) {
         return res.status(400).json({
           success: false,
-          error: "Поисковый з��прос должен содержать минимум 2 символа",
+          error: "Поисковый запрос должен содержать минимум 2 символа",
           errorType: "VALIDATION_ERROR",
           timestamp: new Date().toISOString(),
         });
