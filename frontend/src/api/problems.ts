@@ -99,7 +99,25 @@ export class ProblemsApi {
    * Создание новой проблемы
    */
   async createProblem(data: ProblemCreateData): Promise<APIResponse<Problem>> {
-    return apiClient.post<APIResponse<Problem>>(this.basePath, data);
+    // Маппинг полей для соответствия backend API
+    const backendData = {
+      device_id: data.deviceId,
+      title: data.title,
+      description: data.description,
+      category: data.category,
+      icon: data.icon,
+      color: data.color,
+      tags: data.tags,
+      priority: data.priority,
+      estimated_time: data.estimatedTime,
+      difficulty: data.difficulty,
+      success_rate: data.successRate,
+      status: data.status,
+      metadata: data.metadata
+    };
+
+    console.log('📤 Отправка данных проблемы:', backendData);
+    return apiClient.post<APIResponse<Problem>>(this.basePath, backendData);
   }
 
   /**
@@ -109,7 +127,27 @@ export class ProblemsApi {
     id: string,
     data: ProblemUpdateData,
   ): Promise<APIResponse<Problem>> {
-    return apiClient.put<APIResponse<Problem>>(`${this.basePath}/${id}`, data);
+    // Маппинг полей для соответствия backend API
+    const backendData: any = {};
+
+    if (data.deviceId !== undefined) backendData.device_id = data.deviceId;
+    if (data.title !== undefined) backendData.title = data.title;
+    if (data.description !== undefined) backendData.description = data.description;
+    if (data.category !== undefined) backendData.category = data.category;
+    if (data.icon !== undefined) backendData.icon = data.icon;
+    if (data.color !== undefined) backendData.color = data.color;
+    if (data.tags !== undefined) backendData.tags = data.tags;
+    if (data.priority !== undefined) backendData.priority = data.priority;
+    if (data.estimatedTime !== undefined) backendData.estimated_time = data.estimatedTime;
+    if (data.difficulty !== undefined) backendData.difficulty = data.difficulty;
+    if (data.successRate !== undefined) backendData.success_rate = data.successRate;
+    if (data.status !== undefined) backendData.status = data.status;
+    if (data.completedCount !== undefined) backendData.completed_count = data.completedCount;
+    if (data.isActive !== undefined) backendData.is_active = data.isActive;
+    if (data.metadata !== undefined) backendData.metadata = data.metadata;
+
+    console.log('📤 Обновление данных проблемы:', backendData);
+    return apiClient.put<APIResponse<Problem>>(`${this.basePath}/${id}`, backendData);
   }
 
   /**
