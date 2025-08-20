@@ -52,6 +52,7 @@ import {
   useCreateProblem,
   useUpdateProblem,
   useDeleteProblem,
+  useDuplicateProblem,
 } from "@/hooks/useProblems";
 
 const iconMap = {
@@ -94,6 +95,7 @@ const ProblemsManager = () => {
   const createProblemMutation = useCreateProblem();
   const updateProblemMutation = useUpdateProblem();
   const deleteProblemMutation = useDeleteProblem();
+  const duplicateProblemMutation = useDuplicateProblem();
 
   const getActiveDevices = () =>
     devices.filter((d: any) => d.is_active !== false);
@@ -256,7 +258,7 @@ const ProblemsManager = () => {
         status: "published",
       };
 
-      console.log("🚀 Отправка данных:", problemData);
+      console.log("🚀 Отпра��ка данных:", problemData);
 
       const result = await createProblemMutation.mutateAsync(problemData);
 
@@ -365,29 +367,31 @@ const ProblemsManager = () => {
     } catch (error) {
       console.error("Error toggling problem status:", error);
       alert(
-        "Ошибка при изменении статуса проблемы: " + (error as any)?.message,
+        "Ош��бка при изменении статуса проблемы: " + (error as any)?.message,
       );
     }
   };
 
   const handleDuplicate = async (problem: Problem) => {
     try {
-      await createProblemMutation.mutateAsync({
-        deviceId: problem.device_id || problem.deviceId,
-        title: `${problem.title} (копия)`,
-        description: problem.description,
-        category: problem.category,
-        icon: problem.icon,
-        color: problem.color,
-        priority: problem.priority || 1,
-        estimatedTime: problem.estimated_time || 5,
-        difficulty: problem.difficulty || "beginner",
-        tags: problem.tags || [],
-        status: "draft",
+      console.log("🔄 Дублирование проблемы:", problem.id);
+      await duplicateProblemMutation.mutateAsync({
+        id: problem.id,
+        targetDeviceId: problem.device_id || problem.deviceId,
       });
+      console.log("✅ Проблема успешно продублирована");
     } catch (error) {
-      console.error("Error duplicating problem:", error);
-      alert("Ошибка при дублировании проблемы: " + (error as any)?.message);
+      console.error("❌ Ошибка при дублировании проблемы:", error);
+
+      const errorResponse = (error as any)?.response?.data;
+      if (errorResponse?.errorType === "DUPLICATE_ERROR") {
+        const existingProblem = errorResponse.existingProblem;
+        alert(
+          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует для этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`
+        );
+      } else {
+        alert("Ошибка при дублировании проблемы: " + ((error as any)?.message || "Неизвестная ошибка"));
+      }
     }
   };
 
@@ -468,7 +472,15 @@ const ProblemsManager = () => {
                 status: "published" as any,
               };
               console.log("📦 Тестовые данные:", testData);
-              createProblemMutation.mutate(testData);
+              createProblemMutation.mutateAsync(testData)
+                .then(() => {
+                  console.log("✅ Тестовая проблема создана успешно");
+                  alert("Тестовая проблема создана успешно!");
+                })
+                .catch((error) => {
+                  console.error("❌ Ошибка при создании тестовой проблемы:", error);
+                  alert("Ошибка при создании тестовой проблемы: " + (error?.message || "Неизвестная ошибка"));
+                });
             }}
             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
             disabled={createProblemMutation.isPending}
@@ -673,7 +685,7 @@ const ProblemsManager = () => {
                   </Button>
                   <Button
                     onClick={() => {
-                      console.log("🔘 Нажата кнопка создания проблемы");
+                      console.log("🔘 Нажата кнопка создания ��роблемы");
                       handleCreate();
                     }}
                     disabled={
