@@ -70,7 +70,7 @@ class Problem extends BaseModel {
         FROM problems p
         LEFT JOIN devices d ON p.device_id = d.id
         LEFT JOIN diagnostic_steps ds ON p.id = ds.problem_id
-        LEFT JOIN diagnostic_sessions sess ON p.id = sess.problem_id AND sess.is_active = true
+        LEFT JOIN diagnostic_sessions sess ON p.id = sess.problem_id
         WHERE ${whereConditions.join(' AND ')}
         GROUP BY p.id, d.name, d.brand, d.model, d.color
         ORDER BY p.priority DESC, p.created_at DESC
@@ -116,7 +116,7 @@ class Problem extends BaseModel {
         FROM problems p
         LEFT JOIN devices d ON p.device_id = d.id
         LEFT JOIN diagnostic_steps ds ON p.id = ds.problem_id
-        LEFT JOIN diagnostic_sessions sess ON p.id = sess.problem_id AND sess.is_active = true
+        LEFT JOIN diagnostic_sessions sess ON p.id = sess.problem_id
         WHERE p.id = $1
         GROUP BY p.id, d.name, d.brand, d.model, d.color, d.status
       `;
@@ -153,7 +153,7 @@ class Problem extends BaseModel {
       
       return this.findAllWithDetails(filters, options);
     } catch (error) {
-      console.error('Ошибка получения проблем по устройству:', error.message);
+      console.error('Ошибка получения проблем по устро��ству:', error.message);
       throw error;
     }
   }
@@ -356,7 +356,7 @@ class Problem extends BaseModel {
   }
 
   /**
-   * Проверка возможности удаления проблемы
+   * Проверка возможности удаления ��роблемы
    */
   async canDelete(id) {
     try {
@@ -367,7 +367,7 @@ class Problem extends BaseModel {
           COUNT(CASE WHEN sess.end_time IS NULL THEN 1 END) as active_sessions_count
         FROM problems p
         LEFT JOIN diagnostic_steps ds ON p.id = ds.problem_id AND ds.is_active = true
-        LEFT JOIN diagnostic_sessions sess ON p.id = sess.problem_id AND sess.is_active = true
+        LEFT JOIN diagnostic_sessions sess ON p.id = sess.problem_id
         WHERE p.id = $1
         GROUP BY p.id
       `;
@@ -391,7 +391,7 @@ class Problem extends BaseModel {
       if (stepsCount > 0) {
         return {
           canDelete: false,
-          reason: `Проблема содержит ${stepsCount} диагностических шагов. Сначала удалите их.`,
+          reason: `Проблема содержит ${stepsCount} диагностических шагов. Сначала уда��ите их.`,
           suggestion: 'Можно архивировать проблему вместо удаления'
         };
       }
