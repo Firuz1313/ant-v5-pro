@@ -57,7 +57,7 @@ class Problem extends BaseModel {
       }
 
       const sql = `
-        SELECT 
+        SELECT
           p.*,
           d.name as device_name,
           d.brand as device_brand,
@@ -66,7 +66,10 @@ class Problem extends BaseModel {
           COUNT(DISTINCT ds.id) as steps_count,
           COUNT(DISTINCT CASE WHEN ds.is_active = true THEN ds.id END) as active_steps_count,
           COUNT(DISTINCT sess.id) as sessions_count,
-          COUNT(DISTINCT CASE WHEN sess.success = true THEN sess.id END) as successful_sessions_count
+          COUNT(DISTINCT CASE
+            WHEN sess.success = true OR sess.completed_steps = sess.total_steps
+            THEN sess.id
+          END) as successful_sessions_count
         FROM problems p
         LEFT JOIN devices d ON p.device_id = d.id
         LEFT JOIN diagnostic_steps ds ON p.id = ds.problem_id
@@ -96,7 +99,7 @@ class Problem extends BaseModel {
   }
 
   /**
-   * Получение проблемы по ID с полной информацией
+   * Получение проблемы по ID с полной ин��ормацией
    */
   async findByIdWithDetails(id) {
     try {
@@ -380,7 +383,7 @@ class Problem extends BaseModel {
 
       const result = await query(sql, [id]);
       if (result.rows.length === 0) {
-        return { canDelete: false, reason: "Проблема не найдена" };
+        return { canDelete: false, reason: "Пробле��а не найдена" };
       }
 
       const stats = result.rows[0];
