@@ -203,11 +203,23 @@ export class ApiClient {
       console.log(`📡 Method: ${fetchOptions.method || "GET"}`);
       console.log(`📡 Headers:`, headers);
 
-      const response = await this.originalFetch(url, {
-        ...fetchOptions,
-        headers,
-        signal: controller.signal,
-      });
+      let response: Response;
+
+      if (this.useFallback) {
+        // Use XMLHttpRequest fallback if fetch has failed before
+        console.log(`📡 Using XHR fallback due to previous fetch failures`);
+        response = await this.xhrFallback(url, {
+          ...fetchOptions,
+          headers,
+        });
+      } else {
+        // Try fetch first
+        response = await this.originalFetch(url, {
+          ...fetchOptions,
+          headers,
+          signal: controller.signal,
+        });
+      }
 
       console.log(`📡 Fetch completed with status: ${response.status}`);
       clearTimeout(timeoutId);
