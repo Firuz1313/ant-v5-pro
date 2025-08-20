@@ -31,6 +31,7 @@ export class ApiClient {
   private defaultHeaders: Record<string, string>;
   private activeRequests: Map<string, Promise<any>> = new Map();
   private originalFetch: typeof fetch;
+  private useFallback: boolean = false;
 
   constructor(config: ApiClientConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
@@ -232,7 +233,7 @@ export class ApiClient {
           responseData = { message: responseText };
         }
       } else {
-        console.log(`��� Empty response`);
+        console.log(`📡 Empty response`);
         responseData = {};
       }
 
