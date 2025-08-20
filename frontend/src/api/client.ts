@@ -352,6 +352,8 @@ const getApiBaseUrl = (): string => {
     const port = window.location.port;
 
     console.log("🌐 Current location:", window.location.href);
+    console.log("🌐 Hostname:", hostname);
+    console.log("🌐 Port:", port);
 
     // В облачной среде fly.dev/builder.codes
     if (hostname.includes("builder.codes") || hostname.includes("fly.dev")) {
