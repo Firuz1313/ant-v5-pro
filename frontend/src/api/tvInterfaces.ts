@@ -43,7 +43,9 @@ export const tvInterfacesAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceApiResponse>(`/${id}`);
+      const response = await apiClient.get<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+      );
 
       return {
         success: true,
@@ -52,10 +54,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -202,7 +201,7 @@ export const tvInterfacesAPI = {
       if (!id) {
         return {
           success: false,
-          error: "ID TV интерфейса обязателен",
+          error: "ID TV интерфейса обяз��телен",
         };
       }
 
