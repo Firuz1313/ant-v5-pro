@@ -62,7 +62,10 @@ import {
 } from "@/components/ui/alert-dialog";
 
 const TVInterfaceBuilder = () => {
-  const { data: devices = [] } = useDevices();
+  const { data: devicesResponse } = useDevices();
+
+  // Извлекаем массивы данных из ответа API
+  const devices = devicesResponse?.data || [];
   const { toast } = useToast();
 
   // State
@@ -271,7 +274,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error updating TV interface:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при обновлении TV интерфейса",
+        description: "Произошла ошибка при обновлении TV ин��ерфейса",
         variant: "destructive",
       });
     } finally {
@@ -468,7 +471,7 @@ const TVInterfaceBuilder = () => {
                 <AlertDialogTitle>Очистить все TV интерфейсы?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Это действие удалит все существующие TV интерфейсы. После
-                  очистки вы сможете создавать свои собственные интерфейсы
+                  очистки вы сможете создавать св��и собственные интерфейсы
                   вручную через UI.
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -879,7 +882,7 @@ const TVInterfaceBuilder = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Редактировать TV интерфейс</DialogTitle>
+            <DialogTitle>Ре��актировать TV интерфейс</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
