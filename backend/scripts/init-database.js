@@ -58,7 +58,7 @@ async function executeSqlFile(filePath) {
 
     return true;
   } catch (error) {
-    throw new Error(`Ошибка выполнения ${filePath}: ${error.message}`);
+    throw new Error(`О��ибка выполнения ${filePath}: ${error.message}`);
   }
 }
 
@@ -108,10 +108,10 @@ async function checkDataExists() {
 }
 
 /**
- * Выполнить миграци��
+ * Выполнить миграции
  */
 async function runMigrations() {
-  log.header('🔄 Выполнение миграций');
+  log.header('🔄 Выполн��ние миграций');
   
   const migrationsDir = join(__dirname, '../migrations');
   const migrationFiles = [
@@ -148,10 +148,10 @@ async function seedDatabase() {
     
     log.info('Заполнение таблицы problems...');
     await seedProblems();
-    log.success('Таблица problems зап��лнена');
+    log.success('Таблица problems заполнена');
     
   } catch (error) {
-    log.error(`Ошибка заполнения данными: ${error.message}`);
+    log.error(`Ошибка з��полнения данными: ${error.message}`);
     throw error;
   }
 }
@@ -165,7 +165,7 @@ async function initializeDatabase() {
     
     // Проверяем подключение
     log.info('Проверка подключения к базе данных...');
-    const isConnected = await checkConnection();
+    const isConnected = await testConnection();
     
     if (!isConnected) {
       throw new Error('Не удается подключиться к базе данных');
