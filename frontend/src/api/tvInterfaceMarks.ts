@@ -1,7 +1,8 @@
 // TV Interface Marks API Client
+import { apiClient, handleApiError } from "./client";
 
-// Base API URL
-const API_BASE_URL = "/api/v1/tv-interface-marks";
+// API endpoint base
+const API_ENDPOINT = "/v1/tv-interface-marks";
 
 // Types
 export interface TVInterfaceMark {
@@ -302,7 +303,7 @@ export const tvInterfaceMarksAPI = {
         error:
           error instanceof Error
             ? error.message
-            : "Ошибка при создании отметки",
+            : "Ошибка при создании ��тметки",
       };
     }
   },
