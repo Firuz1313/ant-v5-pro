@@ -191,7 +191,7 @@ async function initializeDatabase() {
         log.info(`  ${table}: ${count} записей`);
       });
       
-      // Если данных мало, заполняем
+      // ��сли данных мало, заполняем
       if (dataCounts.devices < 5 || dataCounts.problems < 10) {
         log.warn('Недостаточно данных, заполняем...');
         await seedDatabase();
@@ -200,12 +200,13 @@ async function initializeDatabase() {
     
     // Показываем финальную статистику
     log.header('📊 Статистика базы данных');
-    const finalStats = await getDatabaseStats();
-    
-    if (finalStats && Array.isArray(finalStats)) {
-      finalStats.forEach(stat => {
-        log.info(`${stat.table_name}: ${stat.row_count} записей`);
+    try {
+      const finalCounts = await checkDataExists();
+      Object.entries(finalCounts).forEach(([table, count]) => {
+        log.info(`${table}: ${count} записей`);
       });
+    } catch (error) {
+      log.warn(`Не удалось получить статистику: ${error.message}`);
     }
     
     log.success('База данных успешно инициализирована!');
