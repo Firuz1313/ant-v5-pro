@@ -311,8 +311,8 @@ COMMENT ON TABLE diagnostic_steps IS 'Пошаговые инструкции д
 COMMENT ON TABLE users IS 'Учетные записи пользователей и администраторов';
 COMMENT ON TABLE diagnostic_sessions IS 'Сессии диагностики пользователей';
 COMMENT ON TABLE session_steps IS 'Детальный трекинг шагов в сессиях';
-COMMENT ON TABLE step_actions IS 'Детализированные действия для шагов';
+COMMENT ON TABLE step_actions IS 'Детализированные действия ��ля шагов';
 COMMENT ON TABLE change_logs IS 'Журнал всех изменений в системе';
 COMMENT ON TABLE site_settings IS 'Глобальные настройки системы';
 
-PRINT 'Migration 001: Основные таблицы созданы успешно';
+-- Migration 001: Основные таблицы созданы успешно
