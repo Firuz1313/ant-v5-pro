@@ -5,7 +5,7 @@ class TVInterface extends BaseModel {
     super("tv_interfaces");
   }
 
-  // Определение схемы для валидации
+  // Определение схемы дл�� валидации
   getSchema() {
     return {
       name: { type: "string", required: true, minLength: 1, maxLength: 255 },
@@ -259,21 +259,29 @@ class TVInterface extends BaseModel {
 
       const tvInterface = result.rows[0];
 
-      // Парсим JSON поля
-      if (tvInterface.clickable_areas) {
-        try {
-          tvInterface.clickable_areas = JSON.parse(tvInterface.clickable_areas);
-        } catch (e) {
+      // Парсим JSON поля если они существуют
+      if (tvInterface.hasOwnProperty('clickable_areas')) {
+        if (tvInterface.clickable_areas) {
+          try {
+            tvInterface.clickable_areas = JSON.parse(tvInterface.clickable_areas);
+          } catch (e) {
+            tvInterface.clickable_areas = [];
+          }
+        } else {
           tvInterface.clickable_areas = [];
         }
       } else {
         tvInterface.clickable_areas = [];
       }
 
-      if (tvInterface.highlight_areas) {
-        try {
-          tvInterface.highlight_areas = JSON.parse(tvInterface.highlight_areas);
-        } catch (e) {
+      if (tvInterface.hasOwnProperty('highlight_areas')) {
+        if (tvInterface.highlight_areas) {
+          try {
+            tvInterface.highlight_areas = JSON.parse(tvInterface.highlight_areas);
+          } catch (e) {
+            tvInterface.highlight_areas = [];
+          }
+        } else {
           tvInterface.highlight_areas = [];
         }
       } else {
