@@ -101,6 +101,7 @@ export class ProblemsApi {
   async createProblem(data: ProblemCreateData): Promise<APIResponse<Problem>> {
     // Маппинг полей для соответствия backend API
     const backendData = {
+      // ID исключен - всегда генерируется сервером для уникальности
       device_id: data.deviceId,
       title: data.title,
       description: data.description,
@@ -116,7 +117,7 @@ export class ProblemsApi {
       metadata: data.metadata,
     };
 
-    console.log("📤 Отправка данных проблемы:", backendData);
+    console.log("📤 Отправка данных проблемы (без ID):", backendData);
     return apiClient.post<APIResponse<Problem>>(this.basePath, backendData);
   }
 

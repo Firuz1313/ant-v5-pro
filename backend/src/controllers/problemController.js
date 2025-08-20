@@ -12,6 +12,11 @@ const deviceModel = new Device();
  * Контроллер для управления проблемами
  */
 class ProblemController {
+  constructor() {
+    // Простая защита от спама - храним последние создания по IP
+    this.lastCreationsByIP = new Map();
+    this.SPAM_PROTECTION_WINDOW = 5000; // 5 секунд между созданиями с одного IP
+  }
   /**
    * Получение списка проблем
    * GET /api/v1/problems
@@ -117,6 +122,30 @@ class ProblemController {
   async createProblem(req, res, next) {
     try {
       const problemData = req.body;
+      const clientIP =
+        req.ip ||
+        req.connection.remoteAddress ||
+        req.headers["x-forwarded-for"];
+
+      // Простая защита от спама
+      const now = Date.now();
+      const lastCreation = this.lastCreationsByIP.get(clientIP);
+
+      if (lastCreation && now - lastCreation < this.SPAM_PROTECTION_WINDOW) {
+        console.warn(
+          `⚠️  Обнаружена попытка спама от IP: ${clientIP}. Последнее создание: ${new Date(lastCreation).toISOString()}`,
+        );
+        return res.status(429).json({
+          success: false,
+          error:
+            "Слишком частые запросы на создание проблем. Подождите несколько секунд.",
+          errorType: "RATE_LIMIT",
+          retryAfter: Math.ceil(
+            (this.SPAM_PROTECTION_WINDOW - (now - lastCreation)) / 1000,
+          ),
+          timestamp: new Date().toISOString(),
+        });
+      }
 
       // Проверяем существование устройства
       if (problemData.device_id) {
@@ -131,21 +160,38 @@ class ProblemController {
         }
       }
 
-      // Проверяем уникальность названия для устройства (только среди активных и опубликованных проблем)
+      // Проверяем уникальность названия для устройства (только среди актив��ых и опубликованных проблем)
       if (problemData.device_id && problemData.title) {
-        const existingProblem = await problemModel.findOne({
-          title: problemData.title,
-          device_id: problemData.device_id,
-          is_active: true,
-          status: ["published", "draft"], // Исключаем архивированные
-        });
+        // Нормализуем название для сравнения
+        const normalizedTitle = problemData.title.trim().toLowerCase();
+
+        console.log(
+          `🔍 Проверка уникальности названия: "${problemData.title}" (нормализовано: "${normalizedTitle}") для устройства: ${problemData.device_id}`,
+        );
+
+        // Используем SQL запрос для case-insensitive поиска
+        const checkSql = `
+          SELECT id, title, status, created_at
+          FROM problems
+          WHERE LOWER(TRIM(title)) = $1
+            AND device_id = $2
+            AND is_active = true
+            AND status IN ('published', 'draft')
+          LIMIT 1
+        `;
+
+        const checkResult = await problemModel.query(checkSql, [
+          normalizedTitle,
+          problemData.device_id,
+        ]);
+        const existingProblem = checkResult.rows[0];
 
         if (existingProblem) {
           console.warn(
             `⚠️  Попытка создать дубликат проблемы: "${problemData.title}" для устройства ${problemData.device_id}`,
           );
           console.warn(
-            `⚠️  Существующая проблема ID: ${existingProblem.id}, статус: ${existingProblem.status}`,
+            `⚠️  Существующая про��лема ID: ${existingProblem.id}, статус: ${existingProblem.status}`,
           );
 
           return res.status(409).json({
@@ -155,7 +201,7 @@ class ProblemController {
             errorType: "DUPLICATE_ERROR",
             details: {
               message:
-                "Название проблемы должно быть уникальным для каждого устройства",
+                "Название проблем�� должно быть уникальным для каждого устройства",
               suggestions: [
                 "Измените название проблемы",
                 "Добавьте уточняющие детали к названию",
@@ -173,7 +219,59 @@ class ProblemController {
         }
       }
 
-      const newProblem = await problemModel.create(problemData);
+      // Гарантируем уникальность ID при создании
+      let attempts = 0;
+      let newProblem = null;
+      const maxAttempts = 5;
+
+      while (attempts < maxAttempts && !newProblem) {
+        try {
+          // Генерируем новый ID для каждой попытки
+          const uniqueProblemData = {
+            ...problemData,
+            id: undefined, // Позволяем BaseModel сгенерировать новый ID
+          };
+
+          newProblem = await problemModel.create(uniqueProblemData);
+
+          console.log(
+            `✅ Проблема создана с ID: ${newProblem.id} (попытка ${attempts + 1})`,
+          );
+
+          // Записываем время создания для защиты от спама
+          this.lastCreationsByIP.set(clientIP, Date.now());
+
+          // Очищаем старые записи (оставляем только последние 100)
+          if (this.lastCreationsByIP.size > 100) {
+            const entries = Array.from(this.lastCreationsByIP.entries());
+            const sortedEntries = entries
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 50);
+            this.lastCreationsByIP.clear();
+            sortedEntries.forEach(([ip, time]) =>
+              this.lastCreationsByIP.set(ip, time),
+            );
+          }
+
+          break;
+        } catch (error) {
+          attempts++;
+          if (error.code === "23505" && error.detail?.includes("id")) {
+            // Конфликт по ID, пробуем еще раз
+            console.warn(
+              `⚠️  Конфликт ID при создании проблемы, попытка ${attempts}/${maxAttempts}`,
+            );
+            if (attempts >= maxAttempts) {
+              throw new Error(
+                "Не удалось создать уникальный ID после нескольких попыток",
+              );
+            }
+          } else {
+            // Другая ошибка, пробрасываем дальше
+            throw error;
+          }
+        }
+      }
 
       res.status(201).json({
         success: true,
@@ -195,7 +293,7 @@ class ProblemController {
       const { id } = req.params;
       const updateData = req.body;
 
-      // Проверяем существование проблемы
+      // Проверяем су��ествование проблемы
       const existingProblem = await problemModel.findById(id);
       if (!existingProblem) {
         return res.status(404).json({
@@ -223,16 +321,38 @@ class ProblemController {
       }
 
       // Проверяем уникальность названия при изменении
-      if (updateData.title && updateData.title !== existingProblem.title) {
+      if (
+        updateData.title &&
+        updateData.title.trim().toLowerCase() !==
+          existingProblem.title.trim().toLowerCase()
+      ) {
         const deviceIdToCheck =
           updateData.device_id || existingProblem.device_id;
-        const duplicateProblem = await problemModel.findOne({
-          title: updateData.title,
-          device_id: deviceIdToCheck,
-          is_active: true,
-        });
+        const normalizedTitle = updateData.title.trim().toLowerCase();
 
-        if (duplicateProblem && duplicateProblem.id !== id) {
+        console.log(
+          `🔍 Проверка уникальности при обновлении: "${updateData.title}" для устройства: ${deviceIdToCheck}`,
+        );
+
+        // Используем SQL запрос для case-insensitive поиска
+        const checkSql = `
+          SELECT id, title, status, created_at
+          FROM problems
+          WHERE LOWER(TRIM(title)) = $1
+            AND device_id = $2
+            AND is_active = true
+            AND id != $3
+          LIMIT 1
+        `;
+
+        const checkResult = await problemModel.query(checkSql, [
+          normalizedTitle,
+          deviceIdToCheck,
+          id,
+        ]);
+        const duplicateProblem = checkResult.rows[0];
+
+        if (duplicateProblem) {
           return res.status(409).json({
             success: false,
             error:
@@ -342,7 +462,7 @@ class ProblemController {
   }
 
   /**
-   * Поиск проблем
+   * ��оиск проблем
    * GET /api/v1/problems/search
    */
   async searchProblems(req, res, next) {
@@ -605,7 +725,7 @@ class ProblemController {
       if (!session_result || !["success", "failure"].includes(session_result)) {
         return res.status(400).json({
           success: false,
-          error: "Результат сессии должен быть success или failure",
+          error: "Резуль��ат сессии должен быть success или failure",
           errorType: "VALIDATION_ERROR",
           timestamp: new Date().toISOString(),
         });

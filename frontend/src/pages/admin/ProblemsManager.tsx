@@ -52,6 +52,7 @@ import {
   useCreateProblem,
   useUpdateProblem,
   useDeleteProblem,
+  useDuplicateProblem,
 } from "@/hooks/useProblems";
 
 const iconMap = {
@@ -94,10 +95,21 @@ const ProblemsManager = () => {
   const createProblemMutation = useCreateProblem();
   const updateProblemMutation = useUpdateProblem();
   const deleteProblemMutation = useDeleteProblem();
+  const duplicateProblemMutation = useDuplicateProblem();
 
   const getActiveDevices = () =>
     devices.filter((d: any) => d.is_active !== false);
   const getStepsForProblem = (problemId: string) => [];
+
+  // Check if a problem with the same title and device already exists
+  const checkForDuplicateTitle = (title: string, deviceId: string): boolean => {
+    return problems.some(
+      (problem) =>
+        problem.title.toLowerCase().trim() === title.toLowerCase().trim() &&
+        (problem.device_id === deviceId || problem.deviceId === deviceId) &&
+        problem.is_active !== false,
+    );
+  };
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -241,6 +253,14 @@ const ProblemsManager = () => {
       return;
     }
 
+    // Client-side duplicate check for better UX
+    if (checkForDuplicateTitle(formData.title, formData.deviceId)) {
+      alert(
+        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\nПожалуйста, выберите другое ��азвание.`,
+      );
+      return;
+    }
+
     try {
       const problemData = {
         deviceId: formData.deviceId,
@@ -256,7 +276,7 @@ const ProblemsManager = () => {
         status: "published",
       };
 
-      console.log("🚀 Отправка данных:", problemData);
+      console.log("🚀 Отпра��ка данных:", problemData);
 
       const result = await createProblemMutation.mutateAsync(problemData);
 
@@ -277,7 +297,12 @@ const ProblemsManager = () => {
       const errorResponse = (error as any)?.response?.data;
       const errorMessage = (error as any)?.message || "Неизвестная ошибка";
 
-      if (errorResponse?.errorType === "DUPLICATE_ERROR") {
+      if (errorResponse?.errorType === "RATE_LIMIT") {
+        const retryAfter = errorResponse.retryAfter || 5;
+        alert(
+          `Слишком частые попытки создания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
+        );
+      } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         const suggestions = errorResponse.details?.suggestions || [];
 
@@ -343,7 +368,7 @@ const ProblemsManager = () => {
       await deleteProblemMutation.mutateAsync({ id: problemId });
     } catch (error) {
       console.error("Error deleting problem:", error);
-      alert("Ошибка при удалении проблемы: " + (error as any)?.message);
+      alert("Ошибка ��ри удалении проблемы: " + (error as any)?.message);
     }
   };
 
@@ -365,29 +390,34 @@ const ProblemsManager = () => {
     } catch (error) {
       console.error("Error toggling problem status:", error);
       alert(
-        "Ошибка при изменении статуса проблемы: " + (error as any)?.message,
+        "Ош��бка при изменении статуса проблемы: " + (error as any)?.message,
       );
     }
   };
 
   const handleDuplicate = async (problem: Problem) => {
     try {
-      await createProblemMutation.mutateAsync({
-        deviceId: problem.device_id || problem.deviceId,
-        title: `${problem.title} (копия)`,
-        description: problem.description,
-        category: problem.category,
-        icon: problem.icon,
-        color: problem.color,
-        priority: problem.priority || 1,
-        estimatedTime: problem.estimated_time || 5,
-        difficulty: problem.difficulty || "beginner",
-        tags: problem.tags || [],
-        status: "draft",
+      console.log("🔄 Дублирование проблемы:", problem.id);
+      await duplicateProblemMutation.mutateAsync({
+        id: problem.id,
+        targetDeviceId: problem.device_id || problem.deviceId,
       });
+      console.log("✅ Проблема успешно продублирована");
     } catch (error) {
-      console.error("Error duplicating problem:", error);
-      alert("Ошибка при дублировании проблемы: " + (error as any)?.message);
+      console.error("❌ Ошибка при дублировании проблемы:", error);
+
+      const errorResponse = (error as any)?.response?.data;
+      if (errorResponse?.errorType === "DUPLICATE_ERROR") {
+        const existingProblem = errorResponse.existingProblem;
+        alert(
+          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`,
+        );
+      } else {
+        alert(
+          "Ошибка при дублировании проблемы: " +
+            ((error as any)?.message || "Неизвестная ошибка"),
+        );
+      }
     }
   };
 
@@ -453,10 +483,27 @@ const ProblemsManager = () => {
             variant="outline"
             onClick={() => {
               console.log("🧪 Тестирование API создания проблемы");
-              const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+              // Генерируем действительно уникальный ID
+              const timestamp = Date.now();
+              const randomPart = Math.random().toString(36).substring(2, 11);
+              const microTime = performance.now().toString().replace(".", "");
+              const uniqueId = `${timestamp}_${randomPart}_${microTime.slice(-6)}`;
+
+              let testTitle = `TEST-${uniqueId}`;
+
+              // Проверяем уникальность на клиенте
+              while (checkForDuplicateTitle(testTitle, "openbox")) {
+                console.warn(
+                  `⚠️  Название ${testTitle} уже существует, генерируем новое`,
+                );
+                const newRandom = Math.random().toString(36).substring(2, 11);
+                testTitle = `TEST-${timestamp}_${newRandom}_${Date.now().toString().slice(-4)}`;
+              }
+
               const testData = {
                 deviceId: "openbox",
-                title: `TEST-${uniqueId}`,
+                title: testTitle,
                 description: `Автоматически сгенерированная тестовая проблема, создана ${new Date().toLocaleString()}`,
                 category: "critical" as any,
                 icon: "AlertTriangle",
@@ -468,7 +515,35 @@ const ProblemsManager = () => {
                 status: "published" as any,
               };
               console.log("📦 Тестовые данные:", testData);
-              createProblemMutation.mutate(testData);
+              createProblemMutation
+                .mutateAsync(testData)
+                .then(() => {
+                  console.log("✅ Тестовая проблема создана успешно");
+                  alert("Тестовая проблема создана успешно!");
+                })
+                .catch((error) => {
+                  console.error(
+                    "❌ Ошибка при создании тестовой проблемы:",
+                    error,
+                  );
+
+                  const errorResponse = error?.response?.data;
+                  if (errorResponse?.errorType === "RATE_LIMIT") {
+                    const retryAfter = errorResponse.retryAfter || 5;
+                    alert(
+                      `Слишком частое тестирование API.\n\nПодождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
+                    );
+                  } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
+                    alert(
+                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
+                    );
+                  } else {
+                    alert(
+                      "Ошибка при создании тестовой проблемы: " +
+                        (error?.message || "Неизвестная ошибка"),
+                    );
+                  }
+                });
             }}
             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
             disabled={createProblemMutation.isPending}
@@ -499,7 +574,7 @@ const ProblemsManager = () => {
 
                 alert(`Удалено ${testProblems.length} тестовых проблем`);
               } catch (error) {
-                console.error("Ошибка при удалении тестовых проблем:", error);
+                console.error("О��ибка при удалении тестовых проблем:", error);
                 alert("Ошибка при удалении тестовых проблем");
               }
             }}
@@ -673,18 +748,31 @@ const ProblemsManager = () => {
                   </Button>
                   <Button
                     onClick={() => {
-                      console.log("🔘 Нажата кнопка создания проблемы");
+                      console.log("🔘 ��ажата кнопка создания ��роблемы");
                       handleCreate();
                     }}
                     disabled={
                       !formData.title ||
                       !formData.deviceId ||
-                      createProblemMutation.isPending
+                      createProblemMutation.isPending ||
+                      (formData.title &&
+                        formData.deviceId &&
+                        checkForDuplicateTitle(
+                          formData.title,
+                          formData.deviceId,
+                        ))
                     }
                   >
                     {createProblemMutation.isPending
                       ? "Создание..."
-                      : "Создать"}
+                      : formData.title &&
+                          formData.deviceId &&
+                          checkForDuplicateTitle(
+                            formData.title,
+                            formData.deviceId,
+                          )
+                        ? "Название уже существует"
+                        : "Создать"}
                   </Button>
                 </div>
               </div>
@@ -1050,7 +1138,7 @@ const ProblemsManager = () => {
           <CardContent className="p-12 text-center">
             <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Проблемы не найдены
+              Пр��блемы не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
               Попробуйте изменить фильтры поиска или создайт�� новую проблему.

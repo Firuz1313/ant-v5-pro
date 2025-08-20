@@ -67,7 +67,7 @@ export const deviceValidation = {
 // Схемы валидации для проблем
 export const problemValidation = {
   create: Joi.object({
-    id: commonSchemas.id.optional(),
+    // ID убран из валидации - всегда генерируется сервером
     device_id: commonSchemas.id.required(),
     title: Joi.string().min(1).max(500).required(),
     description: commonSchemas.longText,

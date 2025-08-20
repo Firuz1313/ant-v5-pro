@@ -21,7 +21,13 @@ class BaseModel {
    * Генерация уникального ID
    */
   generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    // Используем более надежную генерацию ID с префиксом таблицы
+    const timestamp = Date.now().toString(36);
+    const randomPart = Math.random().toString(36).substr(2, 9);
+    const tablePart = this.tableName.substr(0, 3); // Первые 3 символа названия таблицы
+    const microTime = process.hrtime.bigint().toString(36).substr(-4); // Микросекунды для уникальности
+
+    return `${tablePart}_${timestamp}_${randomPart}_${microTime}`;
   }
 
   /**
@@ -43,7 +49,8 @@ class BaseModel {
       is_active: data.is_active !== undefined ? data.is_active : true,
     };
 
-    return prepared;
+    // Конвертируем объекты и массивы в JSON строки для PostgreSQL JSONB полей
+    return this.serializeJsonFields(prepared);
   }
 
   /**
@@ -55,11 +62,57 @@ class BaseModel {
       updated_at: this.createTimestamp(),
     };
 
-    // Удаляем поля, которые нельзя обновлять
+    // Удаляем поля, которые нельзя об��овлять
     delete prepared.id;
     delete prepared.created_at;
 
-    return prepared;
+    // Конвертируем объекты и массивы в JSON строки для PostgreSQL JSONB полей
+    return this.serializeJsonFields(prepared);
+  }
+
+  /**
+   * Сериализация JSON полей для PostgreSQL
+   */
+  serializeJsonFields(data) {
+    const serialized = { ...data };
+
+    // Список полей, которые должны быть сериализованы в JSON
+    const jsonFields = [
+      "tags",
+      "metadata",
+      "buttons",
+      "zones",
+      "clickable_areas",
+      "highlight_areas",
+      "validation_rules",
+      "failure_actions",
+      "media",
+      "next_step_conditions",
+      "dimensions",
+      "breakpoints",
+      "permissions",
+      "preferences",
+      "changes",
+      "error_steps",
+      "feedback",
+      "user_input",
+      "coordinates",
+      "api_settings",
+      "email_settings",
+      "storage_settings",
+      "supported_languages",
+    ];
+
+    for (const field of jsonFields) {
+      if (serialized[field] !== undefined && serialized[field] !== null) {
+        if (typeof serialized[field] === "object") {
+          // Конвертируем объекты и массивы в JSON строки
+          serialized[field] = JSON.stringify(serialized[field]);
+        }
+      }
+    }
+
+    return serialized;
   }
 
   /**
@@ -161,7 +214,7 @@ class BaseModel {
       paramIndex++;
     }
 
-    // Добавляем WHERE условия
+    // Доба��ляем WHERE условия
     if (conditions.length > 0) {
       sql += ` WHERE ${conditions.join(" AND ")}`;
     }
@@ -198,7 +251,7 @@ class BaseModel {
       return result.rows[0];
     } catch (error) {
       console.error(
-        `Ошибка создания записи в ${this.tableName}:`,
+        `Ошибка с��здания записи в ${this.tableName}:`,
         error.message,
       );
       throw error;
@@ -385,7 +438,7 @@ class BaseModel {
   }
 
   /**
-   * Массовое обновление записей
+   * Ма��совое обновление записей
    */
   async bulkUpdate(updates) {
     try {
