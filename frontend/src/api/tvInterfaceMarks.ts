@@ -193,9 +193,9 @@ export const tvInterfaceMarksAPI = {
     filters?: TVInterfaceMarkFilters,
   ): Promise<TVInterfaceMarkListResponse> {
     try {
-      const queryParams = buildQueryParams(filters || {});
-      const response = await apiRequest<TVInterfaceMarkListResponse>(
-        `/tv-interface/${tvInterfaceId}${queryParams}`,
+      const response = await apiClient.get<TVInterfaceMarkListResponse>(
+        `${API_ENDPOINT}/tv-interface/${tvInterfaceId}`,
+        { params: filters },
       );
 
       return {
@@ -205,10 +205,7 @@ export const tvInterfaceMarksAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке отметок TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
