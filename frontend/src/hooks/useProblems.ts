@@ -124,12 +124,18 @@ export const useDeleteProblem = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ id, force = false }: { id: string; force?: boolean }) =>
-      problemsApi.deleteProblem(id, force),
+    mutationFn: ({ id, force = false }: { id: string; force?: boolean }) => {
+      console.log(`🗑️ Hook: Deleting problem ${id} with force=${force}`);
+      return problemsApi.deleteProblem(id, force);
+    },
     onSuccess: (response, { id }) => {
+      console.log(`✅ Hook: Delete success for ${id}:`, response);
       queryClient.invalidateQueries({ queryKey: problemKeys.lists() });
       queryClient.removeQueries({ queryKey: problemKeys.detail(id) });
       queryClient.invalidateQueries({ queryKey: problemKeys.stats() });
+    },
+    onError: (error, { id }) => {
+      console.error(`❌ Hook: Delete error for ${id}:`, error);
     },
   });
 };
