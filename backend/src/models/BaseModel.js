@@ -21,7 +21,13 @@ class BaseModel {
    * Генерация уникального ID
    */
   generateId() {
-    return Date.now().toString(36) + Math.random().toString(36).substr(2);
+    // Используем более надежную генерацию ID с префиксом таблицы
+    const timestamp = Date.now().toString(36);
+    const randomPart = Math.random().toString(36).substr(2, 9);
+    const tablePart = this.tableName.substr(0, 3); // Первые 3 символа названия таблицы
+    const microTime = process.hrtime.bigint().toString(36).substr(-4); // Микросекунды для уникальности
+
+    return `${tablePart}_${timestamp}_${randomPart}_${microTime}`;
   }
 
   /**
@@ -161,7 +167,7 @@ class BaseModel {
       paramIndex++;
     }
 
-    // Добавляем WHERE условия
+    // Доба��ляем WHERE условия
     if (conditions.length > 0) {
       sql += ` WHERE ${conditions.join(" AND ")}`;
     }
