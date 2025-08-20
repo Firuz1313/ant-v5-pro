@@ -57,7 +57,9 @@ export class ApiClient {
     if (typeof window !== "undefined") {
       const hostname = window.location.hostname;
       if (hostname.includes("builder.codes") || hostname.includes("fly.dev")) {
-        console.log("🌩️ Cloud environment detected - enabling XMLHttpRequest fallback by default");
+        console.log(
+          "🌩️ Cloud environment detected - enabling XMLHttpRequest fallback by default",
+        );
         this.useFallback = true;
       }
     }
@@ -370,22 +372,29 @@ export class ApiClient {
           error.message.includes("Illegal invocation")
         ) {
           console.error(`📡 Network error detected - checking connectivity`);
-          console.error(`📡 Current environment: ${window?.location?.hostname || 'unknown'}`);
-          console.error(`📡 Using fallback: ${this.useFallback ? 'Yes' : 'No'}`);
+          console.error(
+            `📡 Current environment: ${window?.location?.hostname || "unknown"}`,
+          );
+          console.error(
+            `📡 Using fallback: ${this.useFallback ? "Yes" : "No"}`,
+          );
 
           // Check if FullStory is interfering
           const isFullStoryPresent =
             error.stack && error.stack.includes("fullstory.com");
           const isIllegalInvocation =
             error.message.includes("Illegal invocation");
-          const isCloudEnvironment = window?.location?.hostname?.includes("builder.codes") ||
-                                     window?.location?.hostname?.includes("fly.dev");
+          const isCloudEnvironment =
+            window?.location?.hostname?.includes("builder.codes") ||
+            window?.location?.hostname?.includes("fly.dev");
 
           if (isFullStoryPresent || isIllegalInvocation || isCloudEnvironment) {
             console.error(
               `📡 Fetch API interference detected - switching to XMLHttpRequest fallback`,
             );
-            console.error(`📡 Interference detected: FullStory=${isFullStoryPresent}, IllegalInvocation=${isIllegalInvocation}, Cloud=${isCloudEnvironment}`);
+            console.error(
+              `📡 Interference detected: FullStory=${isFullStoryPresent}, IllegalInvocation=${isIllegalInvocation}, Cloud=${isCloudEnvironment}`,
+            );
             if (!this.useFallback) {
               this.useFallback = true;
               console.log(`📡 Enabling XHR fallback mode for future requests`);

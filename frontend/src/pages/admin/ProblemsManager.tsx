@@ -89,7 +89,8 @@ const ProblemsManager = () => {
   const createProblem = async (problem: any) => {};
   const updateProblem = async (id: string, data: any) => {};
   const deleteProblem = async (id: string) => {};
-  const getActiveDevices = () => devices.filter((d: any) => d.is_active !== false);
+  const getActiveDevices = () =>
+    devices.filter((d: any) => d.is_active !== false);
   const getStepsForProblem = (problemId: string) => [];
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -186,7 +187,8 @@ const ProblemsManager = () => {
       problem.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       problem.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDevice =
-      filterDevice === "all" || (problem.device_id || problem.deviceId) === filterDevice;
+      filterDevice === "all" ||
+      (problem.device_id || problem.deviceId) === filterDevice;
     const matchesCategory =
       filterCategory === "all" || problem.category === filterCategory;
     return matchesSearch && matchesDevice && matchesCategory;
@@ -270,7 +272,10 @@ const ProblemsManager = () => {
     try {
       const currentStatus = problem.status || problem.is_active;
       await updateProblem(problemId, {
-        status: currentStatus === "published" || currentStatus === "active" ? "draft" : "published",
+        status:
+          currentStatus === "published" || currentStatus === "active"
+            ? "draft"
+            : "published",
       });
     } catch (error) {
       console.error("Error toggling problem status:", error);
@@ -593,10 +598,18 @@ const ProblemsManager = () => {
                   <div className="flex items-center space-x-2">
                     <Badge
                       variant={
-                        (problem.status === "published" || problem.status === "active" || problem.is_active) ? "default" : "secondary"
+                        problem.status === "published" ||
+                        problem.status === "active" ||
+                        problem.is_active
+                          ? "default"
+                          : "secondary"
                       }
                     >
-                      {(problem.status === "published" || problem.status === "active" || problem.is_active) ? "Активна" : "Неактивна"}
+                      {problem.status === "published" ||
+                      problem.status === "active" ||
+                      problem.is_active
+                        ? "Активна"
+                        : "Неактивна"}
                     </Badge>
                   </div>
                 </div>
@@ -632,13 +645,18 @@ const ProblemsManager = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-green-600">
-                      {(problem.success_rate !== undefined ? problem.success_rate : problem.successRate) || 0}%
+                      {(problem.success_rate !== undefined
+                        ? problem.success_rate
+                        : problem.successRate) || 0}
+                      %
                     </div>
                     <div className="text-xs text-gray-500">успеха</div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-blue-600">
-                      {(problem.completed_count !== undefined ? problem.completed_count : problem.completions) || 0}
+                      {(problem.completed_count !== undefined
+                        ? problem.completed_count
+                        : problem.completions) || 0}
                     </div>
                     <div className="text-xs text-gray-500">решений</div>
                   </div>
@@ -652,12 +670,16 @@ const ProblemsManager = () => {
                       size="sm"
                       onClick={() => handleToggleStatus(problem.id)}
                       title={
-                        (problem.status === "published" || problem.status === "active" || problem.is_active)
+                        problem.status === "published" ||
+                        problem.status === "active" ||
+                        problem.is_active
                           ? "Деактивировать"
                           : "Активировать"
                       }
                     >
-                      {(problem.status === "published" || problem.status === "active" || problem.is_active) ? (
+                      {problem.status === "published" ||
+                      problem.status === "active" ||
+                      problem.is_active ? (
                         <EyeOff className="h-3 w-3" />
                       ) : (
                         <Eye className="h-3 w-3" />

@@ -1,5 +1,5 @@
-import { apiClient } from './client';
-import { Step, APIResponse, PaginatedResponse, FilterOptions } from '../types';
+import { apiClient } from "./client";
+import { Step, APIResponse, PaginatedResponse, FilterOptions } from "../types";
 
 export interface StepFilters extends FilterOptions {
   problemId?: string;
@@ -83,7 +83,7 @@ export interface StepInsertRequest {
 }
 
 export class StepsApi {
-  private readonly basePath = '/steps';
+  private readonly basePath = "/steps";
 
   /**
    * Получение списка шагов
@@ -91,7 +91,7 @@ export class StepsApi {
   async getSteps(
     page: number = 1,
     limit: number = 20,
-    filters: StepFilters = {}
+    filters: StepFilters = {},
   ): Promise<PaginatedResponse<StepWithDetails>> {
     return apiClient.get<PaginatedResponse<StepWithDetails>>(this.basePath, {
       params: {
@@ -108,14 +108,13 @@ export class StepsApi {
   async getStep(
     id: string,
     includeDetails: boolean = false,
-    includeStats: boolean = false
+    includeStats: boolean = false,
   ): Promise<APIResponse<StepWithDetails & { usageStats?: StepUsageStats }>> {
-    return apiClient.get<APIResponse<StepWithDetails & { usageStats?: StepUsageStats }>>(
-      `${this.basePath}/${id}`,
-      {
-        params: { include_details: includeDetails, include_stats: includeStats },
-      }
-    );
+    return apiClient.get<
+      APIResponse<StepWithDetails & { usageStats?: StepUsageStats }>
+    >(`${this.basePath}/${id}`, {
+      params: { include_details: includeDetails, include_stats: includeStats },
+    });
   }
 
   /**
@@ -130,7 +129,7 @@ export class StepsApi {
    */
   async updateStep(
     id: string,
-    data: StepUpdateData
+    data: StepUpdateData,
   ): Promise<APIResponse<Step>> {
     return apiClient.put<APIResponse<Step>>(`${this.basePath}/${id}`, data);
   }
@@ -141,7 +140,7 @@ export class StepsApi {
   async deleteStep(
     id: string,
     force: boolean = false,
-    reorder: boolean = true
+    reorder: boolean = true,
   ): Promise<APIResponse<Step>> {
     return apiClient.delete<APIResponse<Step>>(`${this.basePath}/${id}`, {
       params: { force, reorder },
@@ -160,13 +159,13 @@ export class StepsApi {
    */
   async getStepsByProblem(
     problemId: string,
-    isActive: boolean = true
+    isActive: boolean = true,
   ): Promise<APIResponse<StepWithDetails[]>> {
     return apiClient.get<APIResponse<StepWithDetails[]>>(
       `${this.basePath}/problem/${problemId}`,
       {
         params: { is_active: isActive },
-      }
+      },
     );
   }
 
@@ -176,11 +175,14 @@ export class StepsApi {
   async searchSteps(
     query: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<APIResponse<StepWithDetails[]>> {
-    return apiClient.get<APIResponse<StepWithDetails[]>>(`${this.basePath}/search`, {
-      params: { q: query, limit, offset },
-    });
+    return apiClient.get<APIResponse<StepWithDetails[]>>(
+      `${this.basePath}/search`,
+      {
+        params: { q: query, limit, offset },
+      },
+    );
   }
 
   /**
@@ -188,7 +190,7 @@ export class StepsApi {
    */
   async reorderSteps(
     problemId: string,
-    stepIds: string[]
+    stepIds: string[],
   ): Promise<APIResponse<Step[]>> {
     return apiClient.put<APIResponse<Step[]>>(`${this.basePath}/reorder`, {
       problem_id: problemId,
@@ -202,7 +204,7 @@ export class StepsApi {
   async insertStep(
     problemId: string,
     afterStepNumber: number,
-    stepData: Omit<StepCreateData, 'problemId'>
+    stepData: Omit<StepCreateData, "problemId">,
   ): Promise<APIResponse<Step>> {
     return apiClient.post<APIResponse<Step>>(`${this.basePath}/insert`, {
       problem_id: problemId,
@@ -216,11 +218,14 @@ export class StepsApi {
    */
   async duplicateStep(
     id: string,
-    targetProblemId?: string
+    targetProblemId?: string,
   ): Promise<APIResponse<Step>> {
-    return apiClient.post<APIResponse<Step>>(`${this.basePath}/${id}/duplicate`, {
-      target_problem_id: targetProblemId,
-    });
+    return apiClient.post<APIResponse<Step>>(
+      `${this.basePath}/${id}/duplicate`,
+      {
+        target_problem_id: targetProblemId,
+      },
+    );
   }
 
   /**
@@ -241,15 +246,19 @@ export class StepsApi {
    * Получение статистики использования шага
    */
   async getStepStats(id: string): Promise<APIResponse<StepUsageStats>> {
-    return apiClient.get<APIResponse<StepUsageStats>>(`${this.basePath}/${id}/stats`);
+    return apiClient.get<APIResponse<StepUsageStats>>(
+      `${this.basePath}/${id}/stats`,
+    );
   }
 
   /**
    * Валидация порядка шагов в проблеме
    */
-  async validateStepOrder(problemId: string): Promise<APIResponse<StepOrderValidation>> {
+  async validateStepOrder(
+    problemId: string,
+  ): Promise<APIResponse<StepOrderValidation>> {
     return apiClient.get<APIResponse<StepOrderValidation>>(
-      `${this.basePath}/validate/${problemId}`
+      `${this.basePath}/validate/${problemId}`,
     );
   }
 
@@ -258,7 +267,7 @@ export class StepsApi {
    */
   async fixStepNumbering(problemId: string): Promise<APIResponse<Step[]>> {
     return apiClient.post<APIResponse<Step[]>>(
-      `${this.basePath}/fix-numbering/${problemId}`
+      `${this.basePath}/fix-numbering/${problemId}`,
     );
   }
 }
