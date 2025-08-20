@@ -56,7 +56,7 @@ export interface ProblemWithDetails extends Problem {
 }
 
 export class ProblemsApi {
-  private readonly basePath = '/v1/problems';
+  private readonly basePath = '/problems';
 
   /**
    * Получение списка проблем
