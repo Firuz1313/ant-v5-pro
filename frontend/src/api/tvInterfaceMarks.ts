@@ -2,7 +2,7 @@
 import { apiClient, handleApiError } from "./client";
 
 // API endpoint base
-const API_ENDPOINT = "/v1/tv-interface-marks";
+const API_ENDPOINT = "/tv-interface-marks";
 
 // Types
 export interface TVInterfaceMark {

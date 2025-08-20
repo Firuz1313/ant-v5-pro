@@ -1,8 +1,13 @@
-import { apiClient } from './client';
-import { Device, APIResponse, PaginatedResponse, FilterOptions } from '../types';
+import { apiClient } from "./client";
+import {
+  Device,
+  APIResponse,
+  PaginatedResponse,
+  FilterOptions,
+} from "../types";
 
 export interface DeviceFilters extends FilterOptions {
-  status?: 'active' | 'inactive' | 'maintenance';
+  status?: "active" | "inactive" | "maintenance";
   brand?: string;
   include_stats?: boolean;
   admin?: boolean;
@@ -18,7 +23,7 @@ export interface DeviceCreateData {
   logoUrl?: string;
   color?: string;
   orderIndex?: number;
-  status?: 'active' | 'inactive' | 'maintenance';
+  status?: "active" | "inactive" | "maintenance";
   metadata?: Record<string, any>;
 }
 
@@ -41,7 +46,7 @@ export interface BulkUpdateItem {
 }
 
 export class DevicesApi {
-  private readonly basePath = '/v1/devices';
+  private readonly basePath = "/devices";
 
   /**
    * Получение списка устройств
@@ -49,7 +54,7 @@ export class DevicesApi {
   async getDevices(
     page: number = 1,
     limit: number = 20,
-    filters: DeviceFilters = {}
+    filters: DeviceFilters = {},
   ): Promise<PaginatedResponse<Device>> {
     return apiClient.get<PaginatedResponse<Device>>(this.basePath, {
       params: {
@@ -65,7 +70,7 @@ export class DevicesApi {
    */
   async getDevice(
     id: string,
-    includeStats: boolean = false
+    includeStats: boolean = false,
   ): Promise<APIResponse<Device>> {
     return apiClient.get<APIResponse<Device>>(`${this.basePath}/${id}`, {
       params: { include_stats: includeStats },
@@ -84,7 +89,7 @@ export class DevicesApi {
    */
   async updateDevice(
     id: string,
-    data: DeviceUpdateData
+    data: DeviceUpdateData,
   ): Promise<APIResponse<Device>> {
     return apiClient.put<APIResponse<Device>>(`${this.basePath}/${id}`, data);
   }
@@ -94,7 +99,7 @@ export class DevicesApi {
    */
   async deleteDevice(
     id: string,
-    force: boolean = false
+    force: boolean = false,
   ): Promise<APIResponse<Device>> {
     return apiClient.delete<APIResponse<Device>>(`${this.basePath}/${id}`, {
       params: { force },
@@ -105,7 +110,9 @@ export class DevicesApi {
    * Восстановление архивированного устройства
    */
   async restoreDevice(id: string): Promise<APIResponse<Device>> {
-    return apiClient.post<APIResponse<Device>>(`${this.basePath}/${id}/restore`);
+    return apiClient.post<APIResponse<Device>>(
+      `${this.basePath}/${id}/restore`,
+    );
   }
 
   /**
@@ -114,7 +121,7 @@ export class DevicesApi {
   async searchDevices(
     query: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<APIResponse<Device[]>> {
     return apiClient.get<APIResponse<Device[]>>(`${this.basePath}/search`, {
       params: { q: query, limit, offset },
@@ -150,7 +157,7 @@ export class DevicesApi {
    * Массовое обновление устройств
    */
   async bulkUpdateDevices(
-    updates: BulkUpdateItem[]
+    updates: BulkUpdateItem[],
   ): Promise<APIResponse<Device[]>> {
     return apiClient.put<APIResponse<Device[]>>(`${this.basePath}/bulk`, {
       updates,
@@ -161,8 +168,8 @@ export class DevicesApi {
    * Экспорт устройств
    */
   async exportDevices(
-    format: string = 'json',
-    includeProblems: boolean = false
+    format: string = "json",
+    includeProblems: boolean = false,
   ): Promise<APIResponse<Device[]>> {
     return apiClient.get<APIResponse<Device[]>>(`${this.basePath}/export`, {
       params: { format, include_problems: includeProblems },

@@ -9,7 +9,7 @@ import {
 import { apiClient, handleApiError } from "./client";
 
 // API endpoint base
-const API_ENDPOINT = "/v1/tv-interfaces";
+const API_ENDPOINT = "/tv-interfaces";
 
 // TV Interface API service
 export const tvInterfacesAPI = {
@@ -202,7 +202,7 @@ export const tvInterfacesAPI = {
 
       return {
         success: true,
-        message: response.message || "TV интерфейс успешно удален",
+        message: response.message || "TV инте��фейс успешно удален",
       };
     } catch (error) {
       return {

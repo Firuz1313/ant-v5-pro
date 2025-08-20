@@ -52,6 +52,17 @@ export class ApiClient {
       (window as any).__originalFetch = window.fetch.bind(window);
       this.originalFetch = window.fetch.bind(window);
     }
+
+    // In cloud environments, use XMLHttpRequest by default to avoid fetch issues
+    if (typeof window !== "undefined") {
+      const hostname = window.location.hostname;
+      if (hostname.includes("builder.codes") || hostname.includes("fly.dev")) {
+        console.log(
+          "🌩️ Cloud environment detected - enabling XMLHttpRequest fallback by default",
+        );
+        this.useFallback = true;
+      }
+    }
   }
 
   private async xhrFallback(
@@ -361,16 +372,28 @@ export class ApiClient {
           error.message.includes("Illegal invocation")
         ) {
           console.error(`📡 Network error detected - checking connectivity`);
+          console.error(
+            `📡 Current environment: ${window?.location?.hostname || "unknown"}`,
+          );
+          console.error(
+            `📡 Using fallback: ${this.useFallback ? "Yes" : "No"}`,
+          );
 
           // Check if FullStory is interfering
           const isFullStoryPresent =
             error.stack && error.stack.includes("fullstory.com");
           const isIllegalInvocation =
             error.message.includes("Illegal invocation");
+          const isCloudEnvironment =
+            window?.location?.hostname?.includes("builder.codes") ||
+            window?.location?.hostname?.includes("fly.dev");
 
-          if (isFullStoryPresent || isIllegalInvocation) {
+          if (isFullStoryPresent || isIllegalInvocation || isCloudEnvironment) {
             console.error(
               `📡 Fetch API interference detected - switching to XMLHttpRequest fallback`,
+            );
+            console.error(
+              `📡 Interference detected: FullStory=${isFullStoryPresent}, IllegalInvocation=${isIllegalInvocation}, Cloud=${isCloudEnvironment}`,
             );
             if (!this.useFallback) {
               this.useFallback = true;
@@ -499,21 +522,21 @@ const getApiBaseUrl = (): string => {
     // В облачной среде fly.dev/builder.codes
     if (hostname.includes("builder.codes") || hostname.includes("fly.dev")) {
       // Сначала пробуем proxy
-      const proxyUrl = "/api";
+      const proxyUrl = "/api/v1";
       console.log("🌩️ Cloud environment - trying proxy URL:", proxyUrl);
       return proxyUrl;
     }
 
     // Локальн��я разработка - пря��ое подключение к бэ��енду
     if (hostname === "localhost" && port === "8080") {
-      const directUrl = "http://localhost:3000/api";
+      const directUrl = "http://localhost:3000/api/v1";
       console.log("🏠 Local development - using direct connection:", directUrl);
       return directUrl;
     }
   }
 
   // Default fallback
-  const defaultUrl = "/api";
+  const defaultUrl = "/api/v1";
   console.log("🔄 Using default API URL:", defaultUrl);
   return defaultUrl;
 };

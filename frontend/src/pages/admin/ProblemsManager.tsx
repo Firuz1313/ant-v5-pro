@@ -89,7 +89,8 @@ const ProblemsManager = () => {
   const createProblem = async (problem: any) => {};
   const updateProblem = async (id: string, data: any) => {};
   const deleteProblem = async (id: string) => {};
-  const getActiveDevices = () => devices.filter((d: any) => d.is_active);
+  const getActiveDevices = () =>
+    devices.filter((d: any) => d.is_active !== false);
   const getStepsForProblem = (problemId: string) => [];
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -186,7 +187,8 @@ const ProblemsManager = () => {
       problem.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       problem.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDevice =
-      filterDevice === "all" || problem.deviceId === filterDevice;
+      filterDevice === "all" ||
+      (problem.device_id || problem.deviceId) === filterDevice;
     const matchesCategory =
       filterCategory === "all" || problem.category === filterCategory;
     return matchesSearch && matchesDevice && matchesCategory;
@@ -200,7 +202,7 @@ const ProblemsManager = () => {
 
   const getDeviceName = (deviceId: string) => {
     const device = devices.find((d) => d.id === deviceId);
-    return device?.name || "Неизвестная приставка";
+    return device?.name || "Неизвестна�� приставка";
   };
 
   const getCategoryInfo = (category: string) => {
@@ -268,8 +270,12 @@ const ProblemsManager = () => {
     if (!problem) return;
 
     try {
+      const currentStatus = problem.status || problem.is_active;
       await updateProblem(problemId, {
-        status: problem.status === "published" ? "draft" : "published",
+        status:
+          currentStatus === "published" || currentStatus === "active"
+            ? "draft"
+            : "published",
       });
     } catch (error) {
       console.error("Error toggling problem status:", error);
@@ -297,7 +303,7 @@ const ProblemsManager = () => {
       category: problem.category,
       icon: problem.icon,
       color: problem.color,
-      deviceId: problem.deviceId,
+      deviceId: problem.device_id || problem.deviceId,
     });
     setIsEditDialogOpen(true);
   };
@@ -371,7 +377,7 @@ const ProblemsManager = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Создать новую проблему</DialogTitle>
+                <DialogTitle>С��здать новую проблему</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
@@ -541,7 +547,7 @@ const ProblemsManager = () => {
             <div className="flex gap-2">
               <Select value={filterDevice} onValueChange={setFilterDevice}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Приставка" />
+                  <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все приставки</SelectItem>
@@ -592,10 +598,18 @@ const ProblemsManager = () => {
                   <div className="flex items-center space-x-2">
                     <Badge
                       variant={
-                        problem.status === "active" ? "default" : "secondary"
+                        problem.status === "published" ||
+                        problem.status === "active" ||
+                        problem.is_active
+                          ? "default"
+                          : "secondary"
                       }
                     >
-                      {problem.status === "active" ? "Активна" : "Неактивна"}
+                      {problem.status === "published" ||
+                      problem.status === "active" ||
+                      problem.is_active
+                        ? "Активна"
+                        : "Неактивна"}
                     </Badge>
                   </div>
                 </div>
@@ -603,7 +617,7 @@ const ProblemsManager = () => {
                 <div className="flex items-center space-x-2">
                   <Tv className="h-4 w-4 text-gray-400" />
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {getDeviceName(problem.deviceId)}
+                    {getDeviceName(problem.device_id || problem.deviceId)}
                   </span>
                 </div>
               </CardHeader>
@@ -631,13 +645,18 @@ const ProblemsManager = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-green-600">
-                      {problem.successRate}%
+                      {(problem.success_rate !== undefined
+                        ? problem.success_rate
+                        : problem.successRate) || 0}
+                      %
                     </div>
                     <div className="text-xs text-gray-500">успеха</div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-blue-600">
-                      {problem.completions}
+                      {(problem.completed_count !== undefined
+                        ? problem.completed_count
+                        : problem.completions) || 0}
                     </div>
                     <div className="text-xs text-gray-500">решений</div>
                   </div>
@@ -651,12 +670,16 @@ const ProblemsManager = () => {
                       size="sm"
                       onClick={() => handleToggleStatus(problem.id)}
                       title={
-                        problem.status === "active"
+                        problem.status === "published" ||
+                        problem.status === "active" ||
+                        problem.is_active
                           ? "Деактивировать"
                           : "Активировать"
                       }
                     >
-                      {problem.status === "active" ? (
+                      {problem.status === "published" ||
+                      problem.status === "active" ||
+                      problem.is_active ? (
                         <EyeOff className="h-3 w-3" />
                       ) : (
                         <Eye className="h-3 w-3" />

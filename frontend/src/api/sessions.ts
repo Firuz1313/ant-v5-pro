@@ -1,5 +1,10 @@
-import { apiClient } from './client';
-import { DiagnosticSession, APIResponse, PaginatedResponse, FilterOptions } from '../types';
+import { apiClient } from "./client";
+import {
+  DiagnosticSession,
+  APIResponse,
+  PaginatedResponse,
+  FilterOptions,
+} from "../types";
 
 export interface SessionFilters extends FilterOptions {
   deviceId?: string;
@@ -38,7 +43,7 @@ export interface SessionProgressUpdate {
   stepId: string;
   stepNumber?: number;
   completed?: boolean;
-  result?: 'success' | 'failure' | 'skipped';
+  result?: "success" | "failure" | "skipped";
   timeSpent?: number;
   userInput?: string;
   errors?: any[];
@@ -73,7 +78,7 @@ export interface SessionStepProgress {
   stepDescription?: string;
   stepEstimatedTime?: number;
   completed: boolean;
-  result?: 'success' | 'failure' | 'skipped';
+  result?: "success" | "failure" | "skipped";
   timeSpent?: number;
   userInput?: string;
   errors?: any[];
@@ -122,7 +127,7 @@ export interface CleanupResult {
 }
 
 export class SessionsApi {
-  private readonly basePath = '/v1/sessions';
+  private readonly basePath = "/sessions";
 
   /**
    * Получение списка сессий
@@ -130,15 +135,18 @@ export class SessionsApi {
   async getSessions(
     page: number = 1,
     limit: number = 20,
-    filters: SessionFilters = {}
+    filters: SessionFilters = {},
   ): Promise<PaginatedResponse<SessionWithProgress>> {
-    return apiClient.get<PaginatedResponse<SessionWithProgress>>(this.basePath, {
-      params: {
-        page,
-        limit,
-        ...filters,
+    return apiClient.get<PaginatedResponse<SessionWithProgress>>(
+      this.basePath,
+      {
+        params: {
+          page,
+          limit,
+          ...filters,
+        },
       },
-    });
+    );
   }
 
   /**
@@ -146,17 +154,22 @@ export class SessionsApi {
    */
   async getSession(
     id: string,
-    includeProgress: boolean = false
+    includeProgress: boolean = false,
   ): Promise<APIResponse<SessionWithProgress>> {
-    return apiClient.get<APIResponse<SessionWithProgress>>(`${this.basePath}/${id}`, {
-      params: { include_progress: includeProgress },
-    });
+    return apiClient.get<APIResponse<SessionWithProgress>>(
+      `${this.basePath}/${id}`,
+      {
+        params: { include_progress: includeProgress },
+      },
+    );
   }
 
   /**
    * Создание новой сессии
    */
-  async createSession(data: SessionCreateData): Promise<APIResponse<DiagnosticSession>> {
+  async createSession(
+    data: SessionCreateData,
+  ): Promise<APIResponse<DiagnosticSession>> {
     return apiClient.post<APIResponse<DiagnosticSession>>(this.basePath, data);
   }
 
@@ -165,9 +178,12 @@ export class SessionsApi {
    */
   async updateSession(
     id: string,
-    data: SessionUpdateData
+    data: SessionUpdateData,
   ): Promise<APIResponse<DiagnosticSession>> {
-    return apiClient.put<APIResponse<DiagnosticSession>>(`${this.basePath}/${id}`, data);
+    return apiClient.put<APIResponse<DiagnosticSession>>(
+      `${this.basePath}/${id}`,
+      data,
+    );
   }
 
   /**
@@ -175,11 +191,11 @@ export class SessionsApi {
    */
   async completeSession(
     id: string,
-    data: SessionCompletionData
+    data: SessionCompletionData,
   ): Promise<APIResponse<DiagnosticSession>> {
     return apiClient.post<APIResponse<DiagnosticSession>>(
       `${this.basePath}/${id}/complete`,
-      data
+      data,
     );
   }
 
@@ -188,11 +204,11 @@ export class SessionsApi {
    */
   async updateProgress(
     id: string,
-    progressData: SessionProgressUpdate
+    progressData: SessionProgressUpdate,
   ): Promise<APIResponse<DiagnosticSession>> {
     return apiClient.post<APIResponse<DiagnosticSession>>(
       `${this.basePath}/${id}/progress`,
-      progressData
+      progressData,
     );
   }
 
@@ -201,22 +217,27 @@ export class SessionsApi {
    */
   async getActiveSessions(
     limit: number = 50,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<APIResponse<SessionWithProgress[]>> {
-    return apiClient.get<APIResponse<SessionWithProgress[]>>(`${this.basePath}/active`, {
-      params: { limit, offset },
-    });
+    return apiClient.get<APIResponse<SessionWithProgress[]>>(
+      `${this.basePath}/active`,
+      {
+        params: { limit, offset },
+      },
+    );
   }
 
   /**
    * Получение статистики сессий
    */
-  async getSessionStats(filters: {
-    deviceId?: string;
-    problemId?: string;
-    dateFrom?: string;
-    dateTo?: string;
-  } = {}): Promise<APIResponse<SessionStats>> {
+  async getSessionStats(
+    filters: {
+      deviceId?: string;
+      problemId?: string;
+      dateFrom?: string;
+      dateTo?: string;
+    } = {},
+  ): Promise<APIResponse<SessionStats>> {
     return apiClient.get<APIResponse<SessionStats>>(`${this.basePath}/stats`, {
       params: filters,
     });
@@ -227,13 +248,13 @@ export class SessionsApi {
    */
   async getPopularProblems(
     limit: number = 10,
-    timeframe: string = '30 days'
+    timeframe: string = "30 days",
   ): Promise<APIResponse<PopularProblem[]>> {
     return apiClient.get<APIResponse<PopularProblem[]>>(
       `${this.basePath}/popular-problems`,
       {
         params: { limit, timeframe },
-      }
+      },
     );
   }
 
@@ -241,12 +262,15 @@ export class SessionsApi {
    * Получение аналитики по времени
    */
   async getTimeAnalytics(
-    period: 'hour' | 'day' | 'week' | 'month' = 'day',
-    limit: number = 30
+    period: "hour" | "day" | "week" | "month" = "day",
+    limit: number = 30,
   ): Promise<APIResponse<TimeAnalytics[]>> {
-    return apiClient.get<APIResponse<TimeAnalytics[]>>(`${this.basePath}/analytics`, {
-      params: { period, limit },
-    });
+    return apiClient.get<APIResponse<TimeAnalytics[]>>(
+      `${this.basePath}/analytics`,
+      {
+        params: { period, limit },
+      },
+    );
   }
 
   /**
@@ -254,11 +278,14 @@ export class SessionsApi {
    */
   async deleteSession(
     id: string,
-    force: boolean = false
+    force: boolean = false,
   ): Promise<APIResponse<DiagnosticSession>> {
-    return apiClient.delete<APIResponse<DiagnosticSession>>(`${this.basePath}/${id}`, {
-      params: { force },
-    });
+    return apiClient.delete<APIResponse<DiagnosticSession>>(
+      `${this.basePath}/${id}`,
+      {
+        params: { force },
+      },
+    );
   }
 
   /**
@@ -266,35 +293,43 @@ export class SessionsApi {
    */
   async restoreSession(id: string): Promise<APIResponse<DiagnosticSession>> {
     return apiClient.post<APIResponse<DiagnosticSession>>(
-      `${this.basePath}/${id}/restore`
+      `${this.basePath}/${id}/restore`,
     );
   }
 
   /**
    * Очистка старых сессий
    */
-  async cleanupOldSessions(daysToKeep: number = 90): Promise<APIResponse<CleanupResult>> {
-    return apiClient.post<APIResponse<CleanupResult>>(`${this.basePath}/cleanup`, {
-      days_to_keep: daysToKeep,
-    });
+  async cleanupOldSessions(
+    daysToKeep: number = 90,
+  ): Promise<APIResponse<CleanupResult>> {
+    return apiClient.post<APIResponse<CleanupResult>>(
+      `${this.basePath}/cleanup`,
+      {
+        days_to_keep: daysToKeep,
+      },
+    );
   }
 
   /**
    * Экспорт сессий
    */
   async exportSessions(
-    format: string = 'json',
+    format: string = "json",
     filters: {
       deviceId?: string;
       problemId?: string;
       dateFrom?: string;
       dateTo?: string;
       includeProgress?: boolean;
-    } = {}
+    } = {},
   ): Promise<APIResponse<SessionWithProgress[]>> {
-    return apiClient.get<APIResponse<SessionWithProgress[]>>(`${this.basePath}/export`, {
-      params: { format, ...filters },
-    });
+    return apiClient.get<APIResponse<SessionWithProgress[]>>(
+      `${this.basePath}/export`,
+      {
+        params: { format, ...filters },
+      },
+    );
   }
 }
 

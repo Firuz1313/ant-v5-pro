@@ -1,10 +1,15 @@
-import { apiClient } from './client';
-import { Problem, APIResponse, PaginatedResponse, FilterOptions } from '../types';
+import { apiClient } from "./client";
+import {
+  Problem,
+  APIResponse,
+  PaginatedResponse,
+  FilterOptions,
+} from "../types";
 
 export interface ProblemFilters extends FilterOptions {
   deviceId?: string;
-  category?: 'critical' | 'moderate' | 'minor' | 'other';
-  status?: 'draft' | 'published' | 'archived';
+  category?: "critical" | "moderate" | "minor" | "other";
+  status?: "draft" | "published" | "archived";
   includeDetails?: boolean;
   admin?: boolean;
 }
@@ -14,15 +19,15 @@ export interface ProblemCreateData {
   deviceId: string;
   title: string;
   description?: string;
-  category?: 'critical' | 'moderate' | 'minor' | 'other';
+  category?: "critical" | "moderate" | "minor" | "other";
   icon?: string;
   color?: string;
   tags?: string[];
   priority?: number;
   estimatedTime?: number;
-  difficulty?: 'beginner' | 'intermediate' | 'advanced';
+  difficulty?: "beginner" | "intermediate" | "advanced";
   successRate?: number;
-  status?: 'draft' | 'published' | 'archived';
+  status?: "draft" | "published" | "archived";
   metadata?: Record<string, any>;
 }
 
@@ -56,7 +61,7 @@ export interface ProblemWithDetails extends Problem {
 }
 
 export class ProblemsApi {
-  private readonly basePath = '/v1/problems';
+  private readonly basePath = "/problems";
 
   /**
    * Получение списка проблем
@@ -64,7 +69,7 @@ export class ProblemsApi {
   async getProblems(
     page: number = 1,
     limit: number = 20,
-    filters: ProblemFilters = {}
+    filters: ProblemFilters = {},
   ): Promise<PaginatedResponse<ProblemWithDetails>> {
     return apiClient.get<PaginatedResponse<ProblemWithDetails>>(this.basePath, {
       params: {
@@ -80,11 +85,14 @@ export class ProblemsApi {
    */
   async getProblem(
     id: string,
-    includeDetails: boolean = false
+    includeDetails: boolean = false,
   ): Promise<APIResponse<ProblemWithDetails>> {
-    return apiClient.get<APIResponse<ProblemWithDetails>>(`${this.basePath}/${id}`, {
-      params: { include_details: includeDetails },
-    });
+    return apiClient.get<APIResponse<ProblemWithDetails>>(
+      `${this.basePath}/${id}`,
+      {
+        params: { include_details: includeDetails },
+      },
+    );
   }
 
   /**
@@ -99,7 +107,7 @@ export class ProblemsApi {
    */
   async updateProblem(
     id: string,
-    data: ProblemUpdateData
+    data: ProblemUpdateData,
   ): Promise<APIResponse<Problem>> {
     return apiClient.put<APIResponse<Problem>>(`${this.basePath}/${id}`, data);
   }
@@ -109,7 +117,7 @@ export class ProblemsApi {
    */
   async deleteProblem(
     id: string,
-    force: boolean = false
+    force: boolean = false,
   ): Promise<APIResponse<Problem>> {
     return apiClient.delete<APIResponse<Problem>>(`${this.basePath}/${id}`, {
       params: { force },
@@ -120,7 +128,9 @@ export class ProblemsApi {
    * Восстановление архивированной проблемы
    */
   async restoreProblem(id: string): Promise<APIResponse<Problem>> {
-    return apiClient.post<APIResponse<Problem>>(`${this.basePath}/${id}/restore`);
+    return apiClient.post<APIResponse<Problem>>(
+      `${this.basePath}/${id}/restore`,
+    );
   }
 
   /**
@@ -129,20 +139,28 @@ export class ProblemsApi {
   async searchProblems(
     query: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<APIResponse<ProblemWithDetails[]>> {
-    return apiClient.get<APIResponse<ProblemWithDetails[]>>(`${this.basePath}/search`, {
-      params: { q: query, limit, offset },
-    });
+    return apiClient.get<APIResponse<ProblemWithDetails[]>>(
+      `${this.basePath}/search`,
+      {
+        params: { q: query, limit, offset },
+      },
+    );
   }
 
   /**
    * Получение популярных проблем
    */
-  async getPopularProblems(limit: number = 10): Promise<APIResponse<ProblemWithDetails[]>> {
-    return apiClient.get<APIResponse<ProblemWithDetails[]>>(`${this.basePath}/popular`, {
-      params: { limit },
-    });
+  async getPopularProblems(
+    limit: number = 10,
+  ): Promise<APIResponse<ProblemWithDetails[]>> {
+    return apiClient.get<APIResponse<ProblemWithDetails[]>>(
+      `${this.basePath}/popular`,
+      {
+        params: { limit },
+      },
+    );
   }
 
   /**
@@ -152,13 +170,13 @@ export class ProblemsApi {
     deviceId: string,
     status?: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<APIResponse<ProblemWithDetails[]>> {
     return apiClient.get<APIResponse<ProblemWithDetails[]>>(
       `${this.basePath}/device/${deviceId}`,
       {
         params: { status, limit, offset },
-      }
+      },
     );
   }
 
@@ -169,13 +187,13 @@ export class ProblemsApi {
     category: string,
     deviceId?: string,
     limit: number = 20,
-    offset: number = 0
+    offset: number = 0,
   ): Promise<APIResponse<ProblemWithDetails[]>> {
     return apiClient.get<APIResponse<ProblemWithDetails[]>>(
       `${this.basePath}/category/${category}`,
       {
         params: { device_id: deviceId, limit, offset },
-      }
+      },
     );
   }
 
@@ -184,25 +202,32 @@ export class ProblemsApi {
    */
   async duplicateProblem(
     id: string,
-    targetDeviceId?: string
+    targetDeviceId?: string,
   ): Promise<APIResponse<Problem>> {
-    return apiClient.post<APIResponse<Problem>>(`${this.basePath}/${id}/duplicate`, {
-      target_device_id: targetDeviceId,
-    });
+    return apiClient.post<APIResponse<Problem>>(
+      `${this.basePath}/${id}/duplicate`,
+      {
+        target_device_id: targetDeviceId,
+      },
+    );
   }
 
   /**
    * Публикация проблемы
    */
   async publishProblem(id: string): Promise<APIResponse<Problem>> {
-    return apiClient.post<APIResponse<Problem>>(`${this.basePath}/${id}/publish`);
+    return apiClient.post<APIResponse<Problem>>(
+      `${this.basePath}/${id}/publish`,
+    );
   }
 
   /**
    * Снятие проблемы с публикации
    */
   async unpublishProblem(id: string): Promise<APIResponse<Problem>> {
-    return apiClient.post<APIResponse<Problem>>(`${this.basePath}/${id}/unpublish`);
+    return apiClient.post<APIResponse<Problem>>(
+      `${this.basePath}/${id}/unpublish`,
+    );
   }
 
   /**
@@ -210,11 +235,14 @@ export class ProblemsApi {
    */
   async updateProblemStats(
     id: string,
-    sessionResult: 'success' | 'failure'
+    sessionResult: "success" | "failure",
   ): Promise<APIResponse<Problem>> {
-    return apiClient.post<APIResponse<Problem>>(`${this.basePath}/${id}/update-stats`, {
-      session_result: sessionResult,
-    });
+    return apiClient.post<APIResponse<Problem>>(
+      `${this.basePath}/${id}/update-stats`,
+      {
+        session_result: sessionResult,
+      },
+    );
   }
 
   /**
@@ -228,13 +256,16 @@ export class ProblemsApi {
    * Экспорт проблем
    */
   async exportProblems(
-    format: string = 'json',
+    format: string = "json",
     deviceId?: string,
-    includeSteps: boolean = false
+    includeSteps: boolean = false,
   ): Promise<APIResponse<ProblemWithDetails[]>> {
-    return apiClient.get<APIResponse<ProblemWithDetails[]>>(`${this.basePath}/export`, {
-      params: { format, device_id: deviceId, include_steps: includeSteps },
-    });
+    return apiClient.get<APIResponse<ProblemWithDetails[]>>(
+      `${this.basePath}/export`,
+      {
+        params: { format, device_id: deviceId, include_steps: includeSteps },
+      },
+    );
   }
 }
 
