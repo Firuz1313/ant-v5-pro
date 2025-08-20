@@ -89,7 +89,7 @@ const ProblemsManager = () => {
   const createProblem = async (problem: any) => {};
   const updateProblem = async (id: string, data: any) => {};
   const deleteProblem = async (id: string) => {};
-  const getActiveDevices = () => devices.filter((d: any) => d.is_active);
+  const getActiveDevices = () => devices.filter((d: any) => d.is_active !== false);
   const getStepsForProblem = (problemId: string) => [];
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -200,7 +200,7 @@ const ProblemsManager = () => {
 
   const getDeviceName = (deviceId: string) => {
     const device = devices.find((d) => d.id === deviceId);
-    return device?.name || "Неизвестная приставка";
+    return device?.name || "Неизвестна�� приставка";
   };
 
   const getCategoryInfo = (category: string) => {
@@ -376,7 +376,7 @@ const ProblemsManager = () => {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="deviceId">Прис��авка</Label>
+                  <Label htmlFor="deviceId">Приставка</Label>
                   <Select
                     value={formData.deviceId}
                     onValueChange={(value) =>
