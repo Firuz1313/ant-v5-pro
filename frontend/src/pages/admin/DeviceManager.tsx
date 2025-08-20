@@ -170,6 +170,12 @@ const DeviceManager = () => {
       resetForm();
     } catch (error) {
       console.error("Error creating device:", error);
+      // Show user-friendly error message
+      if (error.response && error.response.error) {
+        alert(`Error: ${error.response.error}`);
+      } else {
+        alert(`Error creating device: ${error.message}`);
+      }
     }
   };
 
