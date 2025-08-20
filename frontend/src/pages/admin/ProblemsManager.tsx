@@ -87,7 +87,7 @@ const ProblemsManager = () => {
   const { data: devicesResponse } = useDevices();
   const { data: problemsResponse } = useProblems(1, 20, { admin: true });
 
-  // Извлекаем массивы данных из ответа API
+  // Извлекаем массивы данных из отв��та API
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
 
@@ -417,7 +417,7 @@ const ProblemsManager = () => {
       });
       console.log("✅ Проблема успешно продублирована");
     } catch (error) {
-      console.error("❌ Ошибка при дублировании проблемы:", error);
+      console.error("�� Ошибка при дублировании проблемы:", error);
 
       const errorResponse = (error as any)?.response?.data;
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
@@ -456,6 +456,35 @@ const ProblemsManager = () => {
       color: "from-yellow-500 to-yellow-600",
       deviceId: "",
     });
+  };
+
+  const handleActivateAllProblems = async () => {
+    if (
+      !confirm(
+        "Вы уверены, что хотите активировать ВСЕ проблемы? Все проблемы будут переведены в статус 'published'.",
+      )
+    )
+      return;
+
+    try {
+      console.log("🔄 Массовая активация проблем...");
+
+      // Активируем все проблемы по одной
+      for (const problem of problems) {
+        await updateProblemMutation.mutateAsync({
+          id: problem.id,
+          data: {
+            status: "published",
+            is_active: true,
+          },
+        });
+      }
+
+      alert(`Все проблемы (${problems.length}) успешно активированы!`);
+    } catch (error) {
+      console.error("Ошибка при активации проблем:", error);
+      alert("Ошибка при активации проблем: " + (error as any)?.message);
+    }
   };
 
   const handleClearAllProblems = async () => {
@@ -595,6 +624,14 @@ const ProblemsManager = () => {
             disabled={!problems.some((p) => p.title.startsWith("TEST-"))}
           >
             🧹 Очистить тесты
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleActivateAllProblems}
+            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Активировать все
           </Button>
           <Button
             variant="outline"
@@ -1056,7 +1093,7 @@ const ProblemsManager = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Подробное описание проблемы"
+                placeholder="Подр��бное описание проблемы"
               />
             </div>
 

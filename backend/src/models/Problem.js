@@ -57,7 +57,7 @@ class Problem extends BaseModel {
       }
 
       const sql = `
-        SELECT 
+        SELECT
           p.*,
           d.name as device_name,
           d.brand as device_brand,
@@ -66,7 +66,7 @@ class Problem extends BaseModel {
           COUNT(DISTINCT ds.id) as steps_count,
           COUNT(DISTINCT CASE WHEN ds.is_active = true THEN ds.id END) as active_steps_count,
           COUNT(DISTINCT sess.id) as sessions_count,
-          COUNT(DISTINCT CASE WHEN sess.success = true THEN sess.id END) as successful_sessions_count
+          0 as successful_sessions_count
         FROM problems p
         LEFT JOIN devices d ON p.device_id = d.id
         LEFT JOIN diagnostic_steps ds ON p.id = ds.problem_id
@@ -101,7 +101,7 @@ class Problem extends BaseModel {
   async findByIdWithDetails(id) {
     try {
       const sql = `
-        SELECT 
+        SELECT
           p.*,
           d.name as device_name,
           d.brand as device_brand,
@@ -111,8 +111,8 @@ class Problem extends BaseModel {
           COUNT(DISTINCT ds.id) as steps_count,
           COUNT(DISTINCT CASE WHEN ds.is_active = true THEN ds.id END) as active_steps_count,
           COUNT(DISTINCT sess.id) as sessions_count,
-          COUNT(DISTINCT CASE WHEN sess.success = true THEN sess.id END) as successful_sessions_count,
-          AVG(CASE WHEN sess.success = true THEN sess.duration END) as avg_completion_time
+          0 as successful_sessions_count,
+          NULL as avg_completion_time
         FROM problems p
         LEFT JOIN devices d ON p.device_id = d.id
         LEFT JOIN diagnostic_steps ds ON p.id = ds.problem_id
@@ -234,7 +234,7 @@ class Problem extends BaseModel {
         steps_count: parseInt(row.steps_count || 0),
       }));
     } catch (error) {
-      console.error("Ошибка получения популярных проблем:", error.message);
+      console.error("Ошибка получения популярных пробле��:", error.message);
       throw error;
     }
   }
@@ -397,7 +397,7 @@ class Problem extends BaseModel {
       if (stepsCount > 0) {
         return {
           canDelete: false,
-          reason: `Проблема содержит ${stepsCount} диагностических шагов. Сначала удалите их.`,
+          reason: `Проблема содержит ${stepsCount} ��иагностических шагов. Сначала удалите их.`,
           suggestion: "Можно архивировать проблему вместо удаления",
         };
       }
