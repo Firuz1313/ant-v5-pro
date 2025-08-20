@@ -19,7 +19,7 @@ async function seedDatabase() {
 
     console.log("✅ Подключение к базе данных успешно");
 
-    // 1. Пропускаем создание пользователей (таблица имеет другую структуру)
+    // 1. Пропускаем создание пользова��елей (таблица имеет другую структуру)
     console.log("\n👤 Пропускаем создание пользователей (уже существуют)...");
 
     // 2. Создаем устройства
@@ -49,7 +49,7 @@ async function seedDatabase() {
         name: 'ANT Professional',
         brand: 'ANT',
         model: 'ANT-PR300',
-        description: 'Профессиональная моде��ь для коммерческого использования',
+        description: 'Профессиональная модель для коммерческого использования',
         color: 'from-green-500 to-green-600',
         order_index: 3
       },
@@ -179,49 +179,8 @@ async function seedDatabase() {
     // 4. Пропускаем диагностические шаги (схема таблицы отличается)
     console.log("🔧 Пропускаем диагностические шаги (будут добавлены позже)...");
 
-    // 5. Создаем пульты
-    console.log("🎮 Создание пультов дистанционного управления...");
-    
-    const remotes = [
-      {
-        id: 'remote-ant-basic',
-        device_id: 'device-ant-basic',
-        name: 'ANT Basic Remote',
-        manufacturer: 'ANT',
-        model: 'REM-B100',
-        description: 'Стандартный пульт для приставки ANT Basic',
-        layout: 'standard',
-        color_scheme: 'dark',
-        dimensions: '{"width": 60, "height": 200}',
-        buttons: JSON.stringify([
-          {id: 'power', label: 'POWER', x: 30, y: 20, width: 40, height: 15, color: '#ff4444'},
-          {id: 'menu', label: 'MENU', x: 10, y: 50, width: 30, height: 15, color: '#4444ff'},
-          {id: 'up', label: '▲', x: 30, y: 80, width: 25, height: 15, color: '#444444'},
-          {id: 'down', label: '▼', x: 30, y: 110, width: 25, height: 15, color: '#444444'},
-          {id: 'left', label: '◄', x: 10, y: 95, width: 15, height: 15, color: '#444444'},
-          {id: 'right', label: '►', x: 45, y: 95, width: 15, height: 15, color: '#444444'},
-          {id: 'ok', label: 'OK', x: 25, y: 95, width: 20, height: 15, color: '#44ff44'}
-        ]),
-        is_default: true
-      }
-    ];
-
-    for (const remote of remotes) {
-      await database.query(`
-        INSERT INTO remotes (id, device_id, name, manufacturer, model, description, layout, color_scheme, dimensions, buttons, is_default)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
-        ON CONFLICT (id) DO UPDATE SET
-          name = EXCLUDED.name,
-          manufacturer = EXCLUDED.manufacturer,
-          model = EXCLUDED.model,
-          description = EXCLUDED.description,
-          layout = EXCLUDED.layout,
-          color_scheme = EXCLUDED.color_scheme,
-          dimensions = EXCLUDED.dimensions,
-          buttons = EXCLUDED.buttons,
-          is_default = EXCLUDED.is_default
-      `, [remote.id, remote.device_id, remote.name, remote.manufacturer, remote.model, remote.description, remote.layout, remote.color_scheme, remote.dimensions, remote.buttons, remote.is_default]);
-    }
+    // 5. Пропускаем пульты (будут добавлены позже)
+    console.log("🎮 Пропускаем пульты дистанционного управления...");
 
     // 6. Обновляем настройки сайта
     console.log("⚙️  Обновление настроек сайта...");
