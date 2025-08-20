@@ -41,7 +41,7 @@ export interface BulkUpdateItem {
 }
 
 export class DevicesApi {
-  private readonly basePath = '/v1/devices';
+  private readonly basePath = '/devices';
 
   /**
    * Получение списка устройств
