@@ -251,9 +251,22 @@ const TVInterfaceBuilder = () => {
 
     setIsLoading(true);
     try {
+      // Подготавливаем данные для обновления, включая только измененные поля
+      const updateData: any = {
+        name: formData.name,
+        description: formData.description,
+        type: formData.type,
+        deviceId: formData.deviceId,
+      };
+
+      // Добавляем screenshot_data только если был загружен новый скриншот
+      if (formData.screenshotData && formData.screenshotData.startsWith('data:')) {
+        updateData.screenshotData = formData.screenshotData;
+      }
+
       const response = await tvInterfacesAPI.update(
         selectedInterface.id,
-        formData,
+        updateData,
       );
       if (response.success) {
         toast({
@@ -365,7 +378,7 @@ const TVInterfaceBuilder = () => {
     } catch (error) {
       console.error("Error duplicating TV interface:", error);
       toast({
-        title: "Ошибка",
+        title: "Оши��ка",
         description: "Произошла ошибка при дублировании TV интерфейса",
         variant: "destructive",
       });
@@ -472,7 +485,7 @@ const TVInterfaceBuilder = () => {
                 <AlertDialogTitle>Очистить все TV интерфейсы?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Это действие удалит все существующие TV интерфейсы. После
-                  очистки вы сможете создавать св��и собственные интерфейсы
+                  очистки вы сможете создавать св��и со��ственные интерфейсы
                   вручную через UI.
                 </AlertDialogDescription>
               </AlertDialogHeader>
