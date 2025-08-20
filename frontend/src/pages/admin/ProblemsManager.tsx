@@ -253,6 +253,14 @@ const ProblemsManager = () => {
       return;
     }
 
+    // Client-side duplicate check for better UX
+    if (checkForDuplicateTitle(formData.title, formData.deviceId)) {
+      alert(
+        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\nПожалуйста, выберите другое название.`
+      );
+      return;
+    }
+
     try {
       const problemData = {
         deviceId: formData.deviceId,
@@ -536,7 +544,7 @@ const ProblemsManager = () => {
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Оч��стить всё
+            Очистить всё
           </Button>
           <Button variant="outline">
             <Upload className="h-4 w-4 mr-2" />
@@ -695,7 +703,7 @@ const ProblemsManager = () => {
                   </Button>
                   <Button
                     onClick={() => {
-                      console.log("🔘 Нажата кнопка создания ��роблемы");
+                      console.log("🔘 ��ажата кнопка создания ��роблемы");
                       handleCreate();
                     }}
                     disabled={
