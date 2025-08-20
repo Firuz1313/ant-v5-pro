@@ -97,7 +97,7 @@ const RemoteBuilder = () => {
   const createRemote = async (remote: any) => {};
   const updateRemote = async (id: string, data: any) => {};
   const deleteRemote = async (id: string) => {};
-  const getActiveDevices = () => devices.filter((d: any) => d.isActive);
+  const getActiveDevices = () => devices.filter((d: any) => d.is_active);
   const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
   const getRemotesForDevice = (deviceId: string) =>
     remotes.filter((r: any) => r.deviceId === deviceId);
@@ -275,7 +275,7 @@ const RemoteBuilder = () => {
       await deleteRemote(remoteId);
     } catch (error) {
       console.error("Error deleting remote:", error);
-      alert("Ошибка при удалении пульта");
+      alert("Ошибка при удалении п��льта");
     }
   };
 
@@ -1121,7 +1121,7 @@ const RemoteBuilder = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Использований:
+                        И��пользований:
                       </span>
                       <span className="font-medium">{usageCount}</span>
                     </div>
