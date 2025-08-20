@@ -6,132 +6,10 @@ import {
   TVInterfaceApiResponse,
   TVInterfaceListResponse,
 } from "@/types/tvInterface";
+import { apiClient, handleApiError } from "./client";
 
-// Базовый URL для API
-const API_BASE_URL = "/api/v1/tv-interfaces";
-
-// Функция для повторных попыток
-const withRetry = async <T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3,
-  delay: number = 1000,
-): Promise<T> => {
-  let lastError: Error;
-
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error as Error;
-
-      // Если это сетевая ошибка и не последняя попытка, повторяем
-      if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch") &&
-        attempt < maxRetries
-      ) {
-        console.warn(
-          `🔄 Retry attempt ${attempt}/${maxRetries} after ${delay}ms delay...`,
-        );
-        await new Promise((resolve) => setTimeout(resolve, delay * attempt));
-        continue;
-      }
-
-      // Если это не сетевая ошибка или последняя попытка, прекращаем
-      throw error;
-    }
-  }
-
-  throw lastError!;
-};
-
-// Helper функция для HTTP запросов
-const apiRequest = async <T>(
-  endpoint: string,
-  options: RequestInit = {},
-): Promise<T> => {
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  const defaultOptions: RequestInit = {
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    timeout: 30000, // 30 секунд
-    ...options,
-  };
-
-  try {
-    // Добавляем отладочную информацию
-    console.log(`🔄 API Request: ${options.method || "GET"} ${url}`);
-
-    const response = await fetch(url, defaultOptions);
-
-    console.log(`✅ API Response: ${response.status} for ${url}`);
-
-    if (!response.ok) {
-      let errorData: any = {};
-      try {
-        errorData = await response.json();
-      } catch {
-        errorData = {
-          error: `HTTP ${response.status}: ${response.statusText}`,
-        };
-      }
-
-      const errorMessage =
-        errorData.error ||
-        errorData.message ||
-        `HTTP error! status: ${response.status} (${response.statusText})`;
-      console.error(`❌ API Error: ${errorMessage} for ${url}`);
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    console.log(`📦 API Data received for ${url}:`, {
-      size: JSON.stringify(data).length,
-    });
-    return data;
-  } catch (error) {
-    if (
-      error instanceof TypeError &&
-      error.message.includes("Failed to fetch")
-    ) {
-      console.error(`🌐 Network Error for ${url}:`, {
-        message: error.message,
-        name: error.name,
-        stack: error.stack,
-        url,
-        options: defaultOptions,
-      });
-      throw new Error(
-        `Сетевая ошибка: Не удается подключиться к серверу. Проверьте интернет-соединение.`,
-      );
-    }
-
-    console.error(`💥 API Request failed for ${url}:`, {
-      error: error.message,
-      type: error.constructor.name,
-      url,
-      options: defaultOptions,
-    });
-    throw error;
-  }
-};
-
-// Построение query параметров
-const buildQueryParams = (params: Record<string, any>): string => {
-  const searchParams = new URLSearchParams();
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      searchParams.append(key, String(value));
-    }
-  });
-
-  const queryString = searchParams.toString();
-  return queryString ? `?${queryString}` : "";
-};
+// API endpoint base
+const API_ENDPOINT = "/v1/tv-interfaces";
 
 // TV Interface API service
 export const tvInterfacesAPI = {
@@ -217,7 +95,7 @@ export const tvInterfacesAPI = {
   // Создать новый TV интерфейс
   async create(data: CreateTVInterfaceData): Promise<TVInterfaceApiResponse> {
     try {
-      // Валидация на фронтенде
+      // Валидация на фро��тенде
       if (!data.name?.trim()) {
         return {
           success: false,
