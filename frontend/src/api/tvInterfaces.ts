@@ -196,9 +196,9 @@ export const tvInterfacesAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceApiResponse>(`/${id}`, {
-        method: "DELETE",
-      });
+      const response = await apiClient.delete<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+      );
 
       return {
         success: true,
@@ -207,10 +207,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при удалении TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -307,7 +304,7 @@ export const tvInterfacesAPI = {
     }
   },
 
-  // Экспортировать TV интерфейс
+  // Экспортировать TV интерфе��с
   async export(id: string): Promise<TVInterfaceApiResponse> {
     try {
       if (!id) {
