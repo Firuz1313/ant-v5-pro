@@ -222,6 +222,18 @@ class ProblemController {
           newProblem = await problemModel.create(uniqueProblemData);
 
           console.log(`✅ Проблема создана с ID: ${newProblem.id} (попытка ${attempts + 1})`);
+
+          // Записываем время создания для защиты от спама
+          this.lastCreationsByIP.set(clientIP, Date.now());
+
+          // Очищаем старые записи (оставляем только последние 100)
+          if (this.lastCreationsByIP.size > 100) {
+            const entries = Array.from(this.lastCreationsByIP.entries());
+            const sortedEntries = entries.sort((a, b) => b[1] - a[1]).slice(0, 50);
+            this.lastCreationsByIP.clear();
+            sortedEntries.forEach(([ip, time]) => this.lastCreationsByIP.set(ip, time));
+          }
+
           break;
         } catch (error) {
           attempts++;
