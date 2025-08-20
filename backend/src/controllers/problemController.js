@@ -42,7 +42,14 @@ class ProblemController {
       if (device_id) filters.device_id = device_id;
       if (category) filters.category = category;
       if (status) filters.status = status;
-      if (is_active !== undefined) filters.is_active = is_active === "true";
+
+      // Set is_active filter: true by default, unless explicitly set to false
+      if (is_active !== undefined) {
+        filters.is_active = is_active === "true";
+      } else {
+        // By default, only show active problems
+        filters.is_active = true;
+      }
 
       const options = {
         limit: Math.min(parseInt(limit), 100),
@@ -396,7 +403,7 @@ class ProblemController {
         });
       }
 
-      // Проверяем возможность удаления
+      // ��роверяем возможность удаления
       const deleteCheck = await problemModel.canDelete(id);
       if (!deleteCheck.canDelete && force !== "true") {
         return res.status(409).json({
