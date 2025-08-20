@@ -392,7 +392,7 @@ const ProblemsManager = () => {
       return;
 
     try {
-      // Удаляем все проблемы по одной
+      // Удаляем все проб��емы по одной
       for (const problem of problems) {
         await deleteProblemMutation.mutateAsync({ id: problem.id });
       }
@@ -413,7 +413,7 @@ const ProblemsManager = () => {
             Управление проблемами
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Созд��ние и настройка проблем для различных моделей приставок
+            Создание и настройка проблем для различных моделей приставок
           </p>
         </div>
         <div className="flex space-x-2">
@@ -581,10 +581,13 @@ const ProblemsManager = () => {
                     Отмена
                   </Button>
                   <Button
-                    onClick={handleCreate}
-                    disabled={!formData.title || !formData.deviceId}
+                    onClick={() => {
+                      console.log('🔘 Нажата кнопка создания проблемы');
+                      handleCreate();
+                    }}
+                    disabled={!formData.title || !formData.deviceId || createProblemMutation.isPending}
                   >
-                    Создать
+                    {createProblemMutation.isPending ? 'Создание...' : 'Создать'}
                   </Button>
                 </div>
               </div>
@@ -798,7 +801,7 @@ const ProblemsManager = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Редакт��ровать проблему</DialogTitle>
+            <DialogTitle>Редактировать проблему</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -810,7 +813,7 @@ const ProblemsManager = () => {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Выберите приставку" />
+                  <SelectValue placeholder="Выберите п��иставку" />
                 </SelectTrigger>
                 <SelectContent>
                   {getActiveDevices().map((device) => (
