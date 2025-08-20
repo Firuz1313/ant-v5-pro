@@ -161,9 +161,15 @@ const DeviceManager = () => {
       const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, '-')}-${formData.name.toLowerCase().replace(/\s+/g, '-')}`;
 
       await devicesApi.createDevice({
-        ...formData,
         id: deviceId,
-        isActive: true,
+        name: formData.name,
+        brand: formData.brand,
+        model: formData.model,
+        description: formData.description,
+        image_url: formData.imageUrl,
+        logo_url: formData.logoUrl,
+        color: formData.color,
+        status: 'active',
       });
       await refetch();
       setIsCreateDialogOpen(false);
@@ -581,7 +587,7 @@ const DeviceManager = () => {
             </div>
 
             <div>
-              <Label htmlFor="edit-model">Модель</Label>
+              <Label htmlFor="edit-model">Модел��</Label>
               <Input
                 id="edit-model"
                 value={formData.model}
