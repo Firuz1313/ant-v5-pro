@@ -85,7 +85,7 @@ interface Problem {
 
 const ProblemsManager = () => {
   const { data: devicesResponse } = useDevices();
-  const { data: problemsResponse } = useProblems();
+  const { data: problemsResponse } = useProblems(1, 20, { is_active: true });
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
@@ -556,7 +556,7 @@ const ProblemsManager = () => {
                   } else {
                     alert(
                       "Ошибка при создании тестовой проблемы: " +
-                        (error?.message || "Неизвестная ошибка"),
+                        (error?.message || "Неизвестная ��шибка"),
                     );
                   }
                 });
@@ -1044,7 +1044,7 @@ const ProblemsManager = () => {
             </div>
 
             <div>
-              <Label htmlFor="edit-description">Описание</Label>
+              <Label htmlFor="edit-description">Описан��е</Label>
               <Textarea
                 id="edit-description"
                 value={formData.description}
