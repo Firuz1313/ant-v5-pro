@@ -29,6 +29,7 @@ export class ApiClient {
   private baseUrl: string;
   private timeout: number;
   private defaultHeaders: Record<string, string>;
+  private activeRequests: Map<string, Promise<any>> = new Map();
 
   constructor(config: ApiClientConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
