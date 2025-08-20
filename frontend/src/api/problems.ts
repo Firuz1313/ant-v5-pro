@@ -165,9 +165,12 @@ export class ProblemsApi {
     id: string,
     force: boolean = false,
   ): Promise<APIResponse<Problem>> {
-    return apiClient.delete<APIResponse<Problem>>(`${this.basePath}/${id}`, {
-      params: { force },
+    console.log(`🗑️ API: Deleting problem ${id} with force=${force}`);
+    const response = await apiClient.delete<APIResponse<Problem>>(`${this.basePath}/${id}`, {
+      params: { force: force.toString() },
     });
+    console.log(`✅ API: Delete response:`, response);
+    return response;
   }
 
   /**
