@@ -513,21 +513,21 @@ const getApiBaseUrl = (): string => {
     // В облачной среде fly.dev/builder.codes
     if (hostname.includes("builder.codes") || hostname.includes("fly.dev")) {
       // Сначала пробуем proxy
-      const proxyUrl = "/api";
+      const proxyUrl = "/api/v1";
       console.log("🌩️ Cloud environment - trying proxy URL:", proxyUrl);
       return proxyUrl;
     }
 
     // Локальн��я разработка - пря��ое подключение к бэ��енду
     if (hostname === "localhost" && port === "8080") {
-      const directUrl = "http://localhost:3000/api";
+      const directUrl = "http://localhost:3000/api/v1";
       console.log("🏠 Local development - using direct connection:", directUrl);
       return directUrl;
     }
   }
 
   // Default fallback
-  const defaultUrl = "/api";
+  const defaultUrl = "/api/v1";
   console.log("🔄 Using default API URL:", defaultUrl);
   return defaultUrl;
 };
