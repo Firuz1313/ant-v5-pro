@@ -273,14 +273,16 @@ export class ApiClient {
         if (error.message === "Failed to fetch" || error.name === "TypeError") {
           console.error(`📡 Network error detected - checking connectivity`);
 
-          // Retry for network failures (up to 2 retries)
-          if (retryCount < 2) {
-            console.log(`🔄 Retrying network request (attempt ${retryCount + 1}/2) after 1s delay...`);
-            await new Promise(resolve => setTimeout(resolve, 1000));
+          // Retry for network failures (up to 3 retries with exponential backoff)
+          if (retryCount < 3) {
+            const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 5000); // 1s, 2s, 4s max
+            console.log(`🔄 Retrying network request (attempt ${retryCount + 1}/3) after ${backoffDelay}ms delay...`);
+            console.log(`📡 This might be due to database reconnection - please wait...`);
+            await new Promise(resolve => setTimeout(resolve, backoffDelay));
             return this.makeRequest<T>(endpoint, options, retryCount + 1);
           }
 
-          throw new ApiError("Network connection failed after 2 retries - please check your internet connection and try again", 0);
+          throw new ApiError("Network connection failed after 3 retries - this may be due to database connectivity issues. Please try again in a moment.", 0);
         }
 
         // Handle specific body stream errors
