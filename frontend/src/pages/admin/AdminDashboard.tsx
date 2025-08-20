@@ -62,7 +62,7 @@ const AdminDashboard = () => {
   // Statistics - using real API data
   const deviceStats = {
     total: devices.length,
-    active: devices.filter((d: any) => d.isActive).length,
+    active: devices.filter((d: any) => d.is_active).length,
   };
   const problemStats = {
     total: problems.length,
@@ -432,7 +432,7 @@ const AdminDashboard = () => {
                   size="sm"
                 >
                   <Settings className="h-4 w-4 mr-2" />
-                  Общие настройки
+                  Общие настройк��
                 </Button>
                 <Button
                   className="w-full justify-start"
