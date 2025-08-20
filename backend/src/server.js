@@ -90,9 +90,9 @@ if (process.env.COMPRESSION_ENABLED !== "false") {
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 минут
-  max: NODE_ENV === "development"
-    ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000 // 1000 запросов для разработки
-    : parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // 100 для продакшена
+  max: NODE_ENV === "development" || process.env.FLY_APP_NAME
+    ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 10000 // 10000 запросов для разработки и облачных сред
+    : parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000, // 1000 для продакшена
   message: {
     error: "Слишком много запросов с этого IP, попробуйте позже.",
     retryAfter: Math.ceil(
@@ -109,6 +109,14 @@ const limiter = rateLimit({
         return true;
       }
     }
+
+    // Пропускаем rate limiting для облачных proxy IP
+    if (process.env.FLY_APP_NAME || NODE_ENV === "development") {
+      const clientIP = req.headers['fly-client-ip'] || req.headers['x-forwarded-for'] || req.ip;
+      console.log(`📊 Rate limit check - Client IP: ${clientIP}, Skipping: true`);
+      return true;
+    }
+
     return false;
   }
 });
