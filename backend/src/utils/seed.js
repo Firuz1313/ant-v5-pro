@@ -19,7 +19,7 @@ async function seedDatabase() {
 
     console.log("✅ Подключение к базе данных успешно");
 
-    // 1. Пропускаем создание пользователей (таблица имеет другую ст��уктуру)
+    // 1. Пропускаем создание пользователей (таблица имеет другую структуру)
     console.log("\n👤 Пропускаем создание пользователей (уже существуют)...");
 
     // 2. Создаем устройства
@@ -107,7 +107,7 @@ async function seedDatabase() {
       {
         id: 'problem-no-sound',
         device_id: 'device-ant-basic',
-        title: 'Нет звука',
+        title: 'Нет з��ука',
         description: 'Изображение есть, но звук отсутствует',
         category: 'moderate',
         icon: 'VolumeX',
@@ -185,22 +185,15 @@ async function seedDatabase() {
     // 6. Пропускаем настройки сайта
     console.log("⚙️  Пропускаем настройки сайта...");
 
-    // Получаем статистику
-    console.log("\n📊 Получение статистики...");
-    const stats = await database.getDatabaseStats();
-    
+    // Проверяем количество записей
+    console.log("\n📊 Проверка данных...");
+    const devicesCount = await database.query("SELECT COUNT(*) as count FROM devices");
+    const problemsCount = await database.query("SELECT COUNT(*) as count FROM problems");
+
     console.log("🎉 База данных успешно заполнена!");
     console.log("===================================");
-    console.log(`📏 Размер базы: ${stats.databaseSize}`);
-    
-    if (stats.tables.length > 0) {
-      console.log("\n📋 Статистика таблиц:");
-      stats.tables.forEach(table => {
-        if (table.live_rows > 0) {
-          console.log(`  📄 ${table.tablename}: ${table.live_rows} записей`);
-        }
-      });
-    }
+    console.log(`📺 Устройств: ${devicesCount.rows[0].count}`);
+    console.log(`⚠️  Проблем: ${problemsCount.rows[0].count}`);
 
     console.log("\n✅ Заполнение базы данных завершено!");
     
