@@ -318,7 +318,7 @@ const ProblemsManager = () => {
         alertMessage += `• Создана: ${existingProblem?.created_at ? new Date(existingProblem.created_at).toLocaleDateString() : "н/д"}\n\n`;
 
         if (suggestions.length > 0) {
-          alertMessage += `Рекомендации:\n${suggestions.map((s) => `• ${s}`).join("\n")}`;
+          alertMessage += `Рекомен��ации:\n${suggestions.map((s) => `• ${s}`).join("\n")}`;
         }
 
         alert(alertMessage);
@@ -854,7 +854,11 @@ const ProblemsManager = () => {
           return (
             <Card
               key={problem.id}
-              className="group hover:shadow-lg transition-shadow"
+              className={`group hover:shadow-lg transition-shadow ${
+                problem.is_active === false || problem.status === "archived"
+                  ? "opacity-60 border-dashed border-gray-300"
+                  : ""
+              }`}
             >
               <CardHeader>
                 <div className="flex items-start justify-between mb-3">
