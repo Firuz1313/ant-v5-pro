@@ -538,7 +538,10 @@ const getApiBaseUrl = (): string => {
     // Локальная разработка на порту 8080 - прямое подключение к бэкенду
     if (hostname === "localhost" && port === "8080") {
       const directUrl = "http://localhost:3000/api/v1";
-      console.log("🏠 Local development (port 8080) - using direct connection:", directUrl);
+      console.log(
+        "🏠 Local development (port 8080) - using direct connection:",
+        directUrl,
+      );
       return directUrl;
     }
   }
