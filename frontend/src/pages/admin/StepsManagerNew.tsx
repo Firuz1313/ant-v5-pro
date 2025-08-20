@@ -434,7 +434,7 @@ const StepsManagerNew = () => {
     };
 
     try {
-      await stepsApi.update(selectedStep.id, updatedData);
+      await stepsApi.updateStep(selectedStep.id, updatedData);
 
       // If step has TV interface markings, update them
       if (
@@ -481,7 +481,7 @@ const StepsManagerNew = () => {
     if (!step) return;
 
     try {
-      await stepsApi.update(stepId, {
+      await stepsApi.updateStep(stepId, {
         isActive: !step.isActive,
       });
 
