@@ -119,7 +119,7 @@ class TVInterface extends BaseModel {
     }
   }
 
-  // Создать новый интерфейс
+  // ��оздать новый интерфейс
   async create(data) {
     try {
       // Валидаци�� обязательных полей
@@ -144,6 +144,16 @@ class TVInterface extends BaseModel {
         throw new Error("Выбранное устройство не найдено");
       }
 
+      // Проверяем какие колонки существуют в таблице
+      const columnsQuery = `
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name = 'tv_interfaces' AND column_name IN ('clickable_areas', 'highlight_areas');
+      `;
+      const existingColumns = await this.query(columnsQuery);
+      const hasClickableAreas = existingColumns.rows.some(row => row.column_name === 'clickable_areas');
+      const hasHighlightAreas = existingColumns.rows.some(row => row.column_name === 'highlight_areas');
+
       const now = new Date().toISOString();
       const tvInterfaceData = {
         name: data.name.trim(),
@@ -152,12 +162,18 @@ class TVInterface extends BaseModel {
         device_id: data.device_id,
         screenshot_url: data.screenshot_url || null,
         screenshot_data: data.screenshot_data || null,
-        clickable_areas: JSON.stringify(data.clickable_areas || []),
-        highlight_areas: JSON.stringify(data.highlight_areas || []),
         is_active: data.is_active !== undefined ? data.is_active : true,
         created_at: now,
         updated_at: now,
       };
+
+      // Добавляем колонки только если они существуют
+      if (hasClickableAreas) {
+        tvInterfaceData.clickable_areas = JSON.stringify(data.clickable_areas || []);
+      }
+      if (hasHighlightAreas) {
+        tvInterfaceData.highlight_areas = JSON.stringify(data.highlight_areas || []);
+      }
 
       const result = await super.create(tvInterfaceData);
 
@@ -170,7 +186,7 @@ class TVInterface extends BaseModel {
     }
   }
 
-  // Обновить интерфейс
+  // Об��овить интерфейс
   async update(id, data) {
     try {
       // Проверяем существование интерфейса
