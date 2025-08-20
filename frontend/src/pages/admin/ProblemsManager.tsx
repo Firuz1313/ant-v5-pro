@@ -99,7 +99,12 @@ const ProblemsManager = () => {
 
   const getActiveDevices = () =>
     devices.filter((d: any) => d.is_active !== false);
-  const getStepsForProblem = (problemId: string) => [];
+  const getStepsForProblem = (problemId: string) => {
+    // TODO: Implement actual steps fetching logic
+    // For now return empty array to allow deletion
+    console.log(`🔍 Checking steps for problem ${problemId}: 0 steps found`);
+    return [];
+  };
 
   // Check if a problem with the same title and device already exists
   const checkForDuplicateTitle = (title: string, deviceId: string): boolean => {
@@ -300,7 +305,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "RATE_LIMIT") {
         const retryAfter = errorResponse.retryAfter || 5;
         alert(
-          `Слишком частые попытки создания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
+          `Слишком частые попытки создания проблем.\n\nПожалуйста, п��дождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
         );
       } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
