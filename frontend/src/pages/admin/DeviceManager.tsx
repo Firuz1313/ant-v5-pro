@@ -98,7 +98,7 @@ const DeviceManager = () => {
     },
     {
       value: "from-green-500 to-green-600",
-      label: "Зе��еный",
+      label: "Зеленый",
       preview: "bg-green-500",
     },
     {
@@ -186,12 +186,27 @@ const DeviceManager = () => {
       resetForm();
     } catch (error) {
       console.error("Error creating device:", error);
-      // Show user-friendly error message
-      if (error.response && error.response.error) {
-        alert(`Error: ${error.response.error}`);
-      } else {
-        alert(`Error creating device: ${error.message}`);
+
+      // Show user-friendly error message based on error type
+      let errorMessage = "Ошибка при создании устройства";
+
+      if (error.response) {
+        if (error.response.error) {
+          errorMessage = error.response.error;
+        } else if (error.response.message) {
+          errorMessage = error.response.message;
+        }
+      } else if (error.message) {
+        if (error.message.includes("409")) {
+          errorMessage = "Устройство с таким названием уже существует";
+        } else if (error.message.includes("400")) {
+          errorMessage = "Неверные данные. Проверьте все поля.";
+        } else {
+          errorMessage = error.message;
+        }
       }
+
+      alert(errorMessage);
     }
   };
 
@@ -697,7 +712,7 @@ const DeviceManager = () => {
               Приставки не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменить поисковый запро�� или создайте новую приставку.
+              Попробуйте изменить поисковый запрос или создайте новую приставку.
             </p>
           </CardContent>
         </Card>
