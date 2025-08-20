@@ -44,7 +44,7 @@ async function executeSqlFile(filePath) {
 
     const sql = fs.readFileSync(filePath, 'utf8');
     
-    // Разделяем SQL на отдельны�� команды
+    // Разделяем SQL на отдельные команды
     const commands = sql
       .split(';')
       .map(cmd => cmd.trim())
@@ -93,7 +93,7 @@ async function checkDataExists() {
     
     for (const table of tables) {
       try {
-        const result = await execDatabase(`SELECT COUNT(*) as count FROM ${table}`);
+        const result = await query(`SELECT COUNT(*) as count FROM ${table}`);
         counts[table] = parseInt(result.rows[0].count);
       } catch (error) {
         counts[table] = 0;
@@ -108,7 +108,7 @@ async function checkDataExists() {
 }
 
 /**
- * Выполнить миграции
+ * Выполнить миграци��
  */
 async function runMigrations() {
   log.header('🔄 Выполнение миграций');
@@ -148,7 +148,7 @@ async function seedDatabase() {
     
     log.info('Заполнение таблицы problems...');
     await seedProblems();
-    log.success('Таблица problems заполнена');
+    log.success('Таблица problems зап��лнена');
     
   } catch (error) {
     log.error(`Ошибка заполнения данными: ${error.message}`);
@@ -177,7 +177,7 @@ async function initializeDatabase() {
     log.info(`Найдено таблиц: ${existingTables.length}`);
     
     if (existingTables.length === 0) {
-      // Если таблиц нет, выполняем ��олную инициали��ацию
+      // Если таблиц нет, выполняем полную инициали��ацию
       log.info('Таблицы не найдены, выполняем полную инициализацию...');
       await runMigrations();
       await seedDatabase();
@@ -208,7 +208,7 @@ async function initializeDatabase() {
       });
     }
     
-    log.success('База данных успешно инициали��ирована!');
+    log.success('База данных успешно инициализирована!');
     
   } catch (error) {
     log.error(`Ошибка инициализации: ${error.message}`);
