@@ -256,7 +256,7 @@ const ProblemsManager = () => {
     // Client-side duplicate check for better UX
     if (checkForDuplicateTitle(formData.title, formData.deviceId)) {
       alert(
-        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\nПожалуйста, выберите другое название.`
+        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\nПожалуйста, выберите другое ��азвание.`
       );
       return;
     }
@@ -363,7 +363,7 @@ const ProblemsManager = () => {
       await deleteProblemMutation.mutateAsync({ id: problemId });
     } catch (error) {
       console.error("Error deleting problem:", error);
-      alert("Ошибка при удалении проблемы: " + (error as any)?.message);
+      alert("Ошибка ��ри удалении проблемы: " + (error as any)?.message);
     }
   };
 
@@ -529,7 +529,7 @@ const ProblemsManager = () => {
 
                 alert(`Удалено ${testProblems.length} тестовых проблем`);
               } catch (error) {
-                console.error("Ошибка при удалении тестовых проблем:", error);
+                console.error("О��ибка при удалении тестовых проблем:", error);
                 alert("Ошибка при удалении тестовых проблем");
               }
             }}
@@ -709,11 +709,14 @@ const ProblemsManager = () => {
                     disabled={
                       !formData.title ||
                       !formData.deviceId ||
-                      createProblemMutation.isPending
+                      createProblemMutation.isPending ||
+                      (formData.title && formData.deviceId && checkForDuplicateTitle(formData.title, formData.deviceId))
                     }
                   >
                     {createProblemMutation.isPending
                       ? "Создание..."
+                      : formData.title && formData.deviceId && checkForDuplicateTitle(formData.title, formData.deviceId)
+                      ? "Название уже существует"
                       : "Создать"}
                   </Button>
                 </div>
