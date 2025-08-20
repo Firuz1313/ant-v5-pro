@@ -251,7 +251,7 @@ const ProblemsManager = () => {
         status: "published",
       };
 
-      console.log('🚀 Отправ��а данных:', problemData);
+      console.log('🚀 Отправка данных:', problemData);
 
       const result = await createProblemMutation.mutateAsync(problemData);
 
@@ -428,26 +428,51 @@ const ProblemsManager = () => {
             variant="outline"
             onClick={() => {
               console.log('🧪 Тестирование API создания проблемы');
-              const uniqueId = Date.now();
+              const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
               const testData = {
                 deviceId: 'openbox',
-                title: `Тестовая проблема ${uniqueId}`,
-                description: `Описание тестовой проблемы, создана ${new Date().toLocaleString()}`,
+                title: `TEST-${uniqueId}`,
+                description: `Автоматически сгенерированная тестовая проблема, создана ${new Date().toLocaleString()}`,
                 category: 'critical' as any,
                 icon: 'AlertTriangle',
                 color: 'from-red-500 to-red-600',
                 priority: 1,
                 estimatedTime: 5,
                 difficulty: 'beginner' as any,
-                tags: [],
+                tags: ['тест', 'автоматически созданная'],
                 status: 'published' as any,
               };
               console.log('📦 Тестовые данные:', testData);
               createProblemMutation.mutate(testData);
             }}
             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+            disabled={createProblemMutation.isPending}
           >
-            🧪 Тест API
+            {createProblemMutation.isPending ? '⏳' : '🧪'} Тест API
+          </Button>
+          <Button
+            variant="outline"
+            onClick={async () => {
+              if (!confirm('Удалить все тестовые проблемы (начинающиеся с TEST-)?')) return;
+
+              try {
+                const testProblems = problems.filter(p => p.title.startsWith('TEST-'));
+                console.log(`🧹 Удаление ${testProblems.length} тестовых проблем`);
+
+                for (const problem of testProblems) {
+                  await deleteProblemMutation.mutateAsync({ id: problem.id });
+                }
+
+                alert(`Удалено ${testProblems.length} тестовых проблем`);
+              } catch (error) {
+                console.error('Ошибка при удалении тестовых проблем:', error);
+                alert('Ошибка при удалении тестовых проблем');
+              }
+            }}
+            className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
+            disabled={!problems.some(p => p.title.startsWith('TEST-'))}
+          >
+            🧹 Очистить тесты
           </Button>
           <Button
             variant="outline"
@@ -833,7 +858,7 @@ const ProblemsManager = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Редактироват�� проблему</DialogTitle>
+            <DialogTitle>Редактировать проблему</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
@@ -988,7 +1013,7 @@ const ProblemsManager = () => {
               Проблемы не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменить фильтры поиска или создайте новую проблему.
+              Попробуйте изменить фильтры поиска или создайт�� новую проблему.
             </p>
           </CardContent>
         </Card>
