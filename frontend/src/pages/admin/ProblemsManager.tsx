@@ -421,10 +421,11 @@ const ProblemsManager = () => {
             variant="outline"
             onClick={() => {
               console.log('🧪 Тестирование API создания проблемы');
+              const uniqueId = Date.now();
               const testData = {
                 deviceId: 'openbox',
-                title: 'Тестовая проблема ' + new Date().toLocaleTimeString(),
-                description: 'Описание тестовой проблемы',
+                title: `Тестовая проблема ${uniqueId}`,
+                description: `Описание тестовой проблемы, создана ${new Date().toLocaleString()}`,
                 category: 'critical' as any,
                 icon: 'AlertTriangle',
                 color: 'from-red-500 to-red-600',
