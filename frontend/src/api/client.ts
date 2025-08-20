@@ -163,7 +163,7 @@ export class ApiClient {
       console.log(`📡 Method: ${fetchOptions.method || "GET"}`);
       console.log(`📡 Headers:`, headers);
 
-      const response = await fetch(url, {
+      const response = await this.originalFetch(url, {
         ...fetchOptions,
         headers,
         signal: controller.signal,
