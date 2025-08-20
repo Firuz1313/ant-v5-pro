@@ -167,30 +167,46 @@ export class ApiClient {
       let responseText = "";
 
       try {
-        // Check if body is already used before attempting to read
+        // Always clone the response immediately to prevent body consumption issues
+        let responseToRead = response;
+
+        // If body is already used, we can't read it, but we can still provide error info
         if (response.bodyUsed) {
-          console.error(`📡 Response body already consumed - providing fallback error`);
+          console.error(`📡 Response body already consumed - creating fallback response`);
           responseText = JSON.stringify({
             error: `HTTP ${response.status}`,
             message: `Request failed with status ${response.status}`,
             errorType: "RESPONSE_ALREADY_USED",
           });
         } else {
-          // Clone the response first to prevent body consumption issues
-          const responseClone = response.clone();
-          responseText = await responseClone.text();
-          console.log(
-            `📡 Response text (first 100 chars): ${responseText.substring(0, 100)}`,
-          );
+          // Clone before reading to prevent consumption issues
+          try {
+            responseToRead = response.clone();
+            responseText = await responseToRead.text();
+            console.log(
+              `📡 Response text (first 100 chars): ${responseText.substring(0, 100)}`,
+            );
+          } catch (cloneError) {
+            console.error(`📡 Failed to clone response:`, cloneError);
+            // If cloning fails, try reading original (last resort)
+            try {
+              responseText = await response.text();
+            } catch (originalError) {
+              console.error(`📡 Failed to read original response:`, originalError);
+              responseText = JSON.stringify({
+                error: `HTTP ${response.status}`,
+                message: `Failed to read response body`,
+                errorType: "RESPONSE_READ_ERROR",
+              });
+            }
+          }
         }
       } catch (textError) {
         console.error(`📡 Failed to read response text:`, textError);
-        // If reading failed, create a basic error response based on status
+        // Create a basic error response based on status
         responseText = JSON.stringify({
           error: `HTTP ${response.status}`,
-          message: textError.message.includes("body stream") || textError.message.includes("already read")
-            ? `Request failed with status ${response.status}`
-            : `Failed to read response: ${textError.message}`,
+          message: `Failed to read response: ${textError.message}`,
           errorType: "RESPONSE_READ_ERROR",
         });
       }
