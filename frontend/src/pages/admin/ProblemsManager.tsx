@@ -305,7 +305,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "RATE_LIMIT") {
         const retryAfter = errorResponse.retryAfter || 5;
         alert(
-          `Слишком частые попытки создания проблем.\n\nПожалуйста, п��дождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
+          `Слишком частые попытки ��оздания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
         );
       } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
@@ -357,23 +357,38 @@ const ProblemsManager = () => {
   };
 
   const handleDelete = async (problemId: string) => {
+    console.log(`🗑️ Delete requested for problem ID: ${problemId}`);
+
     const stepsCount = getStepsForProblem(problemId).length;
+    console.log(`📊 Steps count for problem ${problemId}: ${stepsCount}`);
+
     if (stepsCount > 0) {
+      console.log(`❌ Cannot delete problem with ${stepsCount} active steps`);
       alert(
         `Нельзя удалить проблему с ${stepsCount} активными шагами. Сначала удалите шаги.`,
       );
       return;
     }
 
+    console.log(`✅ Steps validation passed, showing confirmation`);
     if (!confirm("Вы уверены, что хотите удалить эту проблему?")) {
+      console.log(`❌ User cancelled deletion`);
       return;
     }
 
+    console.log(`🚀 Starting delete mutation for problem ${problemId}`);
     try {
-      await deleteProblemMutation.mutateAsync({ id: problemId });
+      const result = await deleteProblemMutation.mutateAsync({ id: problemId });
+      console.log(`✅ Delete successful:`, result);
+
+      // Force refetch of problems
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
+
     } catch (error) {
-      console.error("Error deleting problem:", error);
-      alert("Ошибка ��ри удалении проблемы: " + (error as any)?.message);
+      console.error("❌ Error deleting problem:", error);
+      alert("Ошибка при удалении проблемы: " + (error as any)?.message);
     }
   };
 
@@ -419,7 +434,7 @@ const ProblemsManager = () => {
         );
       } else {
         alert(
-          "Ошибка при дублировании проблемы: " +
+          "Ошибка ��ри дублировании проблемы: " +
             ((error as any)?.message || "Неизвестная ошибка"),
         );
       }
@@ -807,7 +822,7 @@ const ProblemsManager = () => {
                   <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все приставки</SelectItem>
+                  <SelectItem value="all">Все пристав��и</SelectItem>
                   {getActiveDevices().map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
