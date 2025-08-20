@@ -92,7 +92,7 @@ export class ApiClient {
 
     // For GET requests, check if there's already a pending request
     if (method === "GET" && this.activeRequests.has(requestKey)) {
-      console.log(`🔄 Deduplicating GET request to: ${url}`);
+      console.log(`���� Deduplicating GET request to: ${url}`);
       return this.activeRequests.get(requestKey) as Promise<T>;
     }
 
@@ -149,6 +149,10 @@ export class ApiClient {
   ): Promise<T> {
     try {
       console.log(`📡 Sending fetch request...`);
+      console.log(`📡 URL: ${url}`);
+      console.log(`📡 Method: ${fetchOptions.method || "GET"}`);
+      console.log(`📡 Headers:`, headers);
+
       const response = await fetch(url, {
         ...fetchOptions,
         headers,
@@ -243,7 +247,7 @@ export class ApiClient {
         console.error(`📡 Error name:`, error.name);
         console.error(`📡 Error stack:`, error.stack);
         console.error(`📡 Request URL:`, url);
-        console.error(`📡 Request method:`, fetchOptions.method || "GET");
+        console.error(`�� Request method:`, fetchOptions.method || "GET");
 
         if (error.name === "AbortError") {
           throw new ApiError("Request timeout", 408);
