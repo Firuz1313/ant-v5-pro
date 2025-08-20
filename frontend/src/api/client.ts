@@ -41,12 +41,13 @@ export class ApiClient {
     };
 
     // Store the original fetch to bypass FullStory or other fetch wrappers
-    this.originalFetch = (window as any).__originalFetch || window.fetch;
+    // Bind to window to prevent "Illegal invocation" errors
+    this.originalFetch = ((window as any).__originalFetch || window.fetch).bind(window);
 
     // If FullStory hasn't wrapped fetch yet, store the original
     if (!((window as any).__originalFetch)) {
-      (window as any).__originalFetch = window.fetch;
-      this.originalFetch = window.fetch;
+      (window as any).__originalFetch = window.fetch.bind(window);
+      this.originalFetch = window.fetch.bind(window);
     }
   }
 
@@ -231,7 +232,7 @@ export class ApiClient {
           responseData = { message: responseText };
         }
       } else {
-        console.log(`📡 Empty response`);
+        console.log(`��� Empty response`);
         responseData = {};
       }
 
