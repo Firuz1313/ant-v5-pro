@@ -289,16 +289,31 @@ export class ApiClient {
         if (error.message === "Failed to fetch" || error.name === "TypeError") {
           console.error(`📡 Network error detected - checking connectivity`);
 
+          // Check if FullStory is interfering
+          const isFullStoryPresent = error.stack && error.stack.includes('fullstory.com');
+          if (isFullStoryPresent) {
+            console.error(`📡 FullStory interference detected - this may be causing fetch failures`);
+            console.error(`📡 Stack trace includes: fullstory.com`);
+          }
+
           // Retry for network failures (up to 3 retries with exponential backoff)
           if (retryCount < 3) {
             const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 5000); // 1s, 2s, 4s max
             console.log(`🔄 Retrying network request (attempt ${retryCount + 1}/3) after ${backoffDelay}ms delay...`);
-            console.log(`📡 This might be due to database reconnection - please wait...`);
+            if (isFullStoryPresent) {
+              console.log(`📡 Attempting to bypass FullStory fetch wrapper...`);
+            } else {
+              console.log(`📡 This might be due to database reconnection - please wait...`);
+            }
             await new Promise(resolve => setTimeout(resolve, backoffDelay));
             return this.makeRequest<T>(endpoint, options, retryCount + 1);
           }
 
-          throw new ApiError("Network connection failed after 3 retries - this may be due to database connectivity issues. Please try again in a moment.", 0);
+          const errorMessage = isFullStoryPresent
+            ? "Network request failed due to FullStory interference after 3 retries. Please try refreshing the page."
+            : "Network connection failed after 3 retries - this may be due to database connectivity issues. Please try again in a moment.";
+
+          throw new ApiError(errorMessage, 0);
         }
 
         // Handle specific body stream errors
