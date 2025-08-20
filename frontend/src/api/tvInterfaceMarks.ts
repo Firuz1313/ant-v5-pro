@@ -212,7 +212,7 @@ export const tvInterfaceMarksAPI = {
       if (!data.name?.trim()) {
         return {
           success: false,
-          error: "Название отметки обязательно",
+          error: "Название от��етки обязательно",
         };
       }
 
@@ -223,10 +223,10 @@ export const tvInterfaceMarksAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceMarkApiResponse>("", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      const response = await apiClient.post<TVInterfaceMarkApiResponse>(
+        API_ENDPOINT,
+        data,
+      );
 
       return {
         success: true,
@@ -313,7 +313,7 @@ export const tvInterfaceMarksAPI = {
       if (!tvInterfaceId) {
         return {
           success: false,
-          error: "ID TV интерф��йса обязателен",
+          error: "ID TV интерф��йса об��зателен",
         };
       }
 
