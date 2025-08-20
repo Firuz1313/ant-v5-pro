@@ -123,67 +123,7 @@ export interface TVInterfaceMarkStatsResponse {
   timestamp?: string;
 }
 
-// Helper function for HTTP requests
-const apiRequest = async <T>(
-  endpoint: string,
-  options: RequestInit = {},
-): Promise<T> => {
-  const url = `${API_ENDPOINT}${endpoint}`;
-
-  const defaultOptions: RequestInit = {
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    ...options,
-  };
-
-  try {
-    console.log(`🔄 API Request: ${options.method || "GET"} ${url}`);
-
-    const response = await fetch(url, defaultOptions);
-
-    console.log(`✅ API Response: ${response.status} for ${url}`);
-
-    if (!response.ok) {
-      let errorData: any = {};
-      try {
-        errorData = await response.json();
-      } catch {
-        errorData = {
-          error: `HTTP ${response.status}: ${response.statusText}`,
-        };
-      }
-
-      const errorMessage =
-        errorData.error ||
-        errorData.message ||
-        `HTTP error! status: ${response.status}`;
-      console.error(`❌ API Error: ${errorMessage} for ${url}`);
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`💥 API Request failed for ${url}:`, error);
-    throw error;
-  }
-};
-
-// Build query parameters
-const buildQueryParams = (params: Record<string, any>): string => {
-  const searchParams = new URLSearchParams();
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      searchParams.append(key, String(value));
-    }
-  });
-
-  const queryString = searchParams.toString();
-  return queryString ? `?${queryString}` : "";
-};
+// TV Interface Marks API service
 
 // TV Interface Marks API service
 export const tvInterfaceMarksAPI = {
