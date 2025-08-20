@@ -187,7 +187,7 @@ const StepsManagerNew = () => {
 
   // Загрузка отметок для TV ��нтерфейса
 
-  // Сохранение отметок TV интерфейса
+  // Сох��анение отметок TV интерфейса
   const saveTVInterfaceMarks = async (marks: TVInterfaceMark[]) => {
     try {
       // Здесь можно реализ��вать ло��ику сохранения всех отметок
@@ -467,7 +467,7 @@ const StepsManagerNew = () => {
       await tvInterfaceMarksAPI.deleteByStepId(stepId);
 
       // Delete the step
-      await stepsApi.delete(stepId);
+      await stepsApi.deleteStep(stepId);
 
       // Reload steps
       await loadInitialData();
@@ -1083,7 +1083,7 @@ const StepsManagerNew = () => {
             onValueChange={(value) => handleFieldChange("tvInterfaceId", value)}
           >
             <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Выберите интерфейс ТВ" />
+              <SelectValue placeholder="Выберите интерфейс ��В" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Без интерфейса</SelectItem>
@@ -1599,7 +1599,7 @@ const StepsManagerNew = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Редактировать шаг</DialogTitle>
+            <DialogTitle>Редактировать ��аг</DialogTitle>
           </DialogHeader>
           <StepFormFields isEdit={true} />
           <div className="flex justify-end space-x-2">
