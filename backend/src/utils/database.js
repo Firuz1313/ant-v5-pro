@@ -29,7 +29,7 @@ if (process.env.DATABASE_URL) {
     // Настройки pool соединений
     max: 20, // максимал��ное количество соединений в pool
     min: 2, // минимальное количество соединений
-    idleTimeoutMillis: 30000, // вр��мя простоя перед закрытием ���оединения
+    idleTimeoutMillis: 30000, // время простоя перед закрытием ���оединения
     connectionTimeoutMillis: 10000, // таймаут подключения
     maxUses: 7500, // максимальное количество использований соединения
   };
@@ -55,7 +55,7 @@ if (process.env.DATABASE_URL) {
 // Создание pool соединений
 const pool = new Pool(dbConfig);
 
-// Обработка соб��тий pool
+// Обработка событий pool
 pool.on("connect", (client) => {
   console.log("📊 Новое подключение к PostgreSQL установлено");
 });
@@ -115,7 +115,7 @@ export async function testConnection() {
   }
 }
 
-// Функция выполнения запроса с логированием
+// Функция выполнения запрос�� с логированием
 export async function query(text, params = []) {
   const start = Date.now();
   let client;
@@ -243,7 +243,7 @@ export async function runMigrations() {
 
     for (const filename of migrationFiles) {
       if (executedMigrations.has(filename)) {
-        console.log(`⏭️  Миграция ${filename} уже выполне��а, пропускаем`);
+        console.log(`⏭️  Миграция ${filename} уже выполне��а, пропускае��`);
         continue;
       }
 
@@ -288,12 +288,9 @@ export async function getDatabaseStats() {
       ORDER BY n_live_tup DESC
     `);
 
-    const dbSize = await query(
-      `
-      SELECT pg_size_pretty(pg_database_size($1)) as size
-    `,
-      [dbConfig.database],
-    );
+    const dbSize = await query(`
+      SELECT pg_size_pretty(pg_database_size(current_database())) as size
+    `);
 
     return {
       tables: stats.rows,
@@ -313,7 +310,7 @@ export async function closePool() {
     await pool.end();
     console.log("✅ Пул со��динений закрыт");
   } catch (error) {
-    console.error("❌ Ошибка закрытия п���ла:", error.message);
+    console.error("❌ Ошибка закрытия п��ла:", error.message);
   }
 }
 
@@ -359,7 +356,7 @@ export async function cleanupOldData(daysToKeep = 90) {
   }
 }
 
-// Функция для полнотекс��ового поиска
+// Функция для полнотекстового поиска
 export async function searchText(
   searchTerm,
   tables = ["problems", "devices", "diagnostic_steps"],
