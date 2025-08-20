@@ -151,7 +151,7 @@ class ProblemController {
         });
       }
 
-      // Проверяем существование устройства
+      // Проверяем существов��ние устройства
       if (problemData.device_id) {
         const device = await deviceModel.findById(problemData.device_id);
         if (!device || !device.is_active) {
@@ -267,7 +267,7 @@ class ProblemController {
             );
             if (attempts >= maxAttempts) {
               throw new Error(
-                "Не удалось создать уникальный ID после нескольких п��пыток",
+                "Не удалось создать уникальный ID после нескольких попыток",
               );
             }
           } else {
@@ -414,23 +414,24 @@ class ProblemController {
       }
 
       let deletedProblem;
-      // По умолчанию - жесткое удаление (полное удаление из базы)
-      // Мягкое удаление только при явном указании force=false
-      if (force === "false" || force === false) {
+      // force=true или "true" означает жесткое удаление
+      // force=false или "false" означает мягкое удаление
+      // По умолчанию (если force не указан) - жесткое удаление
+      if (force === "true" || force === true || force === undefined) {
+        // Жесткое удаление - полное удаление из базы
+        deletedProblem = await problemModel.delete(id);
+      } else {
         // Мягкое удаление (архивирование)
         deletedProblem = await problemModel.softDelete(id);
-      } else {
-        // Жесткое удаление по умолчанию - полное удаление из базы
-        deletedProblem = await problemModel.delete(id);
       }
 
       res.json({
         success: true,
         data: deletedProblem,
         message:
-          force === "false" || force === false
-            ? "Проблема архивирована"
-            : "Проблема удалена безвозвратно",
+          force === "true" || force === true || force === undefined
+            ? "Проблема удалена безвозвратно"
+            : "Проблема архивирована",
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
