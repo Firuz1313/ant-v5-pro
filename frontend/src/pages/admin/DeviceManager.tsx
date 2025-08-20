@@ -173,7 +173,7 @@ const DeviceManager = () => {
     if (!selectedDevice) return;
 
     try {
-      await devicesApi.update(selectedDevice.id, formData);
+      await devicesApi.updateDevice(selectedDevice.id, formData);
       await refetch();
       setIsEditDialogOpen(false);
       setSelectedDevice(null);
@@ -187,12 +187,12 @@ const DeviceManager = () => {
     const problemsCount = getProblemsForDevice(deviceId).length;
     if (problemsCount > 0) {
       alert(
-        `Нельзя удалить приставку с ${problemsCount} активными проблемами. Сначала удалите или переместите проблемы.`,
+        `Нельзя удалить приставку с ${problemsCount} активными проблемами. Сначала удалите или перемести��е проблемы.`,
       );
       return;
     }
     try {
-      await devicesApi.delete(deviceId);
+      await devicesApi.deleteDevice(deviceId);
       await refetch();
     } catch (error) {
       console.error("Error deleting device:", error);
