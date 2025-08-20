@@ -83,7 +83,7 @@ export interface StepInsertRequest {
 }
 
 export class StepsApi {
-  private readonly basePath = '/v1/steps';
+  private readonly basePath = '/steps';
 
   /**
    * Получение списка шагов
