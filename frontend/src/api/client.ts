@@ -92,7 +92,7 @@ export class ApiClient {
 
     // For GET requests, check if there's already a pending request
     if (method === "GET" && this.activeRequests.has(requestKey)) {
-      console.log(`���� Deduplicating GET request to: ${url}`);
+      console.log(`🔄 Deduplicating GET request to: ${url}`);
       return this.activeRequests.get(requestKey) as Promise<T>;
     }
 
@@ -247,16 +247,24 @@ export class ApiClient {
         console.error(`📡 Error name:`, error.name);
         console.error(`📡 Error stack:`, error.stack);
         console.error(`📡 Request URL:`, url);
-        console.error(`�� Request method:`, fetchOptions.method || "GET");
+        console.error(`📡 Request method:`, fetchOptions.method || "GET");
 
         if (error.name === "AbortError") {
           throw new ApiError("Request timeout", 408);
         }
 
-        // Handle network connectivity errors
+        // Handle network connectivity errors with retry logic
         if (error.message === "Failed to fetch" || error.name === "TypeError") {
           console.error(`📡 Network error detected - checking connectivity`);
-          throw new ApiError("Network connection failed - please check your internet connection and try again", 0);
+
+          // Retry for network failures (up to 2 retries)
+          if (retryCount < 2) {
+            console.log(`🔄 Retrying network request (attempt ${retryCount + 1}/2) after 1s delay...`);
+            await new Promise(resolve => setTimeout(resolve, 1000));
+            return this.makeRequest<T>(endpoint, options, retryCount + 1);
+          }
+
+          throw new ApiError("Network connection failed after 2 retries - please check your internet connection and try again", 0);
         }
 
         // Handle specific body stream errors
