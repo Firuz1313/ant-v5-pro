@@ -186,7 +186,7 @@ const ProblemsManager = () => {
       problem.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
       problem.description.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesDevice =
-      filterDevice === "all" || problem.deviceId === filterDevice;
+      filterDevice === "all" || (problem.device_id || problem.deviceId) === filterDevice;
     const matchesCategory =
       filterCategory === "all" || problem.category === filterCategory;
     return matchesSearch && matchesDevice && matchesCategory;
@@ -603,7 +603,7 @@ const ProblemsManager = () => {
                 <div className="flex items-center space-x-2">
                   <Tv className="h-4 w-4 text-gray-400" />
                   <span className="text-sm text-gray-600 dark:text-gray-400">
-                    {getDeviceName(problem.deviceId)}
+                    {getDeviceName(problem.device_id || problem.deviceId)}
                   </span>
                 </div>
               </CardHeader>
@@ -760,7 +760,7 @@ const ProblemsManager = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Подробное описание проблемы"
+                placeholder="Подробное описание ��роблемы"
               />
             </div>
 
