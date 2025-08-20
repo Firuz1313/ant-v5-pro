@@ -401,7 +401,7 @@ console.log("========================");
 
 export const apiClient = new ApiClient({
   baseUrl: API_BASE_URL,
-  timeout: 30000,
+  timeout: 60000, // Increased timeout to 60s for database reconnection scenarios
 });
 
 // Helper functions for common API patterns
