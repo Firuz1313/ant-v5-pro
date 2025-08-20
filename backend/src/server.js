@@ -202,7 +202,10 @@ async function startServer() {
     const { fixTVInterfacesSchema } = await import("./utils/database.js");
     await fixTVInterfacesSchema();
   } catch (error) {
-    console.error("⚠️ Ошибка исправления схемы, продолжаем запуск:", error.message);
+    console.error(
+      "⚠️ Ошибка исправления схемы, продолжаем запуск:",
+      error.message,
+    );
   }
 
   // Запуск сервера

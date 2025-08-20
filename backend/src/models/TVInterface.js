@@ -151,8 +151,12 @@ class TVInterface extends BaseModel {
         WHERE table_name = 'tv_interfaces' AND column_name IN ('clickable_areas', 'highlight_areas');
       `;
       const existingColumns = await this.query(columnsQuery);
-      const hasClickableAreas = existingColumns.rows.some(row => row.column_name === 'clickable_areas');
-      const hasHighlightAreas = existingColumns.rows.some(row => row.column_name === 'highlight_areas');
+      const hasClickableAreas = existingColumns.rows.some(
+        (row) => row.column_name === "clickable_areas",
+      );
+      const hasHighlightAreas = existingColumns.rows.some(
+        (row) => row.column_name === "highlight_areas",
+      );
 
       const now = new Date().toISOString();
       const tvInterfaceData = {
@@ -169,10 +173,14 @@ class TVInterface extends BaseModel {
 
       // Добавляем колонки только если они существуют
       if (hasClickableAreas) {
-        tvInterfaceData.clickable_areas = JSON.stringify(data.clickable_areas || []);
+        tvInterfaceData.clickable_areas = JSON.stringify(
+          data.clickable_areas || [],
+        );
       }
       if (hasHighlightAreas) {
-        tvInterfaceData.highlight_areas = JSON.stringify(data.highlight_areas || []);
+        tvInterfaceData.highlight_areas = JSON.stringify(
+          data.highlight_areas || [],
+        );
       }
 
       const result = await super.create(tvInterfaceData);
@@ -260,10 +268,12 @@ class TVInterface extends BaseModel {
       const tvInterface = result.rows[0];
 
       // Парсим JSON поля если они существуют
-      if (tvInterface.hasOwnProperty('clickable_areas')) {
+      if (tvInterface.hasOwnProperty("clickable_areas")) {
         if (tvInterface.clickable_areas) {
           try {
-            tvInterface.clickable_areas = JSON.parse(tvInterface.clickable_areas);
+            tvInterface.clickable_areas = JSON.parse(
+              tvInterface.clickable_areas,
+            );
           } catch (e) {
             tvInterface.clickable_areas = [];
           }
@@ -274,10 +284,12 @@ class TVInterface extends BaseModel {
         tvInterface.clickable_areas = [];
       }
 
-      if (tvInterface.hasOwnProperty('highlight_areas')) {
+      if (tvInterface.hasOwnProperty("highlight_areas")) {
         if (tvInterface.highlight_areas) {
           try {
-            tvInterface.highlight_areas = JSON.parse(tvInterface.highlight_areas);
+            tvInterface.highlight_areas = JSON.parse(
+              tvInterface.highlight_areas,
+            );
           } catch (e) {
             tvInterface.highlight_areas = [];
           }

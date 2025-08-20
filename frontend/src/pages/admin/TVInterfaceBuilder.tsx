@@ -274,7 +274,10 @@ const TVInterfaceBuilder = () => {
       };
 
       // Добавляем screenshot_data только если был загружен новый скриншот
-      if (formData.screenshotData && formData.screenshotData.startsWith('data:')) {
+      if (
+        formData.screenshotData &&
+        formData.screenshotData.startsWith("data:")
+      ) {
         updateData.screenshotData = formData.screenshotData;
       }
 
@@ -472,8 +475,8 @@ const TVInterfaceBuilder = () => {
             Конструктор интерфейса ТВ
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание и управление интерф��йсами ТВ-приставок с полной интеграцией
-            с бэкендом
+            Создание и управление интерф��йсами ТВ-приставок с полной
+            интеграцией с бэкендом
           </p>
         </div>
         <div className="flex space-x-2">
@@ -643,30 +646,30 @@ const TVInterfaceBuilder = () => {
                           variant="outline"
                           size="sm"
                           onClick={removeImage}
-                      title="Удалить скриншот"
-                    >
-                      <X className="h-4 w-4" />
-                    </Button>
-                  )}
+                          title="Удалить скриншот"
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      )}
+                    </div>
+
+                    {previewImageUrl && (
+                      <div className="border rounded-lg p-4">
+                        <img
+                          src={previewImageUrl}
+                          alt="Preview"
+                          className="max-w-full h-48 object-contain mx-auto rounded"
+                        />
+                      </div>
+                    )}
+                  </div>
                 </div>
 
-                {previewImageUrl && (
-                  <div className="border rounded-lg p-4">
-                    <img
-                      src={previewImageUrl}
-                      alt="Preview"
-                      className="max-w-full h-48 object-contain mx-auto rounded"
-                    />
-                  </div>
-                )}
-              </div>
-            </div>
-
-            <div className="flex justify-end space-x-2 pt-4">
-              <Button
-                variant="outline"
-                onClick={() => {
-                  setIsCreateDialogOpen(false);
+                <div className="flex justify-end space-x-2 pt-4">
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      setIsCreateDialogOpen(false);
                       resetForm();
                     }}
                   >
@@ -1036,9 +1039,10 @@ const TVInterfaceBuilder = () => {
                       className="max-w-full h-48 object-contain mx-auto rounded"
                     />
                     <div className="mt-2 text-sm text-gray-500 text-center">
-                      {formData.screenshotData && formData.screenshotData.startsWith('data:') ?
-                        "Новый скриншот будет сохранен" :
-                        "Текущий скриншот интерфейса"}
+                      {formData.screenshotData &&
+                      formData.screenshotData.startsWith("data:")
+                        ? "Новый скриншот будет сохранен"
+                        : "Текущий скриншот интерфейса"}
                     </div>
                   </div>
                 )}

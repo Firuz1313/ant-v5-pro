@@ -285,8 +285,12 @@ export async function fixTVInterfacesSchema() {
     `;
 
     const existingColumns = await query(columnsQuery);
-    const hasClickableAreas = existingColumns.rows.some(row => row.column_name === 'clickable_areas');
-    const hasHighlightAreas = existingColumns.rows.some(row => row.column_name === 'highlight_areas');
+    const hasClickableAreas = existingColumns.rows.some(
+      (row) => row.column_name === "clickable_areas",
+    );
+    const hasHighlightAreas = existingColumns.rows.some(
+      (row) => row.column_name === "highlight_areas",
+    );
 
     // Добавляем недостающие колонки
     if (!hasClickableAreas) {
