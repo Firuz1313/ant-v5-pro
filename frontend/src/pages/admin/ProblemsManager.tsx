@@ -318,7 +318,7 @@ const ProblemsManager = () => {
         alertMessage += `• Создана: ${existingProblem?.created_at ? new Date(existingProblem.created_at).toLocaleDateString() : "н/д"}\n\n`;
 
         if (suggestions.length > 0) {
-          alertMessage += `Рекомен��ации:\n${suggestions.map((s) => `• ${s}`).join("\n")}`;
+          alertMessage += `Рекомендации:\n${suggestions.map((s) => `• ${s}`).join("\n")}`;
         }
 
         alert(alertMessage);
@@ -511,7 +511,7 @@ const ProblemsManager = () => {
               // Проверяем уникальность на клиенте
               while (checkForDuplicateTitle(testTitle, "openbox")) {
                 console.warn(
-                  `⚠️  Название ${testTitle} уже существует, генерируем новое`,
+                  `⚠️  Назва��ие ${testTitle} уже существует, генерируем новое`,
                 );
                 const newRandom = Math.random().toString(36).substring(2, 11);
                 testTitle = `TEST-${timestamp}_${newRandom}_${Date.now().toString().slice(-4)}`;
@@ -870,18 +870,22 @@ const ProblemsManager = () => {
                   <div className="flex items-center space-x-2">
                     <Badge
                       variant={
-                        problem.status === "published" ||
-                        problem.status === "active" ||
-                        problem.is_active
+                        problem.is_active === false || problem.status === "archived"
+                          ? "destructive"
+                          : problem.status === "published" ||
+                            problem.status === "active" ||
+                            problem.is_active
                           ? "default"
                           : "secondary"
                       }
                     >
-                      {problem.status === "published" ||
-                      problem.status === "active" ||
-                      problem.is_active
+                      {problem.is_active === false || problem.status === "archived"
+                        ? "Неактивна"
+                        : problem.status === "published" ||
+                          problem.status === "active" ||
+                          problem.is_active
                         ? "Активна"
-                        : "Неактивна"}
+                        : "Черновик"}
                     </Badge>
                   </div>
                 </div>
