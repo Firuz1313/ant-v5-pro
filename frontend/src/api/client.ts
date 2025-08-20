@@ -158,17 +158,7 @@ export class ApiClient {
       console.log(`📡 Fetch completed with status: ${response.status}`);
       clearTimeout(timeoutId);
 
-      // Handle 429 rate limiting with retry
-      if (response.status === 429 && retryCount < 3) {
-        const retryAfter = response.headers.get("Retry-After") || "2";
-        const delayMs = parseInt(retryAfter) * 1000;
-        console.log(`⏳ Rate limited, retrying after ${delayMs}ms...`);
-
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-        return this.makeRequest<T>(endpoint, options, retryCount + 1);
-      }
-
-      // Read response body only once
+      // Read response body only once before any other operations
       let responseData: any = null;
       let responseText = "";
 
@@ -206,6 +196,16 @@ export class ApiClient {
       } else {
         console.log(`📡 Empty response`);
         responseData = {};
+      }
+
+      // Handle 429 rate limiting with retry AFTER reading body
+      if (response.status === 429 && retryCount < 3) {
+        const retryAfter = response.headers.get("Retry-After") || "2";
+        const delayMs = parseInt(retryAfter) * 1000;
+        console.log(`⏳ Rate limited, retrying after ${delayMs}ms...`);
+
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        return this.makeRequest<T>(endpoint, options, retryCount + 1);
       }
 
       // Check for HTTP errors AFTER reading the body
@@ -332,7 +332,7 @@ const getApiBaseUrl = (): string => {
       return proxyUrl;
     }
 
-    // Локальн��я разработка - пря��ое подключение к бэкенду
+    // Локальн��я разработка - пря��ое подключение к бэ��енду
     if (hostname === "localhost" && port === "8080") {
       const directUrl = "http://localhost:3000/api";
       console.log("🏠 Local development - using direct connection:", directUrl);
