@@ -267,7 +267,7 @@ class ProblemController {
             );
             if (attempts >= maxAttempts) {
               throw new Error(
-                "Не удалось создать уникальный ID после нескольких попыток",
+                "Не удалось создать уникальный ID после нескольких п��пыток",
               );
             }
           } else {
@@ -324,7 +324,7 @@ class ProblemController {
         }
       }
 
-      // Проверяем уникальность названия при изменени��
+      // Проверяем уникальность названия при изменении
       if (
         updateData.title &&
         updateData.title.trim().toLowerCase() !==
@@ -414,7 +414,9 @@ class ProblemController {
       }
 
       let deletedProblem;
-      if (force === "false") {
+      // По умолчанию - жесткое удаление (полное удаление из базы)
+      // Мягкое удаление только при явном указании force=false
+      if (force === "false" || force === false) {
         // Мягкое удаление (архивирование)
         deletedProblem = await problemModel.softDelete(id);
       } else {
@@ -426,7 +428,7 @@ class ProblemController {
         success: true,
         data: deletedProblem,
         message:
-          force === "false"
+          force === "false" || force === false
             ? "Проблема архивирована"
             : "Проблема удалена безвозвратно",
         timestamp: new Date().toISOString(),
