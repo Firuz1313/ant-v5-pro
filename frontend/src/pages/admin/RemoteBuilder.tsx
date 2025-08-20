@@ -85,7 +85,10 @@ interface RemoteTemplate {
 }
 
 const RemoteBuilder = () => {
-  const { data: devices = [] } = useDevices();
+  const { data: devicesResponse } = useDevices();
+
+  // Извлекаем массивы данных из ответа API
+  const devices = devicesResponse?.data || [];
 
   // Temporarily using empty arrays for removed static data
   const remotes: RemoteTemplate[] = [];
