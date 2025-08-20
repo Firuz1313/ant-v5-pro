@@ -218,8 +218,26 @@ const ProblemsManager = () => {
   };
 
   const handleCreate = async () => {
+    console.log('🔄 Начало создания проблемы');
+    console.log('📝 Данные формы:', formData);
+    console.log('🔄 Состояние mutation:', {
+      isLoading: createProblemMutation.isPending,
+      isError: createProblemMutation.isError,
+      error: createProblemMutation.error
+    });
+
+    if (!formData.title) {
+      alert('Пожалуйста, введите название проблемы');
+      return;
+    }
+
+    if (!formData.deviceId) {
+      alert('Пожалуйста, выберите приставку');
+      return;
+    }
+
     try {
-      await createProblemMutation.mutateAsync({
+      const problemData = {
         deviceId: formData.deviceId,
         title: formData.title,
         description: formData.description,
@@ -231,12 +249,26 @@ const ProblemsManager = () => {
         difficulty: "beginner",
         tags: [],
         status: "published",
-      });
+      };
+
+      console.log('🚀 Отправка данных:', problemData);
+
+      const result = await createProblemMutation.mutateAsync(problemData);
+
+      console.log('✅ Проблема создана успешно:', result);
+
       setIsCreateDialogOpen(false);
       resetForm();
+
+      alert('Проблема успешно создана!');
     } catch (error) {
-      console.error("Error creating problem:", error);
-      alert("Ошибка при создании проблемы: " + (error as any)?.message);
+      console.error('❌ Ошибка при создании проблемы:', error);
+      console.error('❌ Детали ошибки:', {
+        message: (error as any)?.message,
+        response: (error as any)?.response,
+        stack: (error as any)?.stack
+      });
+      alert("Ошибка при создании проблемы: " + ((error as any)?.message || 'Неизвестная ошибка'));
     }
   };
 
@@ -381,7 +413,7 @@ const ProblemsManager = () => {
             Управление проблемами
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание и настройка проблем для различных моделей приставок
+            Созд��ние и настройка проблем для различных моделей приставок
           </p>
         </div>
         <div className="flex space-x-2">
@@ -766,7 +798,7 @@ const ProblemsManager = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Редактировать проблему</DialogTitle>
+            <DialogTitle>Редакт��ровать проблему</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
