@@ -60,16 +60,20 @@ interface Device {
 
 const DeviceManager = () => {
   const {
-    data: devices = [],
+    data: devicesResponse,
     isLoading: loading,
     error,
     refetch,
   } = useDevices();
-  const { data: problems = [] } = useProblems();
+  const { data: problemsResponse } = useProblems();
+
+  // Извлекаем массивы данных из ответа API
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   // Helper function to get problems count for device
   const getProblemsForDevice = (deviceId: string) => {
-    return (problems || []).filter((p) => p.deviceId === deviceId);
+    return problems.filter((p) => p.device_id === deviceId);
   };
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
