@@ -360,7 +360,7 @@ const ProblemsManager = () => {
       return;
     }
 
-    if (!confirm("Вы увер��ны, что хотите удалить эту проблему?")) {
+    if (!confirm("Вы уверены, что хотите удалить эту проблему?")) {
       return;
     }
 
@@ -410,7 +410,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         alert(
-          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует для этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`
+          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`
         );
       } else {
         alert("Ошибка при дублировании проблемы: " + ((error as any)?.message || "Неизвестная ошибка"));
@@ -519,9 +519,14 @@ const ProblemsManager = () => {
                   console.error("❌ Ошибка при создании тестовой проблемы:", error);
 
                   const errorResponse = error?.response?.data;
-                  if (errorResponse?.errorType === "DUPLICATE_ERROR") {
+                  if (errorResponse?.errorType === "RATE_LIMIT") {
+                    const retryAfter = errorResponse.retryAfter || 5;
                     alert(
-                      `Не удалось создать тестовую проблему: проблема с ��аким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`
+                      `Слишком частое тестирование API.\n\nПодождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? 'ы' : ''} перед следующей попыткой.`
+                    );
+                  } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
+                    alert(
+                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`
                     );
                   } else {
                     alert("Ошибка при создании тестовой проблемы: " + (error?.message || "Неизвестная ошибка"));
@@ -1111,7 +1116,7 @@ const ProblemsManager = () => {
           <CardContent className="p-12 text-center">
             <AlertTriangle className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Проблемы не найдены
+              Пр��блемы не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
               Попробуйте изменить фильтры поиска или создайт�� новую проблему.
