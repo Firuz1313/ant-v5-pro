@@ -417,7 +417,7 @@ const ProblemsManager = () => {
       });
       console.log("✅ Проблема успешно продублирована");
     } catch (error) {
-      console.error("❌ Ошибка при дублировании проблемы:", error);
+      console.error("�� Ошибка при дублировании проблемы:", error);
 
       const errorResponse = (error as any)?.response?.data;
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
@@ -595,6 +595,14 @@ const ProblemsManager = () => {
             disabled={!problems.some((p) => p.title.startsWith("TEST-"))}
           >
             🧹 Очистить тесты
+          </Button>
+          <Button
+            variant="outline"
+            onClick={handleActivateAllProblems}
+            className="text-green-600 hover:text-green-700 hover:bg-green-50"
+          >
+            <Eye className="h-4 w-4 mr-2" />
+            Активировать все
           </Button>
           <Button
             variant="outline"
