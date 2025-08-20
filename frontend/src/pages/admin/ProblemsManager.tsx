@@ -100,6 +100,16 @@ const ProblemsManager = () => {
   const getActiveDevices = () =>
     devices.filter((d: any) => d.is_active !== false);
   const getStepsForProblem = (problemId: string) => [];
+
+  // Check if a problem with the same title and device already exists
+  const checkForDuplicateTitle = (title: string, deviceId: string): boolean => {
+    return problems.some(
+      (problem) =>
+        problem.title.toLowerCase().trim() === title.toLowerCase().trim() &&
+        (problem.device_id === deviceId || problem.deviceId === deviceId) &&
+        problem.is_active !== false
+    );
+  };
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
@@ -526,7 +536,7 @@ const ProblemsManager = () => {
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Очистить всё
+            Оч��стить всё
           </Button>
           <Button variant="outline">
             <Upload className="h-4 w-4 mr-2" />
