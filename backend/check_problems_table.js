@@ -29,12 +29,14 @@ async function checkProblemsTable() {
     `);
 
     console.log("📋 Table columns:");
-    columns.rows.forEach(col => {
-      console.log(`  - ${col.column_name}: ${col.data_type} ${col.is_nullable === 'NO' ? 'NOT NULL' : 'NULL'} ${col.column_default ? `DEFAULT ${col.column_default}` : ''}`);
+    columns.rows.forEach((col) => {
+      console.log(
+        `  - ${col.column_name}: ${col.data_type} ${col.is_nullable === "NO" ? "NOT NULL" : "NULL"} ${col.column_default ? `DEFAULT ${col.column_default}` : ""}`,
+      );
     });
 
     // Count total problems
-    const countResult = await query('SELECT COUNT(*) as total FROM problems');
+    const countResult = await query("SELECT COUNT(*) as total FROM problems");
     console.log(`📊 Total problems: ${countResult.rows[0].total}`);
 
     // Show sample data
@@ -46,13 +48,15 @@ async function checkProblemsTable() {
     `);
 
     console.log("📄 Recent problems:");
-    sampleData.rows.forEach(row => {
-      console.log(`  - ${row.id}: "${row.title}" (${row.device_id}) [${row.category}] ${row.status} ${row.is_active ? 'ACTIVE' : 'INACTIVE'}`);
+    sampleData.rows.forEach((row) => {
+      console.log(
+        `  - ${row.id}: "${row.title}" (${row.device_id}) [${row.category}] ${row.status} ${row.is_active ? "ACTIVE" : "INACTIVE"}`,
+      );
     });
 
     // Check devices table
     console.log("\n🔍 Checking devices table...");
-    const devicesCount = await query('SELECT COUNT(*) as total FROM devices');
+    const devicesCount = await query("SELECT COUNT(*) as total FROM devices");
     console.log(`📊 Total devices: ${devicesCount.rows[0].total}`);
 
     const devicesList = await query(`
@@ -63,10 +67,9 @@ async function checkProblemsTable() {
     `);
 
     console.log("📄 Active devices:");
-    devicesList.rows.forEach(row => {
+    devicesList.rows.forEach((row) => {
       console.log(`  - ${row.id}: ${row.name} (${row.brand} ${row.model})`);
     });
-
   } catch (error) {
     console.error("❌ Error:", error);
   } finally {

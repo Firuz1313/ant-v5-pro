@@ -123,7 +123,7 @@ class BaseModel {
       if (Array.isArray(filters.status)) {
         // Поддержка массива статусов
         const placeholders = filters.status.map(() => `$${paramIndex++}`);
-        conditions.push(`status IN (${placeholders.join(', ')})`);
+        conditions.push(`status IN (${placeholders.join(", ")})`);
         values.push(...filters.status);
       } else {
         // Одиночный статус
@@ -333,7 +333,7 @@ class BaseModel {
         if (Array.isArray(filters.status)) {
           // Поддержка массива статусов
           const placeholders = filters.status.map(() => `$${paramIndex++}`);
-          conditions.push(`status IN (${placeholders.join(', ')})`);
+          conditions.push(`status IN (${placeholders.join(", ")})`);
           values.push(...filters.status);
         } else {
           // Одиночный статус

@@ -113,10 +113,10 @@ export class ProblemsApi {
       difficulty: data.difficulty,
       success_rate: data.successRate,
       status: data.status,
-      metadata: data.metadata
+      metadata: data.metadata,
     };
 
-    console.log('📤 Отправка данных проблемы:', backendData);
+    console.log("📤 Отправка данных проблемы:", backendData);
     return apiClient.post<APIResponse<Problem>>(this.basePath, backendData);
   }
 
@@ -132,22 +132,29 @@ export class ProblemsApi {
 
     if (data.deviceId !== undefined) backendData.device_id = data.deviceId;
     if (data.title !== undefined) backendData.title = data.title;
-    if (data.description !== undefined) backendData.description = data.description;
+    if (data.description !== undefined)
+      backendData.description = data.description;
     if (data.category !== undefined) backendData.category = data.category;
     if (data.icon !== undefined) backendData.icon = data.icon;
     if (data.color !== undefined) backendData.color = data.color;
     if (data.tags !== undefined) backendData.tags = data.tags;
     if (data.priority !== undefined) backendData.priority = data.priority;
-    if (data.estimatedTime !== undefined) backendData.estimated_time = data.estimatedTime;
+    if (data.estimatedTime !== undefined)
+      backendData.estimated_time = data.estimatedTime;
     if (data.difficulty !== undefined) backendData.difficulty = data.difficulty;
-    if (data.successRate !== undefined) backendData.success_rate = data.successRate;
+    if (data.successRate !== undefined)
+      backendData.success_rate = data.successRate;
     if (data.status !== undefined) backendData.status = data.status;
-    if (data.completedCount !== undefined) backendData.completed_count = data.completedCount;
+    if (data.completedCount !== undefined)
+      backendData.completed_count = data.completedCount;
     if (data.isActive !== undefined) backendData.is_active = data.isActive;
     if (data.metadata !== undefined) backendData.metadata = data.metadata;
 
-    console.log('📤 Обновление данных проблемы:', backendData);
-    return apiClient.put<APIResponse<Problem>>(`${this.basePath}/${id}`, backendData);
+    console.log("📤 Обновление данных проблемы:", backendData);
+    return apiClient.put<APIResponse<Problem>>(
+      `${this.basePath}/${id}`,
+      backendData,
+    );
   }
 
   /**

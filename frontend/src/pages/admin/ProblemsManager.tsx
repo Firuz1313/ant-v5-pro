@@ -47,7 +47,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useDevices } from "@/hooks/useDevices";
-import { useProblems, useCreateProblem, useUpdateProblem, useDeleteProblem } from "@/hooks/useProblems";
+import {
+  useProblems,
+  useCreateProblem,
+  useUpdateProblem,
+  useDeleteProblem,
+} from "@/hooks/useProblems";
 
 const iconMap = {
   Signal,
@@ -218,21 +223,21 @@ const ProblemsManager = () => {
   };
 
   const handleCreate = async () => {
-    console.log('🔄 Начало создания проблемы');
-    console.log('📝 Данные формы:', formData);
-    console.log('🔄 Состояние mutation:', {
+    console.log("🔄 Начало создания проблемы");
+    console.log("📝 Данные формы:", formData);
+    console.log("🔄 Состояние mutation:", {
       isLoading: createProblemMutation.isPending,
       isError: createProblemMutation.isError,
-      error: createProblemMutation.error
+      error: createProblemMutation.error,
     });
 
     if (!formData.title) {
-      alert('Пожалуйста, введите название проблемы');
+      alert("Пожалуйста, введите название проблемы");
       return;
     }
 
     if (!formData.deviceId) {
-      alert('Пожалуйста, выберите приставку');
+      alert("Пожалуйста, выберите приставку");
       return;
     }
 
@@ -251,28 +256,28 @@ const ProblemsManager = () => {
         status: "published",
       };
 
-      console.log('🚀 Отправка данных:', problemData);
+      console.log("🚀 Отправка данных:", problemData);
 
       const result = await createProblemMutation.mutateAsync(problemData);
 
-      console.log('✅ Проблема создана успешно:', result);
+      console.log("✅ Проблема создана успешно:", result);
 
       setIsCreateDialogOpen(false);
       resetForm();
 
-      alert('Проблема успешно создана!');
+      alert("Проблема успешно создана!");
     } catch (error) {
-      console.error('❌ Ошибка при создании проблемы:', error);
-      console.error('❌ Детали ошибки:', {
+      console.error("❌ Ошибка при создании проблемы:", error);
+      console.error("❌ Детали ошибки:", {
         message: (error as any)?.message,
         response: (error as any)?.response,
-        stack: (error as any)?.stack
+        stack: (error as any)?.stack,
       });
 
       const errorResponse = (error as any)?.response?.data;
-      const errorMessage = (error as any)?.message || 'Неизвестная ошибка';
+      const errorMessage = (error as any)?.message || "Неизвестная ошибка";
 
-      if (errorResponse?.errorType === 'DUPLICATE_ERROR') {
+      if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         const suggestions = errorResponse.details?.suggestions || [];
 
@@ -280,15 +285,17 @@ const ProblemsManager = () => {
         alertMessage += `Существующая проблема:\n`;
         alertMessage += `• Название: "${existingProblem?.title}"\n`;
         alertMessage += `• Статус: ${existingProblem?.status}\n`;
-        alertMessage += `• Создана: ${existingProblem?.created_at ? new Date(existingProblem.created_at).toLocaleDateString() : 'н/д'}\n\n`;
+        alertMessage += `• Создана: ${existingProblem?.created_at ? new Date(existingProblem.created_at).toLocaleDateString() : "н/д"}\n\n`;
 
         if (suggestions.length > 0) {
-          alertMessage += `Рекомендации:\n${suggestions.map(s => `• ${s}`).join('\n')}`;
+          alertMessage += `Рекомендации:\n${suggestions.map((s) => `• ${s}`).join("\n")}`;
         }
 
         alert(alertMessage);
-      } else if (errorMessage.includes('уже существует')) {
-        alert('Проблема с таким названием уже существует для этого устройства. Попробуйте другое название.');
+      } else if (errorMessage.includes("уже существует")) {
+        alert(
+          "Проблема с таким названием уже существует для этого устройства. Попробуйте другое название.",
+        );
       } else {
         alert("Ошибка при создании проблемы: " + errorMessage);
       }
@@ -308,7 +315,7 @@ const ProblemsManager = () => {
           category: formData.category,
           icon: formData.icon,
           color: formData.color,
-        }
+        },
       });
       setIsEditDialogOpen(false);
       setSelectedProblem(null);
@@ -353,11 +360,13 @@ const ProblemsManager = () => {
             currentStatus === "published" || currentStatus === "active"
               ? "draft"
               : "published",
-        }
+        },
       });
     } catch (error) {
       console.error("Error toggling problem status:", error);
-      alert("Ошибка при изменении статуса проблемы: " + (error as any)?.message);
+      alert(
+        "Ошибка при изменении статуса проблемы: " + (error as any)?.message,
+      );
     }
   };
 
@@ -443,37 +452,46 @@ const ProblemsManager = () => {
           <Button
             variant="outline"
             onClick={() => {
-              console.log('🧪 Тестирование API создания проблемы');
+              console.log("🧪 Тестирование API создания проблемы");
               const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
               const testData = {
-                deviceId: 'openbox',
+                deviceId: "openbox",
                 title: `TEST-${uniqueId}`,
                 description: `Автоматически сгенерированная тестовая проблема, создана ${new Date().toLocaleString()}`,
-                category: 'critical' as any,
-                icon: 'AlertTriangle',
-                color: 'from-red-500 to-red-600',
+                category: "critical" as any,
+                icon: "AlertTriangle",
+                color: "from-red-500 to-red-600",
                 priority: 1,
                 estimatedTime: 5,
-                difficulty: 'beginner' as any,
-                tags: ['тест', 'автоматически созданная'],
-                status: 'published' as any,
+                difficulty: "beginner" as any,
+                tags: ["тест", "автоматически созданная"],
+                status: "published" as any,
               };
-              console.log('📦 Тестовые данные:', testData);
+              console.log("📦 Тестовые данные:", testData);
               createProblemMutation.mutate(testData);
             }}
             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
             disabled={createProblemMutation.isPending}
           >
-            {createProblemMutation.isPending ? '⏳' : '🧪'} Тест API
+            {createProblemMutation.isPending ? "⏳" : "🧪"} Тест API
           </Button>
           <Button
             variant="outline"
             onClick={async () => {
-              if (!confirm('Удалить все тестовые проблемы (начинающиеся с TEST-)?')) return;
+              if (
+                !confirm(
+                  "Удалить все тестовые проблемы (начинающиеся с TEST-)?",
+                )
+              )
+                return;
 
               try {
-                const testProblems = problems.filter(p => p.title.startsWith('TEST-'));
-                console.log(`🧹 Удаление ${testProblems.length} тестовых проблем`);
+                const testProblems = problems.filter((p) =>
+                  p.title.startsWith("TEST-"),
+                );
+                console.log(
+                  `🧹 Удаление ${testProblems.length} тестовых проблем`,
+                );
 
                 for (const problem of testProblems) {
                   await deleteProblemMutation.mutateAsync({ id: problem.id });
@@ -481,12 +499,12 @@ const ProblemsManager = () => {
 
                 alert(`Удалено ${testProblems.length} тестовых проблем`);
               } catch (error) {
-                console.error('Ошибка при удалении тестовых проблем:', error);
-                alert('Ошибка при удалении тестовых проблем');
+                console.error("Ошибка при удалении тестовых проблем:", error);
+                alert("Ошибка при удалении тестовых проблем");
               }
             }}
             className="text-orange-600 hover:text-orange-700 hover:bg-orange-50"
-            disabled={!problems.some(p => p.title.startsWith('TEST-'))}
+            disabled={!problems.some((p) => p.title.startsWith("TEST-"))}
           >
             🧹 Очистить тесты
           </Button>
@@ -655,12 +673,18 @@ const ProblemsManager = () => {
                   </Button>
                   <Button
                     onClick={() => {
-                      console.log('🔘 Нажата кнопка создания проблемы');
+                      console.log("🔘 Нажата кнопка создания проблемы");
                       handleCreate();
                     }}
-                    disabled={!formData.title || !formData.deviceId || createProblemMutation.isPending}
+                    disabled={
+                      !formData.title ||
+                      !formData.deviceId ||
+                      createProblemMutation.isPending
+                    }
                   >
-                    {createProblemMutation.isPending ? 'Создание...' : 'Создать'}
+                    {createProblemMutation.isPending
+                      ? "Создание..."
+                      : "Создать"}
                   </Button>
                 </div>
               </div>

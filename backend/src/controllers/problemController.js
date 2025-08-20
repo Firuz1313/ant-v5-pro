@@ -1,6 +1,9 @@
-import Problem from '../models/Problem.js';
-import Device from '../models/Device.js';
-import { problemValidation, validateRequest } from '../middleware/validateRequest.js';
+import Problem from "../models/Problem.js";
+import Device from "../models/Device.js";
+import {
+  problemValidation,
+  validateRequest,
+} from "../middleware/validateRequest.js";
 
 const problemModel = new Problem();
 const deviceModel = new Device();
@@ -15,18 +18,18 @@ class ProblemController {
    */
   async getProblems(req, res, next) {
     try {
-      const { 
-        search, 
-        device_id, 
-        category, 
-        status, 
-        is_active, 
-        page = 1, 
-        limit = 20, 
-        sort = 'priority', 
-        order = 'desc',
+      const {
+        search,
+        device_id,
+        category,
+        status,
+        is_active,
+        page = 1,
+        limit = 20,
+        sort = "priority",
+        order = "desc",
         include_details = false,
-        admin = false
+        admin = false,
       } = req.query;
 
       const filters = {};
@@ -34,17 +37,17 @@ class ProblemController {
       if (device_id) filters.device_id = device_id;
       if (category) filters.category = category;
       if (status) filters.status = status;
-      if (is_active !== undefined) filters.is_active = is_active === 'true';
+      if (is_active !== undefined) filters.is_active = is_active === "true";
 
       const options = {
         limit: Math.min(parseInt(limit), 100),
         offset: (parseInt(page) - 1) * Math.min(parseInt(limit), 100),
         sortBy: sort,
-        sortOrder: order.toUpperCase()
+        sortOrder: order.toUpperCase(),
       };
 
       let problems;
-      if (include_details === 'true' || admin === 'true') {
+      if (include_details === "true" || admin === "true") {
         problems = await problemModel.findAllWithDetails(filters, options);
       } else {
         problems = await problemModel.findAll(filters, options);
@@ -63,9 +66,9 @@ class ProblemController {
           total,
           totalPages,
           hasNext: parseInt(page) < totalPages,
-          hasPrev: parseInt(page) > 1
+          hasPrev: parseInt(page) > 1,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -82,7 +85,7 @@ class ProblemController {
       const { include_details = false } = req.query;
 
       let problem;
-      if (include_details === 'true') {
+      if (include_details === "true") {
         problem = await problemModel.findByIdWithDetails(id);
       } else {
         problem = await problemModel.findById(id);
@@ -91,16 +94,16 @@ class ProblemController {
       if (!problem) {
         return res.status(404).json({
           success: false,
-          error: 'Проблема не найдена',
-          errorType: 'NOT_FOUND',
-          timestamp: new Date().toISOString()
+          error: "Проблема не найдена",
+          errorType: "NOT_FOUND",
+          timestamp: new Date().toISOString(),
         });
       }
 
       res.json({
         success: true,
         data: problem,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -121,9 +124,9 @@ class ProblemController {
         if (!device || !device.is_active) {
           return res.status(400).json({
             success: false,
-            error: 'Указанное устройство не найдено или неактивно',
-            errorType: 'VALIDATION_ERROR',
-            timestamp: new Date().toISOString()
+            error: "Указанное устройство не найдено или неактивно",
+            errorType: "VALIDATION_ERROR",
+            timestamp: new Date().toISOString(),
           });
         }
       }
@@ -134,32 +137,38 @@ class ProblemController {
           title: problemData.title,
           device_id: problemData.device_id,
           is_active: true,
-          status: ['published', 'draft'] // Исключаем архивированные
+          status: ["published", "draft"], // Исключаем архивированные
         });
 
         if (existingProblem) {
-          console.warn(`⚠️  Попытка создать дубликат проблемы: "${problemData.title}" для устройства ${problemData.device_id}`);
-          console.warn(`⚠️  Существующая проблема ID: ${existingProblem.id}, статус: ${existingProblem.status}`);
+          console.warn(
+            `⚠️  Попытка создать дубликат проблемы: "${problemData.title}" для устройства ${problemData.device_id}`,
+          );
+          console.warn(
+            `⚠️  Существующая проблема ID: ${existingProblem.id}, статус: ${existingProblem.status}`,
+          );
 
           return res.status(409).json({
             success: false,
-            error: 'Проблема с таким названием уже существует для данного устройства',
-            errorType: 'DUPLICATE_ERROR',
+            error:
+              "Проблема с таким названием уже существует для данного устройства",
+            errorType: "DUPLICATE_ERROR",
             details: {
-              message: 'Название проблемы должно быть уникальным для каждого устройства',
+              message:
+                "Название проблемы должно быть уникальным для каждого устройства",
               suggestions: [
-                'Измените название проблемы',
-                'Добавьте уточняющие детали к названию',
-                'Проверьте, можно ли дополнить существующую проблему'
-              ]
+                "Измените название проблемы",
+                "Добавьте уточняющие детали к названию",
+                "Проверьте, можно ли дополнить существующую проблему",
+              ],
             },
             existingProblem: {
               id: existingProblem.id,
               title: existingProblem.title,
               status: existingProblem.status,
-              created_at: existingProblem.created_at
+              created_at: existingProblem.created_at,
             },
-            timestamp: new Date().toISOString()
+            timestamp: new Date().toISOString(),
           });
         }
       }
@@ -169,8 +178,8 @@ class ProblemController {
       res.status(201).json({
         success: true,
         data: newProblem,
-        message: 'Проблема успешно создана',
-        timestamp: new Date().toISOString()
+        message: "Проблема успешно создана",
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -191,40 +200,45 @@ class ProblemController {
       if (!existingProblem) {
         return res.status(404).json({
           success: false,
-          error: 'Проблема не найдена',
-          errorType: 'NOT_FOUND',
-          timestamp: new Date().toISOString()
+          error: "Проблема не найдена",
+          errorType: "NOT_FOUND",
+          timestamp: new Date().toISOString(),
         });
       }
 
       // Проверяем существование устройства при изменении
-      if (updateData.device_id && updateData.device_id !== existingProblem.device_id) {
+      if (
+        updateData.device_id &&
+        updateData.device_id !== existingProblem.device_id
+      ) {
         const device = await deviceModel.findById(updateData.device_id);
         if (!device || !device.is_active) {
           return res.status(400).json({
             success: false,
-            error: 'Указанное устройство не найдено или неактивно',
-            errorType: 'VALIDATION_ERROR',
-            timestamp: new Date().toISOString()
+            error: "Указанное устройство не найдено или неактивно",
+            errorType: "VALIDATION_ERROR",
+            timestamp: new Date().toISOString(),
           });
         }
       }
 
       // Проверяем уникальность названия при изменении
       if (updateData.title && updateData.title !== existingProblem.title) {
-        const deviceIdToCheck = updateData.device_id || existingProblem.device_id;
+        const deviceIdToCheck =
+          updateData.device_id || existingProblem.device_id;
         const duplicateProblem = await problemModel.findOne({
           title: updateData.title,
           device_id: deviceIdToCheck,
-          is_active: true
+          is_active: true,
         });
 
         if (duplicateProblem && duplicateProblem.id !== id) {
           return res.status(409).json({
             success: false,
-            error: 'Проблема с таким названием уже существует для данного устройст��а',
-            errorType: 'DUPLICATE_ERROR',
-            timestamp: new Date().toISOString()
+            error:
+              "Проблема с таким названием уже существует для данного устройст��а",
+            errorType: "DUPLICATE_ERROR",
+            timestamp: new Date().toISOString(),
           });
         }
       }
@@ -234,8 +248,8 @@ class ProblemController {
       res.json({
         success: true,
         data: updatedProblem,
-        message: 'Проблема успешно обновлена',
-        timestamp: new Date().toISOString()
+        message: "Проблема успешно обновлена",
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -256,27 +270,27 @@ class ProblemController {
       if (!existingProblem) {
         return res.status(404).json({
           success: false,
-          error: 'Проблема не найдена',
-          errorType: 'NOT_FOUND',
-          timestamp: new Date().toISOString()
+          error: "Проблема не найдена",
+          errorType: "NOT_FOUND",
+          timestamp: new Date().toISOString(),
         });
       }
 
       // Проверяем возможность удаления
       const deleteCheck = await problemModel.canDelete(id);
-      if (!deleteCheck.canDelete && force !== 'true') {
+      if (!deleteCheck.canDelete && force !== "true") {
         return res.status(409).json({
           success: false,
           error: deleteCheck.reason,
-          errorType: 'CONSTRAINT_ERROR',
+          errorType: "CONSTRAINT_ERROR",
           suggestion: deleteCheck.suggestion,
           canForceDelete: false,
-          timestamp: new Date().toISOString()
+          timestamp: new Date().toISOString(),
         });
       }
 
       let deletedProblem;
-      if (force === 'true') {
+      if (force === "true") {
         // Жесткое удаление (осторожно!)
         deletedProblem = await problemModel.delete(id);
       } else {
@@ -287,8 +301,11 @@ class ProblemController {
       res.json({
         success: true,
         data: deletedProblem,
-        message: force === 'true' ? 'Проблема удалена безвозвратно' : 'Проблема архивирована',
-        timestamp: new Date().toISOString()
+        message:
+          force === "true"
+            ? "Проблема удалена безвозвратно"
+            : "Проблема архивирована",
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -307,17 +324,17 @@ class ProblemController {
       if (!restoredProblem) {
         return res.status(404).json({
           success: false,
-          error: 'Проблема не найдена или уже активна',
-          errorType: 'NOT_FOUND',
-          timestamp: new Date().toISOString()
+          error: "Проблема не найдена или уже активна",
+          errorType: "NOT_FOUND",
+          timestamp: new Date().toISOString(),
         });
       }
 
       res.json({
         success: true,
         data: restoredProblem,
-        message: 'Проблема успешно восстановлена',
-        timestamp: new Date().toISOString()
+        message: "Проблема успешно восстановлена",
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -335,22 +352,22 @@ class ProblemController {
       if (!searchTerm || searchTerm.trim().length < 2) {
         return res.status(400).json({
           success: false,
-          error: 'Поисковый запрос должен содержать минимум 2 символа',
-          errorType: 'VALIDATION_ERROR',
-          timestamp: new Date().toISOString()
+          error: "Поисковый запрос должен содержать минимум 2 символа",
+          errorType: "VALIDATION_ERROR",
+          timestamp: new Date().toISOString(),
         });
       }
 
       const problems = await problemModel.search(searchTerm.trim(), {
         limit: Math.min(parseInt(limit), 50),
-        offset: parseInt(offset)
+        offset: parseInt(offset),
       });
 
       res.json({
         success: true,
         data: problems,
         query: searchTerm.trim(),
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -365,12 +382,14 @@ class ProblemController {
     try {
       const { limit = 10 } = req.query;
 
-      const problems = await problemModel.getPopular(Math.min(parseInt(limit), 20));
+      const problems = await problemModel.getPopular(
+        Math.min(parseInt(limit), 20),
+      );
 
       res.json({
         success: true,
         data: problems,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -391,16 +410,16 @@ class ProblemController {
       if (!device) {
         return res.status(404).json({
           success: false,
-          error: 'Устройство не найдено',
-          errorType: 'NOT_FOUND',
-          timestamp: new Date().toISOString()
+          error: "Устройство не найдено",
+          errorType: "NOT_FOUND",
+          timestamp: new Date().toISOString(),
         });
       }
 
       const options = {
         status,
         limit: Math.min(parseInt(limit), 50),
-        offset: parseInt(offset)
+        offset: parseInt(offset),
       };
 
       const problems = await problemModel.findByDevice(deviceId, options);
@@ -412,9 +431,9 @@ class ProblemController {
           id: device.id,
           name: device.name,
           brand: device.brand,
-          model: device.model
+          model: device.model,
         },
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -433,7 +452,7 @@ class ProblemController {
       const options = {
         device_id,
         limit: Math.min(parseInt(limit), 50),
-        offset: parseInt(offset)
+        offset: parseInt(offset),
       };
 
       const problems = await problemModel.findByCategory(category, options);
@@ -442,7 +461,7 @@ class ProblemController {
         success: true,
         data: problems,
         category,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -463,9 +482,9 @@ class ProblemController {
       if (!existingProblem) {
         return res.status(404).json({
           success: false,
-          error: 'Проблема не найдена',
-          errorType: 'NOT_FOUND',
-          timestamp: new Date().toISOString()
+          error: "Проблема не найдена",
+          errorType: "NOT_FOUND",
+          timestamp: new Date().toISOString(),
         });
       }
 
@@ -475,20 +494,23 @@ class ProblemController {
         if (!targetDevice || !targetDevice.is_active) {
           return res.status(400).json({
             success: false,
-            error: 'Целевое устройство не найдено или неактивно',
-            errorType: 'VALIDATION_ERROR',
-            timestamp: new Date().toISOString()
+            error: "Целевое устройство не найдено или неактивно",
+            errorType: "VALIDATION_ERROR",
+            timestamp: new Date().toISOString(),
           });
         }
       }
 
-      const duplicatedProblem = await problemModel.duplicate(id, target_device_id);
+      const duplicatedProblem = await problemModel.duplicate(
+        id,
+        target_device_id,
+      );
 
       res.status(201).json({
         success: true,
         data: duplicatedProblem,
-        message: 'Проблема успешно продублирована',
-        timestamp: new Date().toISOString()
+        message: "Проблема успешно продублирована",
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -507,17 +529,17 @@ class ProblemController {
       if (!publishedProblem) {
         return res.status(404).json({
           success: false,
-          error: 'Проблема не найдена',
-          errorType: 'NOT_FOUND',
-          timestamp: new Date().toISOString()
+          error: "Проблема не найдена",
+          errorType: "NOT_FOUND",
+          timestamp: new Date().toISOString(),
         });
       }
 
       res.json({
         success: true,
         data: publishedProblem,
-        message: 'Проблема успешно опубликована',
-        timestamp: new Date().toISOString()
+        message: "Проблема успешно опубликована",
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -536,17 +558,17 @@ class ProblemController {
       if (!unpublishedProblem) {
         return res.status(404).json({
           success: false,
-          error: 'Проблема не найдена',
-          errorType: 'NOT_FOUND',
-          timestamp: new Date().toISOString()
+          error: "Проблема не найдена",
+          errorType: "NOT_FOUND",
+          timestamp: new Date().toISOString(),
         });
       }
 
       res.json({
         success: true,
         data: unpublishedProblem,
-        message: 'Проблема снята с публикации',
-        timestamp: new Date().toISOString()
+        message: "Проблема снята с публикации",
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -564,7 +586,7 @@ class ProblemController {
       res.json({
         success: true,
         data: stats,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -580,12 +602,12 @@ class ProblemController {
       const { id } = req.params;
       const { session_result } = req.body;
 
-      if (!session_result || !['success', 'failure'].includes(session_result)) {
+      if (!session_result || !["success", "failure"].includes(session_result)) {
         return res.status(400).json({
           success: false,
-          error: 'Результат сессии должен быть success или failure',
-          errorType: 'VALIDATION_ERROR',
-          timestamp: new Date().toISOString()
+          error: "Результат сессии должен быть success или failure",
+          errorType: "VALIDATION_ERROR",
+          timestamp: new Date().toISOString(),
         });
       }
 
@@ -593,17 +615,17 @@ class ProblemController {
       if (!updatedProblem) {
         return res.status(404).json({
           success: false,
-          error: 'Проблема не найдена',
-          errorType: 'NOT_FOUND',
-          timestamp: new Date().toISOString()
+          error: "Проблема не найдена",
+          errorType: "NOT_FOUND",
+          timestamp: new Date().toISOString(),
         });
       }
 
       res.json({
         success: true,
         data: updatedProblem,
-        message: 'Статистика проблемы обновлена',
-        timestamp: new Date().toISOString()
+        message: "Статистика проблемы обновлена",
+        timestamp: new Date().toISOString(),
       });
     } catch (error) {
       next(error);
@@ -616,7 +638,7 @@ class ProblemController {
    */
   async exportProblems(req, res, next) {
     try {
-      const { format = 'json', device_id, include_steps = false } = req.query;
+      const { format = "json", device_id, include_steps = false } = req.query;
 
       const filters = { is_active: true };
       if (device_id) filters.device_id = device_id;
@@ -625,29 +647,29 @@ class ProblemController {
 
       let exportData = problems;
 
-      if (include_steps === 'true') {
+      if (include_steps === "true") {
         // Здесь можно добавить логику включения шагов диагностики
         // Для этого понадобится импорт DiagnosticStep модели
       }
 
-      if (format === 'json') {
+      if (format === "json") {
         res.json({
           success: true,
           data: exportData,
           meta: {
             exportedAt: new Date().toISOString(),
             totalRecords: exportData.length,
-            format: 'json',
-            filters: filters
-          }
+            format: "json",
+            filters: filters,
+          },
         });
       } else {
         // Другие форматы можно добавить позже (CSV, XML и т.д.)
         res.status(400).json({
           success: false,
-          error: 'Неподдерживаемый формат экспорта',
-          supportedFormats: ['json'],
-          timestamp: new Date().toISOString()
+          error: "Неподдерживаемый формат экспорта",
+          supportedFormats: ["json"],
+          timestamp: new Date().toISOString(),
         });
       }
     } catch (error) {
@@ -664,21 +686,41 @@ const validateProblemCreation = validateRequest(problemValidation.create);
 const validateProblemUpdate = validateRequest(problemValidation.update);
 
 // Экспортируем методы с примененной валидацией
-export const getProblems = problemController.getProblems.bind(problemController);
-export const getProblemById = problemController.getProblemById.bind(problemController);
-export const createProblem = [validateProblemCreation, problemController.createProblem.bind(problemController)];
-export const updateProblem = [validateProblemUpdate, problemController.updateProblem.bind(problemController)];
-export const deleteProblem = problemController.deleteProblem.bind(problemController);
-export const restoreProblem = problemController.restoreProblem.bind(problemController);
-export const searchProblems = problemController.searchProblems.bind(problemController);
-export const getPopularProblems = problemController.getPopularProblems.bind(problemController);
-export const getProblemsByDevice = problemController.getProblemsByDevice.bind(problemController);
-export const getProblemsByCategory = problemController.getProblemsByCategory.bind(problemController);
-export const duplicateProblem = problemController.duplicateProblem.bind(problemController);
-export const publishProblem = problemController.publishProblem.bind(problemController);
-export const unpublishProblem = problemController.unpublishProblem.bind(problemController);
-export const getProblemStats = problemController.getProblemStats.bind(problemController);
-export const updateProblemStats = problemController.updateProblemStats.bind(problemController);
-export const exportProblems = problemController.exportProblems.bind(problemController);
+export const getProblems =
+  problemController.getProblems.bind(problemController);
+export const getProblemById =
+  problemController.getProblemById.bind(problemController);
+export const createProblem = [
+  validateProblemCreation,
+  problemController.createProblem.bind(problemController),
+];
+export const updateProblem = [
+  validateProblemUpdate,
+  problemController.updateProblem.bind(problemController),
+];
+export const deleteProblem =
+  problemController.deleteProblem.bind(problemController);
+export const restoreProblem =
+  problemController.restoreProblem.bind(problemController);
+export const searchProblems =
+  problemController.searchProblems.bind(problemController);
+export const getPopularProblems =
+  problemController.getPopularProblems.bind(problemController);
+export const getProblemsByDevice =
+  problemController.getProblemsByDevice.bind(problemController);
+export const getProblemsByCategory =
+  problemController.getProblemsByCategory.bind(problemController);
+export const duplicateProblem =
+  problemController.duplicateProblem.bind(problemController);
+export const publishProblem =
+  problemController.publishProblem.bind(problemController);
+export const unpublishProblem =
+  problemController.unpublishProblem.bind(problemController);
+export const getProblemStats =
+  problemController.getProblemStats.bind(problemController);
+export const updateProblemStats =
+  problemController.updateProblemStats.bind(problemController);
+export const exportProblems =
+  problemController.exportProblems.bind(problemController);
 
 export default problemController;
