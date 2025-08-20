@@ -39,6 +39,15 @@ export class ApiClient {
       "Content-Type": "application/json",
       ...config.defaultHeaders,
     };
+
+    // Store the original fetch to bypass FullStory or other fetch wrappers
+    this.originalFetch = (window as any).__originalFetch || window.fetch;
+
+    // If FullStory hasn't wrapped fetch yet, store the original
+    if (!((window as any).__originalFetch)) {
+      (window as any).__originalFetch = window.fetch;
+      this.originalFetch = window.fetch;
+    }
   }
 
   private buildUrl(endpoint: string, params?: Record<string, any>): string {
