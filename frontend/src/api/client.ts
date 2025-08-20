@@ -30,6 +30,8 @@ export class ApiClient {
   private timeout: number;
   private defaultHeaders: Record<string, string>;
   private activeRequests: Map<string, Promise<any>> = new Map();
+  private originalFetch: typeof fetch;
+  private useFallback: boolean = false;
 
   constructor(config: ApiClientConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
@@ -38,6 +40,61 @@ export class ApiClient {
       "Content-Type": "application/json",
       ...config.defaultHeaders,
     };
+
+    // Store the original fetch to bypass FullStory or other fetch wrappers
+    // Bind to window to prevent "Illegal invocation" errors
+    this.originalFetch = ((window as any).__originalFetch || window.fetch).bind(
+      window,
+    );
+
+    // If FullStory hasn't wrapped fetch yet, store the original
+    if (!(window as any).__originalFetch) {
+      (window as any).__originalFetch = window.fetch.bind(window);
+      this.originalFetch = window.fetch.bind(window);
+    }
+  }
+
+  private async xhrFallback(
+    url: string,
+    options: RequestInit,
+  ): Promise<Response> {
+    return new Promise((resolve, reject) => {
+      console.log(`📡 Using XMLHttpRequest fallback for: ${url}`);
+
+      const xhr = new XMLHttpRequest();
+      const method = options.method || "GET";
+
+      xhr.open(method, url);
+      xhr.timeout = this.timeout;
+
+      // Set headers
+      const headers = (options.headers as Record<string, string>) || {};
+      Object.entries(headers).forEach(([key, value]) => {
+        xhr.setRequestHeader(key, value);
+      });
+
+      xhr.onload = () => {
+        const response = new Response(xhr.responseText, {
+          status: xhr.status,
+          statusText: xhr.statusText,
+          headers: new Headers(),
+        });
+        resolve(response);
+      };
+
+      xhr.onerror = () => {
+        reject(
+          new Error(`XHR request failed: ${xhr.status} ${xhr.statusText}`),
+        );
+      };
+
+      xhr.ontimeout = () => {
+        reject(new Error("XHR request timeout"));
+      };
+
+      // Send body if present
+      xhr.send((options.body as string) || null);
+    });
   }
 
   private buildUrl(endpoint: string, params?: Record<string, any>): string {
@@ -149,55 +206,83 @@ export class ApiClient {
   ): Promise<T> {
     try {
       console.log(`📡 Sending fetch request...`);
-      const response = await fetch(url, {
-        ...fetchOptions,
-        headers,
-        signal: controller.signal,
-      });
+      console.log(`📡 URL: ${url}`);
+      console.log(`📡 Method: ${fetchOptions.method || "GET"}`);
+      console.log(`📡 Headers:`, headers);
+
+      let response: Response;
+
+      if (this.useFallback) {
+        // Use XMLHttpRequest fallback if fetch has failed before
+        console.log(`📡 Using XHR fallback due to previous fetch failures`);
+        response = await this.xhrFallback(url, {
+          ...fetchOptions,
+          headers,
+        });
+      } else {
+        // Try fetch first
+        response = await this.originalFetch(url, {
+          ...fetchOptions,
+          headers,
+          signal: controller.signal,
+        });
+      }
 
       console.log(`📡 Fetch completed with status: ${response.status}`);
       clearTimeout(timeoutId);
 
-      // Handle 429 rate limiting with retry
-      if (response.status === 429 && retryCount < 3) {
-        const retryAfter = response.headers.get("Retry-After") || "2";
-        const delayMs = parseInt(retryAfter) * 1000;
-        console.log(`⏳ Rate limited, retrying after ${delayMs}ms...`);
-
-        await new Promise((resolve) => setTimeout(resolve, delayMs));
-        return this.makeRequest<T>(endpoint, options, retryCount + 1);
-      }
-
-      // Read response body only once
+      // Read response body only once before any other operations
       let responseData: any = null;
       let responseText = "";
 
-      // Clone response before reading to avoid consumption issues
-      let responseClone = response.clone();
-
       try {
-        responseText = await responseClone.text();
-        console.log(
-          `📡 Response text (first 100 chars): ${responseText.substring(0, 100)}`,
-        );
+        // Always clone the response immediately to prevent body consumption issues
+        let responseToRead = response;
+
+        // If body is already used, we can't read it, but we can still provide error info
+        if (response.bodyUsed) {
+          console.error(
+            `📡 Response body already consumed - creating fallback response`,
+          );
+          responseText = JSON.stringify({
+            error: `HTTP ${response.status}`,
+            message: `Request failed with status ${response.status}`,
+            errorType: "RESPONSE_ALREADY_USED",
+          });
+        } else {
+          // Clone before reading to prevent consumption issues
+          try {
+            responseToRead = response.clone();
+            responseText = await responseToRead.text();
+            console.log(
+              `📡 Response text (first 100 chars): ${responseText.substring(0, 100)}`,
+            );
+          } catch (cloneError) {
+            console.error(`📡 Failed to clone response:`, cloneError);
+            // If cloning fails, try reading original (last resort)
+            try {
+              responseText = await response.text();
+            } catch (originalError) {
+              console.error(
+                `📡 Failed to read original response:`,
+                originalError,
+              );
+              responseText = JSON.stringify({
+                error: `HTTP ${response.status}`,
+                message: `Failed to read response body`,
+                errorType: "RESPONSE_READ_ERROR",
+              });
+            }
+          }
+        }
       } catch (textError) {
         console.error(`📡 Failed to read response text:`, textError);
-        // Fallback: try reading original response
-        try {
-          if (!response.bodyUsed) {
-            responseText = await response.text();
-          } else {
-            responseText = JSON.stringify({
-              error: `Failed to read response body: ${textError.message}`,
-              errorType: "RESPONSE_READ_ERROR",
-            });
-          }
-        } catch (fallbackError) {
-          responseText = JSON.stringify({
-            error: `Complete failure reading response: ${fallbackError.message}`,
-            errorType: "RESPONSE_READ_ERROR",
-          });
-        }
+        // Create a basic error response based on status
+        responseText = JSON.stringify({
+          error: `HTTP ${response.status}`,
+          message: `Failed to read response: ${textError.message}`,
+          errorType: "RESPONSE_READ_ERROR",
+        });
       }
 
       // Try to parse JSON if we have text
@@ -212,6 +297,16 @@ export class ApiClient {
       } else {
         console.log(`📡 Empty response`);
         responseData = {};
+      }
+
+      // Handle 429 rate limiting with retry AFTER reading body
+      if (response.status === 429 && retryCount < 3) {
+        const retryAfter = response.headers.get("Retry-After") || "2";
+        const delayMs = parseInt(retryAfter) * 1000;
+        console.log(`⏳ Rate limited, retrying after ${delayMs}ms...`);
+
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        return this.makeRequest<T>(endpoint, options, retryCount + 1);
       }
 
       // Check for HTTP errors AFTER reading the body
@@ -239,9 +334,78 @@ export class ApiClient {
 
       if (error instanceof Error) {
         console.error(`📡 Request Error:`, error.message);
+        console.error(`📡 Error name:`, error.name);
+        console.error(`📡 Error stack:`, error.stack);
+        console.error(`📡 Request URL:`, url);
+        console.error(`📡 Request method:`, fetchOptions.method || "GET");
 
         if (error.name === "AbortError") {
-          throw new ApiError("Request timeout", 408);
+          // Check if this is a timeout during potential database reconnection
+          if (retryCount < 2) {
+            console.log(
+              `⏱️ Request timeout (attempt ${retryCount + 1}/2) - retrying due to potential database reconnection...`,
+            );
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            return this.makeRequest<T>(endpoint, options, retryCount + 1);
+          }
+          throw new ApiError(
+            "Request timeout - this may be due to database connectivity issues",
+            408,
+          );
+        }
+
+        // Handle network connectivity errors with retry logic
+        if (
+          error.message === "Failed to fetch" ||
+          error.name === "TypeError" ||
+          error.message.includes("Illegal invocation")
+        ) {
+          console.error(`📡 Network error detected - checking connectivity`);
+
+          // Check if FullStory is interfering
+          const isFullStoryPresent =
+            error.stack && error.stack.includes("fullstory.com");
+          const isIllegalInvocation =
+            error.message.includes("Illegal invocation");
+
+          if (isFullStoryPresent || isIllegalInvocation) {
+            console.error(
+              `📡 Fetch API interference detected - switching to XMLHttpRequest fallback`,
+            );
+            if (!this.useFallback) {
+              this.useFallback = true;
+              console.log(`📡 Enabling XHR fallback mode for future requests`);
+              // Retry immediately with fallback
+              return this.makeRequest<T>(endpoint, options, retryCount);
+            }
+          }
+
+          // Retry for network failures (up to 3 retries with exponential backoff)
+          if (retryCount < 3) {
+            const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 5000); // 1s, 2s, 4s max
+            console.log(
+              `🔄 Retrying network request (attempt ${retryCount + 1}/3) after ${backoffDelay}ms delay...`,
+            );
+            if (this.useFallback) {
+              console.log(`📡 Using XMLHttpRequest fallback...`);
+            } else if (isFullStoryPresent) {
+              console.log(`📡 Attempting to bypass FullStory fetch wrapper...`);
+            } else {
+              console.log(
+                `📡 This might be due to database reconnection - please wait...`,
+              );
+            }
+            await new Promise((resolve) => setTimeout(resolve, backoffDelay));
+            return this.makeRequest<T>(endpoint, options, retryCount + 1);
+          }
+
+          const errorMessage = this.useFallback
+            ? "Network request failed using XMLHttpRequest fallback after 3 retries. Please check your connection."
+            : isFullStoryPresent
+              ? "Network request failed due to fetch API interference after 3 retries. Switching to fallback mode."
+              : "Network connection failed after 3 retries - this may be due to database connectivity issues. Please try again in a moment.";
+
+          throw new ApiError(errorMessage, 0);
         }
 
         // Handle specific body stream errors
@@ -329,6 +493,8 @@ const getApiBaseUrl = (): string => {
     const port = window.location.port;
 
     console.log("🌐 Current location:", window.location.href);
+    console.log("🌐 Hostname:", hostname);
+    console.log("🌐 Port:", port);
 
     // В облачной среде fly.dev/builder.codes
     if (hostname.includes("builder.codes") || hostname.includes("fly.dev")) {
@@ -338,7 +504,7 @@ const getApiBaseUrl = (): string => {
       return proxyUrl;
     }
 
-    // Локальн��я разработка - пря��ое подключение к бэкенду
+    // Локальн��я разработка - пря��ое подключение к бэ��енду
     if (hostname === "localhost" && port === "8080") {
       const directUrl = "http://localhost:3000/api";
       console.log("🏠 Local development - using direct connection:", directUrl);
@@ -360,7 +526,7 @@ console.log("========================");
 
 export const apiClient = new ApiClient({
   baseUrl: API_BASE_URL,
-  timeout: 30000,
+  timeout: 60000, // Increased timeout to 60s for database reconnection scenarios
 });
 
 // Helper functions for common API patterns
