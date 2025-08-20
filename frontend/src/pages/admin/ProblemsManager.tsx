@@ -475,10 +475,25 @@ const ProblemsManager = () => {
             variant="outline"
             onClick={() => {
               console.log("🧪 Тестирование API создания проблемы");
-              const uniqueId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+
+              // Генерируем действительно уникальный ID
+              const timestamp = Date.now();
+              const randomPart = Math.random().toString(36).substring(2, 11);
+              const microTime = performance.now().toString().replace('.', '');
+              const uniqueId = `${timestamp}_${randomPart}_${microTime.slice(-6)}`;
+
+              let testTitle = `TEST-${uniqueId}`;
+
+              // Проверяем уникальность на клиенте
+              while (checkForDuplicateTitle(testTitle, "openbox")) {
+                console.warn(`⚠️  Название ${testTitle} уже существует, генерируем новое`);
+                const newRandom = Math.random().toString(36).substring(2, 11);
+                testTitle = `TEST-${timestamp}_${newRandom}_${Date.now().toString().slice(-4)}`;
+              }
+
               const testData = {
                 deviceId: "openbox",
-                title: `TEST-${uniqueId}`,
+                title: testTitle,
                 description: `Автоматически сгенерированная тестовая проблема, создана ${new Date().toLocaleString()}`,
                 category: "critical" as any,
                 icon: "AlertTriangle",
@@ -497,7 +512,15 @@ const ProblemsManager = () => {
                 })
                 .catch((error) => {
                   console.error("❌ Ошибка при создании тестовой проблемы:", error);
-                  alert("Ошибка при создании тестовой проблемы: " + (error?.message || "Неизвестная ошибка"));
+
+                  const errorResponse = error?.response?.data;
+                  if (errorResponse?.errorType === "DUPLICATE_ERROR") {
+                    alert(
+                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`
+                    );
+                  } else {
+                    alert("Ошибка при создании тестовой проблемы: " + (error?.message || "Неизвестная ошибка"));
+                  }
                 });
             }}
             className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
