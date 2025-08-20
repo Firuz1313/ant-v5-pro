@@ -131,21 +131,33 @@ class ProblemController {
         }
       }
 
-      // Проверяем уникальность названия для устройства (только среди активных и опубликованных проблем)
+      // Проверяем уникальность названия для устройства (только среди актив��ых и опубликованных проблем)
       if (problemData.device_id && problemData.title) {
-        const existingProblem = await problemModel.findOne({
-          title: problemData.title,
-          device_id: problemData.device_id,
-          is_active: true,
-          status: ["published", "draft"], // Исключаем архивированные
-        });
+        // Нормализуем название для сравнения
+        const normalizedTitle = problemData.title.trim().toLowerCase();
+
+        console.log(`🔍 Проверка уникальности названия: "${problemData.title}" (нормализовано: "${normalizedTitle}") для устройства: ${problemData.device_id}`);
+
+        // Используем SQL запрос для case-insensitive поиска
+        const checkSql = `
+          SELECT id, title, status, created_at
+          FROM problems
+          WHERE LOWER(TRIM(title)) = $1
+            AND device_id = $2
+            AND is_active = true
+            AND status IN ('published', 'draft')
+          LIMIT 1
+        `;
+
+        const checkResult = await problemModel.query(checkSql, [normalizedTitle, problemData.device_id]);
+        const existingProblem = checkResult.rows[0];
 
         if (existingProblem) {
           console.warn(
             `⚠️  Попытка создать дубликат проблемы: "${problemData.title}" для устройства ${problemData.device_id}`,
           );
           console.warn(
-            `⚠️  Существующая проблема ID: ${existingProblem.id}, статус: ${existingProblem.status}`,
+            `⚠️  Существующая про��лема ID: ${existingProblem.id}, статус: ${existingProblem.status}`,
           );
 
           return res.status(409).json({
@@ -372,7 +384,7 @@ class ProblemController {
   }
 
   /**
-   * Поиск проблем
+   * ��оиск проблем
    * GET /api/v1/problems/search
    */
   async searchProblems(req, res, next) {
