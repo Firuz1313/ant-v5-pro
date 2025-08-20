@@ -417,21 +417,21 @@ class ProblemController {
       }
 
       let deletedProblem;
-      if (force === "true") {
-        // Жесткое удаление (осторожно!)
-        deletedProblem = await problemModel.delete(id);
-      } else {
-        // Мягкое удаление
+      if (force === "false") {
+        // Мягкое удаление (архивирование)
         deletedProblem = await problemModel.softDelete(id);
+      } else {
+        // Жесткое удаление по умолчанию - полное удаление из базы
+        deletedProblem = await problemModel.delete(id);
       }
 
       res.json({
         success: true,
         data: deletedProblem,
         message:
-          force === "true"
-            ? "Проблема удалена безвозвратно"
-            : "Проблема архивирована",
+          force === "false"
+            ? "Проблема архивирована"
+            : "Проблема удалена безвозвратно",
         timestamp: new Date().toISOString(),
       });
     } catch (error) {
@@ -479,7 +479,7 @@ class ProblemController {
       if (!searchTerm || searchTerm.trim().length < 2) {
         return res.status(400).json({
           success: false,
-          error: "Поисковый запрос должен содержать минимум 2 символа",
+          error: "Поисковый запрос до��жен содержать минимум 2 символа",
           errorType: "VALIDATION_ERROR",
           timestamp: new Date().toISOString(),
         });
@@ -808,7 +808,7 @@ class ProblemController {
 // Создаем экземпляр контроллера
 const problemController = new ProblemController();
 
-// Применяем валидацию к методам
+// Применяем в��лидацию к методам
 const validateProblemCreation = validateRequest(problemValidation.create);
 const validateProblemUpdate = validateRequest(problemValidation.update);
 
