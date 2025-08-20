@@ -266,7 +266,13 @@ export class ApiClient {
         console.error(`📡 Request method:`, fetchOptions.method || "GET");
 
         if (error.name === "AbortError") {
-          throw new ApiError("Request timeout", 408);
+          // Check if this is a timeout during potential database reconnection
+          if (retryCount < 2) {
+            console.log(`⏱️ Request timeout (attempt ${retryCount + 1}/2) - retrying due to potential database reconnection...`);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            return this.makeRequest<T>(endpoint, options, retryCount + 1);
+          }
+          throw new ApiError("Request timeout - this may be due to database connectivity issues", 408);
         }
 
         // Handle network connectivity errors with retry logic
