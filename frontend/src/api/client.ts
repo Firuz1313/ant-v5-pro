@@ -456,6 +456,7 @@ export class ApiClient {
     data?: any,
     options: RequestOptions = {},
   ): Promise<T> {
+    console.log(`🔥 POST request to ${endpoint} with data:`, data);
     return this.makeRequest<T>(endpoint, {
       ...options,
       method: "POST",
@@ -527,10 +528,20 @@ const getApiBaseUrl = (): string => {
       return proxyUrl;
     }
 
-    // Локальн��я разработка - пря��ое подключение к бэ��енду
+    // Локальная разработка на порту 8081 (Vite) - используем proxy
+    if (hostname === "localhost" && port === "8081") {
+      const proxyUrl = "/api/v1";
+      console.log("🏠 Local development (Vite) - using proxy URL:", proxyUrl);
+      return proxyUrl;
+    }
+
+    // Локальная разработка на порту 8080 - прямое подключение к бэкенду
     if (hostname === "localhost" && port === "8080") {
       const directUrl = "http://localhost:3000/api/v1";
-      console.log("🏠 Local development - using direct connection:", directUrl);
+      console.log(
+        "🏠 Local development (port 8080) - using direct connection:",
+        directUrl,
+      );
       return directUrl;
     }
   }
