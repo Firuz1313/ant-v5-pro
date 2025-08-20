@@ -297,7 +297,12 @@ const ProblemsManager = () => {
       const errorResponse = (error as any)?.response?.data;
       const errorMessage = (error as any)?.message || "Неизвестная ошибка";
 
-      if (errorResponse?.errorType === "DUPLICATE_ERROR") {
+      if (errorResponse?.errorType === "RATE_LIMIT") {
+        const retryAfter = errorResponse.retryAfter || 5;
+        alert(
+          `Слишком частые попытки создания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? 'ы' : ''} перед следующей попыткой.`
+        );
+      } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         const suggestions = errorResponse.details?.suggestions || [];
 
@@ -355,7 +360,7 @@ const ProblemsManager = () => {
       return;
     }
 
-    if (!confirm("Вы уверены, что хотите удалить эту проблему?")) {
+    if (!confirm("Вы увер��ны, что хотите удалить эту проблему?")) {
       return;
     }
 
@@ -516,7 +521,7 @@ const ProblemsManager = () => {
                   const errorResponse = error?.response?.data;
                   if (errorResponse?.errorType === "DUPLICATE_ERROR") {
                     alert(
-                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`
+                      `Не удалось создать тестовую проблему: проблема с ��аким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`
                     );
                   } else {
                     alert("Ошибка при создании тестовой проблемы: " + (error?.message || "Неизвестная ошибка"));
