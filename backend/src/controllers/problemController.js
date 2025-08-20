@@ -43,12 +43,9 @@ class ProblemController {
       if (category) filters.category = category;
       if (status) filters.status = status;
 
-      // Set is_active filter: true by default, unless explicitly set to false
+      // Set is_active filter only if explicitly requested
       if (is_active !== undefined) {
         filters.is_active = is_active === "true";
-      } else {
-        // By default, only show active problems
-        filters.is_active = true;
       }
 
       const options = {
@@ -327,7 +324,7 @@ class ProblemController {
         }
       }
 
-      // Проверяем уникальность названия при изменении
+      // Проверяем уникальность названия при изменени��
       if (
         updateData.title &&
         updateData.title.trim().toLowerCase() !==
@@ -479,7 +476,7 @@ class ProblemController {
       if (!searchTerm || searchTerm.trim().length < 2) {
         return res.status(400).json({
           success: false,
-          error: "Поисковый запрос до��жен содержать минимум 2 символа",
+          error: "Поисковый запрос должен содержать минимум 2 символа",
           errorType: "VALIDATION_ERROR",
           timestamp: new Date().toISOString(),
         });
@@ -808,7 +805,7 @@ class ProblemController {
 // Создаем экземпляр контроллера
 const problemController = new ProblemController();
 
-// Применяем в��лидацию к методам
+// Применяем валидацию к методам
 const validateProblemCreation = validateRequest(problemValidation.create);
 const validateProblemUpdate = validateRequest(problemValidation.update);
 
