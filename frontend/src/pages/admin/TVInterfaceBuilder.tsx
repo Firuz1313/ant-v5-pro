@@ -173,6 +173,20 @@ const TVInterfaceBuilder = () => {
     }
   };
 
+  // Remove image during edit (reset to original if no new image)
+  const removeImageEdit = () => {
+    setFormData((prev) => ({ ...prev, screenshotData: undefined }));
+    // При редактировании возвращаем к исходному скриншоту
+    if (selectedInterface) {
+      setPreviewImageUrl(tvInterfaceUtils.getScreenshotUrl(selectedInterface));
+    } else {
+      setPreviewImageUrl(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   // Handle screenshot selection from browser
   const handleScreenshotSelect = (screenshotData: string) => {
     setFormData((prev) => ({ ...prev, screenshotData }));
@@ -220,7 +234,7 @@ const TVInterfaceBuilder = () => {
       const response = await tvInterfacesAPI.create(formData);
       if (response.success) {
         toast({
-          title: "Успех",
+          title: "Успе��",
           description: response.message || "TV интерфейс создан",
         });
         setIsCreateDialogOpen(false);
@@ -251,9 +265,25 @@ const TVInterfaceBuilder = () => {
 
     setIsLoading(true);
     try {
+      // Подготавливаем данные для обновления, включая только измененные поля
+      const updateData: any = {
+        name: formData.name,
+        description: formData.description,
+        type: formData.type,
+        deviceId: formData.deviceId,
+      };
+
+      // Добавляем screenshot_data только если был загружен новый скриншот
+      if (
+        formData.screenshotData &&
+        formData.screenshotData.startsWith("data:")
+      ) {
+        updateData.screenshotData = formData.screenshotData;
+      }
+
       const response = await tvInterfacesAPI.update(
         selectedInterface.id,
-        formData,
+        updateData,
       );
       if (response.success) {
         toast({
@@ -325,7 +355,7 @@ const TVInterfaceBuilder = () => {
         loadTVInterfaces();
       } else {
         toast({
-          title: "Ошибка",
+          title: "��шибка",
           description: response.error || "Не удалось изменить статус",
           variant: "destructive",
         });
@@ -365,7 +395,7 @@ const TVInterfaceBuilder = () => {
     } catch (error) {
       console.error("Error duplicating TV interface:", error);
       toast({
-        title: "Ошибка",
+        title: "Оши��ка",
         description: "Произошла ошибка при дублировании TV интерфейса",
         variant: "destructive",
       });
@@ -413,8 +443,9 @@ const TVInterfaceBuilder = () => {
       description: tvInterface.description,
       type: tvInterface.type,
       deviceId: tvInterface.deviceId,
-      screenshotData: tvInterfaceUtils.getScreenshotUrl(tvInterface),
+      screenshotData: undefined, // Не устанавливаем существующий скриншот как дан��ые
     });
+    // Показываем текущий скриншот как превью, но не как данные для отправки
     setPreviewImageUrl(tvInterfaceUtils.getScreenshotUrl(tvInterface));
     setIsEditDialogOpen(true);
   };
@@ -444,8 +475,8 @@ const TVInterfaceBuilder = () => {
             Конструктор интерфейса ТВ
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание и управление интерфейсами ТВ-приставок с полной интеграцией
-            с бэкендом
+            Создание и управление интерф��йсами ТВ-приставок с полной
+            интеграцией с бэкендом
           </p>
         </div>
         <div className="flex space-x-2">
@@ -471,7 +502,7 @@ const TVInterfaceBuilder = () => {
                 <AlertDialogTitle>Очистить все TV интерфейсы?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Это действие удалит все существующие TV интерфейсы. После
-                  очистки вы сможете создавать св��и собственные интерфейсы
+                  очистки вы сможете создавать св��и со��ственные интерфейсы
                   вручную через UI.
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -615,6 +646,7 @@ const TVInterfaceBuilder = () => {
                           variant="outline"
                           size="sm"
                           onClick={removeImage}
+                          title="Удалить скриншот"
                         >
                           <X className="h-4 w-4" />
                         </Button>
@@ -991,7 +1023,8 @@ const TVInterfaceBuilder = () => {
                       type="button"
                       variant="outline"
                       size="sm"
-                      onClick={removeImage}
+                      onClick={removeImageEdit}
+                      title="Сбросить к исходному скриншоту"
                     >
                       <X className="h-4 w-4" />
                     </Button>
@@ -1005,6 +1038,12 @@ const TVInterfaceBuilder = () => {
                       alt="Preview"
                       className="max-w-full h-48 object-contain mx-auto rounded"
                     />
+                    <div className="mt-2 text-sm text-gray-500 text-center">
+                      {formData.screenshotData &&
+                      formData.screenshotData.startsWith("data:")
+                        ? "Новый скриншот будет сохранен"
+                        : "Текущий скриншот интерфейса"}
+                    </div>
                   </div>
                 )}
               </div>
@@ -1018,7 +1057,7 @@ const TVInterfaceBuilder = () => {
                   resetForm();
                 }}
               >
-                Отмена
+                ��тмена
               </Button>
               <Button onClick={handleEdit} disabled={isLoading}>
                 <Save className="h-4 w-4 mr-2" />

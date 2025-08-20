@@ -5,7 +5,7 @@ class TVInterface extends BaseModel {
     super("tv_interfaces");
   }
 
-  // Определение схемы для валидации
+  // Определение схемы дл�� валидации
   getSchema() {
     return {
       name: { type: "string", required: true, minLength: 1, maxLength: 255 },
@@ -119,7 +119,7 @@ class TVInterface extends BaseModel {
     }
   }
 
-  // Создать новый интерфейс
+  // ��оздать новый интерфейс
   async create(data) {
     try {
       // Валидаци�� обязательных полей
@@ -144,6 +144,20 @@ class TVInterface extends BaseModel {
         throw new Error("Выбранное устройство не найдено");
       }
 
+      // Проверяем какие колонки существуют в таблице
+      const columnsQuery = `
+        SELECT column_name
+        FROM information_schema.columns
+        WHERE table_name = 'tv_interfaces' AND column_name IN ('clickable_areas', 'highlight_areas');
+      `;
+      const existingColumns = await this.query(columnsQuery);
+      const hasClickableAreas = existingColumns.rows.some(
+        (row) => row.column_name === "clickable_areas",
+      );
+      const hasHighlightAreas = existingColumns.rows.some(
+        (row) => row.column_name === "highlight_areas",
+      );
+
       const now = new Date().toISOString();
       const tvInterfaceData = {
         name: data.name.trim(),
@@ -152,12 +166,22 @@ class TVInterface extends BaseModel {
         device_id: data.device_id,
         screenshot_url: data.screenshot_url || null,
         screenshot_data: data.screenshot_data || null,
-        clickable_areas: JSON.stringify(data.clickable_areas || []),
-        highlight_areas: JSON.stringify(data.highlight_areas || []),
         is_active: data.is_active !== undefined ? data.is_active : true,
         created_at: now,
         updated_at: now,
       };
+
+      // Добавляем колонки только если они существуют
+      if (hasClickableAreas) {
+        tvInterfaceData.clickable_areas = JSON.stringify(
+          data.clickable_areas || [],
+        );
+      }
+      if (hasHighlightAreas) {
+        tvInterfaceData.highlight_areas = JSON.stringify(
+          data.highlight_areas || [],
+        );
+      }
 
       const result = await super.create(tvInterfaceData);
 
@@ -170,7 +194,7 @@ class TVInterface extends BaseModel {
     }
   }
 
-  // Обновить интерфейс
+  // Об��овить интерфейс
   async update(id, data) {
     try {
       // Проверяем существование интерфейса
@@ -243,21 +267,33 @@ class TVInterface extends BaseModel {
 
       const tvInterface = result.rows[0];
 
-      // Парсим JSON поля
-      if (tvInterface.clickable_areas) {
-        try {
-          tvInterface.clickable_areas = JSON.parse(tvInterface.clickable_areas);
-        } catch (e) {
+      // Парсим JSON поля если они существуют
+      if (tvInterface.hasOwnProperty("clickable_areas")) {
+        if (tvInterface.clickable_areas) {
+          try {
+            tvInterface.clickable_areas = JSON.parse(
+              tvInterface.clickable_areas,
+            );
+          } catch (e) {
+            tvInterface.clickable_areas = [];
+          }
+        } else {
           tvInterface.clickable_areas = [];
         }
       } else {
         tvInterface.clickable_areas = [];
       }
 
-      if (tvInterface.highlight_areas) {
-        try {
-          tvInterface.highlight_areas = JSON.parse(tvInterface.highlight_areas);
-        } catch (e) {
+      if (tvInterface.hasOwnProperty("highlight_areas")) {
+        if (tvInterface.highlight_areas) {
+          try {
+            tvInterface.highlight_areas = JSON.parse(
+              tvInterface.highlight_areas,
+            );
+          } catch (e) {
+            tvInterface.highlight_areas = [];
+          }
+        } else {
           tvInterface.highlight_areas = [];
         }
       } else {
