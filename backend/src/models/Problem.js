@@ -153,7 +153,7 @@ class Problem extends BaseModel {
       
       return this.findAllWithDetails(filters, options);
     } catch (error) {
-      console.error('Ошибка получения проблем по устро��ству:', error.message);
+      console.error('Ошибка получения проблем по устройству:', error.message);
       throw error;
     }
   }
@@ -356,15 +356,14 @@ class Problem extends BaseModel {
   }
 
   /**
-   * Проверка возможности удаления ��роблемы
+   * Проверка возможности удален��я проблемы
    */
   async canDelete(id) {
     try {
       const sql = `
-        SELECT 
+        SELECT
           COUNT(ds.id) as steps_count,
-          COUNT(sess.id) as sessions_count,
-          COUNT(CASE WHEN sess.end_time IS NULL THEN 1 END) as active_sessions_count
+          COUNT(sess.id) as sessions_count
         FROM problems p
         LEFT JOIN diagnostic_steps ds ON p.id = ds.problem_id AND ds.is_active = true
         LEFT JOIN diagnostic_sessions sess ON p.id = sess.problem_id
@@ -391,8 +390,8 @@ class Problem extends BaseModel {
       if (stepsCount > 0) {
         return {
           canDelete: false,
-          reason: `Проблема содержит ${stepsCount} диагностических шагов. Сначала уда��ите их.`,
-          suggestion: 'Можно архивировать проблему вместо удаления'
+          reason: `Проблема содержит ${stepsCount} диагностических шагов. Сначала удалите их.`,
+          suggestion: 'Можно архивировать про��лему вместо удаления'
         };
       }
 
