@@ -30,6 +30,7 @@ export class ApiClient {
   private timeout: number;
   private defaultHeaders: Record<string, string>;
   private activeRequests: Map<string, Promise<any>> = new Map();
+  private originalFetch: typeof fetch;
 
   constructor(config: ApiClientConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
