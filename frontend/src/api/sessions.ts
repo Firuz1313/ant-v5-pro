@@ -122,7 +122,7 @@ export interface CleanupResult {
 }
 
 export class SessionsApi {
-  private readonly basePath = '/v1/sessions';
+  private readonly basePath = '/sessions';
 
   /**
    * Получение списка сессий
