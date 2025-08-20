@@ -168,22 +168,31 @@ export class ApiClient {
         return this.makeRequest<T>(endpoint, options, retryCount + 1);
       }
 
-      // Ultra-simple approach: read response only once, immediately
+      // Read response body only once
       let responseData: any = null;
       let responseText = "";
 
-      try {
-        responseText = await response.text();
-        console.log(
-          `📡 Response text (first 100 chars): ${responseText.substring(0, 100)}`,
-        );
-      } catch (textError) {
-        console.error(`📡 Failed to read response text:`, textError);
-        // If we can't read the response body, create a generic error response
+      // Check if response body has already been read
+      if (response.bodyUsed) {
+        console.warn(`📡 Response body already consumed`);
         responseText = JSON.stringify({
-          error: `Failed to read response body: ${textError.message}`,
-          errorType: "RESPONSE_READ_ERROR"
+          error: "Response body already consumed",
+          errorType: "BODY_ALREADY_READ"
         });
+      } else {
+        try {
+          responseText = await response.text();
+          console.log(
+            `📡 Response text (first 100 chars): ${responseText.substring(0, 100)}`,
+          );
+        } catch (textError) {
+          console.error(`📡 Failed to read response text:`, textError);
+          // If we can't read the response body, create a generic error response
+          responseText = JSON.stringify({
+            error: `Failed to read response body: ${textError.message}`,
+            errorType: "RESPONSE_READ_ERROR"
+          });
+        }
       }
 
       // Try to parse JSON if we have text
