@@ -297,7 +297,7 @@ const ProblemsManager = () => {
       category: problem.category,
       icon: problem.icon,
       color: problem.color,
-      deviceId: problem.deviceId,
+      deviceId: problem.device_id || problem.deviceId,
     });
     setIsEditDialogOpen(true);
   };
@@ -371,7 +371,7 @@ const ProblemsManager = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>Создать новую проблему</DialogTitle>
+                <DialogTitle>С��здать новую проблему</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
@@ -541,7 +541,7 @@ const ProblemsManager = () => {
             <div className="flex gap-2">
               <Select value={filterDevice} onValueChange={setFilterDevice}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Приставка" />
+                  <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все приставки</SelectItem>
@@ -631,13 +631,13 @@ const ProblemsManager = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-green-600">
-                      {problem.successRate}%
+                      {problem.success_rate || problem.successRate || 0}%
                     </div>
                     <div className="text-xs text-gray-500">успеха</div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-blue-600">
-                      {problem.completions}
+                      {problem.completed_count || problem.completions || 0}
                     </div>
                     <div className="text-xs text-gray-500">решений</div>
                   </div>
@@ -760,7 +760,7 @@ const ProblemsManager = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Подробное описание ��роблемы"
+                placeholder="Подробное описание проблемы"
               />
             </div>
 
