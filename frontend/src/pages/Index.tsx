@@ -21,11 +21,15 @@ import {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { data: devices = [] } = useDevices();
-  const { data: problems = [] } = useProblems();
+  const { data: devicesResponse } = useDevices();
+  const { data: problemsResponse } = useProblems();
+
+  // Извлекаем массивы данных из ответа API
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   const deviceStats = {
-    active: devices.filter((d: any) => d.isActive).length || 0,
+    active: devices.filter((d: any) => d.is_active).length || 0,
     total: devices.length || 0,
   };
   const problemStats = {
