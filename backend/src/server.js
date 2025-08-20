@@ -90,7 +90,9 @@ if (process.env.COMPRESSION_ENABLED !== "false") {
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 минут
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // максимум 100 запросов на IP
+  max: NODE_ENV === "development"
+    ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000 // 1000 запросов для разработки
+    : parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // 100 для продакшена
   message: {
     error: "Слишком много запросов с этого IP, попробуйте позже.",
     retryAfter: Math.ceil(
@@ -99,6 +101,16 @@ const limiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req, res) => {
+    // Пропускаем rate limiting для локальных IP в разработке
+    if (NODE_ENV === "development") {
+      const ip = req.ip || req.connection.remoteAddress;
+      if (ip === "127.0.0.1" || ip === "::1" || ip?.includes("localhost")) {
+        return true;
+      }
+    }
+    return false;
+  }
 });
 
 app.use("/api/", limiter);
@@ -149,7 +161,7 @@ app.use("/api", apiRoutes);
 app.use("/api/*", (req, res) => {
   res.status(404).json({
     success: false,
-    error: "API endpoint не найден",
+    error: "API endpoint не най��ен",
     message: `Маршрут ${req.method} ${req.path} не существует`,
     availableEndpoints: "/api/v1",
   });
