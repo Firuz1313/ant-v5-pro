@@ -376,7 +376,7 @@ const ProblemsManager = () => {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="deviceId">Приставка</Label>
+                  <Label htmlFor="deviceId">Прис��авка</Label>
                   <Select
                     value={formData.deviceId}
                     onValueChange={(value) =>
@@ -632,13 +632,13 @@ const ProblemsManager = () => {
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-green-600">
-                      {problem.success_rate || problem.successRate || 0}%
+                      {(problem.success_rate !== undefined ? problem.success_rate : problem.successRate) || 0}%
                     </div>
                     <div className="text-xs text-gray-500">успеха</div>
                   </div>
                   <div className="text-center">
                     <div className="text-lg font-semibold text-blue-600">
-                      {problem.completed_count || problem.completions || 0}
+                      {(problem.completed_count !== undefined ? problem.completed_count : problem.completions) || 0}
                     </div>
                     <div className="text-xs text-gray-500">решений</div>
                   </div>
