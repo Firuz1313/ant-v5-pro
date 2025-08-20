@@ -137,7 +137,7 @@ const Index = () => {
             </h3>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               {devices
-                .filter((d: any) => d.isActive)
+                .filter((d: any) => d.is_active)
                 .map((device: any) => (
                   <Card
                     key={device.id}
