@@ -216,8 +216,17 @@ const ProblemsManager = () => {
   };
 
   const handleCreate = async () => {
+    console.log("🚀 Starting to create problem with data:", {
+      device_id: formData.deviceId,
+      title: formData.title,
+      description: formData.description,
+      category: formData.category,
+      icon: formData.icon,
+      color: formData.color,
+    });
+
     try {
-      await createProblemMutation.mutateAsync({
+      const result = await createProblemMutation.mutateAsync({
         device_id: formData.deviceId,
         title: formData.title,
         description: formData.description,
@@ -230,10 +239,19 @@ const ProblemsManager = () => {
         tags: [],
         status: "published",
       });
+
+      console.log("✅ Problem created successfully:", result);
       setIsCreateDialogOpen(false);
       resetForm();
     } catch (error) {
-      console.error("Error creating problem:", error);
+      console.error("❌ Error creating problem:", error);
+      console.error("❌ Error details:", {
+        name: error?.name,
+        message: error?.message,
+        stack: error?.stack,
+        status: error?.status,
+        response: error?.response
+      });
       alert("Ошибка при создании проблемы: " + (error?.message || "Неизвестная ошибка"));
     }
   };
@@ -367,7 +385,7 @@ const ProblemsManager = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Управление проблемами
+            У��равление проблемами
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Создание и настройка проблем для различных моделей приставок
@@ -568,7 +586,7 @@ const ProblemsManager = () => {
             <div className="flex gap-2">
               <Select value={filterDevice} onValueChange={setFilterDevice}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Прис��авка" />
+                  <SelectValue placeholder="Прис��авк��" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все приставки</SelectItem>
