@@ -189,13 +189,13 @@ export class ApiClient {
           } else {
             responseText = JSON.stringify({
               error: `Failed to read response body: ${textError.message}`,
-              errorType: "RESPONSE_READ_ERROR"
+              errorType: "RESPONSE_READ_ERROR",
             });
           }
         } catch (fallbackError) {
           responseText = JSON.stringify({
             error: `Complete failure reading response: ${fallbackError.message}`,
-            errorType: "RESPONSE_READ_ERROR"
+            errorType: "RESPONSE_READ_ERROR",
           });
         }
       }

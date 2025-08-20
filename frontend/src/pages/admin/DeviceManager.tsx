@@ -161,8 +161,11 @@ const DeviceManager = () => {
       const timestamp = Date.now();
 
       // Create unique name and ID if using default values
-      const uniqueName = formData.name === "New" ? `${formData.brand} ${timestamp}` : formData.name;
-      const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, '-')}-${uniqueName.toLowerCase().replace(/\s+/g, '-')}-${timestamp}`;
+      const uniqueName =
+        formData.name === "New"
+          ? `${formData.brand} ${timestamp}`
+          : formData.name;
+      const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, "-")}-${uniqueName.toLowerCase().replace(/\s+/g, "-")}-${timestamp}`;
 
       // Prepare device data, excluding empty URLs
       const deviceData = {
@@ -172,7 +175,7 @@ const DeviceManager = () => {
         model: formData.model,
         description: formData.description,
         color: formData.color,
-        status: 'active',
+        status: "active",
       };
 
       // Only add URLs if they are not empty
