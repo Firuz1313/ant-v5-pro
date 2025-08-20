@@ -128,19 +128,28 @@ class ProblemController {
         }
       }
 
-      // Проверяем уникальность названия для устройства
+      // Проверяем уникальность названия для устройства (только среди активных и опубликованных проблем)
       if (problemData.device_id && problemData.title) {
         const existingProblem = await problemModel.findOne({
           title: problemData.title,
           device_id: problemData.device_id,
-          is_active: true
+          is_active: true,
+          status: ['published', 'draft'] // Исключаем архивированные
         });
 
         if (existingProblem) {
+          console.warn(`⚠️  Попытка создать дубликат проблемы: "${problemData.title}" для устройства ${problemData.device_id}`);
+          console.warn(`⚠️  Существующая проблема ID: ${existingProblem.id}, статус: ${existingProblem.status}`);
+
           return res.status(409).json({
             success: false,
             error: 'Проблема с таким названием уже существует для данного устройства',
             errorType: 'DUPLICATE_ERROR',
+            existingProblem: {
+              id: existingProblem.id,
+              title: existingProblem.title,
+              status: existingProblem.status
+            },
             timestamp: new Date().toISOString()
           });
         }
