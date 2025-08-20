@@ -172,32 +172,26 @@ export class ApiClient {
       let responseData: any = null;
       let responseText = "";
 
-      // Clone response before reading to avoid consumption issues
-      let responseClone = response.clone();
-
       try {
-        responseText = await responseClone.text();
-        console.log(
-          `📡 Response text (first 100 chars): ${responseText.substring(0, 100)}`,
-        );
+        // Check if body is already used before attempting to read
+        if (response.bodyUsed) {
+          console.error(`📡 Response body already consumed`);
+          responseText = JSON.stringify({
+            error: "Response body already consumed",
+            errorType: "RESPONSE_ALREADY_USED",
+          });
+        } else {
+          responseText = await response.text();
+          console.log(
+            `📡 Response text (first 100 chars): ${responseText.substring(0, 100)}`,
+          );
+        }
       } catch (textError) {
         console.error(`📡 Failed to read response text:`, textError);
-        // Fallback: try reading original response
-        try {
-          if (!response.bodyUsed) {
-            responseText = await response.text();
-          } else {
-            responseText = JSON.stringify({
-              error: `Failed to read response body: ${textError.message}`,
-              errorType: "RESPONSE_READ_ERROR",
-            });
-          }
-        } catch (fallbackError) {
-          responseText = JSON.stringify({
-            error: `Complete failure reading response: ${fallbackError.message}`,
-            errorType: "RESPONSE_READ_ERROR",
-          });
-        }
+        responseText = JSON.stringify({
+          error: `Failed to read response body: ${textError.message}`,
+          errorType: "RESPONSE_READ_ERROR",
+        });
       }
 
       // Try to parse JSON if we have text
