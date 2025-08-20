@@ -120,9 +120,17 @@ class BaseModel {
     }
 
     if (filters.status) {
-      conditions.push(`status = $${paramIndex}`);
-      values.push(filters.status);
-      paramIndex++;
+      if (Array.isArray(filters.status)) {
+        // Поддержка массива статусов
+        const placeholders = filters.status.map(() => `$${paramIndex++}`);
+        conditions.push(`status IN (${placeholders.join(', ')})`);
+        values.push(...filters.status);
+      } else {
+        // Одиночный статус
+        conditions.push(`status = $${paramIndex}`);
+        values.push(filters.status);
+        paramIndex++;
+      }
     }
 
     if (filters.name) {
@@ -281,7 +289,7 @@ class BaseModel {
       return result.rows[0] || null;
     } catch (error) {
       console.error(
-        `Ошибка мягкого удаления записи из ${this.tableName}:`,
+        `Ошибка мягкого удаления запис�� из ${this.tableName}:`,
         error.message,
       );
       throw error;
