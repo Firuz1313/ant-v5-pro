@@ -157,14 +157,17 @@ const DeviceManager = () => {
 
   const handleCreate = async () => {
     try {
-      // Generate a unique ID based on brand and name with timestamp
+      // Generate a unique timestamp
       const timestamp = Date.now();
-      const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, '-')}-${formData.name.toLowerCase().replace(/\s+/g, '-')}-${timestamp}`;
+
+      // Create unique name and ID if using default values
+      const uniqueName = formData.name === "New" ? `${formData.brand} ${timestamp}` : formData.name;
+      const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, '-')}-${uniqueName.toLowerCase().replace(/\s+/g, '-')}-${timestamp}`;
 
       // Prepare device data, excluding empty URLs
       const deviceData = {
         id: deviceId,
-        name: formData.name,
+        name: uniqueName,
         brand: formData.brand,
         model: formData.model,
         description: formData.description,
@@ -417,7 +420,7 @@ const DeviceManager = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="color">Цветовая схема</Label>
+                  <Label htmlFor="color">Цв��товая схема</Label>
                   <Select
                     value={formData.color}
                     onValueChange={(value) =>
