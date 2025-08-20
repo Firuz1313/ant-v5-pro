@@ -16,9 +16,9 @@ export const tvInterfacesAPI = {
   // Получить все TV интерфейсы
   async getAll(filters?: TVInterfaceFilters): Promise<TVInterfaceListResponse> {
     try {
-      const queryParams = buildQueryParams(filters || {});
-      const response = await withRetry(() =>
-        apiRequest<TVInterfaceListResponse>(`${queryParams}`),
+      const response = await apiClient.get<TVInterfaceListResponse>(
+        API_ENDPOINT,
+        { params: filters },
       );
 
       return {
@@ -28,10 +28,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке TV интерфейсов",
+        error: handleApiError(error),
       };
     }
   },
@@ -95,7 +92,7 @@ export const tvInterfacesAPI = {
   // Создать новый TV интерфейс
   async create(data: CreateTVInterfaceData): Promise<TVInterfaceApiResponse> {
     try {
-      // Валидация на фро��тенде
+      // Валидация на фронтенде
       if (!data.name?.trim()) {
         return {
           success: false,
