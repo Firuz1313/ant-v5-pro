@@ -52,6 +52,15 @@ export class ApiClient {
       (window as any).__originalFetch = window.fetch.bind(window);
       this.originalFetch = window.fetch.bind(window);
     }
+
+    // In cloud environments, use XMLHttpRequest by default to avoid fetch issues
+    if (typeof window !== "undefined") {
+      const hostname = window.location.hostname;
+      if (hostname.includes("builder.codes") || hostname.includes("fly.dev")) {
+        console.log("🌩️ Cloud environment detected - enabling XMLHttpRequest fallback by default");
+        this.useFallback = true;
+      }
+    }
   }
 
   private async xhrFallback(
