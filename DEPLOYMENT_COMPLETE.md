@@ -26,12 +26,14 @@
 ## 🛠️ Что было исправлено
 
 ### 1. Database Configuration
+
 - ✅ Настроен Neon PostgreSQL
 - ✅ Создан автоматический скрипт инициализации (`npm run db:init`)
 - ✅ Исправлены SQL ��апросы и миграции
 - ✅ Настроен connection pooling
 
-### 2. API Client Architecture  
+### 2. API Client Architecture
+
 - ✅ Создан unified API client (`frontend/src/api/client.ts`)
 - ✅ Все API файлы переведены на shared client
 - ✅ Добавлена retry логика для 429 ошибок
@@ -39,12 +41,14 @@
 - ✅ Исправлена обработка response body
 
 ### 3. Rate Limiting & CORS
+
 - ✅ Настроен rate limiting для cloud окружения
 - ✅ Добавлен skip для cloud IP адресов
 - ✅ Увеличены лимиты для development (10000 req/15min)
 - ✅ Настроен CORS для fly.dev доменов
 
 ### 4. Error Handling
+
 - ✅ Централизованная обработка ошибок
 - ✅ React Query retry с exponential backoff
 - ✅ Proper error messages для пользователей
@@ -52,6 +56,7 @@
 ## 📝 Конфигурационные файлы
 
 ### Backend Configuration
+
 ```env
 # backend/.env
 DATABASE_URL=postgresql://neondb_owner:unpkg_4YeHe3BLxhOi@ep-royal-meadow-a5gnz7bg.us-east-2.aws.neon.tech/neondb?sslmode=require
@@ -63,10 +68,11 @@ RATE_LIMIT_MAX_REQUESTS=10000
 ```
 
 ### NPM Scripts
+
 ```json
 {
   "db:init": "node scripts/init-database.js",
-  "db:check": "проверка подключения к БД", 
+  "db:check": "проверка подключения к БД",
   "db:stats": "статистика таблиц",
   "dev": "запуск frontend + backend"
 }
@@ -75,6 +81,7 @@ RATE_LIMIT_MAX_REQUESTS=10000
 ## 🔄 Routine Operations
 
 ### Проверка состояния системы
+
 ```bash
 # Проверка базы данных
 cd backend && npm run db:check
@@ -87,6 +94,7 @@ npm run dev
 ```
 
 ### Инициализация с нуля
+
 ```bash
 # 1. Установка зависимостей
 npm run install:all
@@ -112,12 +120,14 @@ npm run dev
 ## 🚀 Next Steps
 
 ### Для разработки
+
 1. Добавить новые API endpoints п�� необходимости
 2. Расширить frontend функциональность
 3. Добавить тесты (unit, integration, e2e)
 4. Настроить CI/CD pipeline
 
 ### Для продакшена
+
 1. Настроить мониторинг (логи, метрики)
 2. Добавить аутентификацию/авторизацию
 3. Настроить backup базы данных
@@ -128,21 +138,24 @@ npm run dev
 ### Частые проблемы
 
 **DB Connection Error**
+
 ```bash
 # Проверить настройки
 cat backend/.env | grep DATABASE_URL
 
-# Тест подключения  
+# Тест подключения
 cd backend && npm run db:check
 ```
 
 **Rate Limiting (429)**
+
 ```bash
 # Увеличить лимиты в backend/.env
 RATE_LIMIT_MAX_REQUESTS=10000
 ```
 
 **CORS Errors**
+
 ```bash
 # Добавить домен в backend/.env
 ALLOWED_ORIGINS=https://yourdomain.com,http://localhost:8081

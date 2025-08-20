@@ -3,6 +3,7 @@
 ## ⚡ За 5 минут
 
 ### 1. Установка
+
 ```bash
 git clone <repository-url>
 cd ant-support-fullstack
@@ -12,6 +13,7 @@ npm run install:all
 ### 2. База данных (выберите вариант)
 
 #### 🌩️ Neon Cloud (рекомендуется)
+
 ```bash
 # 1. Скопируйте конфигурацию
 cp backend/.env.example backend/.env
@@ -26,6 +28,7 @@ cd backend && npm run db:init
 ```
 
 #### 💻 Локальная PostgreSQL
+
 ```bash
 # 1. Установите PostgreSQL
 sudo apt install postgresql  # Ubuntu
@@ -52,6 +55,7 @@ cd backend && npm run db:init
 ```
 
 ### 3. Запуск
+
 ```bash
 npm run dev
 ```
@@ -63,17 +67,19 @@ npm run dev
 ## 📋 Полезные команды
 
 ### База данных
+
 ```bash
 cd backend
 
 npm run db:check    # Проверка подключения
-npm run db:init     # Полная инициализация  
+npm run db:init     # Полная инициализация
 npm run db:migrate  # Только миграции
 npm run db:seed     # Только данные
 npm run db:stats    # Статистика таблиц
 ```
 
 ### Разработка
+
 ```bash
 npm run dev         # Запуск frontend + backend
 npm run build       # Сборка для продакшена
@@ -81,6 +87,7 @@ npm start          # Запуск продакшен версии
 ```
 
 ### Тестирование
+
 ```bash
 cd backend && npm test     # Backend тесты
 cd frontend && npm test    # Frontend тесты
@@ -91,6 +98,7 @@ cd frontend && npm test    # Frontend тесты
 ## 🔧 Устранение проблем
 
 ### Ошибка подключения к БД
+
 ```bash
 # Проверьте настройки
 cat backend/.env
@@ -100,12 +108,14 @@ cd backend && npm run db:check
 ```
 
 ### 429 Rate Limit ошибки
+
 ```bash
 # В backend/.env добавьте:
 RATE_LIMIT_MAX_REQUESTS=10000
 ```
 
 ### CORS ошибки
+
 ```bash
 # В backend/.env обновите:
 ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8081

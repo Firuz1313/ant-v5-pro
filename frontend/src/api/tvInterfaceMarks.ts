@@ -233,7 +233,9 @@ export const tvInterfaceMarksAPI = {
   },
 
   // Create new mark
-  async create(data: CreateTVInterfaceMarkData): Promise<TVInterfaceMarkApiResponse> {
+  async create(
+    data: CreateTVInterfaceMarkData,
+  ): Promise<TVInterfaceMarkApiResponse> {
     try {
       if (!data.tv_interface_id) {
         return {
@@ -332,7 +334,9 @@ export const tvInterfaceMarksAPI = {
   },
 
   // Delete all marks for TV interface
-  async deleteByTVInterfaceId(tvInterfaceId: string): Promise<TVInterfaceMarkApiResponse> {
+  async deleteByTVInterfaceId(
+    tvInterfaceId: string,
+  ): Promise<TVInterfaceMarkApiResponse> {
     try {
       if (!tvInterfaceId) {
         return {

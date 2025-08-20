@@ -29,7 +29,12 @@ const queryClient = new QueryClient({
         // Don't retry on 4xx errors except 408 (timeout) and 429 (rate limit)
         if (error && typeof error === "object" && "status" in error) {
           const status = error.status as number;
-          if (status >= 400 && status < 500 && status !== 408 && status !== 429) {
+          if (
+            status >= 400 &&
+            status < 500 &&
+            status !== 408 &&
+            status !== 429
+          ) {
             return false;
           }
           // Allow retry for 429 rate limiting

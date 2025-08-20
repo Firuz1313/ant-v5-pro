@@ -88,7 +88,7 @@ export class ApiClient {
     const method = fetchOptions.method || "GET";
 
     // Create unique key for request deduplication (only for GET requests)
-    const requestKey = `${method}:${url}:${fetchOptions.body || ''}`;
+    const requestKey = `${method}:${url}:${fetchOptions.body || ""}`;
 
     // For GET requests, check if there's already a pending request
     if (method === "GET" && this.activeRequests.has(requestKey)) {
@@ -96,7 +96,9 @@ export class ApiClient {
       return this.activeRequests.get(requestKey) as Promise<T>;
     }
 
-    console.log(`🚀 Making ${method} request to: ${url}${retryCount > 0 ? ` (retry ${retryCount})` : ''}`);
+    console.log(
+      `🚀 Making ${method} request to: ${url}${retryCount > 0 ? ` (retry ${retryCount})` : ""}`,
+    );
 
     const headers = {
       ...this.defaultHeaders,
@@ -111,7 +113,16 @@ export class ApiClient {
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
     // Create the actual request promise
-    const requestPromise = this.executeRequest<T>(url, fetchOptions, headers, controller, timeoutId, endpoint, options, retryCount);
+    const requestPromise = this.executeRequest<T>(
+      url,
+      fetchOptions,
+      headers,
+      controller,
+      timeoutId,
+      endpoint,
+      options,
+      retryCount,
+    );
 
     // Store promise for GET requests to enable deduplication
     if (method === "GET") {
@@ -136,7 +147,6 @@ export class ApiClient {
     options: RequestOptions,
     retryCount: number,
   ): Promise<T> {
-
     try {
       console.log(`📡 Sending fetch request...`);
       const response = await fetch(url, {
@@ -150,11 +160,11 @@ export class ApiClient {
 
       // Handle 429 rate limiting with retry
       if (response.status === 429 && retryCount < 3) {
-        const retryAfter = response.headers.get('Retry-After') || '2';
+        const retryAfter = response.headers.get("Retry-After") || "2";
         const delayMs = parseInt(retryAfter) * 1000;
         console.log(`⏳ Rate limited, retrying after ${delayMs}ms...`);
 
-        await new Promise(resolve => setTimeout(resolve, delayMs));
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
         return this.makeRequest<T>(endpoint, options, retryCount + 1);
       }
 

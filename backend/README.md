@@ -75,11 +75,13 @@ npm install
    - Скопируйте строку подключения из Dashboard
 
 2. **Настройка переменных окружения**
+
    ```bash
    cp .env.example .env
    ```
 
    Отредактируйте `.env` файл:
+
    ```env
    # NEON DATABASE CONFIGURATION
    DATABASE_URL=postgresql://neondb_owner:unpkg_4YeHe3BLxhOi@ep-royal-meadow-a5gnz7bg.us-east-2.aws.neon.tech/neondb?sslmode=require
@@ -118,6 +120,7 @@ npm install
 #### Вариант B: Локальная PostgreSQL
 
 1. **Установка PostgreSQL**
+
    ```bash
    # Ubuntu/Debian
    sudo apt update && sudo apt install postgresql postgresql-contrib
@@ -130,6 +133,7 @@ npm install
    ```
 
 2. **Создание базы данных**
+
    ```bash
    # Подключение к PostgreSQL
    sudo -u postgres psql
@@ -143,6 +147,7 @@ npm install
    ```
 
 3. **Настройка .env для локальной БД**
+
    ```env
    # ЛОКАЛЬНАЯ POSTGRESQL
    DB_HOST=localhost
@@ -165,12 +170,14 @@ npm install
 ### 3. Инициализация базы данных
 
 #### Автоматическая инициализация (рекомендуется)
+
 ```bash
 # Полная инициализация: миграции + данные
 npm run db:init
 ```
 
 #### Пошаговая инициализация
+
 ```bash
 # 1. Провер��а подключения
 npm run db:check
@@ -228,6 +235,7 @@ backend/
 ### Переменные окружения БД
 
 #### Обязательные
+
 ```env
 # ДЛЯ NEON/ОБЛАЧНЫХ БД
 DATABASE_URL=postgresql://user:pass@host/db?sslmode=require
@@ -241,6 +249,7 @@ DB_PASSWORD=password
 ```
 
 #### Дополнительные
+
 ```env
 # SSL настройки
 DB_SSL=true                     # true для облачных БД, false для локальных
@@ -259,6 +268,7 @@ DEBUG=true                      # Включить отладочные сооб
 ### Команды для работы с БД
 
 #### Основные команды
+
 ```bash
 # Проверка подключения к БД
 npm run db:check
@@ -277,6 +287,7 @@ npm run db:stats
 ```
 
 #### Дополнительные команды
+
 ```bash
 # Создание бекапа
 npm run db:backup
@@ -392,6 +403,7 @@ npm run dev
 ### Устранение проблем
 
 #### Ошибка подключения к Neon
+
 ```bash
 # Проверьте правильность DATABASE_URL
 echo $DATABASE_URL
@@ -404,6 +416,7 @@ ping ep-royal-meadow-a5gnz7bg.us-east-2.aws.neon.tech
 ```
 
 #### Ошибка "relation does not exist"
+
 ```bash
 # Выполните миграции
 npm run db:migrate
@@ -413,6 +426,7 @@ npm run db:init
 ```
 
 #### Проблемы с правами доступа
+
 ```bash
 # Для локальной БД убедитесь, что пользователь имеет права:
 sudo -u postgres psql
@@ -421,6 +435,7 @@ ALTER USER ant_user CREATEDB;
 ```
 
 #### Rate limiting ошибки (429)
+
 ```bash
 # Увеличьте лимиты в .env
 RATE_LIMIT_MAX_REQUESTS=10000

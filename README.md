@@ -16,7 +16,7 @@
 
 ### Предварительные требования
 
-- Node.js 18+ 
+- Node.js 18+
 - PostgreSQL 14+ (или облачная база данных Neon)
 - npm или yarn
 
@@ -55,22 +55,23 @@ npm run dev
    - Скопируйте строку подключения из дашборда
 
 2. **Настройка переменных окружения**
-   
+
    Создайте файл `backend/.env`:
+
    ```env
    # База данных Neon
    DATABASE_URL=postgresql://username:password@host/database?sslmode=require
    DB_SSL=true
-   
+
    # Настройки пула соединений
    DB_POOL_MIN=2
    DB_POOL_MAX=20
    DB_IDLE_TIMEOUT=30000
    DB_CONNECTION_TIMEOUT=10000
-   
+
    # Отключаем mock базу данных
    USE_MOCK_DB=false
-   
+
    # Остальные настройки
    NODE_ENV=development
    PORT=3000
@@ -86,23 +87,25 @@ npm run dev
 ### Вариант 2: Локальная PostgreSQL
 
 1. **Установка PostgreSQL**
+
    ```bash
    # Ubuntu/Debian
    sudo apt update
    sudo apt install postgresql postgresql-contrib
-   
+
    # macOS (с Homebrew)
    brew install postgresql
    brew services start postgresql
-   
+
    # Windows - скачайте с официального сайта
    ```
 
 2. **Создание базы данных**
+
    ```bash
    # Подключение к PostgreSQL
    sudo -u postgres psql
-   
+
    # Создание базы данных и пользователя
    CREATE DATABASE ant_support;
    CREATE USER ant_user WITH PASSWORD 'secure_password';
@@ -111,6 +114,7 @@ npm run dev
    ```
 
 3. **Настройка .env**
+
    ```env
    # Локальная PostgreSQL
    DB_HOST=localhost
@@ -119,13 +123,13 @@ npm run dev
    DB_USER=ant_user
    DB_PASSWORD=secure_password
    DB_SSL=false
-   
+
    # Настройки пула
    DB_POOL_MIN=2
    DB_POOL_MAX=10
    DB_IDLE_TIMEOUT=30000
    DB_CONNECTION_TIMEOUT=5000
-   
+
    USE_MOCK_DB=false
    NODE_ENV=development
    PORT=3000
@@ -312,6 +316,7 @@ ant-support-fullstack/
 ### Основные эндпоинты
 
 #### Устройства
+
 ```
 GET    /api/v1/devices           # Список устройств
 GET    /api/v1/devices/:id       # Устройство по ID
@@ -322,6 +327,7 @@ GET    /api/v1/devices/stats     # Статистика устройств
 ```
 
 #### Проблемы
+
 ```
 GET    /api/v1/problems          # Список проблем
 GET    /api/v1/problems/:id      # Проблема по ID
@@ -332,6 +338,7 @@ GET    /api/v1/problems/device/:deviceId  # Проблемы по устройс
 ```
 
 #### TV интерфейсы
+
 ```
 GET    /api/v1/tv-interfaces     # Список интерфейсов
 POST   /api/v1/tv-interfaces     # Создание интерфейса
@@ -342,6 +349,7 @@ DELETE /api/v1/tv-interfaces/:id # Удаление интерфейса
 ### Формат ответов
 
 Успешный ответ:
+
 ```json
 {
   "success": true,
@@ -352,6 +360,7 @@ DELETE /api/v1/tv-interfaces/:id # Удаление интерфейса
 ```
 
 Ошибка:
+
 ```json
 {
   "success": false,
@@ -372,6 +381,7 @@ DELETE /api/v1/tv-interfaces/:id # Удаление интерфейса
 ### Настройка среды разработки
 
 1. **Клонирование и установка**
+
    ```bash
    git clone <repository-url>
    cd ant-support-fullstack
@@ -379,10 +389,11 @@ DELETE /api/v1/tv-interfaces/:id # Удаление интерфейса
    ```
 
 2. **Настройка базы данных**
+
    ```bash
    # Скопируйте пример конфигурации
    cp backend/.env.example backend/.env
-   
+
    # Отредактируйте backend/.env с вашими настройками БД
    # Затем инициализируйте базу данных
    cd backend
@@ -416,16 +427,17 @@ npm run db:restore backup.sql
 #### Добавление новой миграции
 
 1. Создайте файл в `backend/migrations/`:
+
    ```sql
    -- backend/migrations/003_add_new_feature.sql
-   
+
    -- Создание новой таблицы
    CREATE TABLE IF NOT EXISTS new_feature (
      id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
      name VARCHAR(255) NOT NULL,
      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
    );
-   
+
    -- Добавление индекса
    CREATE INDEX IF NOT EXISTS idx_new_feature_name ON new_feature(name);
    ```
@@ -457,6 +469,7 @@ npm run test:e2e
 ### Production окружение
 
 1. **Настройка переменных о��ружения**
+
    ```env
    NODE_ENV=production
    DATABASE_URL=postgresql://user:pass@prod-host/db?sslmode=require
@@ -466,10 +479,11 @@ npm run test:e2e
    ```
 
 2. **Сборка и развертывание**
+
    ```bash
    # Сборка frontend
    npm run build
-   
+
    # Запуск в production режиме
    NODE_ENV=production npm start
    ```
@@ -546,6 +560,7 @@ npm run db:init -- --force
 #### 3. CORS ошибки
 
 Обновите `ALLOWED_ORIGINS` в `backend/.env`:
+
 ```env
 ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8081,https://yourdomain.com
 ```
@@ -553,6 +568,7 @@ ALLOWED_ORIGINS=http://localhost:3000,http://localhost:8081,https://yourdomain.c
 #### 4. Rate limiting
 
 Для разработки увеличьте лимиты в `backend/.env`:
+
 ```env
 RATE_LIMIT_MAX_REQUESTS=10000
 RATE_LIMIT_WINDOW_MS=60000
