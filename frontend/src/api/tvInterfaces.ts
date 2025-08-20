@@ -168,10 +168,10 @@ export const tvInterfacesAPI = {
         requestData.highlight_areas = data.highlightAreas;
       if (data.isActive !== undefined) requestData.is_active = data.isActive;
 
-      const response = await apiRequest<TVInterfaceApiResponse>(`/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(requestData),
-      });
+      const response = await apiClient.put<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+        requestData,
+      );
 
       return {
         success: true,
@@ -181,10 +181,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при обновлении TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
