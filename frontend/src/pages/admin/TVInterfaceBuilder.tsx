@@ -173,6 +173,20 @@ const TVInterfaceBuilder = () => {
     }
   };
 
+  // Remove image during edit (reset to original if no new image)
+  const removeImageEdit = () => {
+    setFormData((prev) => ({ ...prev, screenshotData: undefined }));
+    // При редактировании возвращаем к исходному скриншоту
+    if (selectedInterface) {
+      setPreviewImageUrl(tvInterfaceUtils.getScreenshotUrl(selectedInterface));
+    } else {
+      setPreviewImageUrl(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   // Handle screenshot selection from browser
   const handleScreenshotSelect = (screenshotData: string) => {
     setFormData((prev) => ({ ...prev, screenshotData }));
@@ -338,7 +352,7 @@ const TVInterfaceBuilder = () => {
         loadTVInterfaces();
       } else {
         toast({
-          title: "Ошибка",
+          title: "��шибка",
           description: response.error || "Не удалось изменить статус",
           variant: "destructive",
         });
@@ -1032,7 +1046,7 @@ const TVInterfaceBuilder = () => {
                   resetForm();
                 }}
               >
-                Отмена
+                ��тмена
               </Button>
               <Button onClick={handleEdit} disabled={isLoading}>
                 <Save className="h-4 w-4 mr-2" />
