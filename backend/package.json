@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "nodemon src/server.js",
     "start": "node src/server.js",
+    "db:init": "node scripts/init-database.js",
     "db:migrate": "node src/utils/migrate.js",
     "db:seed": "node src/utils/seed.js",
     "test": "jest",
