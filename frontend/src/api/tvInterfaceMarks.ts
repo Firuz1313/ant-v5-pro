@@ -213,8 +213,8 @@ export const tvInterfaceMarksAPI = {
   // Get marks by step ID
   async getByStepId(stepId: string): Promise<TVInterfaceMarkListResponse> {
     try {
-      const response = await apiRequest<TVInterfaceMarkListResponse>(
-        `/step/${stepId}`,
+      const response = await apiClient.get<TVInterfaceMarkListResponse>(
+        `${API_ENDPOINT}/step/${stepId}`,
       );
 
       return {
@@ -224,10 +224,7 @@ export const tvInterfaceMarksAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке отметок шага",
+        error: handleApiError(error),
       };
     }
   },
