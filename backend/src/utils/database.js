@@ -27,7 +27,7 @@ if (process.env.DATABASE_URL) {
       : false,
 
     // Настройки pool соединений
-    max: 20, // максимал��ное количество соединений в pool
+    max: 20, // максимал����ное количество соединений в pool
     min: 2, // минимальное количество соединений
     idleTimeoutMillis: 30000, // время простоя перед закрытием ���оединения
     connectionTimeoutMillis: 10000, // таймаут подключения
@@ -48,7 +48,7 @@ if (process.env.DATABASE_URL) {
     min: 5, // минимальное количество соединений
     idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
     connectionTimeoutMillis: 5000, // таймаут подключения
-    maxUses: 7500, // максимальное количеств�� использований соединения
+    maxUses: 7500, // максимальное количес��в�� использований соединения
   };
 }
 
@@ -272,6 +272,51 @@ export async function runMigrations() {
   }
 }
 
+// Функция исправления схемы tv_interfaces
+export async function fixTVInterfacesSchema() {
+  try {
+    console.log("🔧 Проверка и исправление схемы tv_interfaces...");
+
+    // Проверяем какие колонки существуют
+    const columnsQuery = `
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = 'tv_interfaces' AND column_name IN ('clickable_areas', 'highlight_areas');
+    `;
+
+    const existingColumns = await query(columnsQuery);
+    const hasClickableAreas = existingColumns.rows.some(row => row.column_name === 'clickable_areas');
+    const hasHighlightAreas = existingColumns.rows.some(row => row.column_name === 'highlight_areas');
+
+    // Добавляем недостающие колонки
+    if (!hasClickableAreas) {
+      await query(`
+        ALTER TABLE tv_interfaces
+        ADD COLUMN clickable_areas JSONB NOT NULL DEFAULT '[]'::jsonb
+      `);
+      console.log("✅ Добавлена колонка clickable_areas");
+    }
+
+    if (!hasHighlightAreas) {
+      await query(`
+        ALTER TABLE tv_interfaces
+        ADD COLUMN highlight_areas JSONB NOT NULL DEFAULT '[]'::jsonb
+      `);
+      console.log("✅ Добавлена колонка highlight_areas");
+    }
+
+    if (hasClickableAreas && hasHighlightAreas) {
+      console.log("✅ Все необходимые колонки уже существуют");
+    }
+
+    console.log("🎉 Схема tv_interfaces исправлена");
+    return true;
+  } catch (error) {
+    console.error("❌ Ошибка исправления схемы tv_interfaces:", error.message);
+    throw error;
+  }
+}
+
 // Функция получения статистики базы данных
 export async function getDatabaseStats() {
   try {
@@ -343,7 +388,7 @@ export async function cleanupOldData(daysToKeep = 90) {
     console.log(`✅ Удалено сессий: ${sessionsResult.rowCount}`);
     console.log(`✅ Удалено логов: ${logsResult.rowCount}`);
 
-    // Обновляем статистику
+    // О��новляем статистику
     await query("ANALYZE");
 
     return {
@@ -418,7 +463,7 @@ export async function searchText(
   }
 }
 
-// Экспорт pool для прямого использования в с��учае необходимости
+// Экспорт pool для прямого использования в с����чае необходимости
 export { pool };
 
 export default {
