@@ -49,7 +49,8 @@ class BaseModel {
       is_active: data.is_active !== undefined ? data.is_active : true,
     };
 
-    return prepared;
+    // Конвертируем объекты и массивы в JSON строки для PostgreSQL JSONB полей
+    return this.serializeJsonFields(prepared);
   }
 
   /**
@@ -61,7 +62,7 @@ class BaseModel {
       updated_at: this.createTimestamp(),
     };
 
-    // Удаляем поля, которые нельзя обновлять
+    // Удаляем поля, которые нельзя об��овлять
     delete prepared.id;
     delete prepared.created_at;
 
@@ -204,7 +205,7 @@ class BaseModel {
       return result.rows[0];
     } catch (error) {
       console.error(
-        `Ошибка создания записи в ${this.tableName}:`,
+        `Ошибка с��здания записи в ${this.tableName}:`,
         error.message,
       );
       throw error;
