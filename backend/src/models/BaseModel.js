@@ -330,9 +330,17 @@ class BaseModel {
       }
 
       if (filters.status) {
-        conditions.push(`status = $${paramIndex}`);
-        values.push(filters.status);
-        paramIndex++;
+        if (Array.isArray(filters.status)) {
+          // Поддержка массива статусов
+          const placeholders = filters.status.map(() => `$${paramIndex++}`);
+          conditions.push(`status IN (${placeholders.join(', ')})`);
+          values.push(...filters.status);
+        } else {
+          // Одиночный статус
+          conditions.push(`status = $${paramIndex}`);
+          values.push(filters.status);
+          paramIndex++;
+        }
       }
 
       if (conditions.length > 0) {
