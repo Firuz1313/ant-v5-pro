@@ -98,7 +98,7 @@ const DeviceManager = () => {
     },
     {
       value: "from-green-500 to-green-600",
-      label: "Зеленый",
+      label: "Зе��еный",
       preview: "bg-green-500",
     },
     {
@@ -157,8 +157,9 @@ const DeviceManager = () => {
 
   const handleCreate = async () => {
     try {
-      // Generate a unique ID based on brand and name
-      const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, '-')}-${formData.name.toLowerCase().replace(/\s+/g, '-')}`;
+      // Generate a unique ID based on brand and name with timestamp
+      const timestamp = Date.now();
+      const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, '-')}-${formData.name.toLowerCase().replace(/\s+/g, '-')}-${timestamp}`;
 
       // Prepare device data, excluding empty URLs
       const deviceData = {
@@ -696,7 +697,7 @@ const DeviceManager = () => {
               Приставки не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменить поисковый запрос или создайте новую приставку.
+              Попробуйте изменить поисковый запро�� или создайте новую приставку.
             </p>
           </CardContent>
         </Card>
