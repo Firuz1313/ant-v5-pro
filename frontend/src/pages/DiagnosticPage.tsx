@@ -55,8 +55,8 @@ const DiagnosticPage = () => {
         setLoading(true);
 
         // Load steps for the problem
-        const stepsResponse = await stepsApi.getByProblem(problemId);
-        setSteps(stepsResponse || []);
+        const stepsResponse = await stepsApi.getStepsByProblem(problemId);
+        setSteps(stepsResponse?.data || []);
 
         // Load default remote for device
         try {
