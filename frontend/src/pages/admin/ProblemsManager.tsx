@@ -254,7 +254,7 @@ const ProblemsManager = () => {
     }
 
     if (!formData.deviceId) {
-      alert("Пожалуйста, выберите приставку");
+      alert("Пожалуйста, выберите прист��вку");
       return;
     }
 
@@ -293,7 +293,7 @@ const ProblemsManager = () => {
       alert("Проблема успешно создана!");
     } catch (error) {
       console.error("❌ Ошибка при создании проблемы:", error);
-      console.error("❌ Детали ошибки:", {
+      console.error("❌ Дет��ли ошибки:", {
         message: (error as any)?.message,
         response: (error as any)?.response,
         stack: (error as any)?.stack,
@@ -498,7 +498,7 @@ const ProblemsManager = () => {
           <Button
             variant="outline"
             onClick={() => {
-              console.log("🧪 Тестирование API создания проблемы");
+              console.log("🧪 Тест��рование API создания проблемы");
 
               // Генерируем действительно уникальный ID
               const timestamp = Date.now();
@@ -988,15 +988,13 @@ const ProblemsManager = () => {
                         <Download className="h-4 w-4 mr-2" />
                         Экспортировать
                       </DropdownMenuItem>
-                      {stepsCount === 0 && (
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(problem.id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Удалить
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem
+                        onClick={() => handleDelete(problem.id)}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Удалить навсегда
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -1022,7 +1020,7 @@ const ProblemsManager = () => {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Выберите приставку" />
+                  <SelectValue placeholder="Выберите прис��авку" />
                 </SelectTrigger>
                 <SelectContent>
                   {getActiveDevices().map((device) => (
@@ -1165,7 +1163,7 @@ const ProblemsManager = () => {
               Пр��блемы не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменить фильтры поиска или создайт�� новую проблему.
+              Попробуйте измени��ь фильтры поиска или создайт�� новую проблему.
             </p>
           </CardContent>
         </Card>
