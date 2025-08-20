@@ -8,7 +8,7 @@
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
-import { query, testConnection, getDatabaseStats } from '../src/utils/database.js';
+import { query, testConnection } from '../src/utils/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -78,7 +78,7 @@ async function checkTablesExist() {
     const tables = result.rows.map(row => row.table_name);
     return tables;
   } catch (error) {
-    log.error(`Ошибка проверки таблиц: ${error.message}`);
+    log.error(`Ошибка пров��рки таблиц: ${error.message}`);
     return [];
   }
 }
@@ -191,7 +191,7 @@ async function initializeDatabase() {
         log.info(`  ${table}: ${count} записей`);
       });
       
-      // ��сли данных мало, заполняем
+      // Если данных мало, заполняем
       if (dataCounts.devices < 5 || dataCounts.problems < 10) {
         log.warn('Недостаточно данных, заполняем...');
         await seedDatabase();
