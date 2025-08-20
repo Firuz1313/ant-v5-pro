@@ -6,141 +6,19 @@ import {
   TVInterfaceApiResponse,
   TVInterfaceListResponse,
 } from "@/types/tvInterface";
+import { apiClient, handleApiError } from "./client";
 
-// Базовый URL для API
-const API_BASE_URL = "/api/v1/tv-interfaces";
-
-// Функция для повторных попыток
-const withRetry = async <T>(
-  fn: () => Promise<T>,
-  maxRetries: number = 3,
-  delay: number = 1000,
-): Promise<T> => {
-  let lastError: Error;
-
-  for (let attempt = 1; attempt <= maxRetries; attempt++) {
-    try {
-      return await fn();
-    } catch (error) {
-      lastError = error as Error;
-
-      // Если это сетевая ошибка и не последняя попытка, повторяем
-      if (
-        error instanceof TypeError &&
-        error.message.includes("Failed to fetch") &&
-        attempt < maxRetries
-      ) {
-        console.warn(
-          `🔄 Retry attempt ${attempt}/${maxRetries} after ${delay}ms delay...`,
-        );
-        await new Promise((resolve) => setTimeout(resolve, delay * attempt));
-        continue;
-      }
-
-      // Если это не сетевая ошибка или последняя попытка, прекращаем
-      throw error;
-    }
-  }
-
-  throw lastError!;
-};
-
-// Helper функция для HTTP запросов
-const apiRequest = async <T>(
-  endpoint: string,
-  options: RequestInit = {},
-): Promise<T> => {
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  const defaultOptions: RequestInit = {
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    timeout: 30000, // 30 секунд
-    ...options,
-  };
-
-  try {
-    // Добавляем отладочную информацию
-    console.log(`🔄 API Request: ${options.method || "GET"} ${url}`);
-
-    const response = await fetch(url, defaultOptions);
-
-    console.log(`✅ API Response: ${response.status} for ${url}`);
-
-    if (!response.ok) {
-      let errorData: any = {};
-      try {
-        errorData = await response.json();
-      } catch {
-        errorData = {
-          error: `HTTP ${response.status}: ${response.statusText}`,
-        };
-      }
-
-      const errorMessage =
-        errorData.error ||
-        errorData.message ||
-        `HTTP error! status: ${response.status} (${response.statusText})`;
-      console.error(`❌ API Error: ${errorMessage} for ${url}`);
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    console.log(`📦 API Data received for ${url}:`, {
-      size: JSON.stringify(data).length,
-    });
-    return data;
-  } catch (error) {
-    if (
-      error instanceof TypeError &&
-      error.message.includes("Failed to fetch")
-    ) {
-      console.error(`🌐 Network Error for ${url}:`, {
-        message: error.message,
-        name: error.name,
-        stack: error.stack,
-        url,
-        options: defaultOptions,
-      });
-      throw new Error(
-        `Сетевая ошибка: Не удается подключиться к серверу. Проверьте интернет-соединение.`,
-      );
-    }
-
-    console.error(`💥 API Request failed for ${url}:`, {
-      error: error.message,
-      type: error.constructor.name,
-      url,
-      options: defaultOptions,
-    });
-    throw error;
-  }
-};
-
-// Построение query параметров
-const buildQueryParams = (params: Record<string, any>): string => {
-  const searchParams = new URLSearchParams();
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      searchParams.append(key, String(value));
-    }
-  });
-
-  const queryString = searchParams.toString();
-  return queryString ? `?${queryString}` : "";
-};
+// API endpoint base
+const API_ENDPOINT = "/v1/tv-interfaces";
 
 // TV Interface API service
 export const tvInterfacesAPI = {
   // Получить все TV интерфейсы
   async getAll(filters?: TVInterfaceFilters): Promise<TVInterfaceListResponse> {
     try {
-      const queryParams = buildQueryParams(filters || {});
-      const response = await withRetry(() =>
-        apiRequest<TVInterfaceListResponse>(`${queryParams}`),
+      const response = await apiClient.get<TVInterfaceListResponse>(
+        API_ENDPOINT,
+        { params: filters },
       );
 
       return {
@@ -150,10 +28,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке TV интерфейсов",
+        error: handleApiError(error),
       };
     }
   },
@@ -168,7 +43,9 @@ export const tvInterfacesAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceApiResponse>(`/${id}`);
+      const response = await apiClient.get<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+      );
 
       return {
         success: true,
@@ -177,10 +54,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -195,8 +69,8 @@ export const tvInterfacesAPI = {
         };
       }
 
-      const response = await withRetry(() =>
-        apiRequest<TVInterfaceListResponse>(`/device/${deviceId}`),
+      const response = await apiClient.get<TVInterfaceListResponse>(
+        `${API_ENDPOINT}/device/${deviceId}`,
       );
 
       return {
@@ -206,10 +80,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке TV интерфейсов для устройства",
+        error: handleApiError(error),
       };
     }
   },
@@ -250,10 +121,10 @@ export const tvInterfacesAPI = {
         highlight_areas: data.highlightAreas || [],
       };
 
-      const response = await apiRequest<TVInterfaceApiResponse>("", {
-        method: "POST",
-        body: JSON.stringify(requestData),
-      });
+      const response = await apiClient.post<TVInterfaceApiResponse>(
+        API_ENDPOINT,
+        requestData,
+      );
 
       return {
         success: true,
@@ -263,10 +134,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при создании TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -300,10 +168,10 @@ export const tvInterfacesAPI = {
         requestData.highlight_areas = data.highlightAreas;
       if (data.isActive !== undefined) requestData.is_active = data.isActive;
 
-      const response = await apiRequest<TVInterfaceApiResponse>(`/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(requestData),
-      });
+      const response = await apiClient.put<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+        requestData,
+      );
 
       return {
         success: true,
@@ -313,10 +181,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при обновлении TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -331,9 +196,9 @@ export const tvInterfacesAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceApiResponse>(`/${id}`, {
-        method: "DELETE",
-      });
+      const response = await apiClient.delete<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+      );
 
       return {
         success: true,
@@ -342,10 +207,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при удалении TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -360,25 +222,19 @@ export const tvInterfacesAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceApiResponse>(
-        `/${id}/toggle`,
-        {
-          method: "PATCH",
-        },
+      const response = await apiClient.patch<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/${id}/toggle`,
       );
 
       return {
         success: true,
         data: response.data,
-        message: response.message || "Статус TV интерфейса изменен",
+        message: response.message || "Статус TV интерфейс�� изменен",
       };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при изменении статуса TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -398,12 +254,9 @@ export const tvInterfacesAPI = {
 
       const requestData = newName ? { name: newName } : {};
 
-      const response = await apiRequest<TVInterfaceApiResponse>(
-        `/${id}/duplicate`,
-        {
-          method: "POST",
-          body: JSON.stringify(requestData),
-        },
+      const response = await apiClient.post<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/${id}/duplicate`,
+        requestData,
       );
 
       return {
@@ -414,10 +267,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при дублировании TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -425,7 +275,9 @@ export const tvInterfacesAPI = {
   // Получить статистику TV интерфейсов
   async getStats(): Promise<TVInterfaceApiResponse> {
     try {
-      const response = await apiRequest<TVInterfaceApiResponse>("/stats");
+      const response = await apiClient.get<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/stats`,
+      );
 
       return {
         success: true,
@@ -434,10 +286,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при получении статистики TV интерфейсов",
+        error: handleApiError(error),
       };
     }
   },
@@ -452,8 +301,8 @@ export const tvInterfacesAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceApiResponse>(
-        `/${id}/export`,
+      const response = await apiClient.get<TVInterfaceApiResponse>(
+        `${API_ENDPOINT}/${id}/export`,
       );
 
       return {
@@ -464,10 +313,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при экспорте TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },

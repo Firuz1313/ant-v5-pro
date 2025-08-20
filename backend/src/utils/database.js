@@ -115,7 +115,7 @@ export async function testConnection() {
   }
 }
 
-// Функция выполнения запроса с логированием
+// Функция выполнения запрос�� с логированием
 export async function query(text, params = []) {
   const start = Date.now();
   let client;
@@ -243,7 +243,7 @@ export async function runMigrations() {
 
     for (const filename of migrationFiles) {
       if (executedMigrations.has(filename)) {
-        console.log(`⏭️  Миграция ${filename} уже выполне��а, пропускаем`);
+        console.log(`⏭️  Миграция ${filename} уже выполне��а, пропускае��`);
         continue;
       }
 
@@ -276,24 +276,21 @@ export async function runMigrations() {
 export async function getDatabaseStats() {
   try {
     const stats = await query(`
-      SELECT 
+      SELECT
         schemaname,
-        tablename,
+        relname as table_name,
         n_tup_ins as inserts,
         n_tup_upd as updates,
         n_tup_del as deletes,
-        n_live_tup as live_rows,
+        n_live_tup as row_count,
         n_dead_tup as dead_rows
-      FROM pg_stat_user_tables 
+      FROM pg_stat_user_tables
       ORDER BY n_live_tup DESC
     `);
 
-    const dbSize = await query(
-      `
-      SELECT pg_size_pretty(pg_database_size($1)) as size
-    `,
-      [dbConfig.database],
-    );
+    const dbSize = await query(`
+      SELECT pg_size_pretty(pg_database_size(current_database())) as size
+    `);
 
     return {
       tables: stats.rows,

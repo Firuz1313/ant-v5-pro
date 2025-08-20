@@ -1,7 +1,8 @@
 // TV Interface Marks API Client
+import { apiClient, handleApiError } from "./client";
 
-// Base API URL
-const API_BASE_URL = "/api/v1/tv-interface-marks";
+// API endpoint base
+const API_ENDPOINT = "/v1/tv-interface-marks";
 
 // Types
 export interface TVInterfaceMark {
@@ -48,8 +49,8 @@ export interface CreateTVInterfaceMarkData {
   step_id?: string;
   name: string;
   description?: string;
-  mark_type?: "point" | "zone" | "area";
-  shape?: "circle" | "rectangle" | "polygon" | "ellipse";
+  mark_type: "point" | "zone" | "area";
+  shape: "circle" | "rectangle" | "polygon" | "ellipse";
   position: { x: number; y: number };
   size?: { width: number; height: number };
   coordinates?: { x: number; y: number }[];
@@ -73,20 +74,59 @@ export interface CreateTVInterfaceMarkData {
   animation_delay?: number;
   display_order?: number;
   priority?: "low" | "normal" | "high" | "critical";
+  is_active?: boolean;
+  is_visible?: boolean;
   metadata?: Record<string, any>;
   tags?: string[];
 }
 
-export interface UpdateTVInterfaceMarkData extends Partial<CreateTVInterfaceMarkData> {
+export interface UpdateTVInterfaceMarkData {
+  name?: string;
+  description?: string;
+  mark_type?: "point" | "zone" | "area";
+  shape?: "circle" | "rectangle" | "polygon" | "ellipse";
+  position?: { x: number; y: number };
+  size?: { width: number; height: number };
+  coordinates?: { x: number; y: number }[];
+  color?: string;
+  background_color?: string;
+  border_color?: string;
+  border_width?: number;
+  opacity?: number;
+  is_clickable?: boolean;
+  is_highlightable?: boolean;
+  click_action?: string;
+  hover_action?: string;
+  action_value?: string;
+  action_description?: string;
+  expected_result?: string;
+  hint_text?: string;
+  tooltip_text?: string;
+  warning_text?: string;
+  animation?: "pulse" | "glow" | "bounce" | "shake" | "fade" | "blink" | "none";
+  animation_duration?: number;
+  animation_delay?: number;
+  display_order?: number;
+  priority?: "low" | "normal" | "high" | "critical";
   is_active?: boolean;
   is_visible?: boolean;
+  metadata?: Record<string, any>;
+  tags?: string[];
 }
 
 export interface TVInterfaceMarkFilters {
+  tv_interface_id?: string;
+  step_id?: string;
+  mark_type?: string;
+  shape?: string;
+  is_clickable?: boolean;
+  is_highlightable?: boolean;
   is_active?: boolean;
   is_visible?: boolean;
-  mark_type?: "point" | "zone" | "area";
-  step_id?: string;
+  priority?: string;
+  search?: string;
+  limit?: number;
+  offset?: number;
 }
 
 export interface TVInterfaceMarkApiResponse {
@@ -122,68 +162,6 @@ export interface TVInterfaceMarkStatsResponse {
   timestamp?: string;
 }
 
-// Helper function for HTTP requests
-const apiRequest = async <T>(
-  endpoint: string,
-  options: RequestInit = {},
-): Promise<T> => {
-  const url = `${API_BASE_URL}${endpoint}`;
-
-  const defaultOptions: RequestInit = {
-    headers: {
-      "Content-Type": "application/json",
-      ...options.headers,
-    },
-    ...options,
-  };
-
-  try {
-    console.log(`🔄 API Request: ${options.method || "GET"} ${url}`);
-
-    const response = await fetch(url, defaultOptions);
-
-    console.log(`✅ API Response: ${response.status} for ${url}`);
-
-    if (!response.ok) {
-      let errorData: any = {};
-      try {
-        errorData = await response.json();
-      } catch {
-        errorData = {
-          error: `HTTP ${response.status}: ${response.statusText}`,
-        };
-      }
-
-      const errorMessage =
-        errorData.error ||
-        errorData.message ||
-        `HTTP error! status: ${response.status}`;
-      console.error(`❌ API Error: ${errorMessage} for ${url}`);
-      throw new Error(errorMessage);
-    }
-
-    const data = await response.json();
-    return data;
-  } catch (error) {
-    console.error(`💥 API Request failed for ${url}:`, error);
-    throw error;
-  }
-};
-
-// Build query parameters
-const buildQueryParams = (params: Record<string, any>): string => {
-  const searchParams = new URLSearchParams();
-
-  Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== "") {
-      searchParams.append(key, String(value));
-    }
-  });
-
-  const queryString = searchParams.toString();
-  return queryString ? `?${queryString}` : "";
-};
-
 // TV Interface Marks API service
 export const tvInterfaceMarksAPI = {
   // Get marks by TV interface ID
@@ -192,9 +170,9 @@ export const tvInterfaceMarksAPI = {
     filters?: TVInterfaceMarkFilters,
   ): Promise<TVInterfaceMarkListResponse> {
     try {
-      const queryParams = buildQueryParams(filters || {});
-      const response = await apiRequest<TVInterfaceMarkListResponse>(
-        `/tv-interface/${tvInterfaceId}${queryParams}`,
+      const response = await apiClient.get<TVInterfaceMarkListResponse>(
+        `${API_ENDPOINT}/tv-interface/${tvInterfaceId}`,
+        { params: filters },
       );
 
       return {
@@ -204,10 +182,7 @@ export const tvInterfaceMarksAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке отметок TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -215,8 +190,8 @@ export const tvInterfaceMarksAPI = {
   // Get marks by step ID
   async getByStepId(stepId: string): Promise<TVInterfaceMarkListResponse> {
     try {
-      const response = await apiRequest<TVInterfaceMarkListResponse>(
-        `/step/${stepId}`,
+      const response = await apiClient.get<TVInterfaceMarkListResponse>(
+        `${API_ENDPOINT}/step/${stepId}`,
       );
 
       return {
@@ -226,10 +201,7 @@ export const tvInterfaceMarksAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке отметок шага",
+        error: handleApiError(error),
       };
     }
   },
@@ -244,7 +216,9 @@ export const tvInterfaceMarksAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceMarkApiResponse>(`/${id}`);
+      const response = await apiClient.get<TVInterfaceMarkApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+      );
 
       return {
         success: true,
@@ -253,22 +227,20 @@ export const tvInterfaceMarksAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при загрузке отметки",
+        error: handleApiError(error),
       };
     }
   },
 
   // Create new mark
-  async create(data: CreateTVInterfaceMarkData): Promise<TVInterfaceMarkApiResponse> {
+  async create(
+    data: CreateTVInterfaceMarkData,
+  ): Promise<TVInterfaceMarkApiResponse> {
     try {
-      // Frontend validation
       if (!data.tv_interface_id) {
         return {
           success: false,
-          error: "ID TV интерфейса обязателен",
+          error: "TV интерфейс обязателен",
         };
       }
 
@@ -279,17 +251,17 @@ export const tvInterfaceMarksAPI = {
         };
       }
 
-      if (!data.position || typeof data.position !== "object") {
+      if (!data.position) {
         return {
           success: false,
           error: "Позиция отметки обязательна",
         };
       }
 
-      const response = await apiRequest<TVInterfaceMarkApiResponse>("", {
-        method: "POST",
-        body: JSON.stringify(data),
-      });
+      const response = await apiClient.post<TVInterfaceMarkApiResponse>(
+        API_ENDPOINT,
+        data,
+      );
 
       return {
         success: true,
@@ -299,10 +271,7 @@ export const tvInterfaceMarksAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при создании отметки",
+        error: handleApiError(error),
       };
     }
   },
@@ -320,10 +289,10 @@ export const tvInterfaceMarksAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceMarkApiResponse>(`/${id}`, {
-        method: "PUT",
-        body: JSON.stringify(data),
-      });
+      const response = await apiClient.put<TVInterfaceMarkApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+        data,
+      );
 
       return {
         success: true,
@@ -333,10 +302,7 @@ export const tvInterfaceMarksAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при обновлении отметки",
+        error: handleApiError(error),
       };
     }
   },
@@ -351,9 +317,9 @@ export const tvInterfaceMarksAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceMarkApiResponse>(`/${id}`, {
-        method: "DELETE",
-      });
+      const response = await apiClient.delete<TVInterfaceMarkApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+      );
 
       return {
         success: true,
@@ -362,43 +328,35 @@ export const tvInterfaceMarksAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при удалении отметки",
+        error: handleApiError(error),
       };
     }
   },
 
   // Delete all marks for TV interface
-  async deleteByTVInterfaceId(tvInterfaceId: string): Promise<TVInterfaceMarkApiResponse> {
+  async deleteByTVInterfaceId(
+    tvInterfaceId: string,
+  ): Promise<TVInterfaceMarkApiResponse> {
     try {
       if (!tvInterfaceId) {
         return {
           success: false,
-          error: "ID TV интерф��йса обязателен",
+          error: "ID TV интерфейса обязателен",
         };
       }
 
-      const response = await apiRequest<TVInterfaceMarkApiResponse>(
-        `/tv-interface/${tvInterfaceId}`,
-        {
-          method: "DELETE",
-        },
+      const response = await apiClient.delete<TVInterfaceMarkApiResponse>(
+        `${API_ENDPOINT}/tv-interface/${tvInterfaceId}`,
       );
 
       return {
         success: true,
-        data: response.data,
-        message: response.message || "Отметки TV интерфейса удалены",
+        message: response.message || "Отметки TV интерфейса успешно удалены",
       };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при удалении отметок TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
@@ -413,31 +371,24 @@ export const tvInterfaceMarksAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceMarkApiResponse>(
-        `/step/${stepId}`,
-        {
-          method: "DELETE",
-        },
+      const response = await apiClient.delete<TVInterfaceMarkApiResponse>(
+        `${API_ENDPOINT}/step/${stepId}`,
       );
 
       return {
         success: true,
-        data: response.data,
-        message: response.message || "Отметки шага удалены",
+        message: response.message || "Отметки шага успешно удалены",
       };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при удалении отметок шага",
+        error: handleApiError(error),
       };
     }
   },
 
-  // Reorder marks
-  async reorder(
+  // Reorder marks for TV interface
+  async reorderMarks(
     tvInterfaceId: string,
     markIds: string[],
   ): Promise<TVInterfaceMarkApiResponse> {
@@ -449,32 +400,27 @@ export const tvInterfaceMarksAPI = {
         };
       }
 
-      if (!Array.isArray(markIds)) {
+      if (!Array.isArray(markIds) || markIds.length === 0) {
         return {
           success: false,
-          error: "Массив ID отметок обязателен",
+          error: "Список ID отметок обязателен",
         };
       }
 
-      const response = await apiRequest<TVInterfaceMarkApiResponse>(
-        `/tv-interface/${tvInterfaceId}/reorder`,
-        {
-          method: "PUT",
-          body: JSON.stringify({ mark_ids: markIds }),
-        },
+      const response = await apiClient.put<TVInterfaceMarkApiResponse>(
+        `${API_ENDPOINT}/tv-interface/${tvInterfaceId}/reorder`,
+        { markIds },
       );
 
       return {
         success: true,
-        message: response.message || "Порядок отметок обновлен",
+        data: response.data,
+        message: response.message || "Порядок отметок успешно изменен",
       };
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при изменении порядка отметок",
+        error: handleApiError(error),
       };
     }
   },
@@ -482,7 +428,9 @@ export const tvInterfaceMarksAPI = {
   // Get marks statistics
   async getStats(): Promise<TVInterfaceMarkStatsResponse> {
     try {
-      const response = await apiRequest<TVInterfaceMarkStatsResponse>("/stats");
+      const response = await apiClient.get<TVInterfaceMarkStatsResponse>(
+        `${API_ENDPOINT}/stats`,
+      );
 
       return {
         success: true,
@@ -491,10 +439,7 @@ export const tvInterfaceMarksAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при получении статистики отметок",
+        error: handleApiError(error),
       };
     }
   },

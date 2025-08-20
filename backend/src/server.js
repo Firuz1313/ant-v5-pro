@@ -90,7 +90,10 @@ if (process.env.COMPRESSION_ENABLED !== "false") {
 // Rate limiting
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 минут
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100, // максимум 100 запросов на IP
+  max:
+    NODE_ENV === "development" || process.env.FLY_APP_NAME
+      ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 10000 // 10000 запросов для разработки и облачных сред
+      : parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000, // 1000 для продакшена
   message: {
     error: "Слишком много запросов с этого IP, попробуйте позже.",
     retryAfter: Math.ceil(
@@ -99,6 +102,29 @@ const limiter = rateLimit({
   },
   standardHeaders: true,
   legacyHeaders: false,
+  skip: (req, res) => {
+    // Пропускаем rate limiting для локальных IP в разработке
+    if (NODE_ENV === "development") {
+      const ip = req.ip || req.connection.remoteAddress;
+      if (ip === "127.0.0.1" || ip === "::1" || ip?.includes("localhost")) {
+        return true;
+      }
+    }
+
+    // Пропускаем rate limiting для облачных proxy IP
+    if (process.env.FLY_APP_NAME || NODE_ENV === "development") {
+      const clientIP =
+        req.headers["fly-client-ip"] ||
+        req.headers["x-forwarded-for"] ||
+        req.ip;
+      console.log(
+        `📊 Rate limit check - Client IP: ${clientIP}, Skipping: true`,
+      );
+      return true;
+    }
+
+    return false;
+  },
 });
 
 app.use("/api/", limiter);
@@ -149,7 +175,7 @@ app.use("/api", apiRoutes);
 app.use("/api/*", (req, res) => {
   res.status(404).json({
     success: false,
-    error: "API endpoint не найден",
+    error: "API endpoint не най��ен",
     message: `Маршрут ${req.method} ${req.path} не существует`,
     availableEndpoints: "/api/v1",
   });

@@ -6,7 +6,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 CREATE EXTENSION IF NOT EXISTS "pg_trgm";
 
 -- 1. Таблица устройств (ТВ-приставки)
-CREATE TABLE devices (
+CREATE TABLE IF NOT EXISTS devices (
     id VARCHAR(255) PRIMARY KEY,
     name VARCHAR(255) NOT NULL,
     brand VARCHAR(255) NOT NULL,
@@ -24,7 +24,7 @@ CREATE TABLE devices (
 );
 
 -- 2. Таблица пультов дистанционного управления
-CREATE TABLE remotes (
+CREATE TABLE IF NOT EXISTS remotes (
     id VARCHAR(255) PRIMARY KEY,
     device_id VARCHAR(255) REFERENCES devices(id) ON DELETE SET NULL,
     name VARCHAR(255) NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE remotes (
 );
 
 -- 3. Таблица ТВ интерфейсов
-CREATE TABLE tv_interfaces (
+CREATE TABLE IF NOT EXISTS tv_interfaces (
     id VARCHAR(255) PRIMARY KEY,
     device_id VARCHAR(255) REFERENCES devices(id) ON DELETE SET NULL,
     name VARCHAR(255) NOT NULL,
@@ -69,7 +69,7 @@ CREATE TABLE tv_interfaces (
 );
 
 -- 4. Таблица проблем
-CREATE TABLE problems (
+CREATE TABLE IF NOT EXISTS problems (
     id VARCHAR(255) PRIMARY KEY,
     device_id VARCHAR(255) NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
     title VARCHAR(500) NOT NULL,
@@ -91,7 +91,7 @@ CREATE TABLE problems (
 );
 
 -- 5. Таблица диагностических шагов
-CREATE TABLE diagnostic_steps (
+CREATE TABLE IF NOT EXISTS diagnostic_steps (
     id VARCHAR(255) PRIMARY KEY,
     problem_id VARCHAR(255) NOT NULL REFERENCES problems(id) ON DELETE CASCADE,
     device_id VARCHAR(255) NOT NULL REFERENCES devices(id) ON DELETE CASCADE,
@@ -137,7 +137,7 @@ CREATE TABLE diagnostic_steps (
 );
 
 -- 6. Таблица пользователей
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
     id VARCHAR(255) PRIMARY KEY,
     username VARCHAR(255) UNIQUE NOT NULL,
     email VARCHAR(320) UNIQUE NOT NULL,
@@ -157,7 +157,7 @@ CREATE TABLE users (
 );
 
 -- 7. Таблица диагностических сессий
-CREATE TABLE diagnostic_sessions (
+CREATE TABLE IF NOT EXISTS diagnostic_sessions (
     id VARCHAR(255) PRIMARY KEY,
     device_id VARCHAR(255) NOT NULL REFERENCES devices(id),
     problem_id VARCHAR(255) NOT NULL REFERENCES problems(id),
@@ -180,7 +180,7 @@ CREATE TABLE diagnostic_sessions (
 );
 
 -- 8. Таблица выполненных шагов в сессии
-CREATE TABLE session_steps (
+CREATE TABLE IF NOT EXISTS session_steps (
     id VARCHAR(255) PRIMARY KEY,
     session_id VARCHAR(255) NOT NULL REFERENCES diagnostic_sessions(id) ON DELETE CASCADE,
     step_id VARCHAR(255) NOT NULL REFERENCES diagnostic_steps(id) ON DELETE CASCADE,
@@ -198,7 +198,7 @@ CREATE TABLE session_steps (
 );
 
 -- 9. Таблица действий шагов
-CREATE TABLE step_actions (
+CREATE TABLE IF NOT EXISTS step_actions (
     id VARCHAR(255) PRIMARY KEY,
     step_id VARCHAR(255) NOT NULL REFERENCES diagnostic_steps(id) ON DELETE CASCADE,
     type VARCHAR(50) NOT NULL CHECK (type IN ('button_press', 'navigation', 'wait', 'check', 'input', 'selection', 'confirmation', 'custom')),
@@ -221,7 +221,7 @@ CREATE TABLE step_actions (
 );
 
 -- 10. Таблица журнала изменений
-CREATE TABLE change_logs (
+CREATE TABLE IF NOT EXISTS change_logs (
     id VARCHAR(255) PRIMARY KEY,
     entity_type VARCHAR(50) NOT NULL CHECK (entity_type IN ('device', 'problem', 'step', 'remote', 'tv_interface', 'user', 'session')),
     entity_id VARCHAR(255) NOT NULL,
@@ -239,7 +239,7 @@ CREATE TABLE change_logs (
 );
 
 -- 11. Таблица настроек сайта
-CREATE TABLE site_settings (
+CREATE TABLE IF NOT EXISTS site_settings (
     id VARCHAR(255) PRIMARY KEY DEFAULT 'settings',
     site_name VARCHAR(255) NOT NULL DEFAULT 'ANT Support',
     site_description TEXT,
@@ -315,4 +315,4 @@ COMMENT ON TABLE step_actions IS 'Детализированные действ�
 COMMENT ON TABLE change_logs IS 'Журнал всех изменений в системе';
 COMMENT ON TABLE site_settings IS 'Глобальные настройки системы';
 
-PRINT 'Migration 001: Основные таблицы созданы успешно';
+-- Migration 001: Основные таблицы созданы успешно

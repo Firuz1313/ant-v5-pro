@@ -17,13 +17,17 @@ import { useProblems } from "@/hooks/useProblems";
 
 const DeviceSelection = () => {
   const navigate = useNavigate();
-  const { data: devices = [] } = useDevices();
-  const { data: problems = [] } = useProblems();
+  const { data: devicesResponse } = useDevices();
+  const { data: problemsResponse } = useProblems();
   const [animatedIcons, setAnimatedIcons] = useState<boolean[]>([]);
+
+  // Извлекаем массивы данных из ответа API
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   // Helper function to get problems count for device
   const getProblemsForDevice = (deviceId: string) => {
-    return problems.filter((p: any) => p.deviceId === deviceId);
+    return problems.filter((p: any) => p.device_id === deviceId);
   };
 
   useEffect(() => {

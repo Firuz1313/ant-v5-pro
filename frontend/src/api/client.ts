@@ -29,6 +29,7 @@ export class ApiClient {
   private baseUrl: string;
   private timeout: number;
   private defaultHeaders: Record<string, string>;
+  private activeRequests: Map<string, Promise<any>> = new Map();
 
   constructor(config: ApiClientConfig) {
     this.baseUrl = config.baseUrl.replace(/\/$/, "");
@@ -79,11 +80,25 @@ export class ApiClient {
   private async makeRequest<T>(
     endpoint: string,
     options: RequestOptions = {},
+    retryCount = 0,
   ): Promise<T> {
     const { params, timeout = this.timeout, ...fetchOptions } = options;
 
     const url = this.buildUrl(endpoint, params);
-    console.log(`🚀 Making ${fetchOptions.method || "GET"} request to: ${url}`);
+    const method = fetchOptions.method || "GET";
+
+    // Create unique key for request deduplication (only for GET requests)
+    const requestKey = `${method}:${url}:${fetchOptions.body || ""}`;
+
+    // For GET requests, check if there's already a pending request
+    if (method === "GET" && this.activeRequests.has(requestKey)) {
+      console.log(`🔄 Deduplicating GET request to: ${url}`);
+      return this.activeRequests.get(requestKey) as Promise<T>;
+    }
+
+    console.log(
+      `🚀 Making ${method} request to: ${url}${retryCount > 0 ? ` (retry ${retryCount})` : ""}`,
+    );
 
     const headers = {
       ...this.defaultHeaders,
@@ -92,11 +107,46 @@ export class ApiClient {
 
     console.log(`📤 Request headers:`, headers);
     console.log(`📤 Request body:`, fetchOptions.body ? "Has body" : "No body");
-    console.log(`📤 Request method:`, fetchOptions.method || "GET");
+    console.log(`📤 Request method:`, method);
 
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), timeout);
 
+    // Create the actual request promise
+    const requestPromise = this.executeRequest<T>(
+      url,
+      fetchOptions,
+      headers,
+      controller,
+      timeoutId,
+      endpoint,
+      options,
+      retryCount,
+    );
+
+    // Store promise for GET requests to enable deduplication
+    if (method === "GET") {
+      this.activeRequests.set(requestKey, requestPromise);
+
+      // Clean up after request completes (success or failure)
+      requestPromise.finally(() => {
+        this.activeRequests.delete(requestKey);
+      });
+    }
+
+    return requestPromise;
+  }
+
+  private async executeRequest<T>(
+    url: string,
+    fetchOptions: RequestInit,
+    headers: Record<string, string>,
+    controller: AbortController,
+    timeoutId: NodeJS.Timeout,
+    endpoint: string,
+    options: RequestOptions,
+    retryCount: number,
+  ): Promise<T> {
     try {
       console.log(`📡 Sending fetch request...`);
       const response = await fetch(url, {
@@ -107,6 +157,16 @@ export class ApiClient {
 
       console.log(`📡 Fetch completed with status: ${response.status}`);
       clearTimeout(timeoutId);
+
+      // Handle 429 rate limiting with retry
+      if (response.status === 429 && retryCount < 3) {
+        const retryAfter = response.headers.get("Retry-After") || "2";
+        const delayMs = parseInt(retryAfter) * 1000;
+        console.log(`⏳ Rate limited, retrying after ${delayMs}ms...`);
+
+        await new Promise((resolve) => setTimeout(resolve, delayMs));
+        return this.makeRequest<T>(endpoint, options, retryCount + 1);
+      }
 
       // Ultra-simple approach: read response only once, immediately
       let responseData: any = null;

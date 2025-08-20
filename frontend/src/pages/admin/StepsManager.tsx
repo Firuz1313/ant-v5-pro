@@ -176,7 +176,7 @@ const StepFormFieldsComponent = React.memo(
               <SelectValue placeholder="Выберите интерфейс" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">Без и��терфейса</SelectItem>
+              <SelectItem value="none">Без и��терф��йса</SelectItem>
               {loadingTVInterfaces ? (
                 <SelectItem value="loading" disabled>
                   Загрузка...
@@ -299,8 +299,12 @@ interface DiagnosticStep {
 }
 
 const StepsManager = () => {
-  const { data: devices = [] } = useDevices();
-  const { data: problems = [] } = useProblems();
+  const { data: devicesResponse } = useDevices();
+  const { data: problemsResponse } = useProblems();
+
+  // Извлекаем массивы данных из ответа API
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   // Temporarily using empty arrays for removed static data
   const steps: DiagnosticStep[] = [];
@@ -311,15 +315,15 @@ const StepsManager = () => {
   const updateStep = async (id: string, data: any) => {};
   const deleteStep = async (id: string) => {};
   const reorderSteps = async (problemId: string, stepIds: string[]) => {};
-  const getActiveDevices = () => devices.filter((d: any) => d.isActive);
-  const getActiveRemotes = () => remotes.filter((r: any) => r.isActive);
+  const getActiveDevices = () => devices.filter((d: any) => d.is_active);
+  const getActiveRemotes = () => remotes.filter((r: any) => r.is_active);
   const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
   const getProblemsForDevice = (deviceId: string) =>
-    problems.filter((p: any) => p.deviceId === deviceId);
+    problems.filter((p: any) => p.device_id === deviceId);
   const getRemotesForDevice = (deviceId: string) =>
-    remotes.filter((r: any) => r.deviceId === deviceId);
+    remotes.filter((r: any) => r.device_id === deviceId);
   const getDefaultRemoteForDevice = (deviceId: string) =>
-    remotes.find((r: any) => r.deviceId === deviceId && r.isDefault);
+    remotes.find((r: any) => r.device_id === deviceId && r.is_default);
   const { toast } = useToast();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1223,7 +1227,7 @@ const StepsManager = () => {
                               onClick={() => openEditDialog(step)}
                             >
                               <Edit className="h-4 w-4 mr-2" />
-                              Редактировать
+                              Реда��тировать
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleToggleStatus(step.id)}

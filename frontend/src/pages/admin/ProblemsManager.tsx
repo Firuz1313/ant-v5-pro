@@ -78,14 +78,18 @@ interface Problem {
 }
 
 const ProblemsManager = () => {
-  const { data: devices = [] } = useDevices();
-  const { data: problems = [] } = useProblems();
+  const { data: devicesResponse } = useDevices();
+  const { data: problemsResponse } = useProblems();
+
+  // Извлекаем массивы данных из ответа API
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   // Mock functions for removed static functionality
   const createProblem = async (problem: any) => {};
   const updateProblem = async (id: string, data: any) => {};
   const deleteProblem = async (id: string) => {};
-  const getActiveDevices = () => devices.filter((d: any) => d.isActive);
+  const getActiveDevices = () => devices.filter((d: any) => d.is_active);
   const getStepsForProblem = (problemId: string) => [];
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
@@ -679,7 +683,7 @@ const ProblemsManager = () => {
                         onClick={() => handleDuplicate(problem)}
                       >
                         <Plus className="h-4 w-4 mr-2" />
-                        Дублировать
+                        Дубли��овать
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Download className="h-4 w-4 mr-2" />
