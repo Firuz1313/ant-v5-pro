@@ -357,29 +357,18 @@ const ProblemsManager = () => {
   };
 
   const handleDelete = async (problemId: string) => {
-    console.log(`🗑️ Delete requested for problem ID: ${problemId}`);
+    console.log(`🗑️ Hard delete requested for problem ID: ${problemId}`);
 
-    const stepsCount = getStepsForProblem(problemId).length;
-    console.log(`📊 Steps count for problem ${problemId}: ${stepsCount}`);
-
-    if (stepsCount > 0) {
-      console.log(`❌ Cannot delete problem with ${stepsCount} active steps`);
-      alert(
-        `Нельзя удалить проблему с ${stepsCount} активными шагами. Сначала удалите шаги.`,
-      );
-      return;
-    }
-
-    console.log(`✅ Steps validation passed, showing confirmation`);
-    if (!confirm("Вы уверены, что хотите удалить эту проблему?")) {
+    if (!confirm("Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы данных? Это действие нельзя отменить!")) {
       console.log(`❌ User cancelled deletion`);
       return;
     }
 
-    console.log(`🚀 Starting delete mutation for problem ${problemId}`);
+    console.log(`🚀 Starting hard delete mutation for problem ${problemId}`);
     try {
-      const result = await deleteProblemMutation.mutateAsync({ id: problemId });
-      console.log(`✅ Delete successful:`, result);
+      // force=true means hard delete (complete removal from database)
+      const result = await deleteProblemMutation.mutateAsync({ id: problemId, force: true });
+      console.log(`✅ Hard delete successful:`, result);
       console.log(`🔄 React Query should automatically invalidate and refetch problems list`);
 
     } catch (error) {
@@ -426,7 +415,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         alert(
-          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`,
+          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать сущес��вующую копию или создать новую проблему вручную.`,
         );
       } else {
         alert(
@@ -551,7 +540,7 @@ const ProblemsManager = () => {
                     );
                   } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
                     alert(
-                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
+                      `Не удалось создать тестову�� проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
                     );
                   } else {
                     alert(
