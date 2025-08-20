@@ -66,7 +66,8 @@ class BaseModel {
     delete prepared.id;
     delete prepared.created_at;
 
-    return prepared;
+    // Конвертируем объекты и массивы в JSON строки для PostgreSQL JSONB полей
+    return this.serializeJsonFields(prepared);
   }
 
   /**
@@ -133,7 +134,7 @@ class BaseModel {
         conditions.push(`status IN (${placeholders.join(", ")})`);
         values.push(...filters.status);
       } else {
-        // Одиночный статус
+        // Одино��ный статус
         conditions.push(`status = $${paramIndex}`);
         values.push(filters.status);
         paramIndex++;
