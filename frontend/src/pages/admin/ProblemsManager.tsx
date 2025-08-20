@@ -392,7 +392,7 @@ const ProblemsManager = () => {
       return;
 
     try {
-      // Удаляем все проб��емы по одной
+      // Удаляем все проблемы по одной
       for (const problem of problems) {
         await deleteProblemMutation.mutateAsync({ id: problem.id });
       }
@@ -417,6 +417,30 @@ const ProblemsManager = () => {
           </p>
         </div>
         <div className="flex space-x-2">
+          <Button
+            variant="outline"
+            onClick={() => {
+              console.log('🧪 Тестирование API создания проблемы');
+              const testData = {
+                deviceId: 'openbox',
+                title: 'Тестовая проблема ' + new Date().toLocaleTimeString(),
+                description: 'Описание тестовой проблемы',
+                category: 'critical' as any,
+                icon: 'AlertTriangle',
+                color: 'from-red-500 to-red-600',
+                priority: 1,
+                estimatedTime: 5,
+                difficulty: 'beginner' as any,
+                tags: [],
+                status: 'published' as any,
+              };
+              console.log('📦 Тестовые данные:', testData);
+              createProblemMutation.mutate(testData);
+            }}
+            className="text-blue-600 hover:text-blue-700 hover:bg-blue-50"
+          >
+            🧪 Тест API
+          </Button>
           <Button
             variant="outline"
             onClick={handleClearAllProblems}
@@ -813,7 +837,7 @@ const ProblemsManager = () => {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Выберите п��иставку" />
+                  <SelectValue placeholder="Выберите приставку" />
                 </SelectTrigger>
                 <SelectContent>
                   {getActiveDevices().map((device) => (
@@ -935,7 +959,7 @@ const ProblemsManager = () => {
                 variant="outline"
                 onClick={() => setIsEditDialogOpen(false)}
               >
-                Отмена
+                От��ена
               </Button>
               <Button
                 onClick={handleEdit}
