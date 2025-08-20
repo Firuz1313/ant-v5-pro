@@ -29,7 +29,7 @@ if (process.env.DATABASE_URL) {
     // Настройки pool соединений
     max: 20, // максимал��ное количество соединений в pool
     min: 2, // минимальное количество соединений
-    idleTimeoutMillis: 30000, // время простоя перед закрытием ���оединения
+    idleTimeoutMillis: 30000, // вр��мя простоя перед закрытием ���оединения
     connectionTimeoutMillis: 10000, // таймаут подключения
     maxUses: 7500, // максимальное количество использований соединения
   };
@@ -55,7 +55,7 @@ if (process.env.DATABASE_URL) {
 // Создание pool соединений
 const pool = new Pool(dbConfig);
 
-// Обработка событий pool
+// Обработка соб��тий pool
 pool.on("connect", (client) => {
   console.log("📊 Новое подключение к PostgreSQL установлено");
 });
@@ -276,15 +276,15 @@ export async function runMigrations() {
 export async function getDatabaseStats() {
   try {
     const stats = await query(`
-      SELECT 
+      SELECT
         schemaname,
-        tablename,
+        relname as table_name,
         n_tup_ins as inserts,
         n_tup_upd as updates,
         n_tup_del as deletes,
-        n_live_tup as live_rows,
+        n_live_tup as row_count,
         n_dead_tup as dead_rows
-      FROM pg_stat_user_tables 
+      FROM pg_stat_user_tables
       ORDER BY n_live_tup DESC
     `);
 
@@ -313,7 +313,7 @@ export async function closePool() {
     await pool.end();
     console.log("✅ Пул со��динений закрыт");
   } catch (error) {
-    console.error("❌ Ошибка закрытия п��ла:", error.message);
+    console.error("❌ Ошибка закрытия п���ла:", error.message);
   }
 }
 
@@ -359,7 +359,7 @@ export async function cleanupOldData(daysToKeep = 90) {
   }
 }
 
-// Функция для полнотекстового поиска
+// Функция для полнотекс��ового поиска
 export async function searchText(
   searchTerm,
   tables = ["problems", "devices", "diagnostic_steps"],
