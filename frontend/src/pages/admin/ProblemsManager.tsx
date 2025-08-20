@@ -269,9 +269,25 @@ const ProblemsManager = () => {
         stack: (error as any)?.stack
       });
 
+      const errorResponse = (error as any)?.response?.data;
       const errorMessage = (error as any)?.message || 'Неизвестная ошибка';
 
-      if (errorMessage.includes('уже существует')) {
+      if (errorResponse?.errorType === 'DUPLICATE_ERROR') {
+        const existingProblem = errorResponse.existingProblem;
+        const suggestions = errorResponse.details?.suggestions || [];
+
+        let alertMessage = `Проблема с таким названием уже существует для этого устройства.\n\n`;
+        alertMessage += `Существующая проблема:\n`;
+        alertMessage += `• Название: "${existingProblem?.title}"\n`;
+        alertMessage += `• Статус: ${existingProblem?.status}\n`;
+        alertMessage += `• Создана: ${existingProblem?.created_at ? new Date(existingProblem.created_at).toLocaleDateString() : 'н/д'}\n\n`;
+
+        if (suggestions.length > 0) {
+          alertMessage += `Рекомендации:\n${suggestions.map(s => `• ${s}`).join('\n')}`;
+        }
+
+        alert(alertMessage);
+      } else if (errorMessage.includes('уже существует')) {
         alert('Проблема с таким названием уже существует для этого устройства. Попробуйте другое название.');
       } else {
         alert("Ошибка при создании проблемы: " + errorMessage);
