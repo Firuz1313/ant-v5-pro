@@ -157,8 +157,12 @@ const DeviceManager = () => {
 
   const handleCreate = async () => {
     try {
+      // Generate a unique ID based on brand and name
+      const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, '-')}-${formData.name.toLowerCase().replace(/\s+/g, '-')}`;
+
       await devicesApi.createDevice({
         ...formData,
+        id: deviceId,
         isActive: true,
       });
       await refetch();
