@@ -157,7 +157,7 @@ const DeviceManager = () => {
 
   const handleCreate = async () => {
     try {
-      await devicesApi.create({
+      await devicesApi.createDevice({
         ...formData,
         isActive: true,
       });
