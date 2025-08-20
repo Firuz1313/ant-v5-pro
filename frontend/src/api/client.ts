@@ -233,9 +233,19 @@ export class ApiClient {
 
       if (error instanceof Error) {
         console.error(`📡 Request Error:`, error.message);
+        console.error(`📡 Error name:`, error.name);
+        console.error(`📡 Error stack:`, error.stack);
+        console.error(`📡 Request URL:`, url);
+        console.error(`📡 Request method:`, fetchOptions.method || "GET");
 
         if (error.name === "AbortError") {
           throw new ApiError("Request timeout", 408);
+        }
+
+        // Handle network connectivity errors
+        if (error.message === "Failed to fetch" || error.name === "TypeError") {
+          console.error(`📡 Network error detected - checking connectivity`);
+          throw new ApiError("Network connection failed - please check your internet connection and try again", 0);
         }
 
         // Handle specific body stream errors
