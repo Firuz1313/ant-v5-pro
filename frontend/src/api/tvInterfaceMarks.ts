@@ -239,7 +239,9 @@ export const tvInterfaceMarksAPI = {
         };
       }
 
-      const response = await apiRequest<TVInterfaceMarkApiResponse>(`/${id}`);
+      const response = await apiClient.get<TVInterfaceMarkApiResponse>(
+        `${API_ENDPOINT}/${id}`,
+      );
 
       return {
         success: true,
