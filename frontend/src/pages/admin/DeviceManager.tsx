@@ -160,17 +160,26 @@ const DeviceManager = () => {
       // Generate a unique ID based on brand and name
       const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, '-')}-${formData.name.toLowerCase().replace(/\s+/g, '-')}`;
 
-      await devicesApi.createDevice({
+      // Prepare device data, excluding empty URLs
+      const deviceData = {
         id: deviceId,
         name: formData.name,
         brand: formData.brand,
         model: formData.model,
         description: formData.description,
-        image_url: formData.imageUrl,
-        logo_url: formData.logoUrl,
         color: formData.color,
         status: 'active',
-      });
+      };
+
+      // Only add URLs if they are not empty
+      if (formData.imageUrl && formData.imageUrl.trim()) {
+        deviceData.image_url = formData.imageUrl;
+      }
+      if (formData.logoUrl && formData.logoUrl.trim()) {
+        deviceData.logo_url = formData.logoUrl;
+      }
+
+      await devicesApi.createDevice(deviceData);
       await refetch();
       setIsCreateDialogOpen(false);
       resetForm();
@@ -587,7 +596,7 @@ const DeviceManager = () => {
             </div>
 
             <div>
-              <Label htmlFor="edit-model">Модел��</Label>
+              <Label htmlFor="edit-model">Модель</Label>
               <Input
                 id="edit-model"
                 value={formData.model}
