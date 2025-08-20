@@ -42,7 +42,11 @@ class ProblemController {
       if (device_id) filters.device_id = device_id;
       if (category) filters.category = category;
       if (status) filters.status = status;
-      if (is_active !== undefined) filters.is_active = is_active === "true";
+
+      // Set is_active filter only if explicitly requested
+      if (is_active !== undefined) {
+        filters.is_active = is_active === "true";
+      }
 
       const options = {
         limit: Math.min(parseInt(limit), 100),
@@ -147,7 +151,7 @@ class ProblemController {
         });
       }
 
-      // Проверяем существование устройства
+      // Проверяем существов��ние устройства
       if (problemData.device_id) {
         const device = await deviceModel.findById(problemData.device_id);
         if (!device || !device.is_active) {
@@ -396,7 +400,7 @@ class ProblemController {
         });
       }
 
-      // Проверяем возможность удаления
+      // ��роверяем возможность удаления
       const deleteCheck = await problemModel.canDelete(id);
       if (!deleteCheck.canDelete && force !== "true") {
         return res.status(409).json({
@@ -410,11 +414,14 @@ class ProblemController {
       }
 
       let deletedProblem;
-      if (force === "true") {
-        // Жесткое удаление (осторожно!)
+      // force=true или "true" означает жесткое удаление
+      // force=false или "false" означает мягкое удаление
+      // По умолчанию (если force не указан) - жесткое удаление
+      if (force === "true" || force === true || force === undefined) {
+        // Жесткое удаление - полное удаление из базы
         deletedProblem = await problemModel.delete(id);
       } else {
-        // Мягкое удаление
+        // Мягкое удаление (архивирование)
         deletedProblem = await problemModel.softDelete(id);
       }
 
@@ -422,7 +429,7 @@ class ProblemController {
         success: true,
         data: deletedProblem,
         message:
-          force === "true"
+          force === "true" || force === true || force === undefined
             ? "Проблема удалена безвозвратно"
             : "Проблема архивирована",
         timestamp: new Date().toISOString(),

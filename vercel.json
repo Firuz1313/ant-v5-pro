@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "buildCommand": "npm run build",
+  "outputDirectory": "frontend/dist",
+  "installCommand": "npm run install:all",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/not-supported"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/index.html"
+    }
+  ]
+}

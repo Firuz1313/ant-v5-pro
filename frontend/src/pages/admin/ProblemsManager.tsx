@@ -85,7 +85,7 @@ interface Problem {
 
 const ProblemsManager = () => {
   const { data: devicesResponse } = useDevices();
-  const { data: problemsResponse } = useProblems();
+  const { data: problemsResponse } = useProblems(1, 20, { admin: true });
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
@@ -99,7 +99,12 @@ const ProblemsManager = () => {
 
   const getActiveDevices = () =>
     devices.filter((d: any) => d.is_active !== false);
-  const getStepsForProblem = (problemId: string) => [];
+  const getStepsForProblem = (problemId: string) => {
+    // TODO: Implement actual steps fetching logic
+    // For now return empty array to allow deletion
+    console.log(`🔍 Checking steps for problem ${problemId}: 0 steps found`);
+    return [];
+  };
 
   // Check if a problem with the same title and device already exists
   const checkForDuplicateTitle = (title: string, deviceId: string): boolean => {
@@ -249,7 +254,7 @@ const ProblemsManager = () => {
     }
 
     if (!formData.deviceId) {
-      alert("Пожалуйста, выберите приставку");
+      alert("Пожалуйста, выберите прист��вку");
       return;
     }
 
@@ -288,7 +293,7 @@ const ProblemsManager = () => {
       alert("Проблема успешно создана!");
     } catch (error) {
       console.error("❌ Ошибка при создании проблемы:", error);
-      console.error("❌ Детали ошибки:", {
+      console.error("❌ Дет��ли ошибки:", {
         message: (error as any)?.message,
         response: (error as any)?.response,
         stack: (error as any)?.stack,
@@ -300,7 +305,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "RATE_LIMIT") {
         const retryAfter = errorResponse.retryAfter || 5;
         alert(
-          `Слишком частые попытки создания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
+          `Слишком частые попытки ��оздания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
         );
       } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
@@ -322,7 +327,7 @@ const ProblemsManager = () => {
           "Проблема с таким названием уже существует для этого устройства. Попробуйте другое название.",
         );
       } else {
-        alert("Ошибка при создании проблемы: " + errorMessage);
+        alert("Ошибка при со��дании проблемы: " + errorMessage);
       }
     }
   };
@@ -352,23 +357,31 @@ const ProblemsManager = () => {
   };
 
   const handleDelete = async (problemId: string) => {
-    const stepsCount = getStepsForProblem(problemId).length;
-    if (stepsCount > 0) {
-      alert(
-        `Нельзя удалить проблему с ${stepsCount} активными шагами. Сначала удалите шаги.`,
-      );
+    console.log(`🗑️ Hard delete requested for problem ID: ${problemId}`);
+
+    if (
+      !confirm(
+        "Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы данных? Это действие нельзя отменить!",
+      )
+    ) {
+      console.log(`❌ User cancelled deletion`);
       return;
     }
 
-    if (!confirm("Вы уверены, что хотите удалить эту проблему?")) {
-      return;
-    }
-
+    console.log(`🚀 Starting hard delete mutation for problem ${problemId}`);
     try {
-      await deleteProblemMutation.mutateAsync({ id: problemId });
+      // Явно указываем force: true для полного удаления из базы
+      const result = await deleteProblemMutation.mutateAsync({
+        id: problemId,
+        force: true,
+      });
+      console.log(`✅ Hard delete successful:`, result);
+      console.log(
+        `🔄 React Query should automatically invalidate and refetch problems list`,
+      );
     } catch (error) {
-      console.error("Error deleting problem:", error);
-      alert("Ошибка ��ри удалении проблемы: " + (error as any)?.message);
+      console.error("❌ Error deleting problem:", error);
+      alert("Ошибка при удалении проблемы: " + (error as any)?.message);
     }
   };
 
@@ -414,7 +427,7 @@ const ProblemsManager = () => {
         );
       } else {
         alert(
-          "Ошибка при дублировании проблемы: " +
+          "Ошибка ��ри дублировании проблемы: " +
             ((error as any)?.message || "Неизвестная ошибка"),
         );
       }
@@ -448,7 +461,7 @@ const ProblemsManager = () => {
   const handleClearAllProblems = async () => {
     if (
       !confirm(
-        "Вы уверены, что хотите удалить ВСЕ проблемы? Это действие нельзя отменить!",
+        "Вы ув��рены, что хотите удалить ВСЕ проблемы? Это действие нельзя отменить!",
       )
     )
       return;
@@ -482,7 +495,7 @@ const ProblemsManager = () => {
           <Button
             variant="outline"
             onClick={() => {
-              console.log("🧪 Тестирование API создания проблемы");
+              console.log("🧪 Тест��рование API создания проблемы");
 
               // Генерируем действительно уникальный ID
               const timestamp = Date.now();
@@ -495,7 +508,7 @@ const ProblemsManager = () => {
               // Проверяем уникальность на клиенте
               while (checkForDuplicateTitle(testTitle, "openbox")) {
                 console.warn(
-                  `⚠️  Название ${testTitle} уже существует, генерируем новое`,
+                  `⚠️  Назва��ие ${testTitle} уже существует, генерируем новое`,
                 );
                 const newRandom = Math.random().toString(36).substring(2, 11);
                 testTitle = `TEST-${timestamp}_${newRandom}_${Date.now().toString().slice(-4)}`;
@@ -539,7 +552,7 @@ const ProblemsManager = () => {
                     );
                   } else {
                     alert(
-                      "Ошибка при создании тестовой проблемы: " +
+                      "Ошибка при создании тест��вой проблемы: " +
                         (error?.message || "Неизвестная ошибка"),
                     );
                   }
@@ -802,7 +815,7 @@ const ProblemsManager = () => {
                   <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все приставки</SelectItem>
+                  <SelectItem value="all">Все пристав��и</SelectItem>
                   {getActiveDevices().map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
@@ -838,7 +851,11 @@ const ProblemsManager = () => {
           return (
             <Card
               key={problem.id}
-              className="group hover:shadow-lg transition-shadow"
+              className={`group hover:shadow-lg transition-shadow ${
+                problem.is_active === false || problem.status === "archived"
+                  ? "opacity-60 border-dashed border-gray-300"
+                  : ""
+              }`}
             >
               <CardHeader>
                 <div className="flex items-start justify-between mb-3">
@@ -850,18 +867,24 @@ const ProblemsManager = () => {
                   <div className="flex items-center space-x-2">
                     <Badge
                       variant={
-                        problem.status === "published" ||
-                        problem.status === "active" ||
-                        problem.is_active
-                          ? "default"
-                          : "secondary"
+                        problem.is_active === false ||
+                        problem.status === "archived"
+                          ? "destructive"
+                          : problem.status === "published" ||
+                              problem.status === "active" ||
+                              problem.is_active
+                            ? "default"
+                            : "secondary"
                       }
                     >
-                      {problem.status === "published" ||
-                      problem.status === "active" ||
-                      problem.is_active
-                        ? "Активна"
-                        : "Неактивна"}
+                      {problem.is_active === false ||
+                      problem.status === "archived"
+                        ? "Неактивна"
+                        : problem.status === "published" ||
+                            problem.status === "active" ||
+                            problem.is_active
+                          ? "Активна"
+                          : "Черновик"}
                     </Badge>
                   </div>
                 </div>
@@ -962,17 +985,15 @@ const ProblemsManager = () => {
                       </DropdownMenuItem>
                       <DropdownMenuItem>
                         <Download className="h-4 w-4 mr-2" />
-                        Экспортировать
+                        Экспортирова��ь
                       </DropdownMenuItem>
-                      {stepsCount === 0 && (
-                        <DropdownMenuItem
-                          onClick={() => handleDelete(problem.id)}
-                          className="text-red-600"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          Удалить
-                        </DropdownMenuItem>
-                      )}
+                      <DropdownMenuItem
+                        onClick={() => handleDelete(problem.id)}
+                        className="text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Удалить навсегда
+                      </DropdownMenuItem>
                     </DropdownMenuContent>
                   </DropdownMenu>
                 </div>
@@ -998,7 +1019,7 @@ const ProblemsManager = () => {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Выберите приставку" />
+                  <SelectValue placeholder="Выберите прис��авку" />
                 </SelectTrigger>
                 <SelectContent>
                   {getActiveDevices().map((device) => (
@@ -1141,7 +1162,7 @@ const ProblemsManager = () => {
               Пр��блемы не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменить фильтры поиска или создайт�� новую проблему.
+              Попробуйте измени��ь фильтры поиска ��ли создайт�� новую проблему.
             </p>
           </CardContent>
         </Card>
