@@ -380,7 +380,7 @@ const StepsManagerNew = () => {
       };
 
       // Create step via API
-      const createdStep = await stepsApi.create(stepData);
+      const createdStep = await stepsApi.createStep(stepData);
 
       // If step has TV interface markings, save them
       if (
@@ -536,7 +536,7 @@ const StepsManagerNew = () => {
       tvAreaPosition: step.tvAreaPosition || { x: 0, y: 0 },
     });
 
-    // Загрузить интерфейсы ��ля текущего устро��ства
+    // Загрузить интер��ейсы ��ля текущего устро��ства
     if (step.deviceId) {
       loadTVInterfacesForDevice(step.deviceId);
     }
@@ -944,7 +944,7 @@ const StepsManagerNew = () => {
                 <Target className="h-4 w-4 mr-2" />
                 {isPickingTVArea
                   ? "Завершить выделение"
-                  : "Выбрать область (перетащите мышью)"}
+                  : "Выбрать область (пе��етащите мышью)"}
               </Button>
 
               {isPickingTVArea && (
