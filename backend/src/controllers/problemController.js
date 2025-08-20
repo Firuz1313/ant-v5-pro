@@ -155,7 +155,7 @@ class ProblemController {
             errorType: "DUPLICATE_ERROR",
             details: {
               message:
-                "Название проблемы должно быть уникальным для каждого устройства",
+                "Название проблем�� должно быть уникальным для каждого устройства",
               suggestions: [
                 "Измените название проблемы",
                 "Добавьте уточняющие детали к названию",
@@ -173,7 +173,37 @@ class ProblemController {
         }
       }
 
-      const newProblem = await problemModel.create(problemData);
+      // Гарантируем уникальность ID при создании
+      let attempts = 0;
+      let newProblem = null;
+      const maxAttempts = 5;
+
+      while (attempts < maxAttempts && !newProblem) {
+        try {
+          // Генерируем новый ID для каждой попытки
+          const uniqueProblemData = {
+            ...problemData,
+            id: undefined, // Позволяем BaseModel сгенерировать новый ID
+          };
+
+          newProblem = await problemModel.create(uniqueProblemData);
+
+          console.log(`✅ Проблема создана с ID: ${newProblem.id} (попытка ${attempts + 1})`);
+          break;
+        } catch (error) {
+          attempts++;
+          if (error.code === '23505' && error.detail?.includes('id')) {
+            // Конфликт по ID, пробуем еще раз
+            console.warn(`⚠️  Конфликт ID при создании проблемы, попытка ${attempts}/${maxAttempts}`);
+            if (attempts >= maxAttempts) {
+              throw new Error('Не удалось создать уникальный ID после нескольких попыток');
+            }
+          } else {
+            // Другая ошибка, пробрасываем дальше
+            throw error;
+          }
+        }
+      }
 
       res.status(201).json({
         success: true,
@@ -195,7 +225,7 @@ class ProblemController {
       const { id } = req.params;
       const updateData = req.body;
 
-      // Проверяем существование проблемы
+      // Проверяем су��ествование проблемы
       const existingProblem = await problemModel.findById(id);
       if (!existingProblem) {
         return res.status(404).json({
@@ -605,7 +635,7 @@ class ProblemController {
       if (!session_result || !["success", "failure"].includes(session_result)) {
         return res.status(400).json({
           success: false,
-          error: "Результат сессии должен быть success или failure",
+          error: "Резуль��ат сессии должен быть success или failure",
           errorType: "VALIDATION_ERROR",
           timestamp: new Date().toISOString(),
         });
