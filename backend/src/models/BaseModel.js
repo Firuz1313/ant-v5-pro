@@ -47,7 +47,7 @@ class BaseModel {
   }
 
   /**
-   * Подготовка данных для обновления
+   * ��одготовка данных для обновления
    */
   prepareForUpdate(data) {
     const prepared = {
@@ -122,6 +122,12 @@ class BaseModel {
     if (filters.status) {
       conditions.push(`status = $${paramIndex}`);
       values.push(filters.status);
+      paramIndex++;
+    }
+
+    if (filters.name) {
+      conditions.push(`name = $${paramIndex}`);
+      values.push(filters.name);
       paramIndex++;
     }
 
