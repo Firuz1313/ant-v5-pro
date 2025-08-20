@@ -413,8 +413,9 @@ const TVInterfaceBuilder = () => {
       description: tvInterface.description,
       type: tvInterface.type,
       deviceId: tvInterface.deviceId,
-      screenshotData: tvInterfaceUtils.getScreenshotUrl(tvInterface),
+      screenshotData: undefined, // Не устанавливаем существующий скриншот как данные
     });
+    // Показываем текущий скриншот как превью, но не как данные для отправки
     setPreviewImageUrl(tvInterfaceUtils.getScreenshotUrl(tvInterface));
     setIsEditDialogOpen(true);
   };
