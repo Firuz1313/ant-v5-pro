@@ -268,8 +268,9 @@ const ProblemsManager = () => {
     if (!problem) return;
 
     try {
+      const currentStatus = problem.status || problem.is_active;
       await updateProblem(problemId, {
-        status: problem.status === "published" ? "draft" : "published",
+        status: currentStatus === "published" || currentStatus === "active" ? "draft" : "published",
       });
     } catch (error) {
       console.error("Error toggling problem status:", error);
@@ -592,10 +593,10 @@ const ProblemsManager = () => {
                   <div className="flex items-center space-x-2">
                     <Badge
                       variant={
-                        problem.status === "active" ? "default" : "secondary"
+                        (problem.status === "published" || problem.status === "active" || problem.is_active) ? "default" : "secondary"
                       }
                     >
-                      {problem.status === "active" ? "Активна" : "Неактивна"}
+                      {(problem.status === "published" || problem.status === "active" || problem.is_active) ? "Активна" : "Неактивна"}
                     </Badge>
                   </div>
                 </div>
@@ -651,12 +652,12 @@ const ProblemsManager = () => {
                       size="sm"
                       onClick={() => handleToggleStatus(problem.id)}
                       title={
-                        problem.status === "active"
+                        (problem.status === "published" || problem.status === "active" || problem.is_active)
                           ? "Деактивировать"
                           : "Активировать"
                       }
                     >
-                      {problem.status === "active" ? (
+                      {(problem.status === "published" || problem.status === "active" || problem.is_active) ? (
                         <EyeOff className="h-3 w-3" />
                       ) : (
                         <Eye className="h-3 w-3" />
