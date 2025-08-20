@@ -251,7 +251,7 @@ const ProblemsManager = () => {
         status: "published",
       };
 
-      console.log('🚀 Отправка данных:', problemData);
+      console.log('🚀 Отправ��а данных:', problemData);
 
       const result = await createProblemMutation.mutateAsync(problemData);
 
@@ -268,7 +268,14 @@ const ProblemsManager = () => {
         response: (error as any)?.response,
         stack: (error as any)?.stack
       });
-      alert("Ошибка при создании проблемы: " + ((error as any)?.message || 'Неизвестная ошибка'));
+
+      const errorMessage = (error as any)?.message || 'Неизвестная ошибка';
+
+      if (errorMessage.includes('уже существует')) {
+        alert('Проблема с таким названием уже существует для этого устройства. Попробуйте другое название.');
+      } else {
+        alert("Ошибка при создании проблемы: " + errorMessage);
+      }
     }
   };
 
@@ -826,7 +833,7 @@ const ProblemsManager = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Редактировать проблему</DialogTitle>
+            <DialogTitle>Редактироват�� проблему</DialogTitle>
           </DialogHeader>
           <div className="space-y-4">
             <div>
