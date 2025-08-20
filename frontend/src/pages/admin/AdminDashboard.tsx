@@ -36,8 +36,12 @@ import {
 } from "@/components/ui/dropdown-menu";
 
 const AdminDashboard = () => {
-  const { data: devices = [] } = useDevices();
-  const { data: problems = [] } = useProblems();
+  const { data: devicesResponse } = useDevices();
+  const { data: problemsResponse } = useProblems();
+
+  // Извлекаем массивы данных из ответа API
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   // Temporarily using empty arrays for removed static data
   const steps: any[] = [];
