@@ -359,7 +359,11 @@ const ProblemsManager = () => {
   const handleDelete = async (problemId: string) => {
     console.log(`🗑️ Hard delete requested for problem ID: ${problemId}`);
 
-    if (!confirm("Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы данных? Это действие нельзя отменить!")) {
+    if (
+      !confirm(
+        "Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы данных? Это действие нельзя отменить!",
+      )
+    ) {
       console.log(`❌ User cancelled deletion`);
       return;
     }
@@ -367,10 +371,14 @@ const ProblemsManager = () => {
     console.log(`🚀 Starting hard delete mutation for problem ${problemId}`);
     try {
       // Явно указываем force: true для полного удаления из базы
-      const result = await deleteProblemMutation.mutateAsync({ id: problemId, force: true });
+      const result = await deleteProblemMutation.mutateAsync({
+        id: problemId,
+        force: true,
+      });
       console.log(`✅ Hard delete successful:`, result);
-      console.log(`🔄 React Query should automatically invalidate and refetch problems list`);
-
+      console.log(
+        `🔄 React Query should automatically invalidate and refetch problems list`,
+      );
     } catch (error) {
       console.error("❌ Error deleting problem:", error);
       alert("Ошибка при удалении проблемы: " + (error as any)?.message);
@@ -859,22 +867,24 @@ const ProblemsManager = () => {
                   <div className="flex items-center space-x-2">
                     <Badge
                       variant={
-                        problem.is_active === false || problem.status === "archived"
+                        problem.is_active === false ||
+                        problem.status === "archived"
                           ? "destructive"
                           : problem.status === "published" ||
-                            problem.status === "active" ||
-                            problem.is_active
-                          ? "default"
-                          : "secondary"
+                              problem.status === "active" ||
+                              problem.is_active
+                            ? "default"
+                            : "secondary"
                       }
                     >
-                      {problem.is_active === false || problem.status === "archived"
+                      {problem.is_active === false ||
+                      problem.status === "archived"
                         ? "Неактивна"
                         : problem.status === "published" ||
-                          problem.status === "active" ||
-                          problem.is_active
-                        ? "Активна"
-                        : "Черновик"}
+                            problem.status === "active" ||
+                            problem.is_active
+                          ? "Активна"
+                          : "Черновик"}
                     </Badge>
                   </div>
                 </div>
