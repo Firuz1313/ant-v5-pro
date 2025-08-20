@@ -79,11 +79,12 @@ export class ApiClient {
   private async makeRequest<T>(
     endpoint: string,
     options: RequestOptions = {},
+    retryCount = 0,
   ): Promise<T> {
     const { params, timeout = this.timeout, ...fetchOptions } = options;
 
     const url = this.buildUrl(endpoint, params);
-    console.log(`🚀 Making ${fetchOptions.method || "GET"} request to: ${url}`);
+    console.log(`🚀 Making ${fetchOptions.method || "GET"} request to: ${url}${retryCount > 0 ? ` (retry ${retryCount})` : ''}`);
 
     const headers = {
       ...this.defaultHeaders,
@@ -107,6 +108,16 @@ export class ApiClient {
 
       console.log(`📡 Fetch completed with status: ${response.status}`);
       clearTimeout(timeoutId);
+
+      // Handle 429 rate limiting with retry
+      if (response.status === 429 && retryCount < 3) {
+        const retryAfter = response.headers.get('Retry-After') || '2';
+        const delayMs = parseInt(retryAfter) * 1000;
+        console.log(`⏳ Rate limited, retrying after ${delayMs}ms...`);
+
+        await new Promise(resolve => setTimeout(resolve, delayMs));
+        return this.makeRequest<T>(endpoint, options, retryCount + 1);
+      }
 
       // Ultra-simple approach: read response only once, immediately
       let responseData: any = null;
