@@ -258,7 +258,7 @@ class Problem extends BaseModel {
   async duplicate(problemId, targetDeviceId = null) {
     try {
       return await transaction(async (client) => {
-        // Получаем оригинальную проблему
+        // Получаем ори��инальную проблему
         const originalResult = await client.query(
           'SELECT * FROM problems WHERE id = $1',
           [problemId]
@@ -356,7 +356,7 @@ class Problem extends BaseModel {
   }
 
   /**
-   * Проверка возможности удален��я проблемы
+   * Проверка возможности удаления проблемы
    */
   async canDelete(id) {
     try {
@@ -378,12 +378,12 @@ class Problem extends BaseModel {
 
       const stats = result.rows[0];
       const stepsCount = parseInt(stats.steps_count || 0);
-      const activeSessionsCount = parseInt(stats.active_sessions_count || 0);
+      const sessionsCount = parseInt(stats.sessions_count || 0);
 
-      if (activeSessionsCount > 0) {
+      if (sessionsCount > 0) {
         return {
           canDelete: false,
-          reason: `Невозможно удалить проблему с ${activeSessionsCount} активными сессиями диагностики`
+          reason: `Невозможно удалить проблему с ${sessionsCount} связанными сессиями диагностики`
         };
       }
 
@@ -391,7 +391,7 @@ class Problem extends BaseModel {
         return {
           canDelete: false,
           reason: `Проблема содержит ${stepsCount} диагностических шагов. Сначала удалите их.`,
-          suggestion: 'Можно архивировать про��лему вместо удаления'
+          suggestion: 'Можно архивировать проблему вместо удаления'
         };
       }
 
