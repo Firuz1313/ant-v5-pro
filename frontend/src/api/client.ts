@@ -168,18 +168,36 @@ export class ApiClient {
         return this.makeRequest<T>(endpoint, options, retryCount + 1);
       }
 
-      // Ultra-simple approach: read response only once, immediately
+      // Read response body only once
       let responseData: any = null;
       let responseText = "";
 
+      // Clone response before reading to avoid consumption issues
+      let responseClone = response.clone();
+
       try {
-        responseText = await response.text();
+        responseText = await responseClone.text();
         console.log(
           `📡 Response text (first 100 chars): ${responseText.substring(0, 100)}`,
         );
       } catch (textError) {
         console.error(`📡 Failed to read response text:`, textError);
-        responseText = "";
+        // Fallback: try reading original response
+        try {
+          if (!response.bodyUsed) {
+            responseText = await response.text();
+          } else {
+            responseText = JSON.stringify({
+              error: `Failed to read response body: ${textError.message}`,
+              errorType: "RESPONSE_READ_ERROR",
+            });
+          }
+        } catch (fallbackError) {
+          responseText = JSON.stringify({
+            error: `Complete failure reading response: ${fallbackError.message}`,
+            errorType: "RESPONSE_READ_ERROR",
+          });
+        }
       }
 
       // Try to parse JSON if we have text
@@ -320,7 +338,7 @@ const getApiBaseUrl = (): string => {
       return proxyUrl;
     }
 
-    // Локальн��я разработка - прямое подключение к бэкенду
+    // Локальн��я разработка - пря��ое подключение к бэкенду
     if (hostname === "localhost" && port === "8080") {
       const directUrl = "http://localhost:3000/api";
       console.log("🏠 Local development - using direct connection:", directUrl);

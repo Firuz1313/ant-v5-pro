@@ -187,7 +187,7 @@ const StepsManagerNew = () => {
 
   // Загрузка отметок для TV ��нтерфейса
 
-  // Сохранение отметок TV интерфейса
+  // Сох��анение отметок TV интерфейса
   const saveTVInterfaceMarks = async (marks: TVInterfaceMark[]) => {
     try {
       // Здесь можно реализ��вать ло��ику сохранения всех отметок
@@ -380,7 +380,7 @@ const StepsManagerNew = () => {
       };
 
       // Create step via API
-      const createdStep = await stepsApi.create(stepData);
+      const createdStep = await stepsApi.createStep(stepData);
 
       // If step has TV interface markings, save them
       if (
@@ -434,7 +434,7 @@ const StepsManagerNew = () => {
     };
 
     try {
-      await stepsApi.update(selectedStep.id, updatedData);
+      await stepsApi.updateStep(selectedStep.id, updatedData);
 
       // If step has TV interface markings, update them
       if (
@@ -467,7 +467,7 @@ const StepsManagerNew = () => {
       await tvInterfaceMarksAPI.deleteByStepId(stepId);
 
       // Delete the step
-      await stepsApi.delete(stepId);
+      await stepsApi.deleteStep(stepId);
 
       // Reload steps
       await loadInitialData();
@@ -481,7 +481,7 @@ const StepsManagerNew = () => {
     if (!step) return;
 
     try {
-      await stepsApi.update(stepId, {
+      await stepsApi.updateStep(stepId, {
         isActive: !step.isActive,
       });
 
@@ -536,7 +536,7 @@ const StepsManagerNew = () => {
       tvAreaPosition: step.tvAreaPosition || { x: 0, y: 0 },
     });
 
-    // Загрузить интерфейсы ��ля текущего устро��ства
+    // Загрузить интер��ейсы ��ля текущего устро��ства
     if (step.deviceId) {
       loadTVInterfacesForDevice(step.deviceId);
     }
@@ -944,7 +944,7 @@ const StepsManagerNew = () => {
                 <Target className="h-4 w-4 mr-2" />
                 {isPickingTVArea
                   ? "Завершить выделение"
-                  : "Выбрать область (перетащите мышью)"}
+                  : "Выбрать область (пе��етащите мышью)"}
               </Button>
 
               {isPickingTVArea && (
@@ -1083,7 +1083,7 @@ const StepsManagerNew = () => {
             onValueChange={(value) => handleFieldChange("tvInterfaceId", value)}
           >
             <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Выберите интерфейс ТВ" />
+              <SelectValue placeholder="Выберите интерфейс ��В" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Без интерфейса</SelectItem>
@@ -1599,7 +1599,7 @@ const StepsManagerNew = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Редактировать шаг</DialogTitle>
+            <DialogTitle>Редактировать ��аг</DialogTitle>
           </DialogHeader>
           <StepFormFields isEdit={true} />
           <div className="flex justify-end space-x-2">

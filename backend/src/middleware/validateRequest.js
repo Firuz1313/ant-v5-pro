@@ -1,4 +1,4 @@
-import Joi from 'joi';
+import Joi from "joi";
 
 // Общие схемы валидации
 const commonSchemas = {
@@ -16,11 +16,19 @@ const commonSchemas = {
   timestamp: Joi.date().iso(),
   jsonObject: Joi.object().unknown(true),
   jsonArray: Joi.array().items(Joi.any()),
-  color: Joi.string().pattern(/^(from-\w+-\d+\s+to-\w+-\d+|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})$/),
-  status: Joi.string().valid('active', 'inactive', 'draft', 'published', 'archived'),
-  category: Joi.string().valid('critical', 'moderate', 'minor', 'other'),
-  difficulty: Joi.string().valid('beginner', 'intermediate', 'advanced'),
-  role: Joi.string().valid('admin', 'moderator', 'user')
+  color: Joi.string().pattern(
+    /^(from-\w+-\d+\s+to-\w+-\d+|#[0-9a-fA-F]{6}|#[0-9a-fA-F]{3})$/,
+  ),
+  status: Joi.string().valid(
+    "active",
+    "inactive",
+    "draft",
+    "published",
+    "archived",
+  ),
+  category: Joi.string().valid("critical", "moderate", "minor", "other"),
+  difficulty: Joi.string().valid("beginner", "intermediate", "advanced"),
+  role: Joi.string().valid("admin", "moderator", "user"),
 };
 
 // Схемы валидации для устройств
@@ -31,27 +39,29 @@ export const deviceValidation = {
     brand: Joi.string().min(1).max(255).required(),
     model: Joi.string().min(1).max(255).required(),
     description: commonSchemas.text,
-    image_url: commonSchemas.url,
-    logo_url: commonSchemas.url,
-    color: commonSchemas.color.default('from-gray-500 to-gray-600'),
+    image_url: Joi.string().uri().max(500).allow("", null).optional(),
+    logo_url: Joi.string().uri().max(500).allow("", null).optional(),
+    color: commonSchemas.color.default("from-gray-500 to-gray-600"),
     order_index: commonSchemas.integer.default(0),
-    status: Joi.string().valid('active', 'inactive', 'maintenance').default('active'),
-    metadata: commonSchemas.jsonObject
+    status: Joi.string()
+      .valid("active", "inactive", "maintenance")
+      .default("active"),
+    metadata: commonSchemas.jsonObject,
   }),
-  
+
   update: Joi.object({
     name: Joi.string().min(1).max(255),
     brand: Joi.string().min(1).max(255),
     model: Joi.string().min(1).max(255),
     description: commonSchemas.text,
-    image_url: commonSchemas.url,
-    logo_url: commonSchemas.url,
+    image_url: Joi.string().uri().max(500).allow("", null).optional(),
+    logo_url: Joi.string().uri().max(500).allow("", null).optional(),
     color: commonSchemas.color,
     order_index: commonSchemas.integer,
-    status: Joi.string().valid('active', 'inactive', 'maintenance'),
+    status: Joi.string().valid("active", "inactive", "maintenance"),
     is_active: commonSchemas.boolean,
-    metadata: commonSchemas.jsonObject
-  }).min(1)
+    metadata: commonSchemas.jsonObject,
+  }).min(1),
 };
 
 // Схемы валидации для проблем
@@ -61,18 +71,20 @@ export const problemValidation = {
     device_id: commonSchemas.id.required(),
     title: Joi.string().min(1).max(500).required(),
     description: commonSchemas.longText,
-    category: commonSchemas.category.default('other'),
-    icon: Joi.string().max(100).default('HelpCircle'),
-    color: commonSchemas.color.default('from-blue-500 to-blue-600'),
+    category: commonSchemas.category.default("other"),
+    icon: Joi.string().max(100).default("HelpCircle"),
+    color: commonSchemas.color.default("from-blue-500 to-blue-600"),
     tags: commonSchemas.jsonArray.default([]),
     priority: commonSchemas.positiveInteger.default(1),
     estimated_time: commonSchemas.positiveInteger.default(5),
-    difficulty: commonSchemas.difficulty.default('beginner'),
+    difficulty: commonSchemas.difficulty.default("beginner"),
     success_rate: commonSchemas.percentage.default(100),
-    status: Joi.string().valid('draft', 'published', 'archived').default('draft'),
-    metadata: commonSchemas.jsonObject
+    status: Joi.string()
+      .valid("draft", "published", "archived")
+      .default("draft"),
+    metadata: commonSchemas.jsonObject,
   }),
-  
+
   update: Joi.object({
     device_id: commonSchemas.id,
     title: Joi.string().min(1).max(500),
@@ -86,10 +98,10 @@ export const problemValidation = {
     difficulty: commonSchemas.difficulty,
     success_rate: commonSchemas.percentage,
     completed_count: commonSchemas.integer.min(0),
-    status: Joi.string().valid('draft', 'published', 'archived'),
+    status: Joi.string().valid("draft", "published", "archived"),
     is_active: commonSchemas.boolean,
-    metadata: commonSchemas.jsonObject
-  }).min(1)
+    metadata: commonSchemas.jsonObject,
+  }).min(1),
 };
 
 // Схемы валидации для диагностических шагов
@@ -107,7 +119,16 @@ export const stepValidation = {
     highlight_tv_area: Joi.string().max(255),
     tv_interface_id: commonSchemas.id,
     remote_id: commonSchemas.id,
-    action_type: Joi.string().valid('button_press', 'navigation', 'wait', 'check', 'input', 'selection', 'confirmation', 'custom'),
+    action_type: Joi.string().valid(
+      "button_press",
+      "navigation",
+      "wait",
+      "check",
+      "input",
+      "selection",
+      "confirmation",
+      "custom",
+    ),
     button_position: commonSchemas.jsonObject,
     svg_path: commonSchemas.longText,
     zone_id: Joi.string().max(255),
@@ -120,9 +141,9 @@ export const stepValidation = {
     success_text: commonSchemas.text,
     media: commonSchemas.jsonArray.default([]),
     next_step_conditions: commonSchemas.jsonArray.default([]),
-    metadata: commonSchemas.jsonObject
+    metadata: commonSchemas.jsonObject,
   }),
-  
+
   update: Joi.object({
     problem_id: commonSchemas.id,
     device_id: commonSchemas.id,
@@ -135,7 +156,16 @@ export const stepValidation = {
     highlight_tv_area: Joi.string().max(255),
     tv_interface_id: commonSchemas.id,
     remote_id: commonSchemas.id,
-    action_type: Joi.string().valid('button_press', 'navigation', 'wait', 'check', 'input', 'selection', 'confirmation', 'custom'),
+    action_type: Joi.string().valid(
+      "button_press",
+      "navigation",
+      "wait",
+      "check",
+      "input",
+      "selection",
+      "confirmation",
+      "custom",
+    ),
     button_position: commonSchemas.jsonObject,
     svg_path: commonSchemas.longText,
     zone_id: Joi.string().max(255),
@@ -149,8 +179,8 @@ export const stepValidation = {
     media: commonSchemas.jsonArray,
     next_step_conditions: commonSchemas.jsonArray,
     is_active: commonSchemas.boolean,
-    metadata: commonSchemas.jsonObject
-  }).min(1)
+    metadata: commonSchemas.jsonObject,
+  }).min(1),
 };
 
 // Схемы валидации для пультов
@@ -162,8 +192,10 @@ export const remoteValidation = {
     manufacturer: Joi.string().min(1).max(255).required(),
     model: Joi.string().min(1).max(255).required(),
     description: commonSchemas.text,
-    layout: Joi.string().valid('standard', 'compact', 'smart', 'custom').default('standard'),
-    color_scheme: Joi.string().max(50).default('dark'),
+    layout: Joi.string()
+      .valid("standard", "compact", "smart", "custom")
+      .default("standard"),
+    color_scheme: Joi.string().max(50).default("dark"),
     image_url: commonSchemas.url,
     image_data: commonSchemas.longText,
     svg_data: commonSchemas.longText,
@@ -171,16 +203,16 @@ export const remoteValidation = {
     buttons: commonSchemas.jsonArray.default([]),
     zones: commonSchemas.jsonArray.default([]),
     is_default: commonSchemas.boolean.default(false),
-    metadata: commonSchemas.jsonObject
+    metadata: commonSchemas.jsonObject,
   }),
-  
+
   update: Joi.object({
     device_id: commonSchemas.id,
     name: Joi.string().min(1).max(255),
     manufacturer: Joi.string().min(1).max(255),
     model: Joi.string().min(1).max(255),
     description: commonSchemas.text,
-    layout: Joi.string().valid('standard', 'compact', 'smart', 'custom'),
+    layout: Joi.string().valid("standard", "compact", "smart", "custom"),
     color_scheme: Joi.string().max(50),
     image_url: commonSchemas.url,
     image_data: commonSchemas.longText,
@@ -191,8 +223,8 @@ export const remoteValidation = {
     is_default: commonSchemas.boolean,
     usage_count: commonSchemas.integer.min(0),
     is_active: commonSchemas.boolean,
-    metadata: commonSchemas.jsonObject
-  }).min(1)
+    metadata: commonSchemas.jsonObject,
+  }).min(1),
 };
 
 // Схемы валидации для сессий
@@ -206,9 +238,9 @@ export const sessionValidation = {
     total_steps: commonSchemas.integer.min(0).default(0),
     user_agent: Joi.string().max(1000),
     ip_address: Joi.string().ip(),
-    metadata: commonSchemas.jsonObject
+    metadata: commonSchemas.jsonObject,
   }),
-  
+
   update: Joi.object({
     completed_steps: commonSchemas.integer.min(0),
     success: commonSchemas.boolean,
@@ -216,8 +248,8 @@ export const sessionValidation = {
     error_steps: commonSchemas.jsonArray,
     feedback: commonSchemas.jsonObject,
     end_time: commonSchemas.timestamp,
-    metadata: commonSchemas.jsonObject
-  }).min(1)
+    metadata: commonSchemas.jsonObject,
+  }).min(1),
 };
 
 // Схемы для параметров запроса
@@ -226,93 +258,96 @@ export const queryValidation = {
     page: Joi.number().integer().min(1).default(1),
     limit: Joi.number().integer().min(1).max(100).default(20),
     sort: Joi.string().max(50),
-    order: Joi.string().valid('asc', 'desc').default('desc')
+    order: Joi.string().valid("asc", "desc").default("desc"),
   }),
-  
+
   search: Joi.object({
     q: Joi.string().min(1).max(255),
     device_id: commonSchemas.id,
     category: commonSchemas.category,
     status: commonSchemas.status,
-    tags: Joi.alternatives().try(
-      Joi.string(),
-      Joi.array().items(Joi.string())
-    )
+    tags: Joi.alternatives().try(Joi.string(), Joi.array().items(Joi.string())),
   }),
-  
+
   filters: Joi.object({
     device_id: commonSchemas.id,
     status: commonSchemas.status,
     category: commonSchemas.category,
     is_active: commonSchemas.boolean,
     created_after: commonSchemas.timestamp,
-    created_before: commonSchemas.timestamp
-  })
+    created_before: commonSchemas.timestamp,
+  }),
 };
 
 // Основная функция валидации
-export const validateRequest = (schema, source = 'body') => {
+export const validateRequest = (schema, source = "body") => {
   return (req, res, next) => {
     let dataToValidate;
-    
+
     switch (source) {
-      case 'body':
+      case "body":
         dataToValidate = req.body;
         break;
-      case 'params':
+      case "params":
         dataToValidate = req.params;
         break;
-      case 'query':
+      case "query":
         dataToValidate = req.query;
         break;
       default:
         dataToValidate = req.body;
     }
-    
+
     const { error, value } = schema.validate(dataToValidate, {
       abortEarly: false,
       stripUnknown: true,
-      convert: true
+      convert: true,
     });
-    
+
     if (error) {
-      const validationErrors = error.details.map(detail => ({
-        field: detail.path.join('.'),
+      const validationErrors = error.details.map((detail) => ({
+        field: detail.path.join("."),
         message: detail.message,
-        value: detail.context?.value
+        value: detail.context?.value,
       }));
-      
+
       console.warn(`⚠️  Ошибка валидации ${source}:`, validationErrors);
-      
+
       return res.status(400).json({
         success: false,
-        error: 'Ошибка валидации данных',
-        errorType: 'VALIDATION_ERROR',
+        error: "Ошибка валидации данных",
+        errorType: "VALIDATION_ERROR",
         details: validationErrors,
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
       });
     }
-    
+
     // Заменяем исходные данные на валидированные и очищенные
     switch (source) {
-      case 'body':
+      case "body":
         req.body = value;
         break;
-      case 'params':
+      case "params":
         req.params = value;
         break;
-      case 'query':
+      case "query":
         req.query = value;
         break;
     }
-    
+
     next();
   };
 };
 
 // Экспорт вспомогательных функций
-export const validateId = validateRequest(Joi.object({ id: commonSchemas.id }), 'params');
-export const validatePagination = validateRequest(queryValidation.pagination, 'query');
-export const validateSearch = validateRequest(queryValidation.search, 'query');
+export const validateId = validateRequest(
+  Joi.object({ id: commonSchemas.id }),
+  "params",
+);
+export const validatePagination = validateRequest(
+  queryValidation.pagination,
+  "query",
+);
+export const validateSearch = validateRequest(queryValidation.search, "query");
 
 export default validateRequest;

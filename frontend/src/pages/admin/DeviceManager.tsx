@@ -157,15 +157,62 @@ const DeviceManager = () => {
 
   const handleCreate = async () => {
     try {
-      await devicesApi.create({
-        ...formData,
-        isActive: true,
-      });
+      // Generate a unique timestamp
+      const timestamp = Date.now();
+
+      // Create unique name and ID if using default values
+      const uniqueName =
+        formData.name === "New"
+          ? `${formData.brand} ${timestamp}`
+          : formData.name;
+      const deviceId = `${formData.brand.toLowerCase().replace(/\s+/g, "-")}-${uniqueName.toLowerCase().replace(/\s+/g, "-")}-${timestamp}`;
+
+      // Prepare device data, excluding empty URLs
+      const deviceData = {
+        id: deviceId,
+        name: uniqueName,
+        brand: formData.brand,
+        model: formData.model,
+        description: formData.description,
+        color: formData.color,
+        status: "active",
+      };
+
+      // Only add URLs if they are not empty
+      if (formData.imageUrl && formData.imageUrl.trim()) {
+        deviceData.image_url = formData.imageUrl;
+      }
+      if (formData.logoUrl && formData.logoUrl.trim()) {
+        deviceData.logo_url = formData.logoUrl;
+      }
+
+      await devicesApi.createDevice(deviceData);
       await refetch();
       setIsCreateDialogOpen(false);
       resetForm();
     } catch (error) {
       console.error("Error creating device:", error);
+
+      // Show user-friendly error message based on error type
+      let errorMessage = "Ошибка при создании устройства";
+
+      if (error.response) {
+        if (error.response.error) {
+          errorMessage = error.response.error;
+        } else if (error.response.message) {
+          errorMessage = error.response.message;
+        }
+      } else if (error.message) {
+        if (error.message.includes("409")) {
+          errorMessage = "Устройство с таким названием уже существует";
+        } else if (error.message.includes("400")) {
+          errorMessage = "Неверные данные. Проверьте все поля.";
+        } else {
+          errorMessage = error.message;
+        }
+      }
+
+      alert(errorMessage);
     }
   };
 
@@ -173,7 +220,7 @@ const DeviceManager = () => {
     if (!selectedDevice) return;
 
     try {
-      await devicesApi.update(selectedDevice.id, formData);
+      await devicesApi.updateDevice(selectedDevice.id, formData);
       await refetch();
       setIsEditDialogOpen(false);
       setSelectedDevice(null);
@@ -187,12 +234,12 @@ const DeviceManager = () => {
     const problemsCount = getProblemsForDevice(deviceId).length;
     if (problemsCount > 0) {
       alert(
-        `Нельзя удалить приставку с ${problemsCount} активными проблемами. Сначала удалите или переместите проблемы.`,
+        `Нельзя удалить приставку с ${problemsCount} активными проблемами. Сначала удалите или перемести��е проблемы.`,
       );
       return;
     }
     try {
-      await devicesApi.delete(deviceId);
+      await devicesApi.deleteDevice(deviceId);
       await refetch();
     } catch (error) {
       console.error("Error deleting device:", error);
@@ -376,7 +423,7 @@ const DeviceManager = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="color">Цветовая схема</Label>
+                  <Label htmlFor="color">Цв��товая схема</Label>
                   <Select
                     value={formData.color}
                     onValueChange={(value) =>
