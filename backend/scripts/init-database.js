@@ -2,13 +2,13 @@
 
 /**
  * Скрипт для автоматической инициализации базы данных
- * Выполняет миграции и заполнение начальными данными
+ * Выполняет миграции и заполнение н��чальными данными
  */
 
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 import fs from 'fs';
-import { execDatabase, checkConnection, getDatabaseStats } from '../src/utils/database.js';
+import { query, testConnection, getDatabaseStats } from '../src/utils/database.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -177,7 +177,7 @@ async function initializeDatabase() {
     log.info(`Найдено таблиц: ${existingTables.length}`);
     
     if (existingTables.length === 0) {
-      // Если таблиц нет, выполняем полную инициализацию
+      // Если таблиц нет, выполняем полную инициали��ацию
       log.info('Таблицы не найдены, выполняем полную инициализацию...');
       await runMigrations();
       await seedDatabase();
@@ -224,7 +224,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
       process.exit(0);
     })
     .catch((error) => {
-      log.error(`Критическ��я ошибка: ${error.message}`);
+      log.error(`Критическая ошибка: ${error.message}`);
       process.exit(1);
     });
 }
