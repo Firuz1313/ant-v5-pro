@@ -121,10 +121,10 @@ export const tvInterfacesAPI = {
         highlight_areas: data.highlightAreas || [],
       };
 
-      const response = await apiRequest<TVInterfaceApiResponse>("", {
-        method: "POST",
-        body: JSON.stringify(requestData),
-      });
+      const response = await apiClient.post<TVInterfaceApiResponse>(
+        API_ENDPOINT,
+        requestData,
+      );
 
       return {
         success: true,
@@ -134,10 +134,7 @@ export const tvInterfacesAPI = {
     } catch (error) {
       return {
         success: false,
-        error:
-          error instanceof Error
-            ? error.message
-            : "Ошибка при создании TV интерфейса",
+        error: handleApiError(error),
       };
     }
   },
