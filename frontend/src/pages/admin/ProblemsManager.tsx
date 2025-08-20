@@ -85,7 +85,7 @@ interface Problem {
 
 const ProblemsManager = () => {
   const { data: devicesResponse } = useDevices();
-  const { data: problemsResponse } = useProblems(1, 20, { is_active: true });
+  const { data: problemsResponse } = useProblems(1, 20, { admin: true });
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
@@ -327,7 +327,7 @@ const ProblemsManager = () => {
           "Проблема с таким названием уже существует для этого устройства. Попробуйте другое название.",
         );
       } else {
-        alert("Ошибка при создании проблемы: " + errorMessage);
+        alert("Ошибка при со��дании проблемы: " + errorMessage);
       }
     }
   };
@@ -555,8 +555,8 @@ const ProblemsManager = () => {
                     );
                   } else {
                     alert(
-                      "Ошибка при создании тестовой проблемы: " +
-                        (error?.message || "Неизвестная ��шибка"),
+                      "Ошибка при создании тест��вой проблемы: " +
+                        (error?.message || "Неизвестная ошибка"),
                     );
                   }
                 });
@@ -1044,7 +1044,7 @@ const ProblemsManager = () => {
             </div>
 
             <div>
-              <Label htmlFor="edit-description">Описан��е</Label>
+              <Label htmlFor="edit-description">Описание</Label>
               <Textarea
                 id="edit-description"
                 value={formData.description}
