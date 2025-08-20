@@ -338,21 +338,30 @@ export class ApiClient {
         }
 
         // Handle network connectivity errors with retry logic
-        if (error.message === "Failed to fetch" || error.name === "TypeError") {
+        if (error.message === "Failed to fetch" || error.name === "TypeError" || error.message.includes("Illegal invocation")) {
           console.error(`📡 Network error detected - checking connectivity`);
 
           // Check if FullStory is interfering
           const isFullStoryPresent = error.stack && error.stack.includes('fullstory.com');
-          if (isFullStoryPresent) {
-            console.error(`📡 FullStory interference detected - this may be causing fetch failures`);
-            console.error(`📡 Stack trace includes: fullstory.com`);
+          const isIllegalInvocation = error.message.includes("Illegal invocation");
+
+          if (isFullStoryPresent || isIllegalInvocation) {
+            console.error(`📡 Fetch API interference detected - switching to XMLHttpRequest fallback`);
+            if (!this.useFallback) {
+              this.useFallback = true;
+              console.log(`📡 Enabling XHR fallback mode for future requests`);
+              // Retry immediately with fallback
+              return this.makeRequest<T>(endpoint, options, retryCount);
+            }
           }
 
           // Retry for network failures (up to 3 retries with exponential backoff)
           if (retryCount < 3) {
             const backoffDelay = Math.min(1000 * Math.pow(2, retryCount), 5000); // 1s, 2s, 4s max
             console.log(`🔄 Retrying network request (attempt ${retryCount + 1}/3) after ${backoffDelay}ms delay...`);
-            if (isFullStoryPresent) {
+            if (this.useFallback) {
+              console.log(`📡 Using XMLHttpRequest fallback...`);
+            } else if (isFullStoryPresent) {
               console.log(`📡 Attempting to bypass FullStory fetch wrapper...`);
             } else {
               console.log(`📡 This might be due to database reconnection - please wait...`);
@@ -361,9 +370,11 @@ export class ApiClient {
             return this.makeRequest<T>(endpoint, options, retryCount + 1);
           }
 
-          const errorMessage = isFullStoryPresent
-            ? "Network request failed due to FullStory interference after 3 retries. Please try refreshing the page."
-            : "Network connection failed after 3 retries - this may be due to database connectivity issues. Please try again in a moment.";
+          const errorMessage = this.useFallback
+            ? "Network request failed using XMLHttpRequest fallback after 3 retries. Please check your connection."
+            : isFullStoryPresent
+              ? "Network request failed due to fetch API interference after 3 retries. Switching to fallback mode."
+              : "Network connection failed after 3 retries - this may be due to database connectivity issues. Please try again in a moment.";
 
           throw new ApiError(errorMessage, 0);
         }
