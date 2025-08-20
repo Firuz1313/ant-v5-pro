@@ -166,7 +166,7 @@ const ProblemsManager = () => {
     },
     {
       value: "from-indigo-500 to-indigo-600",
-      label: "Инди��о",
+      label: "Индиго",
       preview: "bg-indigo-500",
     },
     {
@@ -245,7 +245,7 @@ const ProblemsManager = () => {
       await updateProblemMutation.mutateAsync({
         id: selectedProblem.id,
         data: {
-          deviceId: formData.deviceId,
+          device_id: formData.deviceId,
           title: formData.title,
           description: formData.description,
           category: formData.category,
@@ -402,7 +402,7 @@ const ProblemsManager = () => {
               </DialogHeader>
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="deviceId">При��тавка</Label>
+                  <Label htmlFor="deviceId">Приставка</Label>
                   <Select
                     value={formData.deviceId}
                     onValueChange={(value) =>
