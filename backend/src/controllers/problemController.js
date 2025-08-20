@@ -145,10 +145,19 @@ class ProblemController {
             success: false,
             error: 'Проблема с таким названием уже существует для данного устройства',
             errorType: 'DUPLICATE_ERROR',
+            details: {
+              message: 'Название проблемы должно быть уникальным для каждого устройства',
+              suggestions: [
+                'Измените название проблемы',
+                'Добавьте уточняющие детали к названию',
+                'Проверьте, можно ли дополнить существующую проблему'
+              ]
+            },
             existingProblem: {
               id: existingProblem.id,
               title: existingProblem.title,
-              status: existingProblem.status
+              status: existingProblem.status,
+              created_at: existingProblem.created_at
             },
             timestamp: new Date().toISOString()
           });
@@ -213,7 +222,7 @@ class ProblemController {
         if (duplicateProblem && duplicateProblem.id !== id) {
           return res.status(409).json({
             success: false,
-            error: 'Проблема с таким названием уже существует для данного устройства',
+            error: 'Проблема с таким названием уже существует для данного устройст��а',
             errorType: 'DUPLICATE_ERROR',
             timestamp: new Date().toISOString()
           });
