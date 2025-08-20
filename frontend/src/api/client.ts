@@ -179,7 +179,11 @@ export class ApiClient {
         );
       } catch (textError) {
         console.error(`📡 Failed to read response text:`, textError);
-        responseText = "";
+        // If we can't read the response body, create a generic error response
+        responseText = JSON.stringify({
+          error: `Failed to read response body: ${textError.message}`,
+          errorType: "RESPONSE_READ_ERROR"
+        });
       }
 
       // Try to parse JSON if we have text
@@ -320,7 +324,7 @@ const getApiBaseUrl = (): string => {
       return proxyUrl;
     }
 
-    // Локальн��я разработка - прямое подключение к бэкенду
+    // Локальн��я разработка - пря��ое подключение к бэкенду
     if (hostname === "localhost" && port === "8080") {
       const directUrl = "http://localhost:3000/api";
       console.log("🏠 Local development - using direct connection:", directUrl);
