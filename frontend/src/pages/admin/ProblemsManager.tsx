@@ -107,7 +107,7 @@ const ProblemsManager = () => {
       (problem) =>
         problem.title.toLowerCase().trim() === title.toLowerCase().trim() &&
         (problem.device_id === deviceId || problem.deviceId === deviceId) &&
-        problem.is_active !== false
+        problem.is_active !== false,
     );
   };
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
@@ -256,7 +256,7 @@ const ProblemsManager = () => {
     // Client-side duplicate check for better UX
     if (checkForDuplicateTitle(formData.title, formData.deviceId)) {
       alert(
-        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\nПожалуйста, выберите другое ��азвание.`
+        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\nПожалуйста, выберите другое ��азвание.`,
       );
       return;
     }
@@ -300,7 +300,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "RATE_LIMIT") {
         const retryAfter = errorResponse.retryAfter || 5;
         alert(
-          `Слишком частые попытки создания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? 'ы' : ''} перед следующей попыткой.`
+          `Слишком частые попытки создания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
         );
       } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
@@ -410,10 +410,13 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         alert(
-          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`
+          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`,
         );
       } else {
-        alert("Ошибка при дублировании проблемы: " + ((error as any)?.message || "Неизвестная ошибка"));
+        alert(
+          "Ошибка при дублировании проблемы: " +
+            ((error as any)?.message || "Неизвестная ошибка"),
+        );
       }
     }
   };
@@ -484,14 +487,16 @@ const ProblemsManager = () => {
               // Генерируем действительно уникальный ID
               const timestamp = Date.now();
               const randomPart = Math.random().toString(36).substring(2, 11);
-              const microTime = performance.now().toString().replace('.', '');
+              const microTime = performance.now().toString().replace(".", "");
               const uniqueId = `${timestamp}_${randomPart}_${microTime.slice(-6)}`;
 
               let testTitle = `TEST-${uniqueId}`;
 
               // Проверяем уникальность на клиенте
               while (checkForDuplicateTitle(testTitle, "openbox")) {
-                console.warn(`⚠️  Название ${testTitle} уже существует, генерируем новое`);
+                console.warn(
+                  `⚠️  Название ${testTitle} уже существует, генерируем новое`,
+                );
                 const newRandom = Math.random().toString(36).substring(2, 11);
                 testTitle = `TEST-${timestamp}_${newRandom}_${Date.now().toString().slice(-4)}`;
               }
@@ -510,26 +515,33 @@ const ProblemsManager = () => {
                 status: "published" as any,
               };
               console.log("📦 Тестовые данные:", testData);
-              createProblemMutation.mutateAsync(testData)
+              createProblemMutation
+                .mutateAsync(testData)
                 .then(() => {
                   console.log("✅ Тестовая проблема создана успешно");
                   alert("Тестовая проблема создана успешно!");
                 })
                 .catch((error) => {
-                  console.error("❌ Ошибка при создании тестовой проблемы:", error);
+                  console.error(
+                    "❌ Ошибка при создании тестовой проблемы:",
+                    error,
+                  );
 
                   const errorResponse = error?.response?.data;
                   if (errorResponse?.errorType === "RATE_LIMIT") {
                     const retryAfter = errorResponse.retryAfter || 5;
                     alert(
-                      `Слишком частое тестирование API.\n\nПодождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? 'ы' : ''} перед следующей попыткой.`
+                      `Слишком частое тестирование API.\n\nПодождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
                     );
                   } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
                     alert(
-                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`
+                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
                     );
                   } else {
-                    alert("Ошибка при создании тестовой проблемы: " + (error?.message || "Неизвестная ошибка"));
+                    alert(
+                      "Ошибка при создании тестовой проблемы: " +
+                        (error?.message || "Неизвестная ошибка"),
+                    );
                   }
                 });
             }}
@@ -743,14 +755,24 @@ const ProblemsManager = () => {
                       !formData.title ||
                       !formData.deviceId ||
                       createProblemMutation.isPending ||
-                      (formData.title && formData.deviceId && checkForDuplicateTitle(formData.title, formData.deviceId))
+                      (formData.title &&
+                        formData.deviceId &&
+                        checkForDuplicateTitle(
+                          formData.title,
+                          formData.deviceId,
+                        ))
                     }
                   >
                     {createProblemMutation.isPending
                       ? "Создание..."
-                      : formData.title && formData.deviceId && checkForDuplicateTitle(formData.title, formData.deviceId)
-                      ? "Название уже существует"
-                      : "Создать"}
+                      : formData.title &&
+                          formData.deviceId &&
+                          checkForDuplicateTitle(
+                            formData.title,
+                            formData.deviceId,
+                          )
+                        ? "Название уже существует"
+                        : "Создать"}
                   </Button>
                 </div>
               </div>

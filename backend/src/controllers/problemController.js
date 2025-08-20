@@ -122,19 +122,27 @@ class ProblemController {
   async createProblem(req, res, next) {
     try {
       const problemData = req.body;
-      const clientIP = req.ip || req.connection.remoteAddress || req.headers['x-forwarded-for'];
+      const clientIP =
+        req.ip ||
+        req.connection.remoteAddress ||
+        req.headers["x-forwarded-for"];
 
       // Простая защита от спама
       const now = Date.now();
       const lastCreation = this.lastCreationsByIP.get(clientIP);
 
-      if (lastCreation && (now - lastCreation) < this.SPAM_PROTECTION_WINDOW) {
-        console.warn(`⚠️  Обнаружена попытка спама от IP: ${clientIP}. Последнее создание: ${new Date(lastCreation).toISOString()}`);
+      if (lastCreation && now - lastCreation < this.SPAM_PROTECTION_WINDOW) {
+        console.warn(
+          `⚠️  Обнаружена попытка спама от IP: ${clientIP}. Последнее создание: ${new Date(lastCreation).toISOString()}`,
+        );
         return res.status(429).json({
           success: false,
-          error: "Слишком частые запросы на создание проблем. Подождите несколько секунд.",
+          error:
+            "Слишком частые запросы на создание проблем. Подождите несколько секунд.",
           errorType: "RATE_LIMIT",
-          retryAfter: Math.ceil((this.SPAM_PROTECTION_WINDOW - (now - lastCreation)) / 1000),
+          retryAfter: Math.ceil(
+            (this.SPAM_PROTECTION_WINDOW - (now - lastCreation)) / 1000,
+          ),
           timestamp: new Date().toISOString(),
         });
       }
@@ -157,7 +165,9 @@ class ProblemController {
         // Нормализуем название для сравнения
         const normalizedTitle = problemData.title.trim().toLowerCase();
 
-        console.log(`🔍 Проверка уникальности названия: "${problemData.title}" (нормализовано: "${normalizedTitle}") для устройства: ${problemData.device_id}`);
+        console.log(
+          `🔍 Проверка уникальности названия: "${problemData.title}" (нормализовано: "${normalizedTitle}") для устройства: ${problemData.device_id}`,
+        );
 
         // Используем SQL запрос для case-insensitive поиска
         const checkSql = `
@@ -170,7 +180,10 @@ class ProblemController {
           LIMIT 1
         `;
 
-        const checkResult = await problemModel.query(checkSql, [normalizedTitle, problemData.device_id]);
+        const checkResult = await problemModel.query(checkSql, [
+          normalizedTitle,
+          problemData.device_id,
+        ]);
         const existingProblem = checkResult.rows[0];
 
         if (existingProblem) {
@@ -221,7 +234,9 @@ class ProblemController {
 
           newProblem = await problemModel.create(uniqueProblemData);
 
-          console.log(`✅ Проблема создана с ID: ${newProblem.id} (попытка ${attempts + 1})`);
+          console.log(
+            `✅ Проблема создана с ID: ${newProblem.id} (попытка ${attempts + 1})`,
+          );
 
           // Записываем время создания для защиты от спама
           this.lastCreationsByIP.set(clientIP, Date.now());
@@ -229,19 +244,27 @@ class ProblemController {
           // Очищаем старые записи (оставляем только последние 100)
           if (this.lastCreationsByIP.size > 100) {
             const entries = Array.from(this.lastCreationsByIP.entries());
-            const sortedEntries = entries.sort((a, b) => b[1] - a[1]).slice(0, 50);
+            const sortedEntries = entries
+              .sort((a, b) => b[1] - a[1])
+              .slice(0, 50);
             this.lastCreationsByIP.clear();
-            sortedEntries.forEach(([ip, time]) => this.lastCreationsByIP.set(ip, time));
+            sortedEntries.forEach(([ip, time]) =>
+              this.lastCreationsByIP.set(ip, time),
+            );
           }
 
           break;
         } catch (error) {
           attempts++;
-          if (error.code === '23505' && error.detail?.includes('id')) {
+          if (error.code === "23505" && error.detail?.includes("id")) {
             // Конфликт по ID, пробуем еще раз
-            console.warn(`⚠️  Конфликт ID при создании проблемы, попытка ${attempts}/${maxAttempts}`);
+            console.warn(
+              `⚠️  Конфликт ID при создании проблемы, попытка ${attempts}/${maxAttempts}`,
+            );
             if (attempts >= maxAttempts) {
-              throw new Error('Не удалось создать уникальный ID после нескольких попыток');
+              throw new Error(
+                "Не удалось создать уникальный ID после нескольких попыток",
+              );
             }
           } else {
             // Другая ошибка, пробрасываем дальше
@@ -298,11 +321,18 @@ class ProblemController {
       }
 
       // Проверяем уникальность названия при изменении
-      if (updateData.title && updateData.title.trim().toLowerCase() !== existingProblem.title.trim().toLowerCase()) {
-        const deviceIdToCheck = updateData.device_id || existingProblem.device_id;
+      if (
+        updateData.title &&
+        updateData.title.trim().toLowerCase() !==
+          existingProblem.title.trim().toLowerCase()
+      ) {
+        const deviceIdToCheck =
+          updateData.device_id || existingProblem.device_id;
         const normalizedTitle = updateData.title.trim().toLowerCase();
 
-        console.log(`🔍 Проверка уникальности при обновлении: "${updateData.title}" для устройства: ${deviceIdToCheck}`);
+        console.log(
+          `🔍 Проверка уникальности при обновлении: "${updateData.title}" для устройства: ${deviceIdToCheck}`,
+        );
 
         // Используем SQL запрос для case-insensitive поиска
         const checkSql = `
@@ -315,7 +345,11 @@ class ProblemController {
           LIMIT 1
         `;
 
-        const checkResult = await problemModel.query(checkSql, [normalizedTitle, deviceIdToCheck, id]);
+        const checkResult = await problemModel.query(checkSql, [
+          normalizedTitle,
+          deviceIdToCheck,
+          id,
+        ]);
         const duplicateProblem = checkResult.rows[0];
 
         if (duplicateProblem) {

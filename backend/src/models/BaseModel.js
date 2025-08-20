@@ -77,15 +77,35 @@ class BaseModel {
     const serialized = { ...data };
 
     // Список полей, которые должны быть сериализованы в JSON
-    const jsonFields = ['tags', 'metadata', 'buttons', 'zones', 'clickable_areas', 'highlight_areas',
-                       'validation_rules', 'failure_actions', 'media', 'next_step_conditions',
-                       'dimensions', 'breakpoints', 'permissions', 'preferences', 'changes',
-                       'error_steps', 'feedback', 'user_input', 'coordinates', 'api_settings',
-                       'email_settings', 'storage_settings', 'supported_languages'];
+    const jsonFields = [
+      "tags",
+      "metadata",
+      "buttons",
+      "zones",
+      "clickable_areas",
+      "highlight_areas",
+      "validation_rules",
+      "failure_actions",
+      "media",
+      "next_step_conditions",
+      "dimensions",
+      "breakpoints",
+      "permissions",
+      "preferences",
+      "changes",
+      "error_steps",
+      "feedback",
+      "user_input",
+      "coordinates",
+      "api_settings",
+      "email_settings",
+      "storage_settings",
+      "supported_languages",
+    ];
 
     for (const field of jsonFields) {
       if (serialized[field] !== undefined && serialized[field] !== null) {
-        if (typeof serialized[field] === 'object') {
+        if (typeof serialized[field] === "object") {
           // Конвертируем объекты и массивы в JSON строки
           serialized[field] = JSON.stringify(serialized[field]);
         }
