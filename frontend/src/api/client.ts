@@ -456,6 +456,7 @@ export class ApiClient {
     data?: any,
     options: RequestOptions = {},
   ): Promise<T> {
+    console.log(`🔥 POST request to ${endpoint} with data:`, data);
     return this.makeRequest<T>(endpoint, {
       ...options,
       method: "POST",
