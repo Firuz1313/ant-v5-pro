@@ -312,7 +312,7 @@ const ProblemsManager = () => {
         const suggestions = errorResponse.details?.suggestions || [];
 
         let alertMessage = `Проблема с таким названием уже существует для этого устройства.\n\n`;
-        alertMessage += `Существующая проблема:\n`;
+        alertMessage += `Суще��твующая проблема:\n`;
         alertMessage += `• Название: "${existingProblem?.title}"\n`;
         alertMessage += `• Статус: ${existingProblem?.status}\n`;
         alertMessage += `• Создана: ${existingProblem?.created_at ? new Date(existingProblem.created_at).toLocaleDateString() : "н/д"}\n\n`;
@@ -366,14 +366,14 @@ const ProblemsManager = () => {
 
     console.log(`🚀 Starting hard delete mutation for problem ${problemId}`);
     try {
-      // force=true means hard delete (complete removal from database)
-      const result = await deleteProblemMutation.mutateAsync({ id: problemId, force: true });
+      // По умолчанию теперь hard delete (полное удаление из базы)
+      const result = await deleteProblemMutation.mutateAsync({ id: problemId });
       console.log(`✅ Hard delete successful:`, result);
       console.log(`🔄 React Query should automatically invalidate and refetch problems list`);
 
     } catch (error) {
       console.error("❌ Error deleting problem:", error);
-      alert("Ошибка при удалении проблемы: " + (error as any)?.message);
+      alert("Ошибка при удалении ��роблемы: " + (error as any)?.message);
     }
   };
 
@@ -415,7 +415,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         alert(
-          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать сущес��вующую копию или создать новую проблему вручную.`,
+          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`,
         );
       } else {
         alert(
@@ -453,7 +453,7 @@ const ProblemsManager = () => {
   const handleClearAllProblems = async () => {
     if (
       !confirm(
-        "Вы уверены, что хотите удалить ВСЕ проблемы? Это действие нельзя отменить!",
+        "Вы уверены, что хотите уд��лить ВСЕ проблемы? Это действие нельзя отменить!",
       )
     )
       return;
@@ -540,7 +540,7 @@ const ProblemsManager = () => {
                     );
                   } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
                     alert(
-                      `Не удалось создать тестову�� проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
+                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
                     );
                   } else {
                     alert(
@@ -1152,7 +1152,7 @@ const ProblemsManager = () => {
               Пр��блемы не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте измени��ь фильтры поиска или создайт�� новую проблему.
+              Попробуйте измени��ь фильтры поиска или создайт�� нову�� проблему.
             </p>
           </CardContent>
         </Card>
