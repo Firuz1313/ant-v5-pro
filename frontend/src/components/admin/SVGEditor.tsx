@@ -573,7 +573,7 @@ const SVGEditor = () => {
                 <Label htmlFor="project-description">Описание</Label>
                 <Textarea
                   id="project-description"
-                  value={project.description}
+                  value={project.description || ""}
                   onChange={(e) =>
                     setProject({ ...project, description: e.target.value })
                   }
