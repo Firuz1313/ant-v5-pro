@@ -175,6 +175,8 @@ const RemoteBuilder = () => {
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
+  const editorFileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [selectedRemote, setSelectedRemote] = useState<RemoteTemplate | null>(
