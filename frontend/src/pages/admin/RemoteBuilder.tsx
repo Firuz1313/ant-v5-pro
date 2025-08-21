@@ -95,17 +95,17 @@ interface RemoteTemplate {
 
 const RemoteBuilder = () => {
   const { data: devicesResponse } = useDevices();
+  const { data: remotesResponse, isLoading: remotesLoading, error: remotesError } = useRemotes();
+
+  const createRemoteMutation = useCreateRemote();
+  const updateRemoteMutation = useUpdateRemote();
+  const deleteRemoteMutation = useDeleteRemote();
+  const setDefaultMutation = useSetDefaultRemote();
+  const duplicateMutation = useDuplicateRemote();
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
-
-  // Temporarily using empty arrays for removed static data
-  const remotes: RemoteTemplate[] = [];
-
-  // Mock functions for removed static functionality
-  const createRemote = async (remote: any) => {};
-  const updateRemote = async (id: string, data: any) => {};
-  const deleteRemote = async (id: string) => {};
+  const remotes: RemoteTemplate[] = remotesResponse?.data || [];
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
   const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
   const getRemotesForDevice = (deviceId: string) =>
@@ -877,7 +877,7 @@ const RemoteBuilder = () => {
                         <SelectValue placeholder="Выберите приставку" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="universal">Универсальный</SelectItem>
+                        <SelectItem value="universal">Унив��рсальный</SelectItem>
                         {activeDevices.map((device) => (
                           <SelectItem key={device.id} value={device.id}>
                             {device.name}
@@ -1329,7 +1329,7 @@ const RemoteBuilder = () => {
                 <div className="mt-2">
                   <img
                     src={previewImageUrl}
-                    alt="Предварительный просмотр"
+                    alt="Предварительный пр��смотр"
                     className="w-full h-32 object-contain bg-gray-100 dark:bg-gray-800 rounded"
                   />
                 </div>
