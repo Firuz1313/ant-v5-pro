@@ -63,8 +63,6 @@ import type { RemoteFilters } from "@/api/remotes";
 import { remotesApi } from "@/api";
 
 console.log("🔥🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! 🔥🔥🔥");
-// TEMPORARY: Alert to verify file is loaded
-alert("🔥 RemoteBuilder file loaded! 🔥");
 
 interface RemoteButton {
   id: string;
@@ -769,7 +767,7 @@ const RemoteBuilder = () => {
                   <AlertDescription>
                     <div className="space-y-3">
                       <p className="text-sm font-medium">
-                        Редактирование: {selectedButton.label}
+                        Редактир��вание: {selectedButton.label}
                       </p>
                       <div>
                         <Label htmlFor="edit-button-label">Название</Label>
