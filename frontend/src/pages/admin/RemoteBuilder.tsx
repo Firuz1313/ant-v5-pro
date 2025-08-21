@@ -149,7 +149,7 @@ const RemoteBuilder = () => {
     isLoading: remotesLoading,
     error: remotesError,
   } = useRemotes();
-  console.log("📊📊📊 RemoteBuilder: useRemotes returned:", {
+  console.log("📊📊���� RemoteBuilder: useRemotes returned:", {
     remotesResponse,
     remotesLoading,
     remotesError,
@@ -421,7 +421,7 @@ const RemoteBuilder = () => {
       toast.success("Пульт дублирован успешно");
     } catch (error: any) {
       console.error("Error duplicating remote:", error);
-      toast.error(error?.message || "Ошибка при дублировании пульта");
+      toast.error(error?.message || "Ошибк�� при дублировании пульта");
     }
   };
 
@@ -1057,7 +1057,7 @@ const RemoteBuilder = () => {
                     >
                       <ImageIcon className="h-4 w-4 mr-2" />
                       {previewImageUrl
-                        ? "Изменить изображение"
+                        ? "Изменить и��ображение"
                         : "Загрузить изображение"}
                     </Button>
                   </div>
@@ -1464,11 +1464,11 @@ const RemoteBuilder = () => {
               <Label htmlFor="edit-description">Описание</Label>
               <Textarea
                 id="edit-description"
-                value={formData.description}
+                value={formData.description || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="��ведите описание пульта"
+                placeholder="Введите описание пульта"
               />
             </div>
 
