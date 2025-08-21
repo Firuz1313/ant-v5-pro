@@ -416,7 +416,7 @@ const RemoteBuilder = () => {
       toast.success("Пульт установлен по умолчанию");
     } catch (error: any) {
       console.error("Error setting default remote:", error);
-      toast.error(error?.message || "��шибка при установке пульта по умолчанию");
+      toast.error(error?.message || "��шибка при установке пульта по умолчани��");
     }
   };
 
@@ -686,10 +686,10 @@ const RemoteBuilder = () => {
                 key={button.id}
                 className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
                 style={{
-                  left: `${(button.position.x / 400) * 100}%`,
-                  top: `${(button.position.y / 600) * 100}%`,
-                  width: `${(button.size.width / 400) * 100}%`,
-                  height: `${(button.size.height / 600) * 100}%`,
+                  left: `${((button.position?.x ?? 0) / 400) * 100}%`,
+                  top: `${((button.position?.y ?? 0) / 600) * 100}%`,
+                  width: `${((button.size?.width ?? 40) / 400) * 100}%`,
+                  height: `${((button.size?.height ?? 40) / 600) * 100}%`,
                   backgroundColor: button.color + "80",
                   color: button.textColor,
                   fontSize: `${button.fontSize}px`,
@@ -873,7 +873,7 @@ const RemoteBuilder = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                Кнопки ({(selectedRemote.buttons || []).length})
+                Кноп��и ({(selectedRemote.buttons || []).length})
               </CardTitle>
             </CardHeader>
             <CardContent>
