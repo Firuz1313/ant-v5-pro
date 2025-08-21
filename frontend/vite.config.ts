@@ -79,11 +79,8 @@ export default defineConfig(({ mode }) => ({
     react({
       // 🔧 FIX: Enable fast refresh for better development experience
       fastRefresh: true,
-      jsxImportSource: '@emotion/react',
-      // 🔧 FIX: Reduce babel transformations that cause re-renders
-      babel: {
-        plugins: [],
-      },
+      // 🔧 FIX: Remove Emotion React imports that cause errors
+      // jsxImportSource: '@emotion/react',
     }),
   ],
   resolve: {
