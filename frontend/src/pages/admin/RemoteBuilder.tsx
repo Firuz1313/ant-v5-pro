@@ -74,6 +74,7 @@ interface RemoteButton {
   isVisible: boolean;
 }
 
+// Using backend API schema format
 interface RemoteTemplate {
   id: string;
   name: string;
@@ -97,7 +98,7 @@ interface RemoteTemplate {
     color?: string;
     description?: string;
   }>;
-  device_id?: string;
+  device_id?: string | null;
   is_default: boolean;
   is_active: boolean;
   usage_count: number;
@@ -305,7 +306,7 @@ const RemoteBuilder = () => {
       resetForm();
     } catch (error: any) {
       console.error("Error updating remote:", error);
-      toast.error(error?.message || "Ошибка при обновлении пульта");
+      toast.error(error?.message || "Ошибка при обновлен��и пульта");
     }
   };
 
@@ -869,7 +870,7 @@ const RemoteBuilder = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name">Название</Label>
+                    <Label htmlFor="name">��азвание</Label>
                     <Input
                       id="name"
                       value={formData.name}
@@ -1062,7 +1063,7 @@ const RemoteBuilder = () => {
             <div className="flex gap-2">
               <Select value={filterDevice} onValueChange={setFilterDevice}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Приставка" />
+                  <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все приставки</SelectItem>
@@ -1450,7 +1451,7 @@ const RemoteBuilder = () => {
           <CardContent className="p-12 text-center">
             <RemoteIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Пульты не найдены
+              Пульты не н��йдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
               Попробуйте изменить фильтры поиска или создайте новый пульт.
