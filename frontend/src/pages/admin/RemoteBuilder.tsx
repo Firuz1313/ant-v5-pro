@@ -839,6 +839,7 @@ const RemoteBuilder = () => {
 
   return (
     <div className="space-y-6">
+      <RemotesTest />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -1123,7 +1124,7 @@ const RemoteBuilder = () => {
                   <CardTitle className="text-lg">{remote.name}</CardTitle>
                   <div className="flex items-center space-x-1">
                     {remote.is_default && (
-                      <Badge variant="default">П�� умолчанию</Badge>
+                      <Badge variant="default">По умолчанию</Badge>
                     )}
                     <Badge variant={remote.is_active ? "default" : "secondary"}>
                       {remote.is_active ? "Активный" : "Неактивный"}
