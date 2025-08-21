@@ -429,9 +429,9 @@ const RemoteBuilder = () => {
   const openEditDialog = (remote: RemoteTemplate) => {
     setSelectedRemote(remote);
     setFormData({
-      name: remote.name,
-      manufacturer: remote.manufacturer,
-      model: remote.model,
+      name: remote.name || "",
+      manufacturer: remote.manufacturer || "",
+      model: remote.model || "",
       description: remote.description || "",
       layout: remote.layout,
       colorScheme: remote.color_scheme || "dark",
@@ -901,7 +901,7 @@ const RemoteBuilder = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Конструктор пультов
+            Конструктор пульто��
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Создание и настройка интерактивных пультов с привязкой к приставкам
