@@ -431,7 +431,7 @@ const RemoteBuilder = () => {
       toast.success("Пульт дублирован успешно");
     } catch (error: any) {
       console.error("Error duplicating remote:", error);
-      toast.error(error?.message || "Ошибка при дублировании пульта");
+      toast.error(error?.message || "Ошибка при дублирован��и пульта");
     }
   };
 
@@ -504,7 +504,7 @@ const RemoteBuilder = () => {
     if (selectedRemote) {
       const updatedRemote = {
         ...selectedRemote,
-        buttons: [...selectedRemote.buttons, newButton],
+        buttons: [...(selectedRemote.buttons || []), newButton],
       };
 
       try {
@@ -546,7 +546,7 @@ const RemoteBuilder = () => {
 
     const updatedRemote = {
       ...selectedRemote,
-      buttons: selectedRemote.buttons.map((b) =>
+      buttons: (selectedRemote.buttons || []).map((b) =>
         b.id === selectedButton.id ? updatedButton : b,
       ),
       updatedAt: new Date().toISOString().split("T")[0],
@@ -572,7 +572,7 @@ const RemoteBuilder = () => {
 
     const updatedRemote = {
       ...selectedRemote,
-      buttons: selectedRemote.buttons.filter((b) => b.id !== buttonId),
+      buttons: (selectedRemote.buttons || []).filter((b) => b.id !== buttonId),
       updatedAt: new Date().toISOString().split("T")[0],
     };
 
@@ -873,12 +873,12 @@ const RemoteBuilder = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                Кнопки ({selectedRemote.buttons.length})
+                Кнопки ({(selectedRemote.buttons || []).length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {selectedRemote.buttons.map((button) => (
+                {(selectedRemote.buttons || []).map((button) => (
                   <div
                     key={button.id}
                     className={`flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
@@ -897,7 +897,7 @@ const RemoteBuilder = () => {
                     <MousePointer className="h-4 w-4 text-gray-400" />
                   </div>
                 ))}
-                {selectedRemote.buttons.length === 0 && (
+                {(selectedRemote.buttons || []).length === 0 && (
                   <div className="text-center text-gray-500 py-4">
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет кнопок</p>
@@ -1247,7 +1247,7 @@ const RemoteBuilder = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Произв��дитель:
+                        Производитель:
                       </span>
                       <span className="font-medium">{remote.manufacturer}</span>
                     </div>
