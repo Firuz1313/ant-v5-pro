@@ -123,7 +123,7 @@ const RemoteBuilder = () => {
     );
     console.log("🚀🚀🚀 RemoteBuilder: remotesApi object:", remotesApi);
     console.log(
-      "🚀🚀🚀 RemoteBuilder: remotesApi.getAll function:",
+      "🚀🚀��� RemoteBuilder: remotesApi.getAll function:",
       remotesApi.getAll,
     );
 
@@ -776,16 +776,16 @@ const RemoteBuilder = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => editorFileInputRef.current?.click()}
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  Изо��ражение
+                  Изображение
                 </Button>
               </div>
 
               <input
-                ref={fileInputRef}
+                ref={editorFileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
