@@ -432,7 +432,7 @@ const RemoteBuilder = () => {
       name: remote.name,
       manufacturer: remote.manufacturer,
       model: remote.model,
-      description: remote.description,
+      description: remote.description || "",
       layout: remote.layout,
       colorScheme: remote.color_scheme || "dark",
       deviceId: remote.device_id || "universal",
@@ -994,7 +994,7 @@ const RemoteBuilder = () => {
                   <Label htmlFor="description">Описание</Label>
                   <Textarea
                     id="description"
-                    value={formData.description}
+                    value={formData.description || ""}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
@@ -1420,7 +1420,7 @@ const RemoteBuilder = () => {
               <Label htmlFor="edit-description">Описание</Label>
               <Textarea
                 id="edit-description"
-                value={formData.description}
+                value={formData.description || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
