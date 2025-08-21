@@ -945,7 +945,7 @@ const RemoteBuilder = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      placeholder="Введите название пульта"
+                      placeholder="Введи��е название пульта"
                     />
                   </div>
                   <div>
@@ -1003,7 +1003,7 @@ const RemoteBuilder = () => {
                   <Label htmlFor="description">Описание</Label>
                   <Textarea
                     id="description"
-                    value={formData.description || ""}
+                    value={safeFormData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
@@ -1429,7 +1429,7 @@ const RemoteBuilder = () => {
               <Label htmlFor="edit-description">Описание</Label>
               <Textarea
                 id="edit-description"
-                value={formData.description || ""}
+                value={safeFormData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
