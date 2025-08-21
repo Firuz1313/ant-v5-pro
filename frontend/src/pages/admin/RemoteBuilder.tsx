@@ -110,6 +110,8 @@ interface RemoteTemplate {
 }
 
 const RemoteBuilder = () => {
+  console.log("🔥🔥🔥 RemoteBuilder: COMPONENT STARTED! ���🔥🔥");
+
   const { data: devicesResponse } = useDevices();
 
   // Simple test of remotesApi
@@ -1062,7 +1064,7 @@ const RemoteBuilder = () => {
                     Отмена
                   </Button>
                   <Button onClick={handleCreate} disabled={!formData.name}>
-                    Создать
+                    Создат��
                   </Button>
                 </div>
               </div>
