@@ -214,6 +214,9 @@ const TVInterfaceBuilder = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    if (editFileInputRef.current) {
+      editFileInputRef.current.value = "";
+    }
   };
 
   // Handle create
@@ -280,7 +283,7 @@ const TVInterfaceBuilder = () => {
         deviceId: formData.deviceId,
       };
 
-      // Добавляем screenshot_data только если был загружен новый скриншот
+      // Добавляем screenshot_data только если был загружен новы�� скриншот
       if (
         formData.screenshotData &&
         formData.screenshotData.startsWith("data:")
@@ -389,7 +392,7 @@ const TVInterfaceBuilder = () => {
       if (response.success) {
         toast({
           title: "Успех",
-          description: response.message || "TV интерфейс дубл������рован",
+          description: response.message || "TV интерфейс дубл����рован",
         });
         loadTVInterfaces();
       } else {
@@ -450,7 +453,7 @@ const TVInterfaceBuilder = () => {
       description: tvInterface.description,
       type: tvInterface.type,
       deviceId: tvInterface.deviceId,
-      screenshotData: undefined, // Не устанавливаем существующий скриншот как дан��ые
+      screenshotData: undefined, // Не устанавливаем существующий скриншот ��ак дан��ые
     });
     // Показываем текущий скриншот как превью, но не как данные для отправки
     setPreviewImageUrl(tvInterfaceUtils.getScreenshotUrl(tvInterface));
@@ -482,7 +485,7 @@ const TVInterfaceBuilder = () => {
             Конструктор интерфейса ТВ
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание и управление интерф��йсами ТВ-приставок с полной
+            Создание и управ��ение интерф��йсами ТВ-приставок с полной
             интеграцией с бэкендом
           </p>
         </div>
@@ -510,7 +513,7 @@ const TVInterfaceBuilder = () => {
                 <AlertDialogDescription>
                   Это действие удалит все существующие TV интерфейсы. После
                   очистки вы сможете создавать св��и со��ственные интерфейсы
-                  вручную через UI.
+                  вручную чере�� UI.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -560,7 +563,7 @@ const TVInterfaceBuilder = () => {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Выберите тип инте��фейса" />
+                        <SelectValue placeholder="Выберите тип интерфейса" />
                       </SelectTrigger>
                       <SelectContent>
                         {TV_INTERFACE_TYPES.map((type) => (
@@ -1006,7 +1009,7 @@ const TVInterfaceBuilder = () => {
             </div>
 
             <div>
-              <Label htmlFor="edit-screenshot">Скри��шот интерфейса</Label>
+              <Label htmlFor="edit-screenshot">Скриншот интерфейса</Label>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Button
