@@ -18,12 +18,26 @@ export default defineConfig(({ mode }) => ({
   server: {
     host: "::",
     port: 8081,
-    hmr: false,
-    watch: null,
+    // 🔧 FIX: Enable HMR but configure it properly
+    hmr: {
+      port: 8082,
+      overlay: false,
+    },
+    // 🔧 FIX: Enable file watching to prevent polling fallback
+    watch: {
+      usePolling: false,
+      interval: 100,
+      ignored: ["**/node_modules/**", "**/.git/**"],
+    },
     middlewareMode: false,
-    force: true,
+    // 🔧 FIX: Don't force dependency pre-bundling
+    force: false,
     clearScreen: false,
     strictPort: true,
+    // 🔧 FIX: Disable aggressive optimizations that cause restarts
+    warmup: {
+      clientFiles: ['./src/main.tsx'],
+    },
     proxy: {
       "/api": {
         target: "http://localhost:3000",
@@ -33,21 +47,26 @@ export default defineConfig(({ mode }) => ({
         timeout: 30000,
         proxyTimeout: 30000,
         configure: (proxy) => {
+          // 🔧 FIX: Reduce logging verbosity to prevent console spam
           proxy.on("proxyReq", (proxyReq, req) => {
-            console.log(
-              "[🔄 PROXY] Request:",
-              req.method,
-              req.url,
-              "→ localhost:3000",
-            );
+            if (process.env.NODE_ENV === 'development') {
+              console.log(
+                "[🔄 PROXY] Request:",
+                req.method,
+                req.url,
+                "→ localhost:3000",
+              );
+            }
           });
           proxy.on("proxyRes", (proxyRes, req) => {
-            console.log(
-              "[✅ PROXY] Response:",
-              proxyRes.statusCode,
-              "for",
-              req.url,
-            );
+            if (process.env.NODE_ENV === 'development' && proxyRes.statusCode >= 400) {
+              console.log(
+                "[✅ PROXY] Response:",
+                proxyRes.statusCode,
+                "for",
+                req.url,
+              );
+            }
           });
           proxy.on("error", (err, req) => {
             console.log("[❌ PROXY] Error:", err.message, "for", req.url);
@@ -58,12 +77,22 @@ export default defineConfig(({ mode }) => ({
   },
   plugins: [
     react({
-      fastRefresh: false,
+      // 🔧 FIX: Enable fast refresh for better development experience
+      fastRefresh: true,
+      jsxImportSource: '@emotion/react',
+      // 🔧 FIX: Reduce babel transformations that cause re-renders
+      babel: {
+        plugins: [],
+      },
     }),
   ],
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src"),
     },
+  },
+  // 🔧 FIX: Add development-specific optimizations
+  define: {
+    __DEV__: mode === 'development',
   },
 }));
