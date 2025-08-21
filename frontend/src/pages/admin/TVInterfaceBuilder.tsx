@@ -95,6 +95,7 @@ const TVInterfaceBuilder = () => {
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const [isScreenshotBrowserOpen, setIsScreenshotBrowserOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   // Load TV interfaces on component mount
   useEffect(() => {
@@ -509,7 +510,7 @@ const TVInterfaceBuilder = () => {
               <AlertDialogFooter>
                 <AlertDialogCancel>Отмена</AlertDialogCancel>
                 <AlertDialogAction onClick={handleCleanupTVInterfaces}>
-                  Очистить все
+                  О��истить все
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -765,7 +766,7 @@ const TVInterfaceBuilder = () => {
               {searchTerm ||
               selectedDeviceFilter !== "all" ||
               selectedTypeFilter !== "all"
-                ? "Попробуйте изменить фильтры поиска"
+                ? "Поп��обуйте изменить фильтры поиска"
                 : "Создайте первый TV интерфейс для начала работы"}
             </p>
             {!searchTerm &&
