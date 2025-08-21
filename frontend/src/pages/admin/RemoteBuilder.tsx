@@ -302,7 +302,7 @@ const RemoteBuilder = () => {
       return;
     }
 
-    if (!confirm("В�� уверены, что хотите удалить этот пульт?")) {
+    if (!confirm("Вы уверены, что хотите удалить этот пульт?")) {
       return;
     }
 
@@ -929,7 +929,7 @@ const RemoteBuilder = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="image-upload">Изображение пульта</Label>
+                  <Label htmlFor="image-upload">��зображение пульта</Label>
                   <div className="flex items-center space-x-2">
                     <Button
                       type="button"
@@ -1092,8 +1092,8 @@ const RemoteBuilder = () => {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">{remote.name}</CardTitle>
                   <div className="flex items-center space-x-1">
-                    {remote.isDefault && (
-                      <Badge variant="default">По ум��лчанию</Badge>
+                    {remote.is_default && (
+                      <Badge variant="default">По умолчанию</Badge>
                     )}
                     <Badge variant={remote.isActive ? "default" : "secondary"}>
                       {remote.isActive ? "Активный" : "Неактивный"}
@@ -1275,7 +1275,7 @@ const RemoteBuilder = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder="Введите название пульта"
+                  placeholder="Введите ��азвание пульта"
                 />
               </div>
               <div>
