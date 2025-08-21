@@ -16,6 +16,7 @@ import SuccessPage from "@/pages/SuccessPage";
 import Index from "@/pages/Index";
 import ApiTest from "@/pages/ApiTest";
 import TVInterfaceDemo from "@/pages/TVInterfaceDemo";
+import RemotesApiTest from "@/pages/RemotesApiTest";
 import NotFound from "@/pages/NotFound";
 
 // Admin pages
@@ -90,6 +91,16 @@ function App() {
           element={
             <Layout>
               <TVInterfaceDemo />
+            </Layout>
+          }
+        />
+
+        {/* Remotes API Test page */}
+        <Route
+          path="/remotes-api-test"
+          element={
+            <Layout>
+              <RemotesApiTest />
             </Layout>
           }
         />

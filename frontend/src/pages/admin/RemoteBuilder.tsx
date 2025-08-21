@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -50,6 +50,19 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import RemoteControl from "@/components/RemoteControl";
 import { useDevices } from "@/hooks/useDevices";
+import {
+  useRemotes,
+  useCreateRemote,
+  useUpdateRemote,
+  useDeleteRemote,
+  useSetDefaultRemote,
+  useDuplicateRemote,
+} from "@/hooks/useRemotes";
+import { toast } from "sonner";
+import type { RemoteFilters } from "@/api/remotes";
+import { remotesApi } from "@/api";
+
+console.log("🔥🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! 🔥🔥🔥");
 
 interface RemoteButton {
   id: string;
@@ -64,6 +77,7 @@ interface RemoteButton {
   isVisible: boolean;
 }
 
+// Using backend API schema format
 interface RemoteTemplate {
   id: string;
   name: string;
@@ -71,38 +85,94 @@ interface RemoteTemplate {
   model: string;
   description: string;
   layout: "standard" | "compact" | "smart" | "custom";
-  colorScheme: string;
-  imageUrl?: string;
-  imageData?: string;
+  color_scheme: string;
+  image_url?: string;
+  image_data?: string;
+  svg_data?: string;
   dimensions: { width: number; height: number };
   buttons: RemoteButton[];
-  deviceId?: string;
-  isDefault: boolean;
-  isActive: boolean;
-  usageCount: number;
-  createdAt: string;
-  updatedAt: string;
+  zones?: Array<{
+    id: string;
+    name: string;
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+    color?: string;
+    description?: string;
+  }>;
+  device_id?: string | null;
+  is_default: boolean;
+  is_active: boolean;
+  usage_count: number;
+  last_used?: string;
+  metadata?: Record<string, any>;
+  created_at: string;
+  updated_at: string;
 }
 
 const RemoteBuilder = () => {
+  console.log("🔥🔥🔥 RemoteBuilder: COMPONENT STARTED! 🔥🔥🔥");
+
   const { data: devicesResponse } = useDevices();
+
+  // Simple test of remotesApi
+  React.useEffect(() => {
+    console.log(
+      "🚀🚀🚀 RemoteBuilder: useEffect STARTED! Testing remotesApi directly 🚀🚀🚀",
+    );
+    console.log("🚀🚀🚀 RemoteBuilder: remotesApi object:", remotesApi);
+    console.log(
+      "🚀🚀🚀 RemoteBuilder: remotesApi.getAll function:",
+      remotesApi.getAll,
+    );
+
+    remotesApi
+      .getAll()
+      .then((result) => {
+        console.log(
+          "✅✅✅ RemoteBuilder: remotesApi.getAll SUCCESS ✅✅✅",
+          result,
+        );
+      })
+      .catch((error) => {
+        console.error(
+          "❌❌❌ RemoteBuilder: remotesApi.getAll ERROR ❌❌❌",
+          error,
+        );
+      });
+  }, []);
+
+  console.log("🚀🚀🚀 RemoteBuilder: About to call useRemotes hook! 🚀🚀🚀");
+  const {
+    data: remotesResponse,
+    isLoading: remotesLoading,
+    error: remotesError,
+  } = useRemotes();
+  console.log("📊📊📊 RemoteBuilder: useRemotes returned:", {
+    remotesResponse,
+    remotesLoading,
+    remotesError,
+  });
+
+  const createRemoteMutation = useCreateRemote();
+  const updateRemoteMutation = useUpdateRemote();
+  const deleteRemoteMutation = useDeleteRemote();
+  const setDefaultMutation = useSetDefaultRemote();
+  const duplicateMutation = useDuplicateRemote();
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
-
-  // Temporarily using empty arrays for removed static data
-  const remotes: RemoteTemplate[] = [];
-
-  // Mock functions for removed static functionality
-  const createRemote = async (remote: any) => {};
-  const updateRemote = async (id: string, data: any) => {};
-  const deleteRemote = async (id: string) => {};
+  const remotes: RemoteTemplate[] = remotesResponse?.data || [];
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
   const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
   const getRemotesForDevice = (deviceId: string) =>
-    remotes.filter((r: any) => r.deviceId === deviceId);
+    remotes.filter((r: any) => r.device_id === deviceId);
   const canDeleteRemote = (id: string) => ({ canDelete: true, reason: "" });
-  const getRemoteUsageCount = (id: string) => 0;
+  const getRemoteUsageCount = (id: string) => {
+    const remote = remotes.find((r) => r.id === id);
+    return remote?.usage_count || 0;
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -210,9 +280,9 @@ const RemoteBuilder = () => {
       filterLayout === "all" || remote.layout === filterLayout;
     const matchesDevice =
       filterDevice === "all" ||
-      remote.deviceId === filterDevice ||
+      remote.device_id === filterDevice ||
       (filterDevice === "universal" &&
-        (!remote.deviceId || remote.deviceId === ""));
+        (!remote.device_id || remote.device_id === ""));
     return matchesSearch && matchesLayout && matchesDevice;
   });
 
@@ -230,20 +300,28 @@ const RemoteBuilder = () => {
 
   const handleCreate = async () => {
     try {
-      await createRemote({
-        ...formData,
-        deviceId: formData.deviceId === "universal" ? "" : formData.deviceId,
+      await createRemoteMutation.mutateAsync({
+        name: formData.name,
+        manufacturer: formData.manufacturer,
+        model: formData.model,
+        description: formData.description,
+        device_id: formData.deviceId === "universal" ? null : formData.deviceId,
+        layout: formData.layout,
+        color_scheme: formData.colorScheme,
         dimensions: { width: 400, height: 600 },
         buttons: [],
-        imageData: previewImageUrl || undefined,
-        isDefault: false,
-        isActive: true,
-        usageCount: 0,
+        zones: [],
+        image_data: previewImageUrl || undefined,
+        is_default: false,
+        is_active: true,
       });
+
+      toast.success("Пульт создан успешно");
       setIsCreateDialogOpen(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating remote:", error);
+      toast.error(error?.message || "Ошибка при создании пульта");
     }
   };
 
@@ -251,31 +329,48 @@ const RemoteBuilder = () => {
     if (!selectedRemote) return;
 
     try {
-      await updateRemote(selectedRemote.id, {
-        ...formData,
-        deviceId: formData.deviceId === "universal" ? "" : formData.deviceId,
-        imageData: previewImageUrl || selectedRemote.imageData,
+      await updateRemoteMutation.mutateAsync({
+        id: selectedRemote.id,
+        data: {
+          name: formData.name,
+          manufacturer: formData.manufacturer,
+          model: formData.model,
+          description: formData.description,
+          device_id:
+            formData.deviceId === "universal" ? null : formData.deviceId,
+          layout: formData.layout,
+          color_scheme: formData.colorScheme,
+          image_data: previewImageUrl || selectedRemote.image_data,
+        },
       });
+
+      toast.success("Пульт обновлен успешно");
       setIsEditDialogOpen(false);
       setSelectedRemote(null);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating remote:", error);
+      toast.error(error?.message || "Ошибка при обновлен��и пульта");
     }
   };
 
   const handleDelete = async (remoteId: string) => {
     const deleteCheck = canDeleteRemote(remoteId);
     if (!deleteCheck.canDelete) {
-      alert(deleteCheck.reason);
+      toast.error(deleteCheck.reason);
+      return;
+    }
+
+    if (!confirm("Вы уверены, что хотите удалить этот пульт?")) {
       return;
     }
 
     try {
-      await deleteRemote(remoteId);
-    } catch (error) {
+      await deleteRemoteMutation.mutateAsync(remoteId);
+      toast.success("Пульт удален успешно");
+    } catch (error: any) {
       console.error("Error deleting remote:", error);
-      alert("Ошибка при удалении п��льта");
+      toast.error(error?.message || "Ошибка при удалении пульта");
     }
   };
 
@@ -284,46 +379,49 @@ const RemoteBuilder = () => {
     if (!remote) return;
 
     try {
-      await updateRemote(remoteId, {
-        isActive: !remote.isActive,
+      await updateRemoteMutation.mutateAsync({
+        id: remoteId,
+        data: {
+          is_active: !remote.is_active,
+        },
       });
-    } catch (error) {
+      toast.success(
+        `Пульт ${remote.is_active ? "деактивирован" : "активирован"}`,
+      );
+    } catch (error: any) {
       console.error("Error toggling remote status:", error);
+      toast.error(error?.message || "Ошибка при изменении статуса пульта");
     }
   };
 
   const handleSetDefault = async (remoteId: string) => {
     const remote = remotes.find((r) => r.id === remoteId);
-    if (!remote?.deviceId) return;
+    if (!remote?.device_id) return;
 
     try {
-      // First, unset all defaults for the device
-      const deviceRemotes = remotes.filter(
-        (r) => r.deviceId === remote.deviceId,
-      );
-      for (const deviceRemote of deviceRemotes) {
-        if (deviceRemote.isDefault && deviceRemote.id !== remoteId) {
-          await updateRemote(deviceRemote.id, { isDefault: false });
-        }
-      }
-
-      // Then set the new default
-      await updateRemote(remoteId, { isDefault: true });
-    } catch (error) {
+      await setDefaultMutation.mutateAsync({
+        remoteId,
+        deviceId: remote.device_id,
+      });
+      toast.success("Пульт установлен по умолчанию");
+    } catch (error: any) {
       console.error("Error setting default remote:", error);
+      toast.error(error?.message || "Ошибка при установке пульта по умолчанию");
     }
   };
 
   const handleDuplicate = async (remote: RemoteTemplate) => {
     try {
-      await createRemote({
-        ...remote,
-        name: `${remote.name} (копия)`,
-        isDefault: false,
-        usageCount: 0,
+      await duplicateMutation.mutateAsync({
+        id: remote.id,
+        data: {
+          name: `${remote.name} (копия)`,
+        },
       });
-    } catch (error) {
+      toast.success("Пульт дублирован успешно");
+    } catch (error: any) {
       console.error("Error duplicating remote:", error);
+      toast.error(error?.message || "Ошибка при дублировании пульта");
     }
   };
 
@@ -335,16 +433,16 @@ const RemoteBuilder = () => {
       model: remote.model,
       description: remote.description,
       layout: remote.layout,
-      colorScheme: remote.colorScheme,
-      deviceId: remote.deviceId || "universal",
+      colorScheme: remote.color_scheme || "dark",
+      deviceId: remote.device_id || "universal",
     });
-    setPreviewImageUrl(remote.imageData || null);
+    setPreviewImageUrl(remote.image_data || null);
     setIsEditDialogOpen(true);
   };
 
   const openEditorDialog = (remote: RemoteTemplate) => {
     setSelectedRemote(remote);
-    setPreviewImageUrl(remote.imageData || null);
+    setPreviewImageUrl(remote.image_data || null);
     setIsEditorDialogOpen(true);
     setIsEditingMode(false);
     setSelectedButton(null);
@@ -400,8 +498,11 @@ const RemoteBuilder = () => {
       };
 
       try {
-        await updateRemote(selectedRemote.id, {
-          buttons: updatedRemote.buttons,
+        await updateRemoteMutation.mutateAsync({
+          id: selectedRemote.id,
+          data: {
+            buttons: updatedRemote.buttons,
+          },
         });
         setSelectedRemote(updatedRemote);
       } catch (error) {
@@ -442,8 +543,11 @@ const RemoteBuilder = () => {
     };
 
     try {
-      await updateRemote(selectedRemote.id, {
-        buttons: updatedRemote.buttons,
+      await updateRemoteMutation.mutateAsync({
+        id: selectedRemote.id,
+        data: {
+          buttons: updatedRemote.buttons,
+        },
       });
       setSelectedRemote(updatedRemote);
       setSelectedButton(null);
@@ -463,8 +567,11 @@ const RemoteBuilder = () => {
     };
 
     try {
-      await updateRemote(selectedRemote.id, {
-        buttons: updatedRemote.buttons,
+      await updateRemoteMutation.mutateAsync({
+        id: selectedRemote.id,
+        data: {
+          buttons: updatedRemote.buttons,
+        },
       });
       setSelectedRemote(updatedRemote);
     } catch (error) {
@@ -476,7 +583,10 @@ const RemoteBuilder = () => {
     if (!selectedRemote) return;
 
     try {
-      await updateRemote(selectedRemote.id, selectedRemote);
+      await updateRemoteMutation.mutateAsync({
+        id: selectedRemote.id,
+        data: selectedRemote,
+      });
       setIsEditorDialogOpen(false);
     } catch (error) {
       console.error("Error saving remote changes:", error);
@@ -680,7 +790,7 @@ const RemoteBuilder = () => {
                   <AlertDescription>
                     <div className="space-y-3">
                       <p className="text-sm font-medium">
-                        Редактирование: {selectedButton.label}
+                        Редактир��вание: {selectedButton.label}
                       </p>
                       <div>
                         <Label htmlFor="edit-button-label">Название</Label>
@@ -818,7 +928,7 @@ const RemoteBuilder = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name">Название</Label>
+                    <Label htmlFor="name">��азвание</Label>
                     <Input
                       id="name"
                       value={formData.name}
@@ -1011,7 +1121,7 @@ const RemoteBuilder = () => {
             <div className="flex gap-2">
               <Select value={filterDevice} onValueChange={setFilterDevice}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Приставка" />
+                  <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все приставки</SelectItem>
@@ -1041,11 +1151,27 @@ const RemoteBuilder = () => {
         </CardContent>
       </Card>
 
+      {/* Loading and Error States */}
+      {remotesLoading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+          <span className="text-lg">Загрузка пультов...</span>
+        </div>
+      )}
+
+      {remotesError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-700">
+            Ошибка загрузки пультов: {(remotesError as any)?.message}
+          </p>
+        </div>
+      )}
+
       {/* Remotes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRemotes.map((remote) => {
-          const device = remote.deviceId
-            ? getDeviceById(remote.deviceId)
+          const device = remote.device_id
+            ? getDeviceById(remote.device_id)
             : null;
           const usageCount = getRemoteUsageCount(remote.id);
 
@@ -1055,11 +1181,11 @@ const RemoteBuilder = () => {
                 <div className="flex items-center justify-between">
                   <CardTitle className="text-lg">{remote.name}</CardTitle>
                   <div className="flex items-center space-x-1">
-                    {remote.isDefault && (
-                      <Badge variant="default">По ум��лчанию</Badge>
+                    {remote.is_default && (
+                      <Badge variant="default">По умолчанию</Badge>
                     )}
-                    <Badge variant={remote.isActive ? "default" : "secondary"}>
-                      {remote.isActive ? "Активный" : "Неактивный"}
+                    <Badge variant={remote.is_active ? "default" : "secondary"}>
+                      {remote.is_active ? "Активный" : "Неактивный"}
                     </Badge>
                   </div>
                 </div>
@@ -1081,9 +1207,9 @@ const RemoteBuilder = () => {
 
                   {/* Remote Preview */}
                   <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-48 flex items-center justify-center relative">
-                    {remote.imageData ? (
+                    {remote.image_data ? (
                       <img
-                        src={remote.imageData}
+                        src={remote.image_data}
                         alt={remote.name}
                         className="max-w-full max-h-full object-contain"
                       />
@@ -1167,9 +1293,9 @@ const RemoteBuilder = () => {
                         <DropdownMenuItem
                           onClick={() => handleToggleStatus(remote.id)}
                         >
-                          {remote.isActive ? "Деактивировать" : "Активировать"}
+                          {remote.is_active ? "Деактивировать" : "Активировать"}
                         </DropdownMenuItem>
-                        {!remote.isDefault && remote.deviceId && (
+                        {!remote.is_default && remote.device_id && (
                           <DropdownMenuItem
                             onClick={() => handleSetDefault(remote.id)}
                           >
@@ -1399,7 +1525,7 @@ const RemoteBuilder = () => {
           <CardContent className="p-12 text-center">
             <RemoteIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Пульты не найдены
+              Пульты не н��йдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
               Попробуйте изменить фильтры поиска или создайте новый пульт.

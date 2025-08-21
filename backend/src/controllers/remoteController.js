@@ -58,6 +58,13 @@ export const getRemotes = async (req, res) => {
       sortBy = "manufacturer";
     }
 
+    console.log("🔍 getRemotes: Calling remoteModel.findAll with:", {
+      offset,
+      limit: parseInt(limit),
+      sortBy: sortBy,
+      sortOrder: sort.includes("desc") ? "DESC" : "ASC",
+    });
+
     const result = await remoteModel.findAll(
       {},
       {
@@ -68,15 +75,33 @@ export const getRemotes = async (req, res) => {
       },
     );
 
+    console.log("🔍 getRemotes: Result from findAll:", {
+      dataLength:
+        result?.data?.length || (Array.isArray(result) ? result.length : 0),
+      total: result?.total || (Array.isArray(result) ? result.length : 0),
+      isArray: Array.isArray(result),
+      fullResult: result,
+    });
+
+    // Handle both object with data/total and direct array results
+    let data, total;
+    if (Array.isArray(result)) {
+      data = result;
+      total = result.length;
+    } else {
+      data = result.data || [];
+      total = result.total || 0;
+    }
+
     res.json({
       success: true,
-      data: result.data,
+      data: data,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: result.total,
-        totalPages: Math.ceil(result.total / limit),
-        hasMore: page * limit < result.total,
+        total: total,
+        totalPages: Math.ceil(total / limit),
+        hasMore: page * limit < total,
       },
       timestamp: new Date().toISOString(),
     });
@@ -338,7 +363,7 @@ export const setRemoteAsDefault = async (req, res) => {
     console.error("Error in setRemoteAsDefault:", error);
     res.status(500).json({
       success: false,
-      error: "Ошибка при установке пульта по умолчанию",
+      error: "Ошибка при установке пульта по у��олчанию",
       details: error.message,
       timestamp: new Date().toISOString(),
     });
