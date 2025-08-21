@@ -214,13 +214,16 @@ const RemoteBuilder = () => {
   });
 
   // Additional safety: ensure formData fields are never null
-  const safeFormData = React.useMemo(() => ({
-    ...formData,
-    name: formData.name || "",
-    manufacturer: formData.manufacturer || "",
-    model: formData.model || "",
-    description: formData.description || "",
-  }), [formData]);
+  const safeFormData = React.useMemo(
+    () => ({
+      ...formData,
+      name: formData.name || "",
+      manufacturer: formData.manufacturer || "",
+      model: formData.model || "",
+      description: formData.description || "",
+    }),
+    [formData],
+  );
 
   const [buttonFormData, setButtonFormData] = useState({
     label: "",
@@ -416,7 +419,9 @@ const RemoteBuilder = () => {
       toast.success("Пульт установлен по умолчанию");
     } catch (error: any) {
       console.error("Error setting default remote:", error);
-      toast.error(error?.message || "��шибка при установке пульта по умолчанию");
+      toast.error(
+        error?.message || "��шибка при установке пульта по умолчанию",
+      );
     }
   };
 
@@ -672,53 +677,59 @@ const RemoteBuilder = () => {
 
             {/* Render buttons on canvas */}
             {(selectedRemote.buttons || [])
-              .filter(button => {
+              .filter((button) => {
                 try {
-                  return button &&
+                  return (
+                    button &&
                     button.id &&
                     (button.position == null ||
-                     (typeof button.position === 'object' &&
-                      (typeof button.position.x === 'number' || button.position.x == null) &&
-                      (typeof button.position.y === 'number' || button.position.y == null))) &&
+                      (typeof button.position === "object" &&
+                        (typeof button.position.x === "number" ||
+                          button.position.x == null) &&
+                        (typeof button.position.y === "number" ||
+                          button.position.y == null))) &&
                     (button.size == null ||
-                     (typeof button.size === 'object' &&
-                      (typeof button.size.width === 'number' || button.size.width == null) &&
-                      (typeof button.size.height === 'number' || button.size.height == null)));
+                      (typeof button.size === "object" &&
+                        (typeof button.size.width === "number" ||
+                          button.size.width == null) &&
+                        (typeof button.size.height === "number" ||
+                          button.size.height == null)))
+                  );
                 } catch (e) {
-                  console.warn('Button filter error:', e, button);
+                  console.warn("Button filter error:", e, button);
                   return false;
                 }
               })
               .map((button) => (
-              <div
-                key={button.id}
-                className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
-                style={{
-                  left: `${((button.position?.x ?? 0) / 400) * 100}%`,
-                  top: `${((button.position?.y ?? 0) / 600) * 100}%`,
-                  width: `${((button.size?.width ?? 40) / 400) * 100}%`,
-                  height: `${((button.size?.height ?? 40) / 600) * 100}%`,
-                  backgroundColor: button.color + "80",
-                  color: button.textColor,
-                  fontSize: `${button.fontSize}px`,
-                  borderRadius:
-                    button.shape === "circle"
-                      ? "50%"
-                      : button.shape === "rounded"
-                        ? "8px"
-                        : "0",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleButtonEdit(button);
-                }}
-              >
-                <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                  {button.label}
-                </span>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
-              </div>
-            ))}
+                <div
+                  key={button.id}
+                  className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
+                  style={{
+                    left: `${((button.position?.x ?? 0) / 400) * 100}%`,
+                    top: `${((button.position?.y ?? 0) / 600) * 100}%`,
+                    width: `${((button.size?.width ?? 40) / 400) * 100}%`,
+                    height: `${((button.size?.height ?? 40) / 600) * 100}%`,
+                    backgroundColor: button.color + "80",
+                    color: button.textColor,
+                    fontSize: `${button.fontSize}px`,
+                    borderRadius:
+                      button.shape === "circle"
+                        ? "50%"
+                        : button.shape === "rounded"
+                          ? "8px"
+                          : "0",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleButtonEdit(button);
+                  }}
+                >
+                  <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+                    {button.label}
+                  </span>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
+                </div>
+              ))}
           </div>
         </div>
 
