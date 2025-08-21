@@ -161,7 +161,7 @@ const RemoteBuilder = () => {
   const setDefaultMutation = useSetDefaultRemote();
   const duplicateMutation = useDuplicateRemote();
 
-  // Извлекаем массивы данных из ответ�� API
+  // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
   const remotes: RemoteTemplate[] = remotesResponse?.data || [];
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
@@ -674,10 +674,10 @@ const RemoteBuilder = () => {
                 key={button.id}
                 className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
                 style={{
-                  left: `${(button.position.x / 400) * 100}%`,
-                  top: `${(button.position.y / 600) * 100}%`,
-                  width: `${(button.size.width / 400) * 100}%`,
-                  height: `${(button.size.height / 600) * 100}%`,
+                  left: `${((button.position?.x ?? 0) / 400) * 100}%`,
+                  top: `${((button.position?.y ?? 0) / 600) * 100}%`,
+                  width: `${((button.size?.width ?? 40) / 400) * 100}%`,
+                  height: `${((button.size?.height ?? 40) / 600) * 100}%`,
                   backgroundColor: button.color + "80",
                   color: button.textColor,
                   fontSize: `${button.fontSize}px`,
@@ -748,7 +748,7 @@ const RemoteBuilder = () => {
                   <AlertDescription>
                     <div className="space-y-3">
                       <p className="text-sm">
-                        Кликните на изображение пульта для добавления кнопки
+                        Кликните на изоб��ажение пульта для добавления кнопки
                       </p>
                       <div>
                         <Label htmlFor="button-label">Название кнопки</Label>
@@ -1301,7 +1301,7 @@ const RemoteBuilder = () => {
                         <DropdownMenuItem
                           onClick={() => handleToggleStatus(remote.id)}
                         >
-                          {remote.is_active ? "Деактивировать" : "Ак��ивировать"}
+                          {remote.is_active ? "Деактивировать" : "Активировать"}
                         </DropdownMenuItem>
                         {!remote.is_default && remote.device_id && (
                           <DropdownMenuItem
