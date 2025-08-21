@@ -890,7 +890,7 @@ const RemoteBuilder = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, model: e.target.value })
                       }
-                      placeholder="Модель пульта"
+                      placeholder="Мо��ель пульта"
                     />
                   </div>
                   <div>
@@ -1052,7 +1052,7 @@ const RemoteBuilder = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все приставки</SelectItem>
-                  <SelectItem value="universal">��ниверсальные</SelectItem>
+                  <SelectItem value="universal">Универсальные</SelectItem>
                   {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
@@ -1206,7 +1206,7 @@ const RemoteBuilder = () => {
                         >
                           {remote.isActive ? "Деактивировать" : "Активировать"}
                         </DropdownMenuItem>
-                        {!remote.isDefault && remote.deviceId && (
+                        {!remote.is_default && remote.device_id && (
                           <DropdownMenuItem
                             onClick={() => handleSetDefault(remote.id)}
                           >
