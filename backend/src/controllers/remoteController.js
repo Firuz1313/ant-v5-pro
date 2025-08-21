@@ -225,7 +225,7 @@ export const updateRemote = async (req, res) => {
       });
     }
 
-    const updatedRemote = await remoteModel.update(id, updateData);
+    const updatedRemote = await remoteModel.updateById(id, updateData);
 
     if (!updatedRemote) {
       return res.status(404).json({
@@ -384,7 +384,7 @@ export const duplicateRemote = async (req, res) => {
     res.status(201).json({
       success: true,
       data: duplicatedRemote,
-      message: "Пульт дублирован успешно",
+      message: "Пульт дубл��рован успешно",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
