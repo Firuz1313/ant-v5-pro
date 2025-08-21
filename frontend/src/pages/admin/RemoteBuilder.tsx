@@ -418,7 +418,7 @@ const RemoteBuilder = () => {
           name: `${remote.name} (копия)`,
         },
       });
-      toast.success("Пульт дублирован успешно");
+      toast.success("Пульт дублирован ус��ешно");
     } catch (error: any) {
       console.error("Error duplicating remote:", error);
       toast.error(error?.message || "Ошибк�� при дублировании пульта");
@@ -428,11 +428,11 @@ const RemoteBuilder = () => {
   const openEditDialog = (remote: RemoteTemplate) => {
     setSelectedRemote(remote);
     setFormData({
-      name: remote.name,
-      manufacturer: remote.manufacturer,
-      model: remote.model,
+      name: remote.name || "",
+      manufacturer: remote.manufacturer || "",
+      model: remote.model || "",
       description: remote.description || "",
-      layout: remote.layout,
+      layout: remote.layout || "standard",
       colorScheme: remote.color_scheme || "dark",
       deviceId: remote.device_id || "universal",
     });
