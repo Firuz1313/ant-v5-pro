@@ -1093,6 +1093,20 @@ const RemoteBuilder = () => {
         </CardContent>
       </Card>
 
+      {/* Loading and Error States */}
+      {remotesLoading && (
+        <div className="flex items-center justify-center py-12">
+          <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+          <span className="text-lg">Загрузка пультов...</span>
+        </div>
+      )}
+
+      {remotesError && (
+        <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+          <p className="text-red-700">Ошибка загрузки пультов: {(remotesError as any)?.message}</p>
+        </div>
+      )}
+
       {/* Remotes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRemotes.map((remote) => {
