@@ -218,9 +218,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
 
         {/* Page Content */}
         <main className="p-6">
-          <ErrorBoundary>
-            {children}
-          </ErrorBoundary>
+          <ErrorBoundary>{children}</ErrorBoundary>
         </main>
       </div>
 

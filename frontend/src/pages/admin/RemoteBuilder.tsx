@@ -515,15 +515,15 @@ const RemoteBuilder = () => {
   };
 
   const handleButtonEdit = (button: RemoteButton) => {
-    if (!button || typeof button !== 'object') return;
+    if (!button || typeof button !== "object") return;
 
     setSelectedButton(button);
     setButtonFormData({
-      label: button.label || '',
-      action: button.action || '',
-      shape: button.shape || 'rectangle',
-      color: button.color || '#3b82f6',
-      textColor: button.textColor || '#ffffff',
+      label: button.label || "",
+      action: button.action || "",
+      shape: button.shape || "rectangle",
+      color: button.color || "#3b82f6",
+      textColor: button.textColor || "#ffffff",
       fontSize: button.fontSize || 12,
     });
   };
@@ -539,8 +539,8 @@ const RemoteBuilder = () => {
     const updatedRemote = {
       ...selectedRemote,
       buttons: (selectedRemote.buttons || [])
-        .filter((b) => b && typeof b === 'object')
-        .map((b) => b.id === selectedButton.id ? updatedButton : b),
+        .filter((b) => b && typeof b === "object")
+        .map((b) => (b.id === selectedButton.id ? updatedButton : b)),
       updatedAt: new Date().toISOString().split("T")[0],
     };
 
@@ -565,7 +565,7 @@ const RemoteBuilder = () => {
     const updatedRemote = {
       ...selectedRemote,
       buttons: (selectedRemote.buttons || [])
-        .filter((b) => b && typeof b === 'object')
+        .filter((b) => b && typeof b === "object")
         .filter((b) => b.id !== buttonId),
       updatedAt: new Date().toISOString().split("T")[0],
     };
@@ -651,33 +651,36 @@ const RemoteBuilder = () => {
             />
 
             {/* Cursor position indicator */}
-            {isCreatingButton && cursorPosition && cursorPosition.x !== undefined && cursorPosition.y !== undefined && (
-              <div
-                className="absolute bg-blue-500 text-white px-2 py-1 rounded text-xs pointer-events-none"
-                style={{
-                  left: `${(cursorPosition.x / 400) * 100}%`,
-                  top: `${(cursorPosition.y / 600) * 100 + 10}%`,
-                  transform: "translateX(-50%)",
-                }}
-              >
-                {Math.round(cursorPosition.x)}, {Math.round(cursorPosition.y)}
-              </div>
-            )}
+            {isCreatingButton &&
+              cursorPosition &&
+              cursorPosition.x !== undefined &&
+              cursorPosition.y !== undefined && (
+                <div
+                  className="absolute bg-blue-500 text-white px-2 py-1 rounded text-xs pointer-events-none"
+                  style={{
+                    left: `${(cursorPosition.x / 400) * 100}%`,
+                    top: `${(cursorPosition.y / 600) * 100 + 10}%`,
+                    transform: "translateX(-50%)",
+                  }}
+                >
+                  {Math.round(cursorPosition.x)}, {Math.round(cursorPosition.y)}
+                </div>
+              )}
 
             {/* Render buttons on canvas */}
             {(() => {
               try {
                 const buttons = selectedRemote?.buttons;
                 if (!buttons || !Array.isArray(buttons)) {
-                  console.log('No buttons or not an array:', buttons);
+                  console.log("No buttons or not an array:", buttons);
                   return null;
                 }
 
-                console.log('Processing buttons:', buttons.length);
+                console.log("Processing buttons:", buttons.length);
 
                 return buttons
                   .filter((button, index) => {
-                    if (!button || typeof button !== 'object') {
+                    if (!button || typeof button !== "object") {
                       console.log(`Invalid button at index ${index}:`, button);
                       return false;
                     }
@@ -701,8 +704,8 @@ const RemoteBuilder = () => {
                             top: `${(y / 600) * 100}%`,
                             width: `${(width / 400) * 100}%`,
                             height: `${(height / 600) * 100}%`,
-                            backgroundColor: (button.color || '#3b82f6') + "80",
-                            color: button.textColor || '#ffffff',
+                            backgroundColor: (button.color || "#3b82f6") + "80",
+                            color: button.textColor || "#ffffff",
                             fontSize: `${button.fontSize || 12}px`,
                             borderRadius:
                               button.shape === "circle"
@@ -713,25 +716,35 @@ const RemoteBuilder = () => {
                           }}
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (button && typeof button === 'object') {
+                            if (button && typeof button === "object") {
                               handleButtonEdit(button);
                             }
                           }}
                         >
                           <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                            {button.label || 'Button'}
+                            {button.label || "Button"}
                           </span>
                           <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
                         </div>
                       );
                     } catch (error) {
-                      console.error('Error rendering button at index', index, ':', error, button);
+                      console.error(
+                        "Error rendering button at index",
+                        index,
+                        ":",
+                        error,
+                        button,
+                      );
                       return null;
                     }
                   });
               } catch (error) {
-                console.error('Error in button rendering:', error);
-                return <div className="text-red-500 p-2">Error rendering buttons: {error.message}</div>;
+                console.error("Error in button rendering:", error);
+                return (
+                  <div className="text-red-500 p-2">
+                    Error rendering buttons: {error.message}
+                  </div>
+                );
               }
             })()}
           </div>
@@ -902,26 +915,28 @@ const RemoteBuilder = () => {
             <CardContent>
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {(selectedRemote.buttons || [])
-                  .filter((button) => button && typeof button === 'object')
+                  .filter((button) => button && typeof button === "object")
                   .map((button) => (
-                  <div
-                    key={button.id}
-                    className={`flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
-                      selectedButton?.id === button.id
-                        ? "ring-2 ring-blue-500"
-                        : ""
-                    }`}
-                    onClick={() => handleButtonEdit(button)}
-                  >
-                    <div>
-                      <div className="font-medium text-sm">{button.label}</div>
-                      <div className="text-xs text-gray-500">
-                        {button.action}
+                    <div
+                      key={button.id}
+                      className={`flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
+                        selectedButton?.id === button.id
+                          ? "ring-2 ring-blue-500"
+                          : ""
+                      }`}
+                      onClick={() => handleButtonEdit(button)}
+                    >
+                      <div>
+                        <div className="font-medium text-sm">
+                          {button.label}
+                        </div>
+                        <div className="text-xs text-gray-500">
+                          {button.action}
+                        </div>
                       </div>
+                      <MousePointer className="h-4 w-4 text-gray-400" />
                     </div>
-                    <MousePointer className="h-4 w-4 text-gray-400" />
-                  </div>
-                ))}
+                  ))}
                 {(selectedRemote.buttons || []).length === 0 && (
                   <div className="text-center text-gray-500 py-4">
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
