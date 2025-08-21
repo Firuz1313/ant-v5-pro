@@ -222,9 +222,9 @@ const RemoteBuilder = () => {
       filterLayout === "all" || remote.layout === filterLayout;
     const matchesDevice =
       filterDevice === "all" ||
-      remote.deviceId === filterDevice ||
+      remote.device_id === filterDevice ||
       (filterDevice === "universal" &&
-        (!remote.deviceId || remote.deviceId === ""));
+        (!remote.device_id || remote.device_id === ""));
     return matchesSearch && matchesLayout && matchesDevice;
   });
 
@@ -291,7 +291,7 @@ const RemoteBuilder = () => {
       resetForm();
     } catch (error: any) {
       console.error("Error updating remote:", error);
-      toast.error(error?.message || "Ош��бка при обновлении пульта");
+      toast.error(error?.message || "Ошибка при обновлении пульта");
     }
   };
 
@@ -850,7 +850,7 @@ const RemoteBuilder = () => {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Создать новый ��ульт</DialogTitle>
+                <DialogTitle>Создать новый пульт</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
