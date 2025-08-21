@@ -242,20 +242,28 @@ const RemoteBuilder = () => {
 
   const handleCreate = async () => {
     try {
-      await createRemote({
-        ...formData,
-        deviceId: formData.deviceId === "universal" ? "" : formData.deviceId,
+      await createRemoteMutation.mutateAsync({
+        name: formData.name,
+        manufacturer: formData.manufacturer,
+        model: formData.model,
+        description: formData.description,
+        device_id: formData.deviceId === "universal" ? null : formData.deviceId,
+        layout: formData.layout,
+        color_scheme: formData.colorScheme,
         dimensions: { width: 400, height: 600 },
         buttons: [],
-        imageData: previewImageUrl || undefined,
-        isDefault: false,
-        isActive: true,
-        usageCount: 0,
+        zones: [],
+        image_data: previewImageUrl || undefined,
+        is_default: false,
+        is_active: true,
       });
+
+      toast.success("Пульт создан успешно");
       setIsCreateDialogOpen(false);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error creating remote:", error);
+      toast.error(error?.message || "Ошибка при создании пульта");
     }
   };
 
@@ -784,7 +792,7 @@ const RemoteBuilder = () => {
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет кнопок</p>
                     <p className="text-xs">
-                      Исп��льзуйте указатель для добавления
+                      Используйте указатель для добавления
                     </p>
                   </div>
                 )}
@@ -899,7 +907,7 @@ const RemoteBuilder = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="Введите описание пульта"
+                    placeholder="В��едите описание пульта"
                   />
                 </div>
 
