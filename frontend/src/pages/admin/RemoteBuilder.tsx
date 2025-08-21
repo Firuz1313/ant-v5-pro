@@ -494,7 +494,7 @@ const RemoteBuilder = () => {
     if (selectedRemote) {
       const updatedRemote = {
         ...selectedRemote,
-        buttons: [...selectedRemote.buttons, newButton],
+        buttons: [...(selectedRemote.buttons || []), newButton],
       };
 
       try {
@@ -536,7 +536,7 @@ const RemoteBuilder = () => {
 
     const updatedRemote = {
       ...selectedRemote,
-      buttons: selectedRemote.buttons.map((b) =>
+      buttons: (selectedRemote.buttons || []).map((b) =>
         b.id === selectedButton.id ? updatedButton : b,
       ),
       updatedAt: new Date().toISOString().split("T")[0],
@@ -562,7 +562,7 @@ const RemoteBuilder = () => {
 
     const updatedRemote = {
       ...selectedRemote,
-      buttons: selectedRemote.buttons.filter((b) => b.id !== buttonId),
+      buttons: (selectedRemote.buttons || []).filter((b) => b.id !== buttonId),
       updatedAt: new Date().toISOString().split("T")[0],
     };
 
@@ -861,12 +861,12 @@ const RemoteBuilder = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                Кнопки ({selectedRemote.buttons.length})
+                Кнопки ({(selectedRemote.buttons || []).length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {selectedRemote.buttons.map((button) => (
+                {(selectedRemote.buttons || []).map((button) => (
                   <div
                     key={button.id}
                     className={`flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
@@ -885,12 +885,12 @@ const RemoteBuilder = () => {
                     <MousePointer className="h-4 w-4 text-gray-400" />
                   </div>
                 ))}
-                {selectedRemote.buttons.length === 0 && (
+                {(selectedRemote.buttons || []).length === 0 && (
                   <div className="text-center text-gray-500 py-4">
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет кнопок</p>
                     <p className="text-xs">
-                      Используйте указатель д��я добавления
+                      Используйте указатель для добавления
                     </p>
                   </div>
                 )}
@@ -908,7 +908,7 @@ const RemoteBuilder = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Конструкто�� пультов
+            Конструктор пультов
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Создание и настройка интерактивных пультов с привязкой к приставкам
@@ -1143,7 +1143,7 @@ const RemoteBuilder = () => {
               </Select>
               <Select value={filterLayout} onValueChange={setFilterLayout}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Макет" />
+                  <SelectValue placeholder="Маке��" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все макеты</SelectItem>
@@ -1193,7 +1193,7 @@ const RemoteBuilder = () => {
                       <Badge variant="default">По умолчанию</Badge>
                     )}
                     <Badge variant={remote.is_active ? "default" : "secondary"}>
-                      {remote.is_active ? "Активный" : "Неакти��ный"}
+                      {remote.is_active ? "Активный" : "Неактивный"}
                     </Badge>
                   </div>
                 </div>
