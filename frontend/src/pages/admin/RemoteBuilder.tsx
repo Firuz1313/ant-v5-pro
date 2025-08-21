@@ -371,7 +371,7 @@ const RemoteBuilder = () => {
       return;
     }
 
-    if (!confirm("В�� уверены, что хотите удалить этот пульт?")) {
+    if (!confirm("В�� уверены, что хотите у��алить этот пульт?")) {
       return;
     }
 
@@ -416,7 +416,7 @@ const RemoteBuilder = () => {
       toast.success("Пульт установлен по умолчанию");
     } catch (error: any) {
       console.error("Error setting default remote:", error);
-      toast.error(error?.message || "��шибка при установке пульта по умолчани��");
+      toast.error(error?.message || "��шибка при установке пульта по умолчанию");
     }
   };
 
@@ -672,15 +672,23 @@ const RemoteBuilder = () => {
 
             {/* Render buttons on canvas */}
             {(selectedRemote.buttons || [])
-              .filter(button =>
-                button &&
-                button.position &&
-                typeof button.position.x === 'number' &&
-                typeof button.position.y === 'number' &&
-                button.size &&
-                typeof button.size.width === 'number' &&
-                typeof button.size.height === 'number'
-              )
+              .filter(button => {
+                try {
+                  return button &&
+                    button.id &&
+                    (button.position == null ||
+                     (typeof button.position === 'object' &&
+                      (typeof button.position.x === 'number' || button.position.x == null) &&
+                      (typeof button.position.y === 'number' || button.position.y == null))) &&
+                    (button.size == null ||
+                     (typeof button.size === 'object' &&
+                      (typeof button.size.width === 'number' || button.size.width == null) &&
+                      (typeof button.size.height === 'number' || button.size.height == null)));
+                } catch (e) {
+                  console.warn('Button filter error:', e, button);
+                  return false;
+                }
+              })
               .map((button) => (
               <div
                 key={button.id}
@@ -734,7 +742,7 @@ const RemoteBuilder = () => {
                   className="w-full"
                 >
                   <Crosshair className="h-4 w-4 mr-2" />
-                  {isCreatingButton ? "Отменить" : "Выбрать позицию"}
+                  {isCreatingButton ? "Отменить" : "Выбр��ть позицию"}
                 </Button>
                 <Button
                   variant="outline"
@@ -873,7 +881,7 @@ const RemoteBuilder = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                Кноп��и ({(selectedRemote.buttons || []).length})
+                Кнопки ({(selectedRemote.buttons || []).length})
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1506,7 +1514,7 @@ const RemoteBuilder = () => {
               </div>
 
               <div>
-                <Label htmlFor="edit-colorScheme">Цветовая схема</Label>
+                <Label htmlFor="edit-colorScheme">Цветовая схем��</Label>
                 <Select
                   value={formData.colorScheme}
                   onValueChange={(value) =>
