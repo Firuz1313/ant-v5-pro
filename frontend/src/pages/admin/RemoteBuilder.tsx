@@ -80,10 +80,10 @@ interface RemoteButton {
 // Using backend API schema format
 interface RemoteTemplate {
   id: string;
-  name: string;
-  manufacturer: string;
-  model: string;
-  description: string;
+  name: string | null;
+  manufacturer: string | null;
+  model: string | null;
+  description: string | null;
   layout: "standard" | "compact" | "smart" | "custom";
   color_scheme: string;
   image_url?: string;
