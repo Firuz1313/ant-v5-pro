@@ -515,14 +515,16 @@ const RemoteBuilder = () => {
   };
 
   const handleButtonEdit = (button: RemoteButton) => {
+    if (!button || typeof button !== 'object') return;
+
     setSelectedButton(button);
     setButtonFormData({
-      label: button.label,
-      action: button.action,
-      shape: button.shape,
-      color: button.color,
-      textColor: button.textColor,
-      fontSize: button.fontSize,
+      label: button.label || '',
+      action: button.action || '',
+      shape: button.shape || 'rectangle',
+      color: button.color || '#3b82f6',
+      textColor: button.textColor || '#ffffff',
+      fontSize: button.fontSize || 12,
     });
   };
 
@@ -536,9 +538,9 @@ const RemoteBuilder = () => {
 
     const updatedRemote = {
       ...selectedRemote,
-      buttons: (selectedRemote.buttons || []).map((b) =>
-        b.id === selectedButton.id ? updatedButton : b,
-      ),
+      buttons: (selectedRemote.buttons || [])
+        .filter((b) => b && typeof b === 'object')
+        .map((b) => b.id === selectedButton.id ? updatedButton : b),
       updatedAt: new Date().toISOString().split("T")[0],
     };
 
@@ -562,7 +564,9 @@ const RemoteBuilder = () => {
 
     const updatedRemote = {
       ...selectedRemote,
-      buttons: (selectedRemote.buttons || []).filter((b) => b.id !== buttonId),
+      buttons: (selectedRemote.buttons || [])
+        .filter((b) => b && typeof b === 'object')
+        .filter((b) => b.id !== buttonId),
       updatedAt: new Date().toISOString().split("T")[0],
     };
 
@@ -662,6 +666,7 @@ const RemoteBuilder = () => {
 
             {/* Render buttons on canvas */}
             {(selectedRemote.buttons || [])
+              .filter((button) => button && typeof button === 'object')
               .map((button) => {
                 // Provide default values for missing properties
                 const position = button.position || { x: 0, y: 0 };
@@ -748,7 +753,7 @@ const RemoteBuilder = () => {
                   <AlertDescription>
                     <div className="space-y-3">
                       <p className="text-sm">
-                        Кликните на изоб��ажение пульта для добавления кнопки
+                        Кликните на изображение пульта для добавления кнопки
                       </p>
                       <div>
                         <Label htmlFor="button-label">Название кнопки</Label>
@@ -866,7 +871,9 @@ const RemoteBuilder = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {(selectedRemote.buttons || []).map((button) => (
+                {(selectedRemote.buttons || [])
+                  .filter((button) => button && typeof button === 'object')
+                  .map((button) => (
                   <div
                     key={button.id}
                     className={`flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
