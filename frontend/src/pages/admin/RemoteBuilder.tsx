@@ -161,7 +161,7 @@ const RemoteBuilder = () => {
   const setDefaultMutation = useSetDefaultRemote();
   const duplicateMutation = useDuplicateRemote();
 
-  // Извлекаем массивы данных из ответа API
+  // Извлекаем массивы данных из ответ�� API
   const devices = devicesResponse?.data || [];
   const remotes: RemoteTemplate[] = remotesResponse?.data || [];
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
@@ -647,7 +647,7 @@ const RemoteBuilder = () => {
             />
 
             {/* Cursor position indicator */}
-            {isCreatingButton && cursorPosition && (
+            {isCreatingButton && cursorPosition && cursorPosition.x !== undefined && cursorPosition.y !== undefined && (
               <div
                 className="absolute bg-blue-500 text-white px-2 py-1 rounded text-xs pointer-events-none"
                 style={{
@@ -1301,7 +1301,7 @@ const RemoteBuilder = () => {
                         <DropdownMenuItem
                           onClick={() => handleToggleStatus(remote.id)}
                         >
-                          {remote.is_active ? "Деактивировать" : "Активировать"}
+                          {remote.is_active ? "Деактивировать" : "Ак��ивировать"}
                         </DropdownMenuItem>
                         {!remote.is_default && remote.device_id && (
                           <DropdownMenuItem
