@@ -15,8 +15,8 @@ const Input = React.forwardRef<HTMLInputElement, React.ComponentProps<"input">>(
           className,
         )}
         ref={ref}
-        value={safeValue}
         {...props}
+        value={safeValue}
       />
     );
   },
