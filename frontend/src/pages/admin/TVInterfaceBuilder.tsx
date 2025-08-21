@@ -437,7 +437,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error cleaning up TV interfaces:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при очистке TV интерфейсов",
+        description: "Произошла ошибка при очистке TV интер��ейсов",
         variant: "destructive",
       });
     } finally {
@@ -1040,6 +1040,13 @@ const TVInterfaceBuilder = () => {
                     </Button>
                   )}
                 </div>
+                <input
+                  ref={editFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
 
                 {previewImageUrl && (
                   <div className="border rounded-lg p-4">
