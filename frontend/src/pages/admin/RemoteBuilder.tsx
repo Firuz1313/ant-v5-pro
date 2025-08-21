@@ -110,7 +110,7 @@ interface RemoteTemplate {
 }
 
 const RemoteBuilder = () => {
-  console.log("🔥🔥🔥 RemoteBuilder: COMPONENT STARTED! ���🔥🔥");
+  console.log("🔥🔥🔥 RemoteBuilder: COMPONENT STARTED! 🔥🔥🔥");
 
   const { data: devicesResponse } = useDevices();
 
@@ -126,7 +126,9 @@ const RemoteBuilder = () => {
       });
   }, []);
 
+  console.log("🚀🚀🚀 RemoteBuilder: About to call useRemotes hook! 🚀🚀🚀");
   const { data: remotesResponse, isLoading: remotesLoading, error: remotesError } = useRemotes();
+  console.log("📊📊📊 RemoteBuilder: useRemotes returned:", { remotesResponse, remotesLoading, remotesError });
 
   const createRemoteMutation = useCreateRemote();
   const updateRemoteMutation = useUpdateRemote();
@@ -339,7 +341,7 @@ const RemoteBuilder = () => {
 
     try {
       await deleteRemoteMutation.mutateAsync(remoteId);
-      toast.success("Пульт удален успешно");
+      toast.success("Пульт удален успешн��");
     } catch (error: any) {
       console.error("Error deleting remote:", error);
       toast.error(error?.message || "Ошибка при удалении пульта");
@@ -1064,7 +1066,7 @@ const RemoteBuilder = () => {
                     Отмена
                   </Button>
                   <Button onClick={handleCreate} disabled={!formData.name}>
-                    Создат��
+                    Создать
                   </Button>
                 </div>
               </div>
@@ -1272,7 +1274,7 @@ const RemoteBuilder = () => {
                         )}
                         <DropdownMenuItem>
                           <Download className="h-4 w-4 mr-2" />
-                          Экспортировать
+                          Экс��ортировать
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(remote.id)}
