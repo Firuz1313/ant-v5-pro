@@ -671,7 +671,7 @@ const RemoteBuilder = () => {
             )}
 
             {/* Render buttons on canvas */}
-            {selectedRemote.buttons
+            {(selectedRemote.buttons || [])
               .filter(button =>
                 button &&
                 button.position &&
@@ -1247,7 +1247,7 @@ const RemoteBuilder = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Производитель:
+                        Произв��дитель:
                       </span>
                       <span className="font-medium">{remote.manufacturer}</span>
                     </div>
