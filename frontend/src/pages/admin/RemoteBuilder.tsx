@@ -60,7 +60,6 @@ import {
 } from "@/hooks/useRemotes";
 import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
-import RemotesTest from "@/components/RemotesTest";
 
 interface RemoteButton {
   id: string;
@@ -345,7 +344,7 @@ const RemoteBuilder = () => {
       toast.success(`Пульт ${remote.is_active ? 'деактивирован' : 'активирован'}`);
     } catch (error: any) {
       console.error("Error toggling remote status:", error);
-      toast.error(error?.message || "Ошибка при изменении статуса пульта");
+      toast.error(error?.message || "Ошибка при изм��нении статуса пульта");
     }
   };
 
