@@ -331,7 +331,7 @@ const RemoteBuilder = () => {
       resetForm();
     } catch (error: any) {
       console.error("Error creating remote:", error);
-      toast.error(error?.message || "Ошибка при создании пульта");
+      toast.error(error?.message || "Ош��бка при создании пульта");
     }
   };
 
@@ -371,7 +371,7 @@ const RemoteBuilder = () => {
       return;
     }
 
-    if (!confirm("Вы уверены, что хотите удалить этот пульт?")) {
+    if (!confirm("В�� уверены, что хотите удалить этот пульт?")) {
       return;
     }
 
@@ -941,18 +941,18 @@ const RemoteBuilder = () => {
                     <Label htmlFor="name">��азвание</Label>
                     <Input
                       id="name"
-                      value={formData.name || ""}
+                      value={safeFormData.name}
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
-                      placeholder="Введи��е название пульта"
+                      placeholder="Введите название пульта"
                     />
                   </div>
                   <div>
                     <Label htmlFor="manufacturer">Производитель</Label>
                     <Input
                       id="manufacturer"
-                      value={formData.manufacturer || ""}
+                      value={safeFormData.manufacturer}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
@@ -969,7 +969,7 @@ const RemoteBuilder = () => {
                     <Label htmlFor="model">Модель</Label>
                     <Input
                       id="model"
-                      value={formData.model || ""}
+                      value={safeFormData.model}
                       onChange={(e) =>
                         setFormData({ ...formData, model: e.target.value })
                       }
@@ -1134,7 +1134,7 @@ const RemoteBuilder = () => {
                   <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все приставки</SelectItem>
+                  <SelectItem value="all">В��е приставки</SelectItem>
                   <SelectItem value="universal">Универсальные</SelectItem>
                   {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
@@ -1370,7 +1370,7 @@ const RemoteBuilder = () => {
                 <Label htmlFor="edit-name">Название</Label>
                 <Input
                   id="edit-name"
-                  value={formData.name || ""}
+                  value={safeFormData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
@@ -1381,7 +1381,7 @@ const RemoteBuilder = () => {
                 <Label htmlFor="edit-manufacturer">Производитель</Label>
                 <Input
                   id="edit-manufacturer"
-                  value={formData.manufacturer || ""}
+                  value={safeFormData.manufacturer}
                   onChange={(e) =>
                     setFormData({ ...formData, manufacturer: e.target.value })
                   }
@@ -1395,7 +1395,7 @@ const RemoteBuilder = () => {
                 <Label htmlFor="edit-model">Модель</Label>
                 <Input
                   id="edit-model"
-                  value={formData.model || ""}
+                  value={safeFormData.model}
                   onChange={(e) =>
                     setFormData({ ...formData, model: e.target.value })
                   }
