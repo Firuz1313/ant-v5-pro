@@ -58,6 +58,13 @@ export const getRemotes = async (req, res) => {
       sortBy = "manufacturer";
     }
 
+    console.log("🔍 getRemotes: Calling remoteModel.findAll with:", {
+      offset,
+      limit: parseInt(limit),
+      sortBy: sortBy,
+      sortOrder: sort.includes("desc") ? "DESC" : "ASC",
+    });
+
     const result = await remoteModel.findAll(
       {},
       {
@@ -67,6 +74,13 @@ export const getRemotes = async (req, res) => {
         sortOrder: sort.includes("desc") ? "DESC" : "ASC",
       },
     );
+
+    console.log("🔍 getRemotes: Result from findAll:", {
+      dataLength: result?.data?.length || 0,
+      total: result?.total || 0,
+      data: result?.data || 'no data field',
+      fullResult: result
+    });
 
     res.json({
       success: true,
@@ -299,7 +313,7 @@ export const getDefaultRemoteForDevice = async (req, res) => {
     if (!remote) {
       return res.status(404).json({
         success: false,
-        error: "Пульт по умолчанию не найден для этого устройства",
+        error: "Пульт по умолчанию не найд��н для этого устройства",
         timestamp: new Date().toISOString(),
       });
     }
@@ -346,7 +360,7 @@ export const setRemoteAsDefault = async (req, res) => {
 };
 
 /**
- * Дублирование пульта
+ * Дублирован��е пульта
  * POST /api/v1/remotes/:id/duplicate
  */
 export const duplicateRemote = async (req, res) => {
@@ -393,7 +407,7 @@ export const incrementRemoteUsage = async (req, res) => {
     res.json({
       success: true,
       data: { usage_count: result.usage_count },
-      message: "Счетчик использования обновлен",
+      message: "��четчик использования обновлен",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
