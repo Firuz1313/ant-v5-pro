@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => ({
     strictPort: true,
     // 🔧 FIX: Disable aggressive optimizations that cause restarts
     warmup: {
-      clientFiles: ['./src/main.tsx'],
+      clientFiles: ["./src/main.tsx"],
     },
     proxy: {
       "/api": {
@@ -49,7 +49,7 @@ export default defineConfig(({ mode }) => ({
         configure: (proxy) => {
           // 🔧 FIX: Reduce logging verbosity to prevent console spam
           proxy.on("proxyReq", (proxyReq, req) => {
-            if (process.env.NODE_ENV === 'development') {
+            if (process.env.NODE_ENV === "development") {
               console.log(
                 "[🔄 PROXY] Request:",
                 req.method,
@@ -59,7 +59,10 @@ export default defineConfig(({ mode }) => ({
             }
           });
           proxy.on("proxyRes", (proxyRes, req) => {
-            if (process.env.NODE_ENV === 'development' && proxyRes.statusCode >= 400) {
+            if (
+              process.env.NODE_ENV === "development" &&
+              proxyRes.statusCode >= 400
+            ) {
               console.log(
                 "[✅ PROXY] Response:",
                 proxyRes.statusCode,
@@ -90,6 +93,6 @@ export default defineConfig(({ mode }) => ({
   },
   // 🔧 FIX: Add development-specific optimizations
   define: {
-    __DEV__: mode === 'development',
+    __DEV__: mode === "development",
   },
 }));

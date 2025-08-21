@@ -1,24 +1,30 @@
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { devicesApi, DeviceFilters, DeviceCreateData, DeviceUpdateData } from '../api';
-import { Device } from '../types';
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import {
+  devicesApi,
+  DeviceFilters,
+  DeviceCreateData,
+  DeviceUpdateData,
+} from "../api";
+import { Device } from "../types";
 
 // Query keys
 export const deviceKeys = {
-  all: ['devices'] as const,
-  lists: () => [...deviceKeys.all, 'list'] as const,
+  all: ["devices"] as const,
+  lists: () => [...deviceKeys.all, "list"] as const,
   list: (filters: DeviceFilters) => [...deviceKeys.lists(), filters] as const,
-  details: () => [...deviceKeys.all, 'detail'] as const,
-  detail: (id: string, includeStats?: boolean) => [...deviceKeys.details(), id, includeStats] as const,
-  search: (query: string) => [...deviceKeys.all, 'search', query] as const,
-  popular: (limit?: number) => [...deviceKeys.all, 'popular', limit] as const,
-  stats: () => [...deviceKeys.all, 'stats'] as const,
+  details: () => [...deviceKeys.all, "detail"] as const,
+  detail: (id: string, includeStats?: boolean) =>
+    [...deviceKeys.details(), id, includeStats] as const,
+  search: (query: string) => [...deviceKeys.all, "search", query] as const,
+  popular: (limit?: number) => [...deviceKeys.all, "popular", limit] as const,
+  stats: () => [...deviceKeys.all, "stats"] as const,
 };
 
 // 🔧 FIX: Hooks for querying devices with optimizations
 export const useDevices = (
   page: number = 1,
   limit: number = 20,
-  filters: DeviceFilters = {}
+  filters: DeviceFilters = {},
 ) => {
   return useQuery({
     queryKey: deviceKeys.list({ page, limit, ...filters }),
@@ -144,9 +150,12 @@ export const useBulkUpdateDevices = () => {
 
 export const useExportDevices = () => {
   return useMutation({
-    mutationFn: ({ format = 'json', includeProblems = false }: { 
-      format?: string; 
-      includeProblems?: boolean; 
+    mutationFn: ({
+      format = "json",
+      includeProblems = false,
+    }: {
+      format?: string;
+      includeProblems?: boolean;
     }) => devicesApi.exportDevices(format, includeProblems),
   });
 };
@@ -169,16 +178,13 @@ export const useOptimisticDeviceUpdate = () => {
   const queryClient = useQueryClient();
 
   return (id: string, updateData: Partial<Device>) => {
-    queryClient.setQueryData(
-      deviceKeys.detail(id),
-      (old: any) => {
-        if (!old?.data) return old;
-        return {
-          ...old,
-          data: { ...old.data, ...updateData }
-        };
-      }
-    );
+    queryClient.setQueryData(deviceKeys.detail(id), (old: any) => {
+      if (!old?.data) return old;
+      return {
+        ...old,
+        data: { ...old.data, ...updateData },
+      };
+    });
   };
 };
 

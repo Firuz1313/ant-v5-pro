@@ -30,7 +30,7 @@ const queryClient = new QueryClient({
       cacheTime: 15 * 60 * 1000, // 15 minutes
       // 🔧 FIX: Enable background refetch to prevent blocking UI
       refetchOnWindowFocus: false,
-      refetchOnReconnect: 'always',
+      refetchOnReconnect: "always",
       refetchInterval: false,
       // 🔧 FIX: Reduce retry attempts to prevent retry loops
       retry: (failureCount, error) => {

@@ -13,12 +13,14 @@
 ## 🎯 **Problem Reproduction**
 
 ### **Environment**
+
 - **Browser**: Chrome 139.0.0.0 on Windows 10
 - **Mode**: Development
 - **URL**: `http://localhost:8081/` (Vite dev server)
 - **Backend**: `http://localhost:3000/` (Express API)
 
 ### **Reproduction Steps**
+
 1. Start development server with `npm run dev`
 2. Navigate to application in browser
 3. Observe multiple page reloads and visual flashing
@@ -26,6 +28,7 @@
 5. Monitor network tab for repeated API calls
 
 ### **Symptoms Observed**
+
 - Continuous vite-hmr and vite-ping WebSocket connections
 - HTTP 404 responses for root path causing reconnection cycles
 - API endpoints called repeatedly every 2-3 seconds
@@ -39,6 +42,7 @@
 ### **PRIMARY CAUSES IDENTIFIED:**
 
 #### 1. 🔥 **Aggressive Vite HMR Configuration**
+
 ```typescript
 // PROBLEMATIC CONFIGURATION:
 server: {
@@ -52,6 +56,7 @@ server: {
 **Impact**: Vite continuously attempted HMR connections despite being disabled, causing restart loops.
 
 #### 2. 📡 **React Query Aggressive Refetching**
+
 ```typescript
 // PROBLEMATIC CONFIGURATION:
 queries: {
@@ -65,6 +70,7 @@ queries: {
 **Impact**: API calls triggered on every component mount/unmount cycle during restarts.
 
 #### 3. 🔄 **WebSocket Connection Cycling**
+
 ```
 Pattern detected in logs:
 GET /?token=iKWKWwsYdRT_ (vite-hmr) → 404
@@ -75,6 +81,7 @@ GET / (vite-ping) → 404
 **Impact**: Failed WebSocket handshakes triggered immediate reconnection attempts.
 
 #### 4. ⚡ **React StrictMode Double-Mounting**
+
 Development mode double-mounting combined with aggressive retry logic caused amplified effect.
 
 ---
@@ -82,6 +89,7 @@ Development mode double-mounting combined with aggressive retry logic caused amp
 ## 🛠️ **Solutions Implemented**
 
 ### **1. Vite Configuration Optimization**
+
 ```typescript
 // ✅ FIXED CONFIGURATION:
 server: {
@@ -102,6 +110,7 @@ server: {
 ```
 
 ### **2. React Query Anti-Restart Optimizations**
+
 ```typescript
 // ✅ FIXED CONFIGURATION:
 queries: {
@@ -115,24 +124,27 @@ queries: {
 ```
 
 ### **3. Individual Hook Optimizations**
+
 ```typescript
 // ✅ APPLIED TO useDevices() AND useProblems():
 export const useDevices = (page = 1, limit = 20, filters = {}) => {
   return useQuery({
     queryKey: deviceKeys.list({ page, limit, ...filters }),
     queryFn: () => devicesApi.getDevices(page, limit, filters),
-    staleTime: 10 * 60 * 1000,     // ✅ Extended cache time
-    refetchOnWindowFocus: false,    // ✅ Prevent focus refetch
-    refetchOnMount: false,          // ✅ Use existing data
-    keepPreviousData: true,         // ✅ Smooth transitions
+    staleTime: 10 * 60 * 1000, // ✅ Extended cache time
+    refetchOnWindowFocus: false, // ✅ Prevent focus refetch
+    refetchOnMount: false, // ✅ Use existing data
+    keepPreviousData: true, // ✅ Smooth transitions
   });
 };
 ```
 
 ### **4. Debounce/Throttle Utilities**
+
 Created `frontend/src/utils/debounce.ts` with utilities to prevent rapid successive calls:
+
 - `debounce()` - Delays execution until calls stop
-- `throttle()` - Limits execution frequency  
+- `throttle()` - Limits execution frequency
 - `createIdempotentRequest()` - Prevents duplicate requests
 
 ---
@@ -140,6 +152,7 @@ Created `frontend/src/utils/debounce.ts` with utilities to prevent rapid success
 ## 📊 **Performance Metrics**
 
 ### **Before Fix:**
+
 - **Startup Time**: 15-20 restarts × 290ms = ~5-6 seconds
 - **API Calls**: 40-60 redundant calls during startup
 - **Visual Flickers**: ~100 per startup cycle
@@ -147,6 +160,7 @@ Created `frontend/src/utils/debounce.ts` with utilities to prevent rapid success
 - **User Experience**: Poor - Unusable during startup
 
 ### **After Fix:**
+
 - **Startup Time**: Single startup in 290ms
 - **API Calls**: 2 calls total (devices + problems)
 - **Visual Flickers**: 0 (smooth loading)
@@ -154,6 +168,7 @@ Created `frontend/src/utils/debounce.ts` with utilities to prevent rapid success
 - **User Experience**: Excellent - Immediate usability
 
 ### **Improvement Metrics:**
+
 - 🚀 **95% faster startup** (6s → 0.3s)
 - 🎯 **95% fewer API calls** (50 → 2)
 - ✨ **100% fewer visual flickers** (100 → 0)
@@ -164,6 +179,7 @@ Created `frontend/src/utils/debounce.ts` with utilities to prevent rapid success
 ## 🧪 **Testing & Validation**
 
 ### **Manual Testing Performed:**
+
 1. ✅ Fresh browser session startup - No restart loops
 2. ✅ Hot reload testing - Stable HMR functionality
 3. ✅ Network throttling - Graceful handling of slow connections
@@ -171,11 +187,13 @@ Created `frontend/src/utils/debounce.ts` with utilities to prevent rapid success
 5. ✅ Multiple tab testing - Independent stable sessions
 
 ### **Browser Testing:**
+
 - ✅ Chrome 139+ - Working perfectly
 - ✅ Firefox (latest) - Stable performance
 - ✅ Safari (if available) - Expected to work
 
 ### **API Integration Testing:**
+
 - ✅ Device endpoint caching - 10 minutes as expected
 - ✅ Problems endpoint caching - 10 minutes as expected
 - ✅ Error handling - Graceful fallbacks
@@ -186,6 +204,7 @@ Created `frontend/src/utils/debounce.ts` with utilities to prevent rapid success
 ## 🛡️ **Monitoring & Prevention**
 
 ### **Monitoring Checklist:**
+
 - [ ] Setup performance monitoring for startup times
 - [ ] Monitor API call frequency in development
 - [ ] Track WebSocket connection stability
@@ -193,6 +212,7 @@ Created `frontend/src/utils/debounce.ts` with utilities to prevent rapid success
 - [ ] Monitor browser console for HMR errors
 
 ### **Prevention Strategies:**
+
 1. **Code Reviews**: Check for aggressive polling/retry logic
 2. **Performance Testing**: Include startup time in CI/CD
 3. **Development Guidelines**: Document React Query best practices
@@ -211,6 +231,7 @@ git revert cgen-afb92..HEAD
 ```
 
 **Files to monitor after rollback:**
+
 - `frontend/vite.config.ts`
 - `frontend/src/main.tsx`
 - `frontend/src/hooks/useDevices.ts`
@@ -221,12 +242,14 @@ git revert cgen-afb92..HEAD
 ## 🎯 **Future Improvements**
 
 ### **Short Term (Next Sprint):**
+
 1. Add service worker for offline caching
 2. Implement request deduplication at API level
 3. Add performance monitoring dashboard
 4. Create automated tests for startup performance
 
 ### **Long Term (Next Quarter):**
+
 1. Migrate to Server-Side Rendering (SSR) for production
 2. Implement advanced caching strategies
 3. Add real-time monitoring with alerts
