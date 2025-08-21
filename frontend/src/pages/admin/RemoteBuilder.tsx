@@ -1495,7 +1495,7 @@ const RemoteBuilder = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => editFileInputRef.current?.click()}
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
