@@ -145,7 +145,7 @@ function App() {
           path="/admin/remotes"
           element={
             <AdminLayout>
-              <RemoteBuilderTest />
+              <RemoteBuilder />
             </AdminLayout>
           }
         />
