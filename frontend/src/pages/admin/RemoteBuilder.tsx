@@ -431,7 +431,7 @@ const RemoteBuilder = () => {
       name: remote.name,
       manufacturer: remote.manufacturer,
       model: remote.model,
-      description: remote.description,
+      description: remote.description || "",
       layout: remote.layout,
       colorScheme: remote.color_scheme || "dark",
       deviceId: remote.device_id || "universal",
@@ -1065,7 +1065,7 @@ const RemoteBuilder = () => {
                     <div className="mt-2">
                       <img
                         src={previewImageUrl}
-                        alt="Предварительный просмотр"
+                        alt="Предвари��ельный просмотр"
                         className="w-full h-32 object-contain bg-gray-100 dark:bg-gray-800 rounded"
                       />
                     </div>
