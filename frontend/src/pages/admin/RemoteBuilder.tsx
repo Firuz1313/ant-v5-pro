@@ -466,8 +466,11 @@ const RemoteBuilder = () => {
       };
 
       try {
-        await updateRemote(selectedRemote.id, {
-          buttons: updatedRemote.buttons,
+        await updateRemoteMutation.mutateAsync({
+          id: selectedRemote.id,
+          data: {
+            buttons: updatedRemote.buttons,
+          }
         });
         setSelectedRemote(updatedRemote);
       } catch (error) {
@@ -508,8 +511,11 @@ const RemoteBuilder = () => {
     };
 
     try {
-      await updateRemote(selectedRemote.id, {
-        buttons: updatedRemote.buttons,
+      await updateRemoteMutation.mutateAsync({
+        id: selectedRemote.id,
+        data: {
+          buttons: updatedRemote.buttons,
+        }
       });
       setSelectedRemote(updatedRemote);
       setSelectedButton(null);
@@ -529,8 +535,11 @@ const RemoteBuilder = () => {
     };
 
     try {
-      await updateRemote(selectedRemote.id, {
-        buttons: updatedRemote.buttons,
+      await updateRemoteMutation.mutateAsync({
+        id: selectedRemote.id,
+        data: {
+          buttons: updatedRemote.buttons,
+        }
       });
       setSelectedRemote(updatedRemote);
     } catch (error) {
@@ -542,7 +551,10 @@ const RemoteBuilder = () => {
     if (!selectedRemote) return;
 
     try {
-      await updateRemote(selectedRemote.id, selectedRemote);
+      await updateRemoteMutation.mutateAsync({
+        id: selectedRemote.id,
+        data: selectedRemote
+      });
       setIsEditorDialogOpen(false);
     } catch (error) {
       console.error("Error saving remote changes:", error);
@@ -1161,9 +1173,9 @@ const RemoteBuilder = () => {
 
                   {/* Remote Preview */}
                   <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-48 flex items-center justify-center relative">
-                    {remote.imageData ? (
+                    {remote.image_data ? (
                       <img
-                        src={remote.imageData}
+                        src={remote.image_data}
                         alt={remote.name}
                         className="max-w-full max-h-full object-contain"
                       />
@@ -1247,7 +1259,7 @@ const RemoteBuilder = () => {
                         <DropdownMenuItem
                           onClick={() => handleToggleStatus(remote.id)}
                         >
-                          {remote.isActive ? "Деактивировать" : "Активировать"}
+                          {remote.is_active ? "Деактивировать" : "Активировать"}
                         </DropdownMenuItem>
                         {!remote.is_default && remote.device_id && (
                           <DropdownMenuItem
