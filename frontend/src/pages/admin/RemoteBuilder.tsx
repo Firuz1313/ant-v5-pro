@@ -661,7 +661,7 @@ const RemoteBuilder = () => {
             )}
 
             {/* Render buttons on canvas */}
-            {selectedRemote.buttons
+            {(selectedRemote.buttons || [])
               .map((button) => {
                 // Provide default values for missing properties
                 const position = button.position || { x: 0, y: 0 };
@@ -890,7 +890,7 @@ const RemoteBuilder = () => {
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет кнопок</p>
                     <p className="text-xs">
-                      Используйте указатель для добавления
+                      Используйте указатель д��я добавления
                     </p>
                   </div>
                 )}
@@ -908,7 +908,7 @@ const RemoteBuilder = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Конструктор пультов
+            Конструкто�� пультов
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Создание и настройка интерактивных пультов с привязкой к приставкам
@@ -1193,7 +1193,7 @@ const RemoteBuilder = () => {
                       <Badge variant="default">По умолчанию</Badge>
                     )}
                     <Badge variant={remote.is_active ? "default" : "secondary"}>
-                      {remote.is_active ? "Активный" : "Неактивный"}
+                      {remote.is_active ? "Активный" : "Неакти��ный"}
                     </Badge>
                   </div>
                 </div>
