@@ -699,7 +699,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
   const handleSave = () => {
     onSave?.(marks);
     toast({
-      title: "Изменения сохранены",
+      title: "Измен��ния сохранены",
       description: `Сохранено ${marks.length} отметок`,
     });
   };
@@ -963,7 +963,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Label htmlFor="mark-description">Описание</Label>
                 <Textarea
                   id="mark-description"
-                  value={markForm.description}
+                  value={markForm.description || ""}
                   onChange={(e) => setMarkForm(prev => ({ ...prev, description: e.target.value }))}
                   placeholder="Описание отметки"
                   rows={3}
@@ -1028,7 +1028,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Label htmlFor="action-description">Описание действия</Label>
                 <Textarea
                   id="action-description"
-                  value={markForm.action_description}
+                  value={markForm.action_description || ""}
                   onChange={(e) => setMarkForm(prev => ({ ...prev, action_description: e.target.value }))}
                   placeholder="Что должен сделать пользователь"
                   rows={2}
@@ -1039,7 +1039,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Label htmlFor="hint-text">Подсказка</Label>
                 <Textarea
                   id="hint-text"
-                  value={markForm.hint_text}
+                  value={markForm.hint_text || ""}
                   onChange={(e) => setMarkForm(prev => ({ ...prev, hint_text: e.target.value }))}
                   placeholder="Подсказка для пользователя"
                   rows={2}
