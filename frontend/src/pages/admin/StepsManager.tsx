@@ -145,7 +145,7 @@ const StepFormFieldsComponent = React.memo(
         </Label>
         <Textarea
           id={isEdit ? "edit-description" : "description"}
-          value={formData.description}
+          value={formData.description || ""}
           onChange={(e) => handleFieldChange("description", e.target.value)}
           placeholder="Краткое описание шага"
         />
@@ -157,7 +157,7 @@ const StepFormFieldsComponent = React.memo(
         </Label>
         <Textarea
           id={isEdit ? "edit-instruction" : "instruction"}
-          value={formData.instruction}
+          value={formData.instruction || ""}
           onChange={(e) => handleFieldChange("instruction", e.target.value)}
           placeholder="Подробная инструкция для ��ользователя"
         />
@@ -259,7 +259,7 @@ const StepFormFieldsComponent = React.memo(
         <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
         <Textarea
           id={isEdit ? "edit-hint" : "hint"}
-          value={formData.hint}
+          value={formData.hint || ""}
           onChange={(e) => handleFieldChange("hint", e.target.value)}
           placeholder="Главна�� ��одсказка данного шага решения"
         />
