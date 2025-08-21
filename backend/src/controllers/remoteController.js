@@ -76,21 +76,31 @@ export const getRemotes = async (req, res) => {
     );
 
     console.log("🔍 getRemotes: Result from findAll:", {
-      dataLength: result?.data?.length || 0,
-      total: result?.total || 0,
-      data: result?.data || 'no data field',
+      dataLength: result?.data?.length || (Array.isArray(result) ? result.length : 0),
+      total: result?.total || (Array.isArray(result) ? result.length : 0),
+      isArray: Array.isArray(result),
       fullResult: result
     });
 
+    // Handle both object with data/total and direct array results
+    let data, total;
+    if (Array.isArray(result)) {
+      data = result;
+      total = result.length;
+    } else {
+      data = result.data || [];
+      total = result.total || 0;
+    }
+
     res.json({
       success: true,
-      data: result.data,
+      data: data,
       pagination: {
         page: parseInt(page),
         limit: parseInt(limit),
-        total: result.total,
-        totalPages: Math.ceil(result.total / limit),
-        hasMore: page * limit < result.total,
+        total: total,
+        totalPages: Math.ceil(total / limit),
+        hasMore: page * limit < total,
       },
       timestamp: new Date().toISOString(),
     });
@@ -313,7 +323,7 @@ export const getDefaultRemoteForDevice = async (req, res) => {
     if (!remote) {
       return res.status(404).json({
         success: false,
-        error: "Пульт по умолчанию не найд��н для этого устройства",
+        error: "Пульт по умолчанию не найден для этого устройства",
         timestamp: new Date().toISOString(),
       });
     }
@@ -352,7 +362,7 @@ export const setRemoteAsDefault = async (req, res) => {
     console.error("Error in setRemoteAsDefault:", error);
     res.status(500).json({
       success: false,
-      error: "Ошибка при установке пульта по умолчанию",
+      error: "Ошибка при установке пульта по у��олчанию",
       details: error.message,
       timestamp: new Date().toISOString(),
     });
@@ -360,7 +370,7 @@ export const setRemoteAsDefault = async (req, res) => {
 };
 
 /**
- * Дублирован��е пульта
+ * Дублирование пульта
  * POST /api/v1/remotes/:id/duplicate
  */
 export const duplicateRemote = async (req, res) => {
@@ -407,7 +417,7 @@ export const incrementRemoteUsage = async (req, res) => {
     res.json({
       success: true,
       data: { usage_count: result.usage_count },
-      message: "��четчик использования обновлен",
+      message: "Счетчик использования обновлен",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
