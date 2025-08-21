@@ -62,6 +62,8 @@ import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
 import { remotesApi } from "@/api";
 
+console.log("🔥🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! 🔥🔥🔥");
+
 interface RemoteButton {
   id: string;
   label: string;
