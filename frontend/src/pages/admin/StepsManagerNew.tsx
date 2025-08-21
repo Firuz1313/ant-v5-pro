@@ -193,7 +193,7 @@ const StepsManagerNew = () => {
       // Здесь можно реализ��вать ло��ику сохранения всех отметок
       // Для простоты сейчас просто обновляем локальное состояние
 
-      // Если есть выбранный шаг, связываем отметки с эт��м шагом
+      // Если ес��ь выбранный шаг, связываем отметки с эт��м шагом
       if (selectedStep?.id) {
         for (const mark of marks) {
           if (mark.step_id !== selectedStep.id) {
@@ -1026,7 +1026,7 @@ const StepsManagerNew = () => {
             onValueChange={(value) => handleFieldChange("problemId", value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Выберите проблему" />
+              <SelectValue placeholder="Выберите пробл��му" />
             </SelectTrigger>
             <SelectContent>
               {getAvailableProblems().map((problem) => (
@@ -1055,7 +1055,7 @@ const StepsManagerNew = () => {
         </Label>
         <Textarea
           id={isEdit ? "edit-description" : "description"}
-          value={formData.description}
+          value={formData.description || ""}
           onChange={(e) => handleFieldChange("description", e.target.value)}
           placeholder="Краткое описание ��ага"
         />
@@ -1067,7 +1067,7 @@ const StepsManagerNew = () => {
         </Label>
         <Textarea
           id={isEdit ? "edit-instruction" : "instruction"}
-          value={formData.instruction}
+          value={formData.instruction || ""}
           onChange={(e) => handleFieldChange("instruction", e.target.value)}
           placeholder="Подробная инструкция для ��ользователя"
         />
@@ -1205,7 +1205,7 @@ const StepsManagerNew = () => {
         <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
         <Textarea
           id={isEdit ? "edit-hint" : "hint"}
-          value={formData.hint}
+          value={formData.hint || ""}
           onChange={(e) => handleFieldChange("hint", e.target.value)}
           placeholder="Дополнительна�� подсказка для пользоват���ля"
         />
