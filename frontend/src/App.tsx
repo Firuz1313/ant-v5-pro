@@ -95,6 +95,16 @@ function App() {
           }
         />
 
+        {/* Remotes API Test page */}
+        <Route
+          path="/remotes-api-test"
+          element={
+            <Layout>
+              <RemotesApiTest />
+            </Layout>
+          }
+        />
+
         {/* Legacy redirect - old problems page */}
         <Route path="/problems" element={<Navigate to="/devices" replace />} />
 
