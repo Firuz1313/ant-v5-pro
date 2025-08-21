@@ -302,7 +302,7 @@ const RemoteBuilder = () => {
       return;
     }
 
-    if (!confirm("Вы уверены, что хотите удалить этот пульт?")) {
+    if (!confirm("В�� уверены, что хотите удалить этот пульт?")) {
       return;
     }
 
@@ -1081,8 +1081,8 @@ const RemoteBuilder = () => {
       {/* Remotes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRemotes.map((remote) => {
-          const device = remote.deviceId
-            ? getDeviceById(remote.deviceId)
+          const device = remote.device_id
+            ? getDeviceById(remote.device_id)
             : null;
           const usageCount = getRemoteUsageCount(remote.id);
 
