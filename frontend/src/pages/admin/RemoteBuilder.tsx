@@ -59,6 +59,7 @@ import {
   useDuplicateRemote
 } from "@/hooks/useRemotes";
 import { toast } from "sonner";
+import type { RemoteFilters } from "@/api/remotes";
 
 interface RemoteButton {
   id: string;
@@ -186,7 +187,7 @@ const RemoteBuilder = () => {
   ];
 
   const colorSchemes = [
-    { value: "dark", label: "Темна��", preview: "bg-gray-800" },
+    { value: "dark", label: "Темная", preview: "bg-gray-800" },
     { value: "light", label: "Светлая", preview: "bg-gray-200" },
     { value: "blue", label: "Синяя", preview: "bg-blue-600" },
     { value: "red", label: "Красная", preview: "bg-red-600" },
