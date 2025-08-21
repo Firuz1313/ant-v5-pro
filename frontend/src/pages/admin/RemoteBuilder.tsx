@@ -60,6 +60,7 @@ import {
 } from "@/hooks/useRemotes";
 import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
+import { remotesApi } from "@/api";
 
 interface RemoteButton {
   id: string;
@@ -313,7 +314,7 @@ const RemoteBuilder = () => {
         }
       });
 
-      toast.success("Пульт обновлен усп��шно");
+      toast.success("Пульт обновлен успешно");
       setIsEditDialogOpen(false);
       setSelectedRemote(null);
       resetForm();
@@ -968,7 +969,7 @@ const RemoteBuilder = () => {
                       <ImageIcon className="h-4 w-4 mr-2" />
                       {previewImageUrl
                         ? "Изменить изображение"
-                        : "Загрузить изо��ражение"}
+                        : "Загрузить изображение"}
                     </Button>
                   </div>
                   {previewImageUrl && (
@@ -1317,7 +1318,7 @@ const RemoteBuilder = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder="Введите названи�� пульта"
+                  placeholder="Введите название пульта"
                 />
               </div>
               <div>
