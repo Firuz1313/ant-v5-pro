@@ -929,7 +929,7 @@ const RemoteBuilder = () => {
                 </div>
 
                 <div>
-                  <Label htmlFor="image-upload">��зображение пульта</Label>
+                  <Label htmlFor="image-upload">Изображение пульта</Label>
                   <div className="flex items-center space-x-2">
                     <Button
                       type="button"
@@ -1052,7 +1052,7 @@ const RemoteBuilder = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все приставки</SelectItem>
-                  <SelectItem value="universal">Универсальные</SelectItem>
+                  <SelectItem value="universal">��ниверсальные</SelectItem>
                   {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
@@ -1095,8 +1095,8 @@ const RemoteBuilder = () => {
                     {remote.is_default && (
                       <Badge variant="default">По умолчанию</Badge>
                     )}
-                    <Badge variant={remote.isActive ? "default" : "secondary"}>
-                      {remote.isActive ? "Активный" : "Неактивный"}
+                    <Badge variant={remote.is_active ? "default" : "secondary"}>
+                      {remote.is_active ? "Активный" : "Неактивный"}
                     </Badge>
                   </div>
                 </div>
@@ -1275,7 +1275,7 @@ const RemoteBuilder = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder="Введите ��азвание пульта"
+                  placeholder="Введите название пульта"
                 />
               </div>
               <div>
