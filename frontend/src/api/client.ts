@@ -528,8 +528,8 @@ const getApiBaseUrl = (): string => {
     }
 
     // Локальн��я разработка - пря��ое подключение к бэ��енду
-    if (hostname === "localhost" && port === "8080") {
-      const directUrl = "http://localhost:3000/api/v1";
+    if (hostname === "localhost" && port === "8081") {
+      const directUrl = "http://localhost:3001/api/v1";
       console.log("🏠 Local development - using direct connection:", directUrl);
       return directUrl;
     }

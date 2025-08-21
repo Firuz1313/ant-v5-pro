@@ -95,6 +95,7 @@ const TVInterfaceBuilder = () => {
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const [isScreenshotBrowserOpen, setIsScreenshotBrowserOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   // Load TV interfaces on component mount
   useEffect(() => {
@@ -148,7 +149,7 @@ const TVInterfaceBuilder = () => {
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
       toast({
-        title: "Ошибка",
+        title: "Ош��бка",
         description: "Размер файла не должен превышать 5 МБ",
         variant: "destructive",
       });
@@ -171,6 +172,9 @@ const TVInterfaceBuilder = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    if (editFileInputRef.current) {
+      editFileInputRef.current.value = "";
+    }
   };
 
   // Remove image during edit (reset to original if no new image)
@@ -184,6 +188,9 @@ const TVInterfaceBuilder = () => {
     }
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+    if (editFileInputRef.current) {
+      editFileInputRef.current.value = "";
     }
   };
 
@@ -206,6 +213,9 @@ const TVInterfaceBuilder = () => {
     setSelectedInterface(null);
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
+    }
+    if (editFileInputRef.current) {
+      editFileInputRef.current.value = "";
     }
   };
 
@@ -273,7 +283,7 @@ const TVInterfaceBuilder = () => {
         deviceId: formData.deviceId,
       };
 
-      // Добавляем screenshot_data только если был загружен новый скриншот
+      // Добавляем screenshot_data только если был загружен новы�� скриншот
       if (
         formData.screenshotData &&
         formData.screenshotData.startsWith("data:")
@@ -427,7 +437,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error cleaning up TV interfaces:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при очистке TV интерфейсов",
+        description: "Произошла ошибка при очистке TV интер��ейсов",
         variant: "destructive",
       });
     } finally {
@@ -443,7 +453,7 @@ const TVInterfaceBuilder = () => {
       description: tvInterface.description,
       type: tvInterface.type,
       deviceId: tvInterface.deviceId,
-      screenshotData: undefined, // Не устанавливаем существующий скриншот как дан��ые
+      screenshotData: undefined, // Не устанавливаем существующий скриншот ��ак дан��ые
     });
     // Показываем текущий скриншот как превью, но не как данные для отправки
     setPreviewImageUrl(tvInterfaceUtils.getScreenshotUrl(tvInterface));
@@ -475,7 +485,7 @@ const TVInterfaceBuilder = () => {
             Конструктор интерфейса ТВ
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание и управление интерф��йсами ТВ-приставок с полной
+            Создание и управ��ение интерф��йсами ТВ-приставок с полной
             интеграцией с бэкендом
           </p>
         </div>
@@ -502,8 +512,8 @@ const TVInterfaceBuilder = () => {
                 <AlertDialogTitle>Очистить все TV интерфейсы?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Это действие удалит все существующие TV интерфейсы. После
-                  очистки вы сможете создавать св��и со��ственные интерфейсы
-                  вручную через UI.
+                  очистки вы сможете создавать св��и со��с��венные интерфейсы
+                  вручную чере�� UI.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -526,7 +536,7 @@ const TVInterfaceBuilder = () => {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Создать новый TV интерфейс</DialogTitle>
+                <DialogTitle>Созда��ь новый TV интерфейс</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -1005,7 +1015,7 @@ const TVInterfaceBuilder = () => {
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => editFileInputRef.current?.click()}
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     Загрузить файл
@@ -1030,6 +1040,13 @@ const TVInterfaceBuilder = () => {
                     </Button>
                   )}
                 </div>
+                <input
+                  ref={editFileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleImageUpload}
+                  className="hidden"
+                />
 
                 {previewImageUrl && (
                   <div className="border rounded-lg p-4">

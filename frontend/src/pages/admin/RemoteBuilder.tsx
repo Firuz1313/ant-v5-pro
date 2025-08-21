@@ -62,7 +62,7 @@ import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
 import { remotesApi } from "@/api";
 
-console.log("���🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! 🔥🔥🔥");
+console.log("���🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! ��🔥🔥");
 
 interface RemoteButton {
   id: string;
@@ -123,7 +123,7 @@ const RemoteBuilder = () => {
     );
     console.log("🚀🚀🚀 RemoteBuilder: remotesApi object:", remotesApi);
     console.log(
-      "🚀🚀🚀 RemoteBuilder: remotesApi.getAll function:",
+      "🚀🚀��� RemoteBuilder: remotesApi.getAll function:",
       remotesApi.getAll,
     );
 
@@ -161,7 +161,7 @@ const RemoteBuilder = () => {
   const setDefaultMutation = useSetDefaultRemote();
   const duplicateMutation = useDuplicateRemote();
 
-  // Извлекаем массивы данны�� из ответа API
+  // Изв��екаем массивы данны�� из ответа API
   const devices = devicesResponse?.data || [];
   const remotes: RemoteTemplate[] = remotesResponse?.data || [];
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
@@ -175,6 +175,8 @@ const RemoteBuilder = () => {
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
+  const editorFileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [selectedRemote, setSelectedRemote] = useState<RemoteTemplate | null>(
@@ -774,7 +776,7 @@ const RemoteBuilder = () => {
                 </Button>
                 <Button
                   variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => editorFileInputRef.current?.click()}
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
@@ -783,7 +785,7 @@ const RemoteBuilder = () => {
               </div>
 
               <input
-                ref={fileInputRef}
+                ref={editorFileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
@@ -809,7 +811,7 @@ const RemoteBuilder = () => {
                               label: e.target.value,
                             })
                           }
-                          placeholder="Например: POWER"
+                          placeholder="Напри��ер: POWER"
                         />
                       </div>
                       <div>
@@ -909,7 +911,7 @@ const RemoteBuilder = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                Кнопки ({(selectedRemote.buttons || []).length})
+                Кнопк�� ({(selectedRemote.buttons || []).length})
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -940,7 +942,7 @@ const RemoteBuilder = () => {
                 {(selectedRemote.buttons || []).length === 0 && (
                   <div className="text-center text-gray-500 py-4">
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>Нет кнопок</p>
+                    <p>Нет кноп��к</p>
                     <p className="text-xs">
                       Используйте указатель для добавления
                     </p>
@@ -978,7 +980,7 @@ const RemoteBuilder = () => {
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="h-4 w-4 mr-2" />
-                Создать пульт
+                Соз��ать пульт
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
@@ -1072,7 +1074,7 @@ const RemoteBuilder = () => {
                     >
                       <ImageIcon className="h-4 w-4 mr-2" />
                       {previewImageUrl
-                        ? "Изменить и��ображение"
+                        ? "Изменить изображение"
                         : "Загрузить изображение"}
                     </Button>
                   </div>
@@ -1493,13 +1495,13 @@ const RemoteBuilder = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => editFileInputRef.current?.click()}
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
                   {previewImageUrl
                     ? "Изменить изображение"
-                    : "Загрузить из��бражение"}
+                    : "Загрузить изображение"}
                 </Button>
               </div>
               {previewImageUrl && (
@@ -1511,6 +1513,13 @@ const RemoteBuilder = () => {
                   />
                 </div>
               )}
+              <input
+                ref={editFileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
