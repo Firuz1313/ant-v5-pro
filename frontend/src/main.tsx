@@ -20,11 +20,19 @@ console.warn = (...args) => {
   originalWarn.apply(console, args);
 };
 
-// Create a client
+// 🔧 FIX: Create a client with anti-restart optimizations
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      staleTime: 5 * 60 * 1000, // 5 minutes
+      // 🔧 FIX: Increase stale time to prevent aggressive refetching
+      staleTime: 10 * 60 * 1000, // 10 minutes
+      // 🔧 FIX: Increase cache time to prevent data loss during restarts
+      cacheTime: 15 * 60 * 1000, // 15 minutes
+      // 🔧 FIX: Enable background refetch to prevent blocking UI
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: "always",
+      refetchInterval: false,
+      // 🔧 FIX: Reduce retry attempts to prevent retry loops
       retry: (failureCount, error) => {
         // Don't retry on 4xx errors except 408 (timeout) and 429 (rate limit)
         if (error && typeof error === "object" && "status" in error) {
@@ -39,36 +47,24 @@ const queryClient = new QueryClient({
           }
           // Allow retry for 429 rate limiting
           if (status === 429) {
-            return failureCount < 2;
+            return failureCount < 1; // 🔧 FIX: Reduce retry count
           }
         }
-        return failureCount < 3;
+        return failureCount < 2; // 🔧 FIX: Reduce from 3 to 2
       },
       retryDelay: (attemptIndex, error) => {
-        // For 429 errors, use exponential backoff starting from 2 seconds
+        // 🔧 FIX: Increase initial delay to prevent rapid retries
         if (error && typeof error === "object" && "status" in error) {
           const status = error.status as number;
           if (status === 429) {
-            return Math.min(2000 * Math.pow(2, attemptIndex), 10000);
+            return Math.min(3000 * Math.pow(2, attemptIndex), 15000); // 🔧 FIX: Longer delays
           }
         }
-        return Math.min(1000 * Math.pow(2, attemptIndex), 30000);
+        return Math.min(2000 * Math.pow(2, attemptIndex), 10000); // 🔧 FIX: Longer base delay
       },
     },
     mutations: {
-      retry: (failureCount, error) => {
-        // Don't retry mutations on 4xx errors except 429
-        if (error && typeof error === "object" && "status" in error) {
-          const status = error.status as number;
-          if (status >= 400 && status < 500 && status !== 429) {
-            return false;
-          }
-          if (status === 429) {
-            return failureCount < 1; // Only retry once for mutations
-          }
-        }
-        return false;
-      },
+      retry: false, // 🔧 FIX: Disable mutation retries to prevent loops
     },
   },
 });
