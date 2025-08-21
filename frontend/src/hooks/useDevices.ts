@@ -14,7 +14,7 @@ export const deviceKeys = {
   stats: () => [...deviceKeys.all, 'stats'] as const,
 };
 
-// Hooks for querying devices
+// 🔧 FIX: Hooks for querying devices with optimizations
 export const useDevices = (
   page: number = 1,
   limit: number = 20,
@@ -23,7 +23,11 @@ export const useDevices = (
   return useQuery({
     queryKey: deviceKeys.list({ page, limit, ...filters }),
     queryFn: () => devicesApi.getDevices(page, limit, filters),
-    staleTime: 5 * 60 * 1000, // 5 minutes
+    staleTime: 10 * 60 * 1000, // 🔧 FIX: 10 minutes to prevent aggressive refetching
+    cacheTime: 15 * 60 * 1000, // 🔧 FIX: 15 minutes cache
+    refetchOnWindowFocus: false, // 🔧 FIX: Prevent refetch on focus
+    refetchOnMount: false, // 🔧 FIX: Prevent refetch on mount if data exists
+    keepPreviousData: true, // 🔧 FIX: Keep previous data during transitions
   });
 };
 
