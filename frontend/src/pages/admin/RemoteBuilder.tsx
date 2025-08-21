@@ -416,7 +416,7 @@ const RemoteBuilder = () => {
       await duplicateMutation.mutateAsync({
         id: remote.id,
         data: {
-          name: `${remote.name} (копия)`,
+          name: `${remote.name || "Пульт"} (копия)`,
         },
       });
       toast.success("Пульт дублирован успешно");
