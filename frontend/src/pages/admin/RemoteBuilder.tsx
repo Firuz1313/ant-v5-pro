@@ -116,13 +116,16 @@ const RemoteBuilder = () => {
 
   // Simple test of remotesApi
   React.useEffect(() => {
-    console.log("=== RemoteBuilder: Testing remotesApi directly ===");
+    console.log("🚀🚀🚀 RemoteBuilder: useEffect STARTED! Testing remotesApi directly 🚀🚀🚀");
+    console.log("🚀🚀🚀 RemoteBuilder: remotesApi object:", remotesApi);
+    console.log("🚀🚀🚀 RemoteBuilder: remotesApi.getAll function:", remotesApi.getAll);
+
     remotesApi.getAll()
       .then((result) => {
-        console.log("=== RemoteBuilder: remotesApi.getAll SUCCESS ===", result);
+        console.log("✅✅✅ RemoteBuilder: remotesApi.getAll SUCCESS ✅✅✅", result);
       })
       .catch((error) => {
-        console.error("=== RemoteBuilder: remotesApi.getAll ERROR ===", error);
+        console.error("❌❌❌ RemoteBuilder: remotesApi.getAll ERROR ❌❌❌", error);
       });
   }, []);
 
@@ -341,7 +344,7 @@ const RemoteBuilder = () => {
 
     try {
       await deleteRemoteMutation.mutateAsync(remoteId);
-      toast.success("Пульт удален успешн��");
+      toast.success("Пульт удален успешно");
     } catch (error: any) {
       console.error("Error deleting remote:", error);
       toast.error(error?.message || "Ошибка при удалении пульта");
@@ -1274,7 +1277,7 @@ const RemoteBuilder = () => {
                         )}
                         <DropdownMenuItem>
                           <Download className="h-4 w-4 mr-2" />
-                          Экс��ортировать
+                          Экспортировать
                         </DropdownMenuItem>
                         <DropdownMenuItem
                           onClick={() => handleDelete(remote.id)}
