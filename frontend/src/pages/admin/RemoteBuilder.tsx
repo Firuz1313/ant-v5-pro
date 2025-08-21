@@ -63,6 +63,8 @@ import type { RemoteFilters } from "@/api/remotes";
 import { remotesApi } from "@/api";
 
 console.log("🔥🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! 🔥🔥🔥");
+// TEMPORARY: Alert to verify file is loaded
+alert("🔥 RemoteBuilder file loaded! 🔥");
 
 interface RemoteButton {
   id: string;
