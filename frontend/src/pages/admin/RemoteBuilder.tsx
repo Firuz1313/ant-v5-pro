@@ -213,6 +213,15 @@ const RemoteBuilder = () => {
     deviceId: "universal",
   });
 
+  // Additional safety: ensure formData fields are never null
+  const safeFormData = React.useMemo(() => ({
+    ...formData,
+    name: formData.name || "",
+    manufacturer: formData.manufacturer || "",
+    model: formData.model || "",
+    description: formData.description || "",
+  }), [formData]);
+
   const [buttonFormData, setButtonFormData] = useState({
     label: "",
     action: "",
