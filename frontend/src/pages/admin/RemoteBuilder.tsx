@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import React, { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -313,7 +313,7 @@ const RemoteBuilder = () => {
         }
       });
 
-      toast.success("Пульт обновлен успешно");
+      toast.success("Пульт обновлен усп��шно");
       setIsEditDialogOpen(false);
       setSelectedRemote(null);
       resetForm();
@@ -655,7 +655,7 @@ const RemoteBuilder = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Palette className="h-5 w-5" />
-                Управлен��е
+                Управление
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -837,7 +837,7 @@ const RemoteBuilder = () => {
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет кнопок</p>
                     <p className="text-xs">
-                      Используйте указател�� для добавления
+                      Используйте указатель для добавления
                     </p>
                   </div>
                 )}
@@ -968,7 +968,7 @@ const RemoteBuilder = () => {
                       <ImageIcon className="h-4 w-4 mr-2" />
                       {previewImageUrl
                         ? "Изменить изображение"
-                        : "Загрузить изображение"}
+                        : "Загрузить изо��ражение"}
                     </Button>
                   </div>
                   {previewImageUrl && (
@@ -1192,7 +1192,7 @@ const RemoteBuilder = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        ��акет:
+                        Макет:
                       </span>
                       <span className="font-medium">
                         {layouts.find((l) => l.value === remote.layout)?.label}
@@ -1317,7 +1317,7 @@ const RemoteBuilder = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
-                  placeholder="Введите название пульта"
+                  placeholder="Введите названи�� пульта"
                 />
               </div>
               <div>
