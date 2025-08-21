@@ -172,6 +172,9 @@ const TVInterfaceBuilder = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    if (editFileInputRef.current) {
+      editFileInputRef.current.value = "";
+    }
   };
 
   // Remove image during edit (reset to original if no new image)
@@ -510,7 +513,7 @@ const TVInterfaceBuilder = () => {
               <AlertDialogFooter>
                 <AlertDialogCancel>Отмена</AlertDialogCancel>
                 <AlertDialogAction onClick={handleCleanupTVInterfaces}>
-                  О��истить все
+                  Очистить все
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -527,7 +530,7 @@ const TVInterfaceBuilder = () => {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Создать новый TV интерфейс</DialogTitle>
+                <DialogTitle>Созда��ь новый TV интерфейс</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -766,7 +769,7 @@ const TVInterfaceBuilder = () => {
               {searchTerm ||
               selectedDeviceFilter !== "all" ||
               selectedTypeFilter !== "all"
-                ? "Поп��обуйте изменить фильтры поиска"
+                ? "Попробуйте изменить фильтры поиска"
                 : "Создайте первый TV интерфейс для начала работы"}
             </p>
             {!searchTerm &&
