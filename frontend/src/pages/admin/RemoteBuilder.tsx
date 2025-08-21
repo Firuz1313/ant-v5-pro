@@ -50,6 +50,15 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import RemoteControl from "@/components/RemoteControl";
 import { useDevices } from "@/hooks/useDevices";
+import {
+  useRemotes,
+  useCreateRemote,
+  useUpdateRemote,
+  useDeleteRemote,
+  useSetDefaultRemote,
+  useDuplicateRemote
+} from "@/hooks/useRemotes";
+import { toast } from "sonner";
 
 interface RemoteButton {
   id: string;
