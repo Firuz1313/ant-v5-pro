@@ -62,7 +62,7 @@ import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
 import { remotesApi } from "@/api";
 
-console.log("🔥🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! 🔥🔥🔥");
+console.log("���🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! 🔥🔥🔥");
 
 interface RemoteButton {
   id: string;
@@ -789,7 +789,7 @@ const RemoteBuilder = () => {
                         <Label htmlFor="button-label">Название кнопки</Label>
                         <Input
                           id="button-label"
-                          value={buttonFormData.label}
+                          value={buttonFormData.label || ""}
                           onChange={(e) =>
                             setButtonFormData({
                               ...buttonFormData,
@@ -839,7 +839,7 @@ const RemoteBuilder = () => {
                         <Label htmlFor="edit-button-label">Название</Label>
                         <Input
                           id="edit-button-label"
-                          value={buttonFormData.label}
+                          value={buttonFormData.label || ""}
                           onChange={(e) =>
                             setButtonFormData({
                               ...buttonFormData,
