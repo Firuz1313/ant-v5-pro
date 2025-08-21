@@ -389,7 +389,7 @@ const DeviceManager = () => {
                   <Label htmlFor="description">Описание</Label>
                   <Textarea
                     id="description"
-                    value={formData.description}
+                    value={formData.description || ""}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
@@ -633,7 +633,7 @@ const DeviceManager = () => {
               <Label htmlFor="edit-description">Описание</Label>
               <Textarea
                 id="edit-description"
-                value={formData.description}
+                value={formData.description || ""}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }

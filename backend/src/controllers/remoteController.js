@@ -225,7 +225,7 @@ export const updateRemote = async (req, res) => {
       });
     }
 
-    const updatedRemote = await remoteModel.update(id, updateData);
+    const updatedRemote = await remoteModel.updateById(id, updateData);
 
     if (!updatedRemote) {
       return res.status(404).json({

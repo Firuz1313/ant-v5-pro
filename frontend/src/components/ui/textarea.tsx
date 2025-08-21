@@ -3,10 +3,15 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export interface TextareaProps
-  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {}
+  extends React.TextareaHTMLAttributes<HTMLTextAreaElement> {
+  value?: string | number | readonly string[] | null | undefined;
+}
 
 const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
-  ({ className, ...props }, ref) => {
+  ({ className, value, ...props }, ref) => {
+    // Ensure value is never null or undefined to prevent React warnings
+    const safeValue = value == null ? "" : value;
+
     return (
       <textarea
         className={cn(
@@ -15,6 +20,7 @@ const Textarea = React.forwardRef<HTMLTextAreaElement, TextareaProps>(
         )}
         ref={ref}
         {...props}
+        value={safeValue}
       />
     );
   },

@@ -80,10 +80,10 @@ interface RemoteButton {
 // Using backend API schema format
 interface RemoteTemplate {
   id: string;
-  name: string;
-  manufacturer: string;
-  model: string;
-  description: string;
+  name: string | null;
+  manufacturer: string | null;
+  model: string | null;
+  description: string | null;
   layout: "standard" | "compact" | "smart" | "custom";
   color_scheme: string;
   image_url?: string;
@@ -175,6 +175,7 @@ const RemoteBuilder = () => {
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [selectedRemote, setSelectedRemote] = useState<RemoteTemplate | null>(
@@ -211,6 +212,18 @@ const RemoteBuilder = () => {
     colorScheme: "dark",
     deviceId: "universal",
   });
+
+  // Additional safety: ensure formData fields are never null
+  const safeFormData = React.useMemo(
+    () => ({
+      ...formData,
+      name: formData.name || "",
+      manufacturer: formData.manufacturer || "",
+      model: formData.model || "",
+      description: formData.description || "",
+    }),
+    [formData],
+  );
 
   const [buttonFormData, setButtonFormData] = useState({
     label: "",
@@ -321,7 +334,7 @@ const RemoteBuilder = () => {
       resetForm();
     } catch (error: any) {
       console.error("Error creating remote:", error);
-      toast.error(error?.message || "Ошибка при создании пульта");
+      toast.error(error?.message || "Ош��бка при создании пульта");
     }
   };
 
@@ -361,13 +374,13 @@ const RemoteBuilder = () => {
       return;
     }
 
-    if (!confirm("Вы уверены, что хотите удалить этот пульт?")) {
+    if (!confirm("В�� уверены, что хотите у��алить этот пульт?")) {
       return;
     }
 
     try {
       await deleteRemoteMutation.mutateAsync(remoteId);
-      toast.success("Пульт удален успешно");
+      toast.success("Пульт ��дален успешно");
     } catch (error: any) {
       console.error("Error deleting remote:", error);
       toast.error(error?.message || "Ошибка при удалении пульта");
@@ -386,7 +399,7 @@ const RemoteBuilder = () => {
         },
       });
       toast.success(
-        `Пульт ${remote.is_active ? "деактивирован" : "активирован"}`,
+        `Пульт ${remote.is_active ? "деак��ивирован" : "активирован"}`,
       );
     } catch (error: any) {
       console.error("Error toggling remote status:", error);
@@ -406,7 +419,9 @@ const RemoteBuilder = () => {
       toast.success("Пульт установлен по умолчанию");
     } catch (error: any) {
       console.error("Error setting default remote:", error);
-      toast.error(error?.message || "Ошибка при установке пульта по умолчанию");
+      toast.error(
+        error?.message || "��шибка при установке пульта по умолчанию",
+      );
     }
   };
 
@@ -415,23 +430,23 @@ const RemoteBuilder = () => {
       await duplicateMutation.mutateAsync({
         id: remote.id,
         data: {
-          name: `${remote.name} (копия)`,
+          name: `${remote.name || "Пульт"} (копия)`,
         },
       });
       toast.success("Пульт дублирован успешно");
     } catch (error: any) {
       console.error("Error duplicating remote:", error);
-      toast.error(error?.message || "Ошибка при дублировании пульта");
+      toast.error(error?.message || "Ошибка при дублирован��и пульта");
     }
   };
 
   const openEditDialog = (remote: RemoteTemplate) => {
     setSelectedRemote(remote);
     setFormData({
-      name: remote.name,
-      manufacturer: remote.manufacturer,
-      model: remote.model,
-      description: remote.description,
+      name: remote.name || "",
+      manufacturer: remote.manufacturer || "",
+      model: remote.model || "",
+      description: remote.description || "",
       layout: remote.layout,
       colorScheme: remote.color_scheme || "dark",
       deviceId: remote.device_id || "universal",
@@ -494,7 +509,7 @@ const RemoteBuilder = () => {
     if (selectedRemote) {
       const updatedRemote = {
         ...selectedRemote,
-        buttons: [...selectedRemote.buttons, newButton],
+        buttons: [...(selectedRemote.buttons || []), newButton],
       };
 
       try {
@@ -536,7 +551,7 @@ const RemoteBuilder = () => {
 
     const updatedRemote = {
       ...selectedRemote,
-      buttons: selectedRemote.buttons.map((b) =>
+      buttons: (selectedRemote.buttons || []).map((b) =>
         b.id === selectedButton.id ? updatedButton : b,
       ),
       updatedAt: new Date().toISOString().split("T")[0],
@@ -562,7 +577,7 @@ const RemoteBuilder = () => {
 
     const updatedRemote = {
       ...selectedRemote,
-      buttons: selectedRemote.buttons.filter((b) => b.id !== buttonId),
+      buttons: (selectedRemote.buttons || []).filter((b) => b.id !== buttonId),
       updatedAt: new Date().toISOString().split("T")[0],
     };
 
@@ -661,36 +676,60 @@ const RemoteBuilder = () => {
             )}
 
             {/* Render buttons on canvas */}
-            {selectedRemote.buttons.map((button) => (
-              <div
-                key={button.id}
-                className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
-                style={{
-                  left: `${(button.position.x / 400) * 100}%`,
-                  top: `${(button.position.y / 600) * 100}%`,
-                  width: `${(button.size.width / 400) * 100}%`,
-                  height: `${(button.size.height / 600) * 100}%`,
-                  backgroundColor: button.color + "80",
-                  color: button.textColor,
-                  fontSize: `${button.fontSize}px`,
-                  borderRadius:
-                    button.shape === "circle"
-                      ? "50%"
-                      : button.shape === "rounded"
-                        ? "8px"
-                        : "0",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleButtonEdit(button);
-                }}
-              >
-                <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                  {button.label}
-                </span>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
-              </div>
-            ))}
+            {(selectedRemote.buttons || [])
+              .filter((button) => {
+                try {
+                  return (
+                    button &&
+                    button.id &&
+                    (button.position == null ||
+                      (typeof button.position === "object" &&
+                        (typeof button.position.x === "number" ||
+                          button.position.x == null) &&
+                        (typeof button.position.y === "number" ||
+                          button.position.y == null))) &&
+                    (button.size == null ||
+                      (typeof button.size === "object" &&
+                        (typeof button.size.width === "number" ||
+                          button.size.width == null) &&
+                        (typeof button.size.height === "number" ||
+                          button.size.height == null)))
+                  );
+                } catch (e) {
+                  console.warn("Button filter error:", e, button);
+                  return false;
+                }
+              })
+              .map((button) => (
+                <div
+                  key={button.id}
+                  className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
+                  style={{
+                    left: `${((button.position?.x ?? 0) / 400) * 100}%`,
+                    top: `${((button.position?.y ?? 0) / 600) * 100}%`,
+                    width: `${((button.size?.width ?? 40) / 400) * 100}%`,
+                    height: `${((button.size?.height ?? 40) / 600) * 100}%`,
+                    backgroundColor: button.color + "80",
+                    color: button.textColor,
+                    fontSize: `${button.fontSize}px`,
+                    borderRadius:
+                      button.shape === "circle"
+                        ? "50%"
+                        : button.shape === "rounded"
+                          ? "8px"
+                          : "0",
+                  }}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleButtonEdit(button);
+                  }}
+                >
+                  <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+                    {button.label}
+                  </span>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
+                </div>
+              ))}
           </div>
         </div>
 
@@ -714,7 +753,7 @@ const RemoteBuilder = () => {
                   className="w-full"
                 >
                   <Crosshair className="h-4 w-4 mr-2" />
-                  {isCreatingButton ? "Отменить" : "Выбрать позицию"}
+                  {isCreatingButton ? "Отменить" : "Выбр��ть позицию"}
                 </Button>
                 <Button
                   variant="outline"
@@ -853,12 +892,12 @@ const RemoteBuilder = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                Кнопки ({selectedRemote.buttons.length})
+                Кнопки ({(selectedRemote.buttons || []).length})
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-2 max-h-64 overflow-y-auto">
-                {selectedRemote.buttons.map((button) => (
+                {(selectedRemote.buttons || []).map((button) => (
                   <div
                     key={button.id}
                     className={`flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-800 rounded cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors ${
@@ -877,7 +916,7 @@ const RemoteBuilder = () => {
                     <MousePointer className="h-4 w-4 text-gray-400" />
                   </div>
                 ))}
-                {selectedRemote.buttons.length === 0 && (
+                {(selectedRemote.buttons || []).length === 0 && (
                   <div className="text-center text-gray-500 py-4">
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет кнопок</p>
@@ -900,7 +939,7 @@ const RemoteBuilder = () => {
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-            Конструктор пультов
+            Конструктор пульто��
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Создание и настройка интерактивных пультов с привязкой к приставкам
@@ -931,7 +970,7 @@ const RemoteBuilder = () => {
                     <Label htmlFor="name">��азвание</Label>
                     <Input
                       id="name"
-                      value={formData.name}
+                      value={safeFormData.name}
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
@@ -942,7 +981,7 @@ const RemoteBuilder = () => {
                     <Label htmlFor="manufacturer">Производитель</Label>
                     <Input
                       id="manufacturer"
-                      value={formData.manufacturer}
+                      value={safeFormData.manufacturer}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
@@ -959,7 +998,7 @@ const RemoteBuilder = () => {
                     <Label htmlFor="model">Модель</Label>
                     <Input
                       id="model"
-                      value={formData.model}
+                      value={safeFormData.model}
                       onChange={(e) =>
                         setFormData({ ...formData, model: e.target.value })
                       }
@@ -993,7 +1032,7 @@ const RemoteBuilder = () => {
                   <Label htmlFor="description">Описание</Label>
                   <Textarea
                     id="description"
-                    value={formData.description}
+                    value={safeFormData.description}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
@@ -1124,7 +1163,7 @@ const RemoteBuilder = () => {
                   <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все приставки</SelectItem>
+                  <SelectItem value="all">В��е приставки</SelectItem>
                   <SelectItem value="universal">Универсальные</SelectItem>
                   {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
@@ -1360,7 +1399,7 @@ const RemoteBuilder = () => {
                 <Label htmlFor="edit-name">Название</Label>
                 <Input
                   id="edit-name"
-                  value={formData.name}
+                  value={safeFormData.name}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
@@ -1371,7 +1410,7 @@ const RemoteBuilder = () => {
                 <Label htmlFor="edit-manufacturer">Производитель</Label>
                 <Input
                   id="edit-manufacturer"
-                  value={formData.manufacturer}
+                  value={safeFormData.manufacturer}
                   onChange={(e) =>
                     setFormData({ ...formData, manufacturer: e.target.value })
                   }
@@ -1385,7 +1424,7 @@ const RemoteBuilder = () => {
                 <Label htmlFor="edit-model">Модель</Label>
                 <Input
                   id="edit-model"
-                  value={formData.model}
+                  value={safeFormData.model}
                   onChange={(e) =>
                     setFormData({ ...formData, model: e.target.value })
                   }
@@ -1419,7 +1458,7 @@ const RemoteBuilder = () => {
               <Label htmlFor="edit-description">Описание</Label>
               <Textarea
                 id="edit-description"
-                value={formData.description}
+                value={safeFormData.description}
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
@@ -1433,15 +1472,22 @@ const RemoteBuilder = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => editFileInputRef.current?.click()}
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
                   {previewImageUrl
-                    ? "Изменить изображение"
+                    ? "Изменить изо��ражение"
                     : "Загрузить изображение"}
                 </Button>
               </div>
+              <input
+                ref={editFileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
               {previewImageUrl && (
                 <div className="mt-2">
                   <img
@@ -1479,7 +1525,7 @@ const RemoteBuilder = () => {
               </div>
 
               <div>
-                <Label htmlFor="edit-colorScheme">Цветовая схема</Label>
+                <Label htmlFor="edit-colorScheme">Цветовая схем��</Label>
                 <Select
                   value={formData.colorScheme}
                   onValueChange={(value) =>

@@ -174,7 +174,7 @@ const SystemSettings = () => {
           <TabsTrigger value="diagnostic">Диагностика</TabsTrigger>
           <TabsTrigger value="notifications">Уведомления</TabsTrigger>
           <TabsTrigger value="security">Безопасность</TabsTrigger>
-          <TabsTrigger value="appearance">Внешний вид</TabsTrigger>
+          <TabsTrigger value="appearance">Вн��шний вид</TabsTrigger>
           <TabsTrigger value="backup">Резервное копирование</TabsTrigger>
         </TabsList>
 
@@ -223,7 +223,7 @@ const SystemSettings = () => {
                 <Label htmlFor="siteDescription">Описание сайта</Label>
                 <Textarea
                   id="siteDescription"
-                  value={settings.siteDescription}
+                  value={settings.siteDescription || ""}
                   onChange={(e) =>
                     updateSetting("siteDescription", e.target.value)
                   }

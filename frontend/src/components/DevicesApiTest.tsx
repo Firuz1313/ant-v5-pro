@@ -1,31 +1,48 @@
-import React, { useState } from 'react';
-import { useDevices, useCreateDevice, useDeviceStats } from '../hooks/useDevices';
-import { Card, CardContent, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Badge } from './ui/badge';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Textarea } from './ui/textarea';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/select';
-import { AlertCircle, Plus, Loader2, CheckCircle, XCircle } from 'lucide-react';
-import { DeviceCreateData } from '../api';
+import React, { useState } from "react";
+import {
+  useDevices,
+  useCreateDevice,
+  useDeviceStats,
+} from "../hooks/useDevices";
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
+import { Textarea } from "./ui/textarea";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
+import { AlertCircle, Plus, Loader2, CheckCircle, XCircle } from "lucide-react";
+import { DeviceCreateData } from "../api";
 
 interface DevicesApiTestProps {
   className?: string;
 }
 
-export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => {
+export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({
+  className,
+}) => {
   const [showCreateForm, setShowCreateForm] = useState(false);
   const [formData, setFormData] = useState<DeviceCreateData>({
-    name: '',
-    brand: '',
-    model: '',
-    description: '',
-    status: 'active',
+    name: "",
+    brand: "",
+    model: "",
+    description: "",
+    status: "active",
   });
 
   // Use hooks for devices data
-  const { data: devicesResponse, isLoading, error, refetch } = useDevices(1, 10);
+  const {
+    data: devicesResponse,
+    isLoading,
+    error,
+    refetch,
+  } = useDevices(1, 10);
   const { data: statsResponse, isLoading: statsLoading } = useDeviceStats();
   const createDeviceMutation = useCreateDevice();
 
@@ -34,24 +51,24 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
 
   const handleCreateDevice = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       await createDeviceMutation.mutateAsync(formData);
       setFormData({
-        name: '',
-        brand: '',
-        model: '',
-        description: '',
-        status: 'active',
+        name: "",
+        brand: "",
+        model: "",
+        description: "",
+        status: "active",
       });
       setShowCreateForm(false);
     } catch (error) {
-      console.error('Failed to create device:', error);
+      console.error("Failed to create device:", error);
     }
   };
 
   const handleInputChange = (field: keyof DeviceCreateData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
+    setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -65,7 +82,11 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
             onClick={() => refetch()}
             disabled={isLoading}
           >
-            {isLoading ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Обновить'}
+            {isLoading ? (
+              <Loader2 className="h-4 w-4 animate-spin" />
+            ) : (
+              "Обновить"
+            )}
           </Button>
           <Button
             onClick={() => setShowCreateForm(!showCreateForm)}
@@ -90,16 +111,24 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
                 <div className="text-sm text-muted-foreground">Всего</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-green-600">{stats.active}</div>
+                <div className="text-2xl font-bold text-green-600">
+                  {stats.active}
+                </div>
                 <div className="text-sm text-muted-foreground">Активных</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-gray-600">{stats.inactive}</div>
+                <div className="text-2xl font-bold text-gray-600">
+                  {stats.inactive}
+                </div>
                 <div className="text-sm text-muted-foreground">Неактивных</div>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-yellow-600">{stats.maintenance}</div>
-                <div className="text-sm text-muted-foreground">На обслуживании</div>
+                <div className="text-2xl font-bold text-yellow-600">
+                  {stats.maintenance}
+                </div>
+                <div className="text-sm text-muted-foreground">
+                  На обслуживании
+                </div>
               </div>
             </div>
           </CardContent>
@@ -120,7 +149,7 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
                   <Input
                     id="name"
                     value={formData.name}
-                    onChange={(e) => handleInputChange('name', e.target.value)}
+                    onChange={(e) => handleInputChange("name", e.target.value)}
                     required
                   />
                 </div>
@@ -129,7 +158,7 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
                   <Input
                     id="brand"
                     value={formData.brand}
-                    onChange={(e) => handleInputChange('brand', e.target.value)}
+                    onChange={(e) => handleInputChange("brand", e.target.value)}
                     required
                   />
                 </div>
@@ -138,7 +167,7 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
                   <Input
                     id="model"
                     value={formData.model}
-                    onChange={(e) => handleInputChange('model', e.target.value)}
+                    onChange={(e) => handleInputChange("model", e.target.value)}
                     required
                   />
                 </div>
@@ -146,9 +175,9 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
                   <Label htmlFor="status">Статус</Label>
                   <Select
                     value={formData.status}
-                    onValueChange={(value: 'active' | 'inactive' | 'maintenance') => 
-                      handleInputChange('status', value)
-                    }
+                    onValueChange={(
+                      value: "active" | "inactive" | "maintenance",
+                    ) => handleInputChange("status", value)}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -156,7 +185,9 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
                     <SelectContent>
                       <SelectItem value="active">Активное</SelectItem>
                       <SelectItem value="inactive">Неактивное</SelectItem>
-                      <SelectItem value="maintenance">На обслуживании</SelectItem>
+                      <SelectItem value="maintenance">
+                        На обслуживании
+                      </SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -165,23 +196,22 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
                 <Label htmlFor="description">Описание</Label>
                 <Textarea
                   id="description"
-                  value={formData.description}
-                  onChange={(e) => handleInputChange('description', e.target.value)}
+                  value={formData.description || ""}
+                  onChange={(e) =>
+                    handleInputChange("description", e.target.value)
+                  }
                   rows={3}
                 />
               </div>
               <div className="flex gap-2">
-                <Button 
-                  type="submit" 
-                  disabled={createDeviceMutation.isPending}
-                >
+                <Button type="submit" disabled={createDeviceMutation.isPending}>
                   {createDeviceMutation.isPending ? (
                     <Loader2 className="h-4 w-4 animate-spin mr-2" />
                   ) : null}
                   Создать устройство
                 </Button>
-                <Button 
-                  type="button" 
+                <Button
+                  type="button"
                   variant="outline"
                   onClick={() => setShowCreateForm(false)}
                 >
@@ -206,15 +236,19 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
             <div className="flex items-center gap-2 p-4 border border-red-200 rounded-lg bg-red-50">
               <AlertCircle className="h-5 w-5 text-red-500" />
               <div>
-                <div className="font-medium text-red-900">Ошибка загрузки устройств</div>
+                <div className="font-medium text-red-900">
+                  Ошибка загрузки устройств
+                </div>
                 <div className="text-sm text-red-700">
-                  {error instanceof Error ? error.message : 'Неизвестная ошибка'}
+                  {error instanceof Error
+                    ? error.message
+                    : "Неизвестная ошибка"}
                 </div>
               </div>
             </div>
           ) : devices.length === 0 ? (
             <div className="text-center py-8 text-muted-foreground">
-              {isLoading ? 'Загрузка устройств...' : 'Устройства не найдены'}
+              {isLoading ? "Загрузка устройств..." : "Устройства не найдены"}
             </div>
           ) : (
             <div className="space-y-2">
@@ -236,10 +270,15 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
                   </div>
                   <div className="flex items-center gap-2">
                     <Badge
-                      variant={device.status === 'active' ? 'default' : 'secondary'}
+                      variant={
+                        device.status === "active" ? "default" : "secondary"
+                      }
                     >
-                      {device.status === 'active' ? 'Активное' : 
-                       device.status === 'maintenance' ? 'Обслуживание' : 'Неактивное'}
+                      {device.status === "active"
+                        ? "Активное"
+                        : device.status === "maintenance"
+                          ? "Обслуживание"
+                          : "Неактивное"}
                     </Badge>
                     {device.isActive ? (
                       <CheckCircle className="h-4 w-4 text-green-500" />
@@ -259,11 +298,13 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
         <div className="flex items-center gap-2 p-4 border border-red-200 rounded-lg bg-red-50">
           <AlertCircle className="h-5 w-5 text-red-500" />
           <div>
-            <div className="font-medium text-red-900">Ошибка создания устройства</div>
+            <div className="font-medium text-red-900">
+              Ошибка создания устройства
+            </div>
             <div className="text-sm text-red-700">
-              {createDeviceMutation.error instanceof Error 
-                ? createDeviceMutation.error.message 
-                : 'Неизвестная ошибка'}
+              {createDeviceMutation.error instanceof Error
+                ? createDeviceMutation.error.message
+                : "Неизвестная ошибка"}
             </div>
           </div>
         </div>
