@@ -109,9 +109,12 @@ const RemoteBuilder = () => {
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
   const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
   const getRemotesForDevice = (deviceId: string) =>
-    remotes.filter((r: any) => r.deviceId === deviceId);
+    remotes.filter((r: any) => r.device_id === deviceId);
   const canDeleteRemote = (id: string) => ({ canDelete: true, reason: "" });
-  const getRemoteUsageCount = (id: string) => 0;
+  const getRemoteUsageCount = (id: string) => {
+    const remote = remotes.find(r => r.id === id);
+    return remote?.usage_count || 0;
+  };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -781,7 +784,7 @@ const RemoteBuilder = () => {
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет кнопок</p>
                     <p className="text-xs">
-                      Используйте указатель для добавления
+                      Исп��льзуйте указатель для добавления
                     </p>
                   </div>
                 )}
@@ -877,7 +880,7 @@ const RemoteBuilder = () => {
                         <SelectValue placeholder="Выберите приставку" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="universal">Унив��рсальный</SelectItem>
+                        <SelectItem value="universal">Универсальный</SelectItem>
                         {activeDevices.map((device) => (
                           <SelectItem key={device.id} value={device.id}>
                             {device.name}
@@ -1329,7 +1332,7 @@ const RemoteBuilder = () => {
                 <div className="mt-2">
                   <img
                     src={previewImageUrl}
-                    alt="Предварительный пр��смотр"
+                    alt="Предварительный просмотр"
                     className="w-full h-32 object-contain bg-gray-100 dark:bg-gray-800 rounded"
                   />
                 </div>
