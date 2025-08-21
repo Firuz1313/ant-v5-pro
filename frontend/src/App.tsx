@@ -25,6 +25,7 @@ import DeviceManager from "@/pages/admin/DeviceManager";
 import ProblemsManager from "@/pages/admin/ProblemsManager";
 import StepsManager from "@/pages/admin/StepsManager";
 import RemoteBuilder from "@/pages/admin/RemoteBuilder";
+import RemoteBuilderTest from "@/pages/admin/RemoteBuilderTest";
 import TVInterfaceBuilder from "@/pages/admin/TVInterfaceBuilder";
 import UsersManager from "@/pages/admin/UsersManager";
 import SystemSettings from "@/pages/admin/SystemSettings";
