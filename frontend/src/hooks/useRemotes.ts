@@ -19,7 +19,8 @@ export const remotesKeys = {
  * Hook for fetching all remotes with filters
  */
 export function useRemotes(filters: RemoteFilters = {}) {
-  console.log("useRemotes called with filters:", filters);
+  console.log("🔥🔥🔥 useRemotes: HOOK EXECUTED! Filters:", filters);
+  console.log("🔥🔥🔥 useRemotes: remotesApi object:", remotesApi);
 
   const result = useQuery({
     queryKey: remotesKeys.list(filters),
