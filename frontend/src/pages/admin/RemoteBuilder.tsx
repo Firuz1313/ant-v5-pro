@@ -361,7 +361,7 @@ const RemoteBuilder = () => {
       return;
     }
 
-    if (!confirm("Вы уверены, что хотите удалить этот пульт?")) {
+    if (!confirm("��ы уверены, что хотите удалить этот пульт?")) {
       return;
     }
 
@@ -418,7 +418,7 @@ const RemoteBuilder = () => {
           name: `${remote.name} (копия)`,
         },
       });
-      toast.success("Пульт дублирован ус��ешно");
+      toast.success("Пульт дублирован успешно");
     } catch (error: any) {
       console.error("Error duplicating remote:", error);
       toast.error(error?.message || "Ошибк�� при дублировании пульта");
@@ -976,7 +976,7 @@ const RemoteBuilder = () => {
                     <Label htmlFor="name">��азвание</Label>
                     <Input
                       id="name"
-                      value={formData.name}
+                      value={formData.name || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, name: e.target.value })
                       }
@@ -987,7 +987,7 @@ const RemoteBuilder = () => {
                     <Label htmlFor="manufacturer">Производитель</Label>
                     <Input
                       id="manufacturer"
-                      value={formData.manufacturer}
+                      value={formData.manufacturer || ""}
                       onChange={(e) =>
                         setFormData({
                           ...formData,
@@ -1004,7 +1004,7 @@ const RemoteBuilder = () => {
                     <Label htmlFor="model">Модель</Label>
                     <Input
                       id="model"
-                      value={formData.model}
+                      value={formData.model || ""}
                       onChange={(e) =>
                         setFormData({ ...formData, model: e.target.value })
                       }
@@ -1230,7 +1230,7 @@ const RemoteBuilder = () => {
                       <Badge variant="default">По умолчанию</Badge>
                     )}
                     <Badge variant={remote.is_active ? "default" : "secondary"}>
-                      {remote.is_active ? "Активный" : "Неактивный"}
+                      {remote.is_active ? "Активный" : "Не��ктивный"}
                     </Badge>
                   </div>
                 </div>
@@ -1405,7 +1405,7 @@ const RemoteBuilder = () => {
                 <Label htmlFor="edit-name">Название</Label>
                 <Input
                   id="edit-name"
-                  value={formData.name}
+                  value={formData.name || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, name: e.target.value })
                   }
@@ -1416,7 +1416,7 @@ const RemoteBuilder = () => {
                 <Label htmlFor="edit-manufacturer">Производитель</Label>
                 <Input
                   id="edit-manufacturer"
-                  value={formData.manufacturer}
+                  value={formData.manufacturer || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, manufacturer: e.target.value })
                   }
@@ -1430,7 +1430,7 @@ const RemoteBuilder = () => {
                 <Label htmlFor="edit-model">Модель</Label>
                 <Input
                   id="edit-model"
-                  value={formData.model}
+                  value={formData.model || ""}
                   onChange={(e) =>
                     setFormData({ ...formData, model: e.target.value })
                   }
