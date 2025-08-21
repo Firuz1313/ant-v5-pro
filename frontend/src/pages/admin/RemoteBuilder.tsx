@@ -1514,7 +1514,7 @@ const RemoteBuilder = () => {
                 </div>
               )}
               <input
-                ref={fileInputRef}
+                ref={editFileInputRef}
                 type="file"
                 accept="image/*"
                 onChange={handleImageUpload}
