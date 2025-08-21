@@ -1287,7 +1287,7 @@ const RemoteBuilder = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Производитель:
+                        ��роизводитель:
                       </span>
                       <span className="font-medium">{remote.manufacturer}</span>
                     </div>
@@ -1499,7 +1499,7 @@ const RemoteBuilder = () => {
                   <ImageIcon className="h-4 w-4 mr-2" />
                   {previewImageUrl
                     ? "Изменить изображение"
-                    : "Загрузить из��бражение"}
+                    : "Загрузить изображение"}
                 </Button>
               </div>
               {previewImageUrl && (
