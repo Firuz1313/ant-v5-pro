@@ -377,7 +377,7 @@ const RemoteBuilder = () => {
 
     try {
       await deleteRemoteMutation.mutateAsync(remoteId);
-      toast.success("Пульт удален успешно");
+      toast.success("Пульт ��дален успешно");
     } catch (error: any) {
       console.error("Error deleting remote:", error);
       toast.error(error?.message || "Ошибка при удалении пульта");
@@ -671,7 +671,9 @@ const RemoteBuilder = () => {
             )}
 
             {/* Render buttons on canvas */}
-            {selectedRemote.buttons.map((button) => (
+            {selectedRemote.buttons
+              .filter(button => button.position && button.size)
+              .map((button) => (
               <div
                 key={button.id}
                 className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
