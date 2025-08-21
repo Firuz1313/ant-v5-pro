@@ -672,7 +672,15 @@ const RemoteBuilder = () => {
 
             {/* Render buttons on canvas */}
             {selectedRemote.buttons
-              .filter(button => button.position && button.size)
+              .filter(button =>
+                button &&
+                button.position &&
+                typeof button.position.x === 'number' &&
+                typeof button.position.y === 'number' &&
+                button.size &&
+                typeof button.size.width === 'number' &&
+                typeof button.size.height === 'number'
+              )
               .map((button) => (
               <div
                 key={button.id}
@@ -1450,7 +1458,7 @@ const RemoteBuilder = () => {
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
                   {previewImageUrl
-                    ? "Изменить изображение"
+                    ? "Изменить изо��ражение"
                     : "Загрузить изображение"}
                 </Button>
               </div>
