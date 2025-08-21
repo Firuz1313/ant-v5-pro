@@ -1,6 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { remotesApi } from "@/api";
-import type { Remote, RemoteCreateData, RemoteUpdateData, RemoteFilters } from "@/types";
+import type { Remote } from "@/types";
+import type { RemoteCreateData, RemoteUpdateData, RemoteFilters } from "@/api/remotes";
 
 // Query keys
 export const remotesKeys = {
