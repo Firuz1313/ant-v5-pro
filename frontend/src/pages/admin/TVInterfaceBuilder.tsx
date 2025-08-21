@@ -189,6 +189,9 @@ const TVInterfaceBuilder = () => {
     if (fileInputRef.current) {
       fileInputRef.current.value = "";
     }
+    if (editFileInputRef.current) {
+      editFileInputRef.current.value = "";
+    }
   };
 
   // Handle screenshot selection from browser
@@ -386,7 +389,7 @@ const TVInterfaceBuilder = () => {
       if (response.success) {
         toast({
           title: "Успех",
-          description: response.message || "TV интерфейс дубл����рован",
+          description: response.message || "TV интерфейс дубл������рован",
         });
         loadTVInterfaces();
       } else {
@@ -557,7 +560,7 @@ const TVInterfaceBuilder = () => {
                       }
                     >
                       <SelectTrigger>
-                        <SelectValue placeholder="Выберите тип интерфейса" />
+                        <SelectValue placeholder="Выберите тип инте��фейса" />
                       </SelectTrigger>
                       <SelectContent>
                         {TV_INTERFACE_TYPES.map((type) => (
@@ -1003,7 +1006,7 @@ const TVInterfaceBuilder = () => {
             </div>
 
             <div>
-              <Label htmlFor="edit-screenshot">Скриншот интерфейса</Label>
+              <Label htmlFor="edit-screenshot">Скри��шот интерфейса</Label>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Button
