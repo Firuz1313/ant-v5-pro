@@ -110,6 +110,19 @@ interface RemoteTemplate {
 
 const RemoteBuilder = () => {
   const { data: devicesResponse } = useDevices();
+
+  // Simple test of remotesApi
+  React.useEffect(() => {
+    console.log("=== RemoteBuilder: Testing remotesApi directly ===");
+    remotesApi.getAll()
+      .then((result) => {
+        console.log("=== RemoteBuilder: remotesApi.getAll SUCCESS ===", result);
+      })
+      .catch((error) => {
+        console.error("=== RemoteBuilder: remotesApi.getAll ERROR ===", error);
+      });
+  }, []);
+
   const { data: remotesResponse, isLoading: remotesLoading, error: remotesError } = useRemotes();
 
   const createRemoteMutation = useCreateRemote();
@@ -642,7 +655,7 @@ const RemoteBuilder = () => {
             <CardHeader>
               <CardTitle className="text-lg flex items-center gap-2">
                 <Palette className="h-5 w-5" />
-                Управление
+                Управлен��е
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
@@ -824,7 +837,7 @@ const RemoteBuilder = () => {
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет кнопок</p>
                     <p className="text-xs">
-                      Используйте указатель для добавления
+                      Используйте указател�� для добавления
                     </p>
                   </div>
                 )}
@@ -1066,7 +1079,7 @@ const RemoteBuilder = () => {
                   <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все пристав��и</SelectItem>
+                  <SelectItem value="all">Все приставки</SelectItem>
                   <SelectItem value="universal">Универсальные</SelectItem>
                   {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
@@ -1179,7 +1192,7 @@ const RemoteBuilder = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Макет:
+                        ��акет:
                       </span>
                       <span className="font-medium">
                         {layouts.find((l) => l.value === remote.layout)?.label}
