@@ -237,7 +237,7 @@ export const updateRemote = async (req, res) => {
 
     res.json({
       success: true,
-      data: updatedRemote,
+      data: remoteModel.formatResponse(updatedRemote),
       message: "Пульт обновлен успешно",
       timestamp: new Date().toISOString(),
     });
