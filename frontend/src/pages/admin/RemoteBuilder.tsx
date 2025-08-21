@@ -662,7 +662,13 @@ const RemoteBuilder = () => {
 
             {/* Render buttons on canvas */}
             {selectedRemote.buttons
-              .filter((button) => button.position && button.size)
+              .map((button) => {
+                // Provide default values for missing properties
+                const position = button.position || { x: 0, y: 0 };
+                const size = button.size || { width: 40, height: 40 };
+
+                return { ...button, position, size };
+              })
               .map((button) => (
               <div
                 key={button.id}
@@ -1241,7 +1247,7 @@ const RemoteBuilder = () => {
                     </div>
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Макет:
+                        Ма��ет:
                       </span>
                       <span className="font-medium">
                         {layouts.find((l) => l.value === remote.layout)?.label}
@@ -1370,7 +1376,7 @@ const RemoteBuilder = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-manufacturer">Производите��ь</Label>
+                <Label htmlFor="edit-manufacturer">Производитель</Label>
                 <Input
                   id="edit-manufacturer"
                   value={formData.manufacturer}
