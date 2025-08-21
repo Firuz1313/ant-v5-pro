@@ -62,7 +62,7 @@ import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
 import { remotesApi } from "@/api";
 
-console.log("���🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! 🔥🔥🔥");
+console.log("���🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! ��🔥🔥");
 
 interface RemoteButton {
   id: string;
@@ -161,7 +161,7 @@ const RemoteBuilder = () => {
   const setDefaultMutation = useSetDefaultRemote();
   const duplicateMutation = useDuplicateRemote();
 
-  // Извлекаем массивы данны�� из ответа API
+  // Изв��екаем массивы данны�� из ответа API
   const devices = devicesResponse?.data || [];
   const remotes: RemoteTemplate[] = remotesResponse?.data || [];
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
@@ -940,7 +940,7 @@ const RemoteBuilder = () => {
                 {(selectedRemote.buttons || []).length === 0 && (
                   <div className="text-center text-gray-500 py-4">
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
-                    <p>Нет кнопок</p>
+                    <p>Нет кноп��к</p>
                     <p className="text-xs">
                       Используйте указатель для добавления
                     </p>
@@ -978,7 +978,7 @@ const RemoteBuilder = () => {
             <DialogTrigger asChild>
               <Button className="bg-blue-600 hover:bg-blue-700">
                 <Plus className="h-4 w-4 mr-2" />
-                Создать пульт
+                Соз��ать пульт
               </Button>
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
@@ -1511,6 +1511,13 @@ const RemoteBuilder = () => {
                   />
                 </div>
               )}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
