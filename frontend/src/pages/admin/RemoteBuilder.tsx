@@ -186,7 +186,7 @@ const RemoteBuilder = () => {
   ];
 
   const colorSchemes = [
-    { value: "dark", label: "Темная", preview: "bg-gray-800" },
+    { value: "dark", label: "Темна��", preview: "bg-gray-800" },
     { value: "light", label: "Светлая", preview: "bg-gray-200" },
     { value: "blue", label: "Синяя", preview: "bg-blue-600" },
     { value: "red", label: "Красная", preview: "bg-red-600" },
@@ -385,7 +385,7 @@ const RemoteBuilder = () => {
       model: remote.model,
       description: remote.description,
       layout: remote.layout,
-      colorScheme: remote.color_scheme,
+      colorScheme: remote.color_scheme || "dark",
       deviceId: remote.device_id || "universal",
     });
     setPreviewImageUrl(remote.image_data || null);
@@ -680,7 +680,7 @@ const RemoteBuilder = () => {
                   <AlertDescription>
                     <div className="space-y-3">
                       <p className="text-sm">
-                        Кликнит�� на изображение пульта для добавления кнопки
+                        Кликните на изображение пульта для добавления кнопки
                       </p>
                       <div>
                         <Label htmlFor="button-label">Название кнопки</Label>
@@ -708,7 +708,7 @@ const RemoteBuilder = () => {
                           }
                         >
                           <SelectTrigger>
-                            <SelectValue placeholder="Вы��ерите действие" />
+                            <SelectValue placeholder="Выберите действие" />
                           </SelectTrigger>
                           <SelectContent>
                             {actionTypes.map((action) => (
@@ -1217,7 +1217,7 @@ const RemoteBuilder = () => {
                         <DropdownMenuItem
                           onClick={() => handleToggleStatus(remote.id)}
                         >
-                          {remote.isActive ? "Деактивировать" : "Активиро��ать"}
+                          {remote.isActive ? "Деактивировать" : "Активировать"}
                         </DropdownMenuItem>
                         {!remote.is_default && remote.device_id && (
                           <DropdownMenuItem
@@ -1347,7 +1347,7 @@ const RemoteBuilder = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Введите описание пу��ьта"
+                placeholder="Введите описание пульта"
               />
             </div>
 
@@ -1452,7 +1452,7 @@ const RemoteBuilder = () => {
               Пульты не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изм��нить фильтры поиска или создайте новый пульт.
+              Попробуйте изменить фильтры поиска или создайте новый пульт.
             </p>
           </CardContent>
         </Card>
