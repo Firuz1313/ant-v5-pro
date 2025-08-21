@@ -271,31 +271,47 @@ const RemoteBuilder = () => {
     if (!selectedRemote) return;
 
     try {
-      await updateRemote(selectedRemote.id, {
-        ...formData,
-        deviceId: formData.deviceId === "universal" ? "" : formData.deviceId,
-        imageData: previewImageUrl || selectedRemote.imageData,
+      await updateRemoteMutation.mutateAsync({
+        id: selectedRemote.id,
+        data: {
+          name: formData.name,
+          manufacturer: formData.manufacturer,
+          model: formData.model,
+          description: formData.description,
+          device_id: formData.deviceId === "universal" ? null : formData.deviceId,
+          layout: formData.layout,
+          color_scheme: formData.colorScheme,
+          image_data: previewImageUrl || selectedRemote.image_data,
+        }
       });
+
+      toast.success("Пульт обновлен успешно");
       setIsEditDialogOpen(false);
       setSelectedRemote(null);
       resetForm();
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error updating remote:", error);
+      toast.error(error?.message || "Ош��бка при обновлении пульта");
     }
   };
 
   const handleDelete = async (remoteId: string) => {
     const deleteCheck = canDeleteRemote(remoteId);
     if (!deleteCheck.canDelete) {
-      alert(deleteCheck.reason);
+      toast.error(deleteCheck.reason);
+      return;
+    }
+
+    if (!confirm("Вы уверены, что хотите удалить этот пульт?")) {
       return;
     }
 
     try {
-      await deleteRemote(remoteId);
-    } catch (error) {
+      await deleteRemoteMutation.mutateAsync(remoteId);
+      toast.success("Пульт удален успешно");
+    } catch (error: any) {
       console.error("Error deleting remote:", error);
-      alert("Ошибка при удалении п��льта");
+      toast.error(error?.message || "Ошибка при удалении пульта");
     }
   };
 
@@ -304,46 +320,47 @@ const RemoteBuilder = () => {
     if (!remote) return;
 
     try {
-      await updateRemote(remoteId, {
-        isActive: !remote.isActive,
+      await updateRemoteMutation.mutateAsync({
+        id: remoteId,
+        data: {
+          is_active: !remote.is_active,
+        }
       });
-    } catch (error) {
+      toast.success(`Пульт ${remote.is_active ? 'деактивирован' : 'активирован'}`);
+    } catch (error: any) {
       console.error("Error toggling remote status:", error);
+      toast.error(error?.message || "Ошибка при изменении статуса пульта");
     }
   };
 
   const handleSetDefault = async (remoteId: string) => {
     const remote = remotes.find((r) => r.id === remoteId);
-    if (!remote?.deviceId) return;
+    if (!remote?.device_id) return;
 
     try {
-      // First, unset all defaults for the device
-      const deviceRemotes = remotes.filter(
-        (r) => r.deviceId === remote.deviceId,
-      );
-      for (const deviceRemote of deviceRemotes) {
-        if (deviceRemote.isDefault && deviceRemote.id !== remoteId) {
-          await updateRemote(deviceRemote.id, { isDefault: false });
-        }
-      }
-
-      // Then set the new default
-      await updateRemote(remoteId, { isDefault: true });
-    } catch (error) {
+      await setDefaultMutation.mutateAsync({
+        remoteId,
+        deviceId: remote.device_id
+      });
+      toast.success("Пульт установлен по умолчанию");
+    } catch (error: any) {
       console.error("Error setting default remote:", error);
+      toast.error(error?.message || "Ошибка при установке пульта по умолчанию");
     }
   };
 
   const handleDuplicate = async (remote: RemoteTemplate) => {
     try {
-      await createRemote({
-        ...remote,
-        name: `${remote.name} (копия)`,
-        isDefault: false,
-        usageCount: 0,
+      await duplicateMutation.mutateAsync({
+        id: remote.id,
+        data: {
+          name: `${remote.name} (копия)`,
+        }
       });
-    } catch (error) {
+      toast.success("Пульт дублирован успешно");
+    } catch (error: any) {
       console.error("Error duplicating remote:", error);
+      toast.error(error?.message || "Ошибка при дублировании пульта");
     }
   };
 
@@ -833,7 +850,7 @@ const RemoteBuilder = () => {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Создать новый пульт</DialogTitle>
+                <DialogTitle>Создать новый ��ульт</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -907,7 +924,7 @@ const RemoteBuilder = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
-                    placeholder="В��едите описание пульта"
+                    placeholder="Введите описание пульта"
                   />
                 </div>
 
