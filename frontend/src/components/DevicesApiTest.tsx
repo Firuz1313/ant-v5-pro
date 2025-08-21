@@ -165,7 +165,7 @@ export const DevicesApiTest: React.FC<DevicesApiTestProps> = ({ className }) => 
                 <Label htmlFor="description">Описание</Label>
                 <Textarea
                   id="description"
-                  value={formData.description}
+                  value={formData.description || ""}
                   onChange={(e) => handleInputChange('description', e.target.value)}
                   rows={3}
                 />
