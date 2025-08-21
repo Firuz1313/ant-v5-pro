@@ -8,7 +8,8 @@ export default function RemotesApiTest() {
 
   useEffect(() => {
     console.log("RemotesApiTest - starting API call");
-    remotesApi.getAll()
+    remotesApi
+      .getAll()
       .then((response) => {
         console.log("RemotesApiTest - success:", response);
         setData(response);

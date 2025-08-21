@@ -76,10 +76,11 @@ export const getRemotes = async (req, res) => {
     );
 
     console.log("🔍 getRemotes: Result from findAll:", {
-      dataLength: result?.data?.length || (Array.isArray(result) ? result.length : 0),
+      dataLength:
+        result?.data?.length || (Array.isArray(result) ? result.length : 0),
       total: result?.total || (Array.isArray(result) ? result.length : 0),
       isArray: Array.isArray(result),
-      fullResult: result
+      fullResult: result,
     });
 
     // Handle both object with data/total and direct array results

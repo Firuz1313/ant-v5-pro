@@ -1,7 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { remotesApi } from "@/api";
 import type { Remote } from "@/types";
-import type { RemoteCreateData, RemoteUpdateData, RemoteFilters } from "@/api/remotes";
+import type {
+  RemoteCreateData,
+  RemoteUpdateData,
+  RemoteFilters,
+} from "@/api/remotes";
 
 // Query keys
 export const remotesKeys = {
@@ -10,9 +14,12 @@ export const remotesKeys = {
   list: (filters: RemoteFilters) => [...remotesKeys.lists(), filters] as const,
   details: () => [...remotesKeys.all, "detail"] as const,
   detail: (id: string) => [...remotesKeys.details(), id] as const,
-  byDevice: (deviceId: string) => [...remotesKeys.all, "byDevice", deviceId] as const,
-  defaultForDevice: (deviceId: string) => [...remotesKeys.all, "default", deviceId] as const,
-  stats: (deviceId?: string) => [...remotesKeys.all, "stats", deviceId] as const,
+  byDevice: (deviceId: string) =>
+    [...remotesKeys.all, "byDevice", deviceId] as const,
+  defaultForDevice: (deviceId: string) =>
+    [...remotesKeys.all, "default", deviceId] as const,
+  stats: (deviceId?: string) =>
+    [...remotesKeys.all, "stats", deviceId] as const,
 };
 
 /**
@@ -93,22 +100,22 @@ export function useCreateRemote() {
     onSuccess: (newRemote) => {
       // Invalidate and refetch all remote lists
       queryClient.invalidateQueries({ queryKey: remotesKeys.lists() });
-      
+
       // Invalidate device-specific queries if device_id is present
       if (newRemote.device_id) {
-        queryClient.invalidateQueries({ 
-          queryKey: remotesKeys.byDevice(newRemote.device_id) 
+        queryClient.invalidateQueries({
+          queryKey: remotesKeys.byDevice(newRemote.device_id),
         });
-        queryClient.invalidateQueries({ 
-          queryKey: remotesKeys.defaultForDevice(newRemote.device_id) 
+        queryClient.invalidateQueries({
+          queryKey: remotesKeys.defaultForDevice(newRemote.device_id),
         });
       }
-      
+
       // Invalidate stats
       queryClient.invalidateQueries({ queryKey: remotesKeys.stats() });
       if (newRemote.device_id) {
-        queryClient.invalidateQueries({ 
-          queryKey: remotesKeys.stats(newRemote.device_id) 
+        queryClient.invalidateQueries({
+          queryKey: remotesKeys.stats(newRemote.device_id),
         });
       }
     },
@@ -127,17 +134,17 @@ export function useUpdateRemote() {
     onSuccess: (updatedRemote, { id }) => {
       // Update the specific remote in cache
       queryClient.setQueryData(remotesKeys.detail(id), updatedRemote);
-      
+
       // Invalidate lists to ensure consistency
       queryClient.invalidateQueries({ queryKey: remotesKeys.lists() });
-      
+
       // Invalidate device-specific queries
       if (updatedRemote.device_id) {
-        queryClient.invalidateQueries({ 
-          queryKey: remotesKeys.byDevice(updatedRemote.device_id) 
+        queryClient.invalidateQueries({
+          queryKey: remotesKeys.byDevice(updatedRemote.device_id),
         });
-        queryClient.invalidateQueries({ 
-          queryKey: remotesKeys.defaultForDevice(updatedRemote.device_id) 
+        queryClient.invalidateQueries({
+          queryKey: remotesKeys.defaultForDevice(updatedRemote.device_id),
         });
       }
     },
@@ -155,20 +162,20 @@ export function useDeleteRemote() {
     onSuccess: (deletedRemote, id) => {
       // Remove from cache
       queryClient.removeQueries({ queryKey: remotesKeys.detail(id) });
-      
+
       // Invalidate lists
       queryClient.invalidateQueries({ queryKey: remotesKeys.lists() });
-      
+
       // Invalidate device-specific queries
       if (deletedRemote.device_id) {
-        queryClient.invalidateQueries({ 
-          queryKey: remotesKeys.byDevice(deletedRemote.device_id) 
+        queryClient.invalidateQueries({
+          queryKey: remotesKeys.byDevice(deletedRemote.device_id),
         });
-        queryClient.invalidateQueries({ 
-          queryKey: remotesKeys.defaultForDevice(deletedRemote.device_id) 
+        queryClient.invalidateQueries({
+          queryKey: remotesKeys.defaultForDevice(deletedRemote.device_id),
         });
       }
-      
+
       // Invalidate stats
       queryClient.invalidateQueries({ queryKey: remotesKeys.stats() });
     },
@@ -182,15 +189,20 @@ export function useSetDefaultRemote() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ remoteId, deviceId }: { remoteId: string; deviceId: string }) =>
-      remotesApi.setAsDefault(remoteId, deviceId),
+    mutationFn: ({
+      remoteId,
+      deviceId,
+    }: {
+      remoteId: string;
+      deviceId: string;
+    }) => remotesApi.setAsDefault(remoteId, deviceId),
     onSuccess: (_, { deviceId }) => {
       // Invalidate all device-related queries to refresh defaults
-      queryClient.invalidateQueries({ 
-        queryKey: remotesKeys.byDevice(deviceId) 
+      queryClient.invalidateQueries({
+        queryKey: remotesKeys.byDevice(deviceId),
       });
-      queryClient.invalidateQueries({ 
-        queryKey: remotesKeys.defaultForDevice(deviceId) 
+      queryClient.invalidateQueries({
+        queryKey: remotesKeys.defaultForDevice(deviceId),
       });
       queryClient.invalidateQueries({ queryKey: remotesKeys.lists() });
     },
@@ -209,10 +221,10 @@ export function useDuplicateRemote() {
     onSuccess: (newRemote) => {
       // Invalidate lists to show the new duplicate
       queryClient.invalidateQueries({ queryKey: remotesKeys.lists() });
-      
+
       if (newRemote.device_id) {
-        queryClient.invalidateQueries({ 
-          queryKey: remotesKeys.byDevice(newRemote.device_id) 
+        queryClient.invalidateQueries({
+          queryKey: remotesKeys.byDevice(newRemote.device_id),
         });
       }
     },

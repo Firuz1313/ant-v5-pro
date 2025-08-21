@@ -56,7 +56,7 @@ import {
   useUpdateRemote,
   useDeleteRemote,
   useSetDefaultRemote,
-  useDuplicateRemote
+  useDuplicateRemote,
 } from "@/hooks/useRemotes";
 import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
@@ -118,22 +118,42 @@ const RemoteBuilder = () => {
 
   // Simple test of remotesApi
   React.useEffect(() => {
-    console.log("🚀🚀🚀 RemoteBuilder: useEffect STARTED! Testing remotesApi directly 🚀🚀🚀");
+    console.log(
+      "🚀🚀🚀 RemoteBuilder: useEffect STARTED! Testing remotesApi directly 🚀🚀🚀",
+    );
     console.log("🚀🚀🚀 RemoteBuilder: remotesApi object:", remotesApi);
-    console.log("🚀🚀🚀 RemoteBuilder: remotesApi.getAll function:", remotesApi.getAll);
+    console.log(
+      "🚀🚀🚀 RemoteBuilder: remotesApi.getAll function:",
+      remotesApi.getAll,
+    );
 
-    remotesApi.getAll()
+    remotesApi
+      .getAll()
       .then((result) => {
-        console.log("✅✅✅ RemoteBuilder: remotesApi.getAll SUCCESS ✅✅✅", result);
+        console.log(
+          "✅✅✅ RemoteBuilder: remotesApi.getAll SUCCESS ✅✅✅",
+          result,
+        );
       })
       .catch((error) => {
-        console.error("❌❌❌ RemoteBuilder: remotesApi.getAll ERROR ❌❌❌", error);
+        console.error(
+          "❌❌❌ RemoteBuilder: remotesApi.getAll ERROR ❌❌❌",
+          error,
+        );
       });
   }, []);
 
   console.log("🚀🚀🚀 RemoteBuilder: About to call useRemotes hook! 🚀🚀🚀");
-  const { data: remotesResponse, isLoading: remotesLoading, error: remotesError } = useRemotes();
-  console.log("📊📊📊 RemoteBuilder: useRemotes returned:", { remotesResponse, remotesLoading, remotesError });
+  const {
+    data: remotesResponse,
+    isLoading: remotesLoading,
+    error: remotesError,
+  } = useRemotes();
+  console.log("📊📊📊 RemoteBuilder: useRemotes returned:", {
+    remotesResponse,
+    remotesLoading,
+    remotesError,
+  });
 
   const createRemoteMutation = useCreateRemote();
   const updateRemoteMutation = useUpdateRemote();
@@ -150,7 +170,7 @@ const RemoteBuilder = () => {
     remotes.filter((r: any) => r.device_id === deviceId);
   const canDeleteRemote = (id: string) => ({ canDelete: true, reason: "" });
   const getRemoteUsageCount = (id: string) => {
-    const remote = remotes.find(r => r.id === id);
+    const remote = remotes.find((r) => r.id === id);
     return remote?.usage_count || 0;
   };
 
@@ -316,11 +336,12 @@ const RemoteBuilder = () => {
           manufacturer: formData.manufacturer,
           model: formData.model,
           description: formData.description,
-          device_id: formData.deviceId === "universal" ? null : formData.deviceId,
+          device_id:
+            formData.deviceId === "universal" ? null : formData.deviceId,
           layout: formData.layout,
           color_scheme: formData.colorScheme,
           image_data: previewImageUrl || selectedRemote.image_data,
-        }
+        },
       });
 
       toast.success("Пульт обновлен успешно");
@@ -362,9 +383,11 @@ const RemoteBuilder = () => {
         id: remoteId,
         data: {
           is_active: !remote.is_active,
-        }
+        },
       });
-      toast.success(`Пульт ${remote.is_active ? 'деактивирован' : 'активирован'}`);
+      toast.success(
+        `Пульт ${remote.is_active ? "деактивирован" : "активирован"}`,
+      );
     } catch (error: any) {
       console.error("Error toggling remote status:", error);
       toast.error(error?.message || "Ошибка при изменении статуса пульта");
@@ -378,7 +401,7 @@ const RemoteBuilder = () => {
     try {
       await setDefaultMutation.mutateAsync({
         remoteId,
-        deviceId: remote.device_id
+        deviceId: remote.device_id,
       });
       toast.success("Пульт установлен по умолчанию");
     } catch (error: any) {
@@ -393,7 +416,7 @@ const RemoteBuilder = () => {
         id: remote.id,
         data: {
           name: `${remote.name} (копия)`,
-        }
+        },
       });
       toast.success("Пульт дублирован успешно");
     } catch (error: any) {
@@ -479,7 +502,7 @@ const RemoteBuilder = () => {
           id: selectedRemote.id,
           data: {
             buttons: updatedRemote.buttons,
-          }
+          },
         });
         setSelectedRemote(updatedRemote);
       } catch (error) {
@@ -524,7 +547,7 @@ const RemoteBuilder = () => {
         id: selectedRemote.id,
         data: {
           buttons: updatedRemote.buttons,
-        }
+        },
       });
       setSelectedRemote(updatedRemote);
       setSelectedButton(null);
@@ -548,7 +571,7 @@ const RemoteBuilder = () => {
         id: selectedRemote.id,
         data: {
           buttons: updatedRemote.buttons,
-        }
+        },
       });
       setSelectedRemote(updatedRemote);
     } catch (error) {
@@ -562,7 +585,7 @@ const RemoteBuilder = () => {
     try {
       await updateRemoteMutation.mutateAsync({
         id: selectedRemote.id,
-        data: selectedRemote
+        data: selectedRemote,
       });
       setIsEditorDialogOpen(false);
     } catch (error) {
@@ -1138,7 +1161,9 @@ const RemoteBuilder = () => {
 
       {remotesError && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-          <p className="text-red-700">Ошибка загрузки пультов: {(remotesError as any)?.message}</p>
+          <p className="text-red-700">
+            Ошибка загрузки пультов: {(remotesError as any)?.message}
+          </p>
         </div>
       )}
 
