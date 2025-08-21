@@ -344,7 +344,7 @@ const RemoteBuilder = () => {
       toast.success(`Пульт ${remote.is_active ? 'деактивирован' : 'активирован'}`);
     } catch (error: any) {
       console.error("Error toggling remote status:", error);
-      toast.error(error?.message || "Ошибка при изм��нении статуса пульта");
+      toast.error(error?.message || "Ошибка при изменении статуса пульта");
     }
   };
 
@@ -838,7 +838,6 @@ const RemoteBuilder = () => {
 
   return (
     <div className="space-y-6">
-      <RemotesTest />
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
@@ -1067,7 +1066,7 @@ const RemoteBuilder = () => {
                   <SelectValue placeholder="Прис��авка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все приставки</SelectItem>
+                  <SelectItem value="all">Все пристав��и</SelectItem>
                   <SelectItem value="universal">Универсальные</SelectItem>
                   {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
