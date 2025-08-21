@@ -778,7 +778,7 @@ const RemoteBuilder = () => {
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  Изображение
+                  Изо��ражение
                 </Button>
               </div>
 
@@ -809,7 +809,7 @@ const RemoteBuilder = () => {
                               label: e.target.value,
                             })
                           }
-                          placeholder="Например: POWER"
+                          placeholder="Напри��ер: POWER"
                         />
                       </div>
                       <div>
@@ -909,7 +909,7 @@ const RemoteBuilder = () => {
           <Card>
             <CardHeader>
               <CardTitle className="text-lg">
-                Кнопки ({(selectedRemote.buttons || []).length})
+                Кнопк�� ({(selectedRemote.buttons || []).length})
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -1072,7 +1072,7 @@ const RemoteBuilder = () => {
                     >
                       <ImageIcon className="h-4 w-4 mr-2" />
                       {previewImageUrl
-                        ? "Изменить и��ображение"
+                        ? "Изменить изображение"
                         : "Загрузить изображение"}
                     </Button>
                   </div>
@@ -1287,7 +1287,7 @@ const RemoteBuilder = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        ��роизводитель:
+                        Производитель:
                       </span>
                       <span className="font-medium">{remote.manufacturer}</span>
                     </div>
