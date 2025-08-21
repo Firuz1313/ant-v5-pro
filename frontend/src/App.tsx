@@ -16,6 +16,7 @@ import SuccessPage from "@/pages/SuccessPage";
 import Index from "@/pages/Index";
 import ApiTest from "@/pages/ApiTest";
 import TVInterfaceDemo from "@/pages/TVInterfaceDemo";
+import RemotesApiTest from "@/pages/RemotesApiTest";
 import NotFound from "@/pages/NotFound";
 
 // Admin pages
