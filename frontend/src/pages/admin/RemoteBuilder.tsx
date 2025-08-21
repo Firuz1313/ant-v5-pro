@@ -60,6 +60,7 @@ import {
 } from "@/hooks/useRemotes";
 import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
+import RemotesTest from "@/components/RemotesTest";
 
 interface RemoteButton {
   id: string;
@@ -1122,7 +1123,7 @@ const RemoteBuilder = () => {
                   <CardTitle className="text-lg">{remote.name}</CardTitle>
                   <div className="flex items-center space-x-1">
                     {remote.is_default && (
-                      <Badge variant="default">По умолчанию</Badge>
+                      <Badge variant="default">П�� умолчанию</Badge>
                     )}
                     <Badge variant={remote.is_active ? "default" : "secondary"}>
                       {remote.is_active ? "Активный" : "Неактивный"}
