@@ -371,7 +371,7 @@ const RemoteBuilder = () => {
       toast.success("Пульт удален успешно");
     } catch (error: any) {
       console.error("Error deleting remote:", error);
-      toast.error(error?.message || "Ошибка при удалении пульта");
+      toast.error(error?.message || "Оши��ка при удалении пульта");
     }
   };
 
@@ -407,7 +407,7 @@ const RemoteBuilder = () => {
       toast.success("Пульт установлен по умолчанию");
     } catch (error: any) {
       console.error("Error setting default remote:", error);
-      toast.error(error?.message || "Ошибка при установке пульта по умолчанию");
+      toast.error(error?.message || "Ошибка при установке ��ульта по умолчанию");
     }
   };
 
@@ -428,7 +428,7 @@ const RemoteBuilder = () => {
 
   const openEditDialog = (remote: RemoteTemplate) => {
     setSelectedRemote(remote);
-    setFormData({
+    const newFormData = {
       name: remote.name || "",
       manufacturer: remote.manufacturer || "",
       model: remote.model || "",
@@ -436,9 +436,13 @@ const RemoteBuilder = () => {
       layout: remote.layout,
       colorScheme: remote.color_scheme || "dark",
       deviceId: remote.device_id || "universal",
-    });
+    };
+    setFormData(newFormData);
     setPreviewImageUrl(remote.image_data || null);
-    setIsEditDialogOpen(true);
+    // Use setTimeout to ensure state update completes before opening dialog
+    setTimeout(() => {
+      setIsEditDialogOpen(true);
+    }, 0);
   };
 
   const openEditorDialog = (remote: RemoteTemplate) => {
@@ -883,7 +887,7 @@ const RemoteBuilder = () => {
                     <Target className="h-8 w-8 mx-auto mb-2 opacity-50" />
                     <p>Нет кнопок</p>
                     <p className="text-xs">
-                      Используйте указатель для добавления
+                      Испо��ьзуйте указатель для добавления
                     </p>
                   </div>
                 )}
@@ -1186,7 +1190,7 @@ const RemoteBuilder = () => {
                       <Badge variant="default">По умолчанию</Badge>
                     )}
                     <Badge variant={remote.is_active ? "default" : "secondary"}>
-                      {remote.is_active ? "Активный" : "Неактивный"}
+                      {remote.is_active ? "Активный" : "Неактивн��й"}
                     </Badge>
                   </div>
                 </div>
