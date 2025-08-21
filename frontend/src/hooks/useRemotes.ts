@@ -19,11 +19,19 @@ export const remotesKeys = {
  * Hook for fetching all remotes with filters
  */
 export function useRemotes(filters: RemoteFilters = {}) {
-  return useQuery({
+  console.log("useRemotes called with filters:", filters);
+
+  const result = useQuery({
     queryKey: remotesKeys.list(filters),
-    queryFn: () => remotesApi.getAll(filters),
+    queryFn: () => {
+      console.log("useRemotes queryFn called, calling remotesApi.getAll");
+      return remotesApi.getAll(filters);
+    },
     staleTime: 5 * 60 * 1000, // 5 minutes
   });
+
+  console.log("useRemotes result:", result);
+  return result;
 }
 
 /**
