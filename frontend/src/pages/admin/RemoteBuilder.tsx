@@ -1038,7 +1038,7 @@ const RemoteBuilder = () => {
                   <Label htmlFor="description">Описание</Label>
                   <Textarea
                     id="description"
-                    value={formData.description}
+                    value={formData.description || ""}
                     onChange={(e) =>
                       setFormData({ ...formData, description: e.target.value })
                     }
@@ -1065,7 +1065,7 @@ const RemoteBuilder = () => {
                     <div className="mt-2">
                       <img
                         src={previewImageUrl}
-                        alt="Предвари��ельный просмотр"
+                        alt="Предварительный просмотр"
                         className="w-full h-32 object-contain bg-gray-100 dark:bg-gray-800 rounded"
                       />
                     </div>
@@ -1468,7 +1468,7 @@ const RemoteBuilder = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Введите описание пульта"
+                placeholder="��ведите описание пульта"
               />
             </div>
 
