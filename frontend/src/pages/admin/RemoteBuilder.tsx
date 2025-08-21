@@ -661,7 +661,9 @@ const RemoteBuilder = () => {
             )}
 
             {/* Render buttons on canvas */}
-            {selectedRemote.buttons.map((button) => (
+            {selectedRemote.buttons
+              .filter((button) => button.position && button.size)
+              .map((button) => (
               <div
                 key={button.id}
                 className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
@@ -1368,7 +1370,7 @@ const RemoteBuilder = () => {
                 />
               </div>
               <div>
-                <Label htmlFor="edit-manufacturer">Производитель</Label>
+                <Label htmlFor="edit-manufacturer">Производите��ь</Label>
                 <Input
                   id="edit-manufacturer"
                   value={formData.manufacturer}
