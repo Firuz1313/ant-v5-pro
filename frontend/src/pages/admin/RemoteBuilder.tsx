@@ -375,13 +375,13 @@ const RemoteBuilder = () => {
       colorScheme: remote.color_scheme,
       deviceId: remote.device_id || "universal",
     });
-    setPreviewImageUrl(remote.imageData || null);
+    setPreviewImageUrl(remote.image_data || null);
     setIsEditDialogOpen(true);
   };
 
   const openEditorDialog = (remote: RemoteTemplate) => {
     setSelectedRemote(remote);
-    setPreviewImageUrl(remote.imageData || null);
+    setPreviewImageUrl(remote.image_data || null);
     setIsEditorDialogOpen(true);
     setIsEditingMode(false);
     setSelectedButton(null);
@@ -987,7 +987,7 @@ const RemoteBuilder = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="colorScheme">��ветовая схема</Label>
+                    <Label htmlFor="colorScheme">Цветовая схема</Label>
                     <Select
                       value={formData.colorScheme}
                       onValueChange={(value) =>
@@ -1439,7 +1439,7 @@ const RemoteBuilder = () => {
               Пульты не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте изменить фильтры поиска или созд��йте новый пульт.
+              Попробуйте изменить фильтры поиска или создайте новый пульт.
             </p>
           </CardContent>
         </Card>
