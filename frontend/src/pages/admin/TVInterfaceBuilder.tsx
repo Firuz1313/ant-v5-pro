@@ -95,6 +95,7 @@ const TVInterfaceBuilder = () => {
   const [previewImageUrl, setPreviewImageUrl] = useState<string | null>(null);
   const [isScreenshotBrowserOpen, setIsScreenshotBrowserOpen] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
 
   // Load TV interfaces on component mount
   useEffect(() => {
@@ -445,7 +446,7 @@ const TVInterfaceBuilder = () => {
       deviceId: tvInterface.deviceId,
       screenshotData: undefined, // Не устанавливаем существующий скриншот как дан��ые
     });
-    // Показываем текущий скриншот как превью, но не как данные для отправки
+    // По��азываем текущий скриншот как превью, но не как данные для отправки
     setPreviewImageUrl(tvInterfaceUtils.getScreenshotUrl(tvInterface));
     setIsEditDialogOpen(true);
   };
@@ -475,7 +476,7 @@ const TVInterfaceBuilder = () => {
             Конструктор интерфейса ТВ
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание и управление интерф��йсами ТВ-приставок с полной
+            Создание и управление интерф��йсами ТВ-��риставок с полной
             интеграцией с бэкендом
           </p>
         </div>
@@ -1002,10 +1003,17 @@ const TVInterfaceBuilder = () => {
               <Label htmlFor="edit-screenshot">Скриншот интерфейса</Label>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
+                  <input
+                    ref={editFileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageUpload}
+                    className="hidden"
+                  />
                   <Button
                     type="button"
                     variant="outline"
-                    onClick={() => fileInputRef.current?.click()}
+                    onClick={() => editFileInputRef.current?.click()}
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     Загрузить файл
