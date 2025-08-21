@@ -175,6 +175,7 @@ const RemoteBuilder = () => {
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const editFileInputRef = useRef<HTMLInputElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const [selectedRemote, setSelectedRemote] = useState<RemoteTemplate | null>(
@@ -386,7 +387,7 @@ const RemoteBuilder = () => {
         },
       });
       toast.success(
-        `Пульт ${remote.is_active ? "деактивирован" : "активирован"}`,
+        `Пульт ${remote.is_active ? "деак��ивирован" : "активирован"}`,
       );
     } catch (error: any) {
       console.error("Error toggling remote status:", error);
@@ -1433,7 +1434,7 @@ const RemoteBuilder = () => {
                 <Button
                   type="button"
                   variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => editFileInputRef.current?.click()}
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
@@ -1442,6 +1443,13 @@ const RemoteBuilder = () => {
                     : "Загрузить изображение"}
                 </Button>
               </div>
+              <input
+                ref={editFileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handleImageUpload}
+                className="hidden"
+              />
               {previewImageUrl && (
                 <div className="mt-2">
                   <img
