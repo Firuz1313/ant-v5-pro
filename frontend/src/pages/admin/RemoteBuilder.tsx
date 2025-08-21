@@ -161,7 +161,7 @@ const RemoteBuilder = () => {
   const setDefaultMutation = useSetDefaultRemote();
   const duplicateMutation = useDuplicateRemote();
 
-  // Извлекаем массивы данных из ответа API
+  // Извлекаем массивы данны�� из ответа API
   const devices = devicesResponse?.data || [];
   const remotes: RemoteTemplate[] = remotesResponse?.data || [];
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
@@ -321,7 +321,7 @@ const RemoteBuilder = () => {
       resetForm();
     } catch (error: any) {
       console.error("Error creating remote:", error);
-      toast.error(error?.message || "Ошибка при создании пульта");
+      toast.error(error?.message || "Ошиб��а при создании пульта");
     }
   };
 
@@ -403,7 +403,7 @@ const RemoteBuilder = () => {
         remoteId,
         deviceId: remote.device_id,
       });
-      toast.success("Пульт установлен по умолчанию");
+      toast.success("Пульт устано��лен по умолчанию");
     } catch (error: any) {
       console.error("Error setting default remote:", error);
       toast.error(error?.message || "Ошибка при установке пульта по умолчанию");
@@ -665,45 +665,75 @@ const RemoteBuilder = () => {
             )}
 
             {/* Render buttons on canvas */}
-            {(selectedRemote.buttons || [])
-              .filter((button) => button && typeof button === 'object')
-              .map((button) => {
-                // Provide default values for missing properties
-                const position = button.position || { x: 0, y: 0 };
-                const size = button.size || { width: 40, height: 40 };
+            {(() => {
+              try {
+                const buttons = selectedRemote?.buttons;
+                if (!buttons || !Array.isArray(buttons)) {
+                  console.log('No buttons or not an array:', buttons);
+                  return null;
+                }
 
-                return { ...button, position, size };
-              })
-              .map((button) => (
-              <div
-                key={button.id}
-                className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
-                style={{
-                  left: `${((button.position?.x ?? 0) / 400) * 100}%`,
-                  top: `${((button.position?.y ?? 0) / 600) * 100}%`,
-                  width: `${((button.size?.width ?? 40) / 400) * 100}%`,
-                  height: `${((button.size?.height ?? 40) / 600) * 100}%`,
-                  backgroundColor: button.color + "80",
-                  color: button.textColor,
-                  fontSize: `${button.fontSize}px`,
-                  borderRadius:
-                    button.shape === "circle"
-                      ? "50%"
-                      : button.shape === "rounded"
-                        ? "8px"
-                        : "0",
-                }}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  handleButtonEdit(button);
-                }}
-              >
-                <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
-                  {button.label}
-                </span>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
-              </div>
-            ))}
+                console.log('Processing buttons:', buttons.length);
+
+                return buttons
+                  .filter((button, index) => {
+                    if (!button || typeof button !== 'object') {
+                      console.log(`Invalid button at index ${index}:`, button);
+                      return false;
+                    }
+                    return true;
+                  })
+                  .map((button, index) => {
+                    try {
+                      const position = button.position || { x: 0, y: 0 };
+                      const size = button.size || { width: 40, height: 40 };
+                      const x = position.x ?? 0;
+                      const y = position.y ?? 0;
+                      const width = size.width ?? 40;
+                      const height = size.height ?? 40;
+
+                      return (
+                        <div
+                          key={button.id || `button-${index}`}
+                          className="absolute border-2 border-blue-500 cursor-pointer hover:border-blue-700 transition-colors"
+                          style={{
+                            left: `${(x / 400) * 100}%`,
+                            top: `${(y / 600) * 100}%`,
+                            width: `${(width / 400) * 100}%`,
+                            height: `${(height / 600) * 100}%`,
+                            backgroundColor: (button.color || '#3b82f6') + "80",
+                            color: button.textColor || '#ffffff',
+                            fontSize: `${button.fontSize || 12}px`,
+                            borderRadius:
+                              button.shape === "circle"
+                                ? "50%"
+                                : button.shape === "rounded"
+                                  ? "8px"
+                                  : "0",
+                          }}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (button && typeof button === 'object') {
+                              handleButtonEdit(button);
+                            }
+                          }}
+                        >
+                          <span className="absolute inset-0 flex items-center justify-center text-xs font-medium">
+                            {button.label || 'Button'}
+                          </span>
+                          <div className="absolute -top-1 -right-1 w-3 h-3 bg-blue-500 rounded-full border border-white"></div>
+                        </div>
+                      );
+                    } catch (error) {
+                      console.error('Error rendering button at index', index, ':', error, button);
+                      return null;
+                    }
+                  });
+              } catch (error) {
+                console.error('Error in button rendering:', error);
+                return <div className="text-red-500 p-2">Error rendering buttons: {error.message}</div>;
+              }
+            })()}
           </div>
         </div>
 
@@ -753,7 +783,7 @@ const RemoteBuilder = () => {
                   <AlertDescription>
                     <div className="space-y-3">
                       <p className="text-sm">
-                        Кликните на изображение пульта для добавления кнопки
+                        Кликните на изображение пульта д��я добавления кнопки
                       </p>
                       <div>
                         <Label htmlFor="button-label">Название кнопки</Label>
@@ -1454,7 +1484,7 @@ const RemoteBuilder = () => {
                   <ImageIcon className="h-4 w-4 mr-2" />
                   {previewImageUrl
                     ? "Изменить изображение"
-                    : "Загрузить изображение"}
+                    : "Загрузить из��бражение"}
                 </Button>
               </div>
               {previewImageUrl && (
