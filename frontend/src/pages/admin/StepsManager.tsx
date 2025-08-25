@@ -52,6 +52,7 @@ import { useDevices } from "@/hooks/useDevices";
 import { useProblems } from "@/hooks/useProblems";
 import { tvInterfacesAPI } from "@/api/tvInterfaces";
 import { TVInterface, tvInterfaceUtils } from "@/types/tvInterface";
+import { stepsApi, remotesApi } from "@/api";
 import TVInterfaceAreaEditor from "@/components/admin/TVInterfaceAreaEditor";
 
 // Мемоизированный компонент формы для предот��ращения потери фокуса
@@ -256,7 +257,7 @@ const StepFormFieldsComponent = React.memo(
       </div>
 
       <div>
-        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
+        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>По��сказка</Label>
         <Textarea
           id={isEdit ? "edit-hint" : "hint"}
           value={formData.hint}
@@ -527,7 +528,7 @@ const StepsManager = () => {
       // Показываем пользователю информацию об ошибке
       if (error instanceof Error && error.message.includes("Сетевая ошибка")) {
         // Можно добавить toast уведомление
-        console.error("П��облемы с подключением к серверу");
+        console.error("П��облемы с подк��ючением к серверу");
       }
     } finally {
       setLoadingTVInterfaces(false);
