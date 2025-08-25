@@ -1321,8 +1321,9 @@ const StepsManager = () => {
                               )}
                               {step.buttonPosition && (
                                 <span>
-                                  Пози���ия: ({Math.round(step.buttonPosition.x)}
-                                  , {Math.round(step.buttonPosition.y)})
+                                  Пози���ия: (
+                                  {Math.round(step.buttonPosition.x)},{" "}
+                                  {Math.round(step.buttonPosition.y)})
                                 </span>
                               )}
                               {step.highlightTVArea && (
