@@ -237,7 +237,7 @@ class TVInterface extends BaseModel {
       await super.updateById(id, updateData);
 
       // Возвращаем обновленный интерфейс с данными устройства
-      const updated = await this.getById(id);
+      const updated = await this.getById(id, true);
       return updated;
     } catch (error) {
       console.error("Error updating TV interface:", error);
