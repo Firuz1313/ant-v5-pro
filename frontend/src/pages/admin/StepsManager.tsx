@@ -350,22 +350,58 @@ const StepsManager = () => {
     }
   };
 
+  // Helper function to convert camelCase to snake_case for API
+  const convertToSnakeCase = (obj: any): any => {
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      // Convert camelCase to snake_case
+      const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+      result[snakeKey] = value;
+    }
+    return result;
+  };
+
   // Step management functions
   const createStep = async (step: DiagnosticStep) => {
     try {
-      const response = await stepsApi.createStep(step);
+      // Convert camelCase to snake_case for backend validation
+      const stepPayload = convertToSnakeCase(step);
+
+      // Remove frontend-only fields and let backend set timestamps
+      delete stepPayload.created_at;
+      delete stepPayload.updated_at;
+      delete stepPayload.id; // Let backend generate ID
+
+      console.log('📤 Sending step payload:', stepPayload);
+
+      const response = await stepsApi.createStep(stepPayload);
       const newStep = response.data;
       setSteps((prev) => [...prev, newStep]);
       return newStep;
     } catch (error) {
       console.error("Error creating step:", error);
+      // Show user-friendly error message
+      toast({
+        title: "Ошибка создания шага",
+        description: error instanceof Error ? error.message : "Не удалось создать шаг. Проверьте заполнение всех обязательных полей.",
+        variant: "destructive",
+      });
       throw error;
     }
   };
 
   const updateStep = async (id: string, data: any) => {
     try {
-      const response = await stepsApi.updateStep(id, data);
+      // Convert camelCase to snake_case for backend validation
+      const updatePayload = convertToSnakeCase(data);
+
+      // Remove frontend-only fields
+      delete updatePayload.created_at;
+      delete updatePayload.updated_at;
+
+      console.log('📤 Sending update payload:', updatePayload);
+
+      const response = await stepsApi.updateStep(id, updatePayload);
       const updatedStep = response.data;
       setSteps((prev) =>
         prev.map((step) =>
@@ -375,6 +411,11 @@ const StepsManager = () => {
       return updatedStep;
     } catch (error) {
       console.error("Error updating step:", error);
+      toast({
+        title: "Ошибка обновления шага",
+        description: error instanceof Error ? error.message : "Не удалось обновить шаг.",
+        variant: "destructive",
+      });
       throw error;
     }
   };
@@ -727,6 +768,16 @@ const StepsManager = () => {
         ? Math.max(...deviceSteps.map((s) => s.stepNumber))
         : 0;
 
+    // Validate required fields before creating step
+    if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
+      toast({
+        title: "Ошибка валидации",
+        description: "Заполните все обязательные поля: устройство, проблема, название и инструкция.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     const newStep: DiagnosticStep = {
       id: `step-${formData.deviceId}-${formData.problemId}-${Date.now()}`,
       ...formData,
@@ -747,8 +798,7 @@ const StepsManager = () => {
           : formData.buttonPosition,
       stepNumber: maxStepNumber + 1,
       isActive: true,
-      createdAt: new Date().toISOString().split("T")[0],
-      updatedAt: new Date().toISOString().split("T")[0],
+      // Don't set timestamps - let backend handle them
     };
 
     try {
