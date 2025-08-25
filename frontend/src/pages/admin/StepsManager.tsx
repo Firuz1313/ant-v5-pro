@@ -370,7 +370,36 @@ const StepsManager = () => {
       // Remove frontend-only fields and let backend set timestamps
       delete stepPayload.created_at;
       delete stepPayload.updated_at;
-      delete stepPayload.id; // Let backend generate ID
+
+      // Ensure ID is included (backend validation requires it)
+      if (!stepPayload.id) {
+        stepPayload.id = step.id || `step-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      }
+
+      // Convert empty strings to undefined for optional fields
+      if (stepPayload.required_action === '') {
+        delete stepPayload.required_action;
+      }
+      if (stepPayload.hint === '') {
+        delete stepPayload.hint;
+      }
+      if (stepPayload.description === '') {
+        delete stepPayload.description;
+      }
+
+      // Remove fields that should not be sent if they are 'none' or undefined
+      if (stepPayload.remote_id === 'none' || stepPayload.remote_id === undefined) {
+        delete stepPayload.remote_id;
+      }
+      if (stepPayload.tv_interface_id === 'none' || stepPayload.tv_interface_id === undefined) {
+        delete stepPayload.tv_interface_id;
+      }
+      if (stepPayload.highlight_remote_button === 'none' || stepPayload.highlight_remote_button === undefined) {
+        delete stepPayload.highlight_remote_button;
+      }
+      if (stepPayload.highlight_tv_area === 'none' || stepPayload.highlight_tv_area === undefined) {
+        delete stepPayload.highlight_tv_area;
+      }
 
       console.log('📤 Sending step payload:', stepPayload);
 
@@ -398,6 +427,31 @@ const StepsManager = () => {
       // Remove frontend-only fields
       delete updatePayload.created_at;
       delete updatePayload.updated_at;
+
+      // Convert empty strings to undefined for optional fields
+      if (updatePayload.required_action === '') {
+        delete updatePayload.required_action;
+      }
+      if (updatePayload.hint === '') {
+        delete updatePayload.hint;
+      }
+      if (updatePayload.description === '') {
+        delete updatePayload.description;
+      }
+
+      // Remove fields that should not be sent if they are 'none' or undefined
+      if (updatePayload.remote_id === 'none') {
+        delete updatePayload.remote_id;
+      }
+      if (updatePayload.tv_interface_id === 'none') {
+        delete updatePayload.tv_interface_id;
+      }
+      if (updatePayload.highlight_remote_button === 'none') {
+        delete updatePayload.highlight_remote_button;
+      }
+      if (updatePayload.highlight_tv_area === 'none') {
+        delete updatePayload.highlight_tv_area;
+      }
 
       console.log('📤 Sending update payload:', updatePayload);
 
