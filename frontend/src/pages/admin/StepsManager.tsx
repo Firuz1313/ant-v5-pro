@@ -343,9 +343,10 @@ const StepsManager = () => {
   // Step management functions
   const createStep = async (step: DiagnosticStep) => {
     try {
-      const result = await stepsApi.createStep(step);
-      setSteps(prev => [...prev, result]);
-      return result;
+      const response = await stepsApi.createStep(step);
+      const newStep = response.data;
+      setSteps(prev => [...prev, newStep]);
+      return newStep;
     } catch (error) {
       console.error("Error creating step:", error);
       throw error;
@@ -354,9 +355,10 @@ const StepsManager = () => {
 
   const updateStep = async (id: string, data: any) => {
     try {
-      const result = await stepsApi.updateStep(id, data);
-      setSteps(prev => prev.map(step => step.id === id ? { ...step, ...result } : step));
-      return result;
+      const response = await stepsApi.updateStep(id, data);
+      const updatedStep = response.data;
+      setSteps(prev => prev.map(step => step.id === id ? { ...step, ...updatedStep } : step));
+      return updatedStep;
     } catch (error) {
       console.error("Error updating step:", error);
       throw error;
@@ -496,7 +498,7 @@ const StepsManager = () => {
       );
       setTVInterfaces([]);
 
-      // Показываем пользоват��лю информацию об ошибке
+      // Показываем пользователю информацию об ошибке
       if (error instanceof Error && error.message.includes("Сетевая ошибка")) {
         // Можно добавить toast уведомление
         console.error("П��облемы с подключением к серверу");
@@ -1045,7 +1047,7 @@ const StepsManager = () => {
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Plus className="h-4 w-4 mr-2" />
-              Созда��ь шаг
+              Создать шаг
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
