@@ -472,6 +472,30 @@ const StepsManager = () => {
     null,
   );
 
+  // ALL useEffect and useCallback hooks must be before conditional returns
+  useEffect(() => {
+    if (formData.deviceId && formData.deviceId !== "all") {
+      loadTVInterfacesForDevice(formData.deviceId);
+    }
+  }, [formData.deviceId]);
+
+  const handleFieldChange = useCallback((field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleDeviceChange = useCallback(
+    (value: string) => {
+      const defaultRemote = getDefaultRemoteForDevice(value);
+      setFormData((prev) => ({
+        ...prev,
+        deviceId: value,
+        problemId: "",
+        remoteId: defaultRemote?.id || "none",
+      }));
+    },
+    [getDefaultRemoteForDevice],
+  );
+
   // Show loading state while data is being fetched - AFTER ALL HOOKS
   if (loading) {
     return (
@@ -481,13 +505,6 @@ const StepsManager = () => {
       </div>
     );
   }
-
-  // Load TV interfaces when device changes
-  useEffect(() => {
-    if (formData.deviceId && formData.deviceId !== "all") {
-      loadTVInterfacesForDevice(formData.deviceId);
-    }
-  }, [formData.deviceId]);
 
   const loadTVInterfacesForDevice = async (deviceId: string) => {
     setLoadingTVInterfaces(true);
@@ -1049,7 +1066,7 @@ const StepsManager = () => {
               {isPickingButton && (
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <p className="text-sm text-blue-700 dark:text-blue-300">
-                    Кликнит�� на изображение пульта, чтобы указать позицию
+                    Кликнит�� на изображение пульта, чтобы указать позици��
                     кнопки
                   </p>
                 </div>
@@ -1321,7 +1338,7 @@ const StepsManager = () => {
                               )}
                               {step.buttonPosition && (
                                 <span>
-                                  Пози��ия: ({Math.round(step.buttonPosition.x)}
+                                  Пози���ия: ({Math.round(step.buttonPosition.x)}
                                   , {Math.round(step.buttonPosition.y)})
                                 </span>
                               )}
