@@ -323,18 +323,28 @@ const StepsManager = () => {
 
       // Load steps
       const stepsResponse = await stepsApi.getSteps(1, 1000); // Get first 1000 steps
-      setSteps(stepsResponse?.data || []);
+      console.log("🔍 Steps response:", stepsResponse);
+
+      // PaginatedResponse has data property, but check both formats
+      const stepsData = stepsResponse?.data || stepsResponse || [];
+      setSteps(Array.isArray(stepsData) ? stepsData : []);
 
       // Load remotes
       const remotesResponse = await remotesApi.getAll();
-      setRemotes(remotesResponse?.data || []);
+      console.log("🔍 Remotes response:", remotesResponse);
+
+      // API response format: { success: true, data: [...] }
+      const remotesData = remotesResponse?.data || remotesResponse || [];
+      setRemotes(Array.isArray(remotesData) ? remotesData : []);
 
       console.log("✅ Loaded data:", {
-        steps: stepsResponse?.data?.length || 0,
-        remotes: remotesResponse?.data?.length || 0
+        steps: Array.isArray(stepsData) ? stepsData.length : 0,
+        remotes: Array.isArray(remotesData) ? remotesData.length : 0,
+        stepsType: typeof stepsData,
+        remotesType: typeof remotesData
       });
     } catch (error) {
-      console.error("Error loading initial data:", error);
+      console.error("❌ Error loading initial data:", error);
     } finally {
       setLoading(false);
     }
@@ -501,7 +511,7 @@ const StepsManager = () => {
       // Показываем пользователю информацию об ошибке
       if (error instanceof Error && error.message.includes("Сетевая ошибка")) {
         // Можно добавить toast уведомление
-        console.error("П��облемы с подключением к серверу");
+        console.error("П��облемы с подключением к с��рверу");
       }
     } finally {
       setLoadingTVInterfaces(false);
@@ -986,7 +996,7 @@ const StepsManager = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingButton ? "Отменить выбор" : "Выбрать позицию"}
+                  {isPickingButton ? "Отменить выбор" : "Выбрать п��зицию"}
                 </Button>
                 <Button
                   variant="outline"
