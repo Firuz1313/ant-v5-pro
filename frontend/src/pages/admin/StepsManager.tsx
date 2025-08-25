@@ -572,8 +572,8 @@ const StepsManager = () => {
       console.warn(
         `⚠️ TV interface ${tvInterface.id} not found in current list, reloading...`,
       );
-      if (selectedDeviceId) {
-        await loadTVInterfacesForDevice(selectedDeviceId);
+      if (formData.deviceId) {
+        await loadTVInterfacesForDevice(formData.deviceId);
       }
       toast({
         title: "Интерфейс не найден",
