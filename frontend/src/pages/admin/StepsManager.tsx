@@ -422,15 +422,7 @@ const StepsManager = () => {
   const getDefaultRemoteForDevice = (deviceId: string) =>
     remotes.find((r: any) => r.device_id === deviceId && r.is_default);
 
-  // Show loading state while data is being fetched
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">Загрузка данных...</span>
-      </div>
-    );
-  }
+  // ALL HOOKS MUST BE DECLARED BEFORE ANY CONDITIONAL RETURNS
   const { toast } = useToast();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -451,6 +443,16 @@ const StepsManager = () => {
   const [selectedTVInterface, setSelectedTVInterface] =
     useState<TVInterface | null>(null);
   const [loadingTVInterfaces, setLoadingTVInterfaces] = useState(false);
+
+  // Show loading state while data is being fetched
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+        <span className="text-lg">Загрузка данных...</span>
+      </div>
+    );
+  }
 
   // Form data state - moved before useEffect to fix initialization order
   const [formData, setFormData] = useState({
