@@ -100,6 +100,8 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     width: 0,
     height: 0,
   });
+  const imageDimensionsRef = useRef({ width: 0, height: 0 });
+  const imageRef = useRef<HTMLImageElement | null>(null);
   const [tempScreenshot, setTempScreenshot] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
@@ -134,14 +136,18 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         canvas.width = displayWidth;
         canvas.height = displayHeight;
 
-        setImageDimensions({ width: img.width, height: img.height });
+        // Update both state and ref synchronously
+        const newDimensions = { width: img.width, height: img.height };
+        setImageDimensions(newDimensions);
+        imageDimensionsRef.current = newDimensions;
+        imageRef.current = img;
         setImageLoaded(true);
 
         // Draw the image
         ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
 
-        // Draw existing areas
-        drawAreas(ctx);
+        // Draw existing areas using the current dimensions
+        drawAreasWithDimensions(ctx, newDimensions);
       };
       img.src = screenshotSrc;
     }
@@ -154,10 +160,124 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     showAreas,
   ]);
 
-  const drawAreas = (ctx: CanvasRenderingContext2D) => {
-    if (!showAreas || !canvasRef.current || !imageDimensions.width || !imageDimensions.height) return;
+  const drawAreasWithDimensions = (ctx: CanvasRenderingContext2D, dimensions: { width: number; height: number }) => {
+    if (!showAreas || !canvasRef.current || !dimensions.width || !dimensions.height) return;
 
     const canvas = canvasRef.current;
+
+    // Draw highlight areas
+    highlightAreas.forEach((area) => {
+      // Convert from percentage coordinates to canvas coordinates
+      const x = (area.x / 100) * canvas.width;
+      const y = (area.y / 100) * canvas.height;
+      const width = (area.width / 100) * canvas.width;
+      const height = (area.height / 100) * canvas.height;
+
+      ctx.save();
+      ctx.fillStyle = area.color || "#fbbf24";
+      ctx.globalAlpha = area.opacity || 0.3;
+
+      if (area.shape === "circle") {
+        ctx.beginPath();
+        ctx.ellipse(
+          x + width / 2,
+          y + height / 2,
+          width / 2,
+          height / 2,
+          0,
+          0,
+          2 * Math.PI,
+        );
+        ctx.fill();
+      } else {
+        ctx.fillRect(x, y, width, height);
+      }
+
+      ctx.restore();
+
+      // Draw label
+      ctx.fillStyle = area.color || "#fbbf24";
+      ctx.font = "12px Inter, sans-serif";
+      ctx.fillText(area.label, x, y - 5);
+    });
+
+    // Draw clickable areas
+    clickableAreas.forEach((area) => {
+      // Convert from percentage coordinates to canvas coordinates
+      const x = (area.x / 100) * canvas.width;
+      const y = (area.y / 100) * canvas.height;
+      const width = (area.width / 100) * canvas.width;
+      const height = (area.height / 100) * canvas.height;
+
+      ctx.strokeStyle = area.color || "#3b82f6";
+      ctx.lineWidth = 2;
+      ctx.setLineDash(selectedAreaId === area.id ? [5, 5] : []);
+
+      if (area.shape === "circle") {
+        ctx.beginPath();
+        ctx.ellipse(
+          x + width / 2,
+          y + height / 2,
+          width / 2,
+          height / 2,
+          0,
+          0,
+          2 * Math.PI,
+        );
+        ctx.stroke();
+      } else {
+        ctx.strokeRect(x, y, width, height);
+      }
+
+      // Draw label
+      ctx.fillStyle = area.color || "#3b82f6";
+      ctx.font = "12px Inter, sans-serif";
+      ctx.fillText(area.label, x, y - 5);
+    });
+
+    // Draw current drawing area
+    if (drawingArea && isDrawing) {
+      const { startX, startY, currentX, currentY } = drawingArea;
+      const x = Math.min(startX, currentX);
+      const y = Math.min(startY, currentY);
+      const width = Math.abs(currentX - startX);
+      const height = Math.abs(currentY - startY);
+
+      ctx.strokeStyle = newAreaData.color;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([3, 3]);
+
+      if (currentTool === "circle") {
+        ctx.beginPath();
+        ctx.ellipse(
+          x + width / 2,
+          y + height / 2,
+          width / 2,
+          height / 2,
+          0,
+          0,
+          2 * Math.PI,
+        );
+        ctx.stroke();
+      } else {
+        ctx.strokeRect(x, y, width, height);
+      }
+    }
+  };
+
+  const drawAreas = (ctx: CanvasRenderingContext2D) => {
+    drawAreasWithDimensions(ctx, imageDimensionsRef.current);
+  };
+
+  const redrawCanvas = () => {
+    if (!canvasRef.current || !imageRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(imageRef.current, 0, 0, canvas.width, canvas.height);
 
     // Draw highlight areas
     highlightAreas.forEach((area) => {
@@ -271,22 +391,23 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
   };
 
   const convertToPercentageCoordinates = (canvasX: number, canvasY: number) => {
-    if (!canvasRef.current || !imageDimensions.width || !imageDimensions.height) {
+    const dimensions = imageDimensionsRef.current;
+    if (!canvasRef.current || !dimensions.width || !dimensions.height) {
       return { x: 0, y: 0 };
     }
 
     const canvas = canvasRef.current;
     // Convert canvas coordinates to image coordinates first
-    const scaleX = imageDimensions.width / canvas.width;
-    const scaleY = imageDimensions.height / canvas.height;
+    const scaleX = dimensions.width / canvas.width;
+    const scaleY = dimensions.height / canvas.height;
 
     const imageX = canvasX * scaleX;
     const imageY = canvasY * scaleY;
 
     // Then convert to percentages (0-100)
     return {
-      x: Math.round((imageX / imageDimensions.width) * 10000) / 100, // 2 decimal places
-      y: Math.round((imageY / imageDimensions.height) * 10000) / 100,
+      x: Math.round((imageX / dimensions.width) * 10000) / 100, // 2 decimal places
+      y: Math.round((imageY / dimensions.height) * 10000) / 100,
     };
   };
 
@@ -317,33 +438,11 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         : null,
     );
 
-    // Redraw canvas
-    const screenshotSrc =
-      tempScreenshot ||
-      tvInterface.screenshotData ||
-      tvInterface.screenshot_data;
-    if (canvasRef.current && screenshotSrc) {
-      const ctx = canvasRef.current.getContext("2d");
-      if (ctx) {
-        const img = new Image();
-        img.onload = () => {
-          ctx.clearRect(
-            0,
-            0,
-            canvasRef.current!.width,
-            canvasRef.current!.height,
-          );
-          ctx.drawImage(
-            img,
-            0,
-            0,
-            canvasRef.current!.width,
-            canvasRef.current!.height,
-          );
-          drawAreas(ctx);
-        };
-        img.src = screenshotSrc;
-      }
+    // Redraw canvas efficiently
+    redrawCanvas();
+    const ctx = canvasRef.current?.getContext("2d");
+    if (ctx) {
+      drawAreas(ctx);
     }
   };
 
@@ -562,7 +661,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
                 <br />
                 screenshotData: {tvInterface.screenshotData ? "✓" : "✗"}
                 <br />
-                screenshot_data: {tvInterface.screenshot_data ? "✓" : "✗"}
+                screenshot_data: {tvInterface.screenshot_data ? "✓" : "���"}
               </p>
             </div>
           </div>
