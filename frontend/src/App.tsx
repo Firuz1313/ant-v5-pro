@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -30,6 +30,19 @@ import UsersManager from "@/pages/admin/UsersManager";
 import SystemSettings from "@/pages/admin/SystemSettings";
 
 function App() {
+  // Apply dark mode by default for ANT Support theme
+  useEffect(() => {
+    // Ensure dark mode is applied (ANT Support uses dark theme primarily)
+    const isDark = localStorage.getItem('theme') === 'dark' ||
+                  (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+
+    if (isDark) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, []);
+
   return (
     <Router>
       <Routes>
