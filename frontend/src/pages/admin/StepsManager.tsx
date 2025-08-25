@@ -117,7 +117,7 @@ const StepFormFieldsComponent = React.memo(
             onValueChange={(value) => handleFieldChange("problemId", value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Выберите пробл��му" />
+              <SelectValue placeholder="Выб��рите пробл��му" />
             </SelectTrigger>
             <SelectContent>
               {getAvailableProblems().map((problem) => (
@@ -222,7 +222,7 @@ const StepFormFieldsComponent = React.memo(
             onValueChange={(value) => handleFieldChange("remoteId", value)}
           >
             <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Выберите пульт" />
+              <SelectValue placeholder="Выберите пуль��" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Без пульта</SelectItem>
@@ -462,7 +462,7 @@ const StepsManager = () => {
     highlightRemoteButton: "none",
     highlightTVArea: "none",
     tvInterface: "home" as DiagnosticStep["tvInterface"],
-    tvInterfaceId: "none", // Добавле��о для выбора ��озданного интерфейса
+    tvInterfaceId: "none", // Добавлено для выбора ��озданного интерфейса
     requiredAction: "",
     hint: "",
     remoteId: "none",
@@ -642,7 +642,7 @@ const StepsManager = () => {
       );
       toast({
         title: "Предупреждение",
-        description: `Не удалось загрузить по��ные данные интерфейса ${tvInterface.name}. Используют��я кэшированные данные.`,
+        description: `Не удалось загрузить по��ные данные интерфейса ${tvInterface.name}. Используются кэшированные данные.`,
         variant: "destructive",
       });
       setSelectedTVInterface(tvInterface);
@@ -674,10 +674,17 @@ const StepsManager = () => {
   };
 
   const getAvailableRemotes = () => {
-    if (formData.deviceId) {
-      return getRemotesForDevice(formData.deviceId);
-    }
-    return getActiveRemotes();
+    const result = formData.deviceId
+      ? getRemotesForDevice(formData.deviceId)
+      : getActiveRemotes();
+
+    console.log("🔍 getAvailableRemotes called:", {
+      selectedDeviceId: formData.deviceId,
+      returnedRemotes: result,
+      resultLength: result.length
+    });
+
+    return result;
   };
 
   const getFilteredRemotes = () => {
