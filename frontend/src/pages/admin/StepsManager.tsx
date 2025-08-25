@@ -341,7 +341,7 @@ const StepsManager = () => {
         steps: Array.isArray(stepsData) ? stepsData.length : 0,
         remotes: Array.isArray(remotesData) ? remotesData.length : 0,
         stepsType: typeof stepsData,
-        remotesType: typeof remotesData
+        remotesType: typeof remotesData,
       });
     } catch (error) {
       console.error("❌ Error loading initial data:", error);
@@ -355,7 +355,7 @@ const StepsManager = () => {
     try {
       const response = await stepsApi.createStep(step);
       const newStep = response.data;
-      setSteps(prev => [...prev, newStep]);
+      setSteps((prev) => [...prev, newStep]);
       return newStep;
     } catch (error) {
       console.error("Error creating step:", error);
@@ -367,7 +367,11 @@ const StepsManager = () => {
     try {
       const response = await stepsApi.updateStep(id, data);
       const updatedStep = response.data;
-      setSteps(prev => prev.map(step => step.id === id ? { ...step, ...updatedStep } : step));
+      setSteps((prev) =>
+        prev.map((step) =>
+          step.id === id ? { ...step, ...updatedStep } : step,
+        ),
+      );
       return updatedStep;
     } catch (error) {
       console.error("Error updating step:", error);
@@ -378,7 +382,7 @@ const StepsManager = () => {
   const deleteStep = async (id: string) => {
     try {
       await stepsApi.deleteStep(id);
-      setSteps(prev => prev.filter(step => step.id !== id));
+      setSteps((prev) => prev.filter((step) => step.id !== id));
     } catch (error) {
       console.error("Error deleting step:", error);
       throw error;
@@ -401,7 +405,7 @@ const StepsManager = () => {
     console.log("🔍 getActiveRemotes called:", {
       totalRemotes: remotes.length,
       remotesArray: remotes,
-      activeRemotes: remotes.filter((r: any) => r.is_active)
+      activeRemotes: remotes.filter((r: any) => r.is_active),
     });
     return remotes.filter((r: any) => r.is_active);
   };
@@ -415,7 +419,7 @@ const StepsManager = () => {
     console.log("🔍 getRemotesForDevice called:", {
       deviceId,
       totalRemotes: remotes.length,
-      remotesForDevice: remotes.filter((r: any) => r.device_id === deviceId)
+      remotesForDevice: remotes.filter((r: any) => r.device_id === deviceId),
     });
     return remotes.filter((r: any) => r.device_id === deviceId);
   };
@@ -625,8 +629,8 @@ const StepsManager = () => {
             "🔄 Interface not found, reloading TV interfaces list...",
           );
           if (formData.deviceId) {
-          await loadTVInterfacesForDevice(formData.deviceId);
-        }
+            await loadTVInterfacesForDevice(formData.deviceId);
+          }
           toast({
             title: "Интерфейс не найден",
             description: `TV интерфе��с "${tvInterface.name}" больше не существует. Список интерфейсов обновлён.`,
@@ -683,7 +687,7 @@ const StepsManager = () => {
     console.log("🔍 getAvailableRemotes called:", {
       selectedDeviceId: formData.deviceId,
       returnedRemotes: result,
-      resultLength: result.length
+      resultLength: result.length,
     });
 
     return result;
