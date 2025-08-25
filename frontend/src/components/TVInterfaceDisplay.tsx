@@ -324,9 +324,12 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
     const updateSize = () => {
       if (containerRef.current) {
         const rect = containerRef.current.getBoundingClientRect();
-        setContainerSize({
-          width: width || rect.width || 800,
-          height: height || rect.height || 450,
+        // Use requestAnimationFrame to prevent ResizeObserver loops
+        requestAnimationFrame(() => {
+          setContainerSize({
+            width: width || rect.width || 800,
+            height: height || rect.height || 450,
+          });
         });
       }
     };

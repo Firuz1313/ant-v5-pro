@@ -211,40 +211,47 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Set canvas size
-    canvas.width = canvasSize.width * scale;
-    canvas.height = canvasSize.height * scale;
+    // Use requestAnimationFrame to prevent ResizeObserver loops
+    requestAnimationFrame(() => {
+      // Set canvas size
+      canvas.width = canvasSize.width * scale;
+      canvas.height = canvasSize.height * scale;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Set CSS size to match canvas buffer
+      canvas.style.width = `${canvasSize.width * scale}px`;
+      canvas.style.height = `${canvasSize.height * scale}px`;
 
-    // Save context
-    ctx.save();
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Apply transformations
-    ctx.scale(scale, scale);
-    ctx.translate(offset.x, offset.y);
+      // Save context
+      ctx.save();
 
-    // Draw image
-    ctx.drawImage(img, 0, 0, canvasSize.width, canvasSize.height);
+      // Apply transformations
+      ctx.scale(scale, scale);
+      ctx.translate(offset.x, offset.y);
 
-    // Draw marks
-    marks.filter(mark => mark.is_visible).forEach((mark) => {
-      drawMark(ctx, mark, mark.id === selectedMark?.id);
+      // Draw image
+      ctx.drawImage(img, 0, 0, canvasSize.width, canvasSize.height);
+
+      // Draw marks
+      marks.filter(mark => mark.is_visible).forEach((mark) => {
+        drawMark(ctx, mark, mark.id === selectedMark?.id);
+      });
+
+      // Draw temporary shapes while drawing
+      if (isDrawing && drawingStart && activeTool !== "select") {
+        drawTemporaryShape(ctx);
+      }
+
+      // Draw polygon temp points
+      if (activeTool === "polygon" && tempPoints.length > 0) {
+        drawPolygonPreview(ctx);
+      }
+
+      // Restore context
+      ctx.restore();
     });
-
-    // Draw temporary shapes while drawing
-    if (isDrawing && drawingStart && activeTool !== "select") {
-      drawTemporaryShape(ctx);
-    }
-
-    // Draw polygon temp points
-    if (activeTool === "polygon" && tempPoints.length > 0) {
-      drawPolygonPreview(ctx);
-    }
-
-    // Restore context
-    ctx.restore();
   }, [marks, selectedMark, scale, offset, imageLoaded, canvasSize, isDrawing, drawingStart, tempPoints, activeTool]);
 
   const drawMark = (ctx: CanvasRenderingContext2D, mark: TVInterfaceMark, isSelected: boolean) => {
@@ -1052,7 +1059,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                   id="expected-result"
                   value={markForm.expected_result}
                   onChange={(e) => setMarkForm(prev => ({ ...prev, expected_result: e.target.value }))}
-                  placeholder="Что должно произойти"
+                  placeholder="Что должно пр��изойти"
                 />
               </div>
             </div>
