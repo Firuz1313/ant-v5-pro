@@ -52,6 +52,7 @@ import { useDevices } from "@/hooks/useDevices";
 import { useProblems } from "@/hooks/useProblems";
 import { tvInterfacesAPI } from "@/api/tvInterfaces";
 import { TVInterface, tvInterfaceUtils } from "@/types/tvInterface";
+import { stepsApi, remotesApi } from "@/api";
 import TVInterfaceAreaEditor from "@/components/admin/TVInterfaceAreaEditor";
 
 // Мемоизированный компонент формы для предот��ращения потери фокуса
@@ -116,7 +117,7 @@ const StepFormFieldsComponent = React.memo(
             onValueChange={(value) => handleFieldChange("problemId", value)}
           >
             <SelectTrigger>
-              <SelectValue placeholder="Выберите пробл��му" />
+              <SelectValue placeholder="Выб��рите пробл��му" />
             </SelectTrigger>
             <SelectContent>
               {getAvailableProblems().map((problem) => (
@@ -221,7 +222,7 @@ const StepFormFieldsComponent = React.memo(
             onValueChange={(value) => handleFieldChange("remoteId", value)}
           >
             <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Выберите пульт" />
+              <SelectValue placeholder="Выберите пуль��" />
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="none">Без пульта</SelectItem>
@@ -306,24 +307,126 @@ const StepsManager = () => {
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
 
-  // Temporarily using empty arrays for removed static data
-  const steps: DiagnosticStep[] = [];
-  const remotes: any[] = [];
+  // Local state for steps and remotes
+  const [steps, setSteps] = useState<DiagnosticStep[]>([]);
+  const [remotes, setRemotes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock functions for removed static functionality
-  const createStep = async (step: DiagnosticStep) => {};
-  const updateStep = async (id: string, data: any) => {};
-  const deleteStep = async (id: string) => {};
-  const reorderSteps = async (problemId: string, stepIds: string[]) => {};
+  // Load initial data
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+
+      // Load steps
+      const stepsResponse = await stepsApi.getSteps(1, 1000); // Get first 1000 steps
+      console.log("🔍 Steps response:", stepsResponse);
+
+      // PaginatedResponse has data property, but check both formats
+      const stepsData = stepsResponse?.data || stepsResponse || [];
+      setSteps(Array.isArray(stepsData) ? stepsData : []);
+
+      // Load remotes
+      const remotesResponse = await remotesApi.getAll();
+      console.log("🔍 Remotes response:", remotesResponse);
+
+      // API response format: { success: true, data: [...] }
+      const remotesData = remotesResponse?.data || remotesResponse || [];
+      setRemotes(Array.isArray(remotesData) ? remotesData : []);
+
+      console.log("✅ Loaded data:", {
+        steps: Array.isArray(stepsData) ? stepsData.length : 0,
+        remotes: Array.isArray(remotesData) ? remotesData.length : 0,
+        stepsType: typeof stepsData,
+        remotesType: typeof remotesData,
+      });
+    } catch (error) {
+      console.error("❌ Error loading initial data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step management functions
+  const createStep = async (step: DiagnosticStep) => {
+    try {
+      const response = await stepsApi.createStep(step);
+      const newStep = response.data;
+      setSteps((prev) => [...prev, newStep]);
+      return newStep;
+    } catch (error) {
+      console.error("Error creating step:", error);
+      throw error;
+    }
+  };
+
+  const updateStep = async (id: string, data: any) => {
+    try {
+      const response = await stepsApi.updateStep(id, data);
+      const updatedStep = response.data;
+      setSteps((prev) =>
+        prev.map((step) =>
+          step.id === id ? { ...step, ...updatedStep } : step,
+        ),
+      );
+      return updatedStep;
+    } catch (error) {
+      console.error("Error updating step:", error);
+      throw error;
+    }
+  };
+
+  const deleteStep = async (id: string) => {
+    try {
+      await stepsApi.deleteStep(id);
+      setSteps((prev) => prev.filter((step) => step.id !== id));
+    } catch (error) {
+      console.error("Error deleting step:", error);
+      throw error;
+    }
+  };
+
+  const reorderSteps = async (problemId: string, stepIds: string[]) => {
+    try {
+      const response = await stepsApi.reorderSteps(problemId, stepIds);
+      // Reload steps to get updated order
+      await loadInitialData();
+    } catch (error) {
+      console.error("Error reordering steps:", error);
+      throw error;
+    }
+  };
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
-  const getActiveRemotes = () => remotes.filter((r: any) => r.is_active);
+
+  const getActiveRemotes = () => {
+    console.log("🔍 getActiveRemotes called:", {
+      totalRemotes: remotes.length,
+      remotesArray: remotes,
+      activeRemotes: remotes.filter((r: any) => r.is_active),
+    });
+    return remotes.filter((r: any) => r.is_active);
+  };
+
   const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
+
   const getProblemsForDevice = (deviceId: string) =>
     problems.filter((p: any) => p.device_id === deviceId);
-  const getRemotesForDevice = (deviceId: string) =>
-    remotes.filter((r: any) => r.device_id === deviceId);
+
+  const getRemotesForDevice = (deviceId: string) => {
+    console.log("🔍 getRemotesForDevice called:", {
+      deviceId,
+      totalRemotes: remotes.length,
+      remotesForDevice: remotes.filter((r: any) => r.device_id === deviceId),
+    });
+    return remotes.filter((r: any) => r.device_id === deviceId);
+  };
   const getDefaultRemoteForDevice = (deviceId: string) =>
     remotes.find((r: any) => r.device_id === deviceId && r.is_default);
+
+  // ALL HOOKS MUST BE DECLARED BEFORE ANY CONDITIONAL RETURNS
   const { toast } = useToast();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -345,7 +448,7 @@ const StepsManager = () => {
     useState<TVInterface | null>(null);
   const [loadingTVInterfaces, setLoadingTVInterfaces] = useState(false);
 
-  // Form data state - moved before useEffect to fix initialization order
+  // Form data state - ALL useState hooks must be before conditional returns
   const [formData, setFormData] = useState({
     deviceId: "",
     problemId: "",
@@ -369,12 +472,39 @@ const StepsManager = () => {
     null,
   );
 
-  // Load TV interfaces when device changes
+  // ALL useEffect and useCallback hooks must be before conditional returns
   useEffect(() => {
     if (formData.deviceId && formData.deviceId !== "all") {
       loadTVInterfacesForDevice(formData.deviceId);
     }
   }, [formData.deviceId]);
+
+  const handleFieldChange = useCallback((field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  const handleDeviceChange = useCallback(
+    (value: string) => {
+      const defaultRemote = getDefaultRemoteForDevice(value);
+      setFormData((prev) => ({
+        ...prev,
+        deviceId: value,
+        problemId: "",
+        remoteId: defaultRemote?.id || "none",
+      }));
+    },
+    [getDefaultRemoteForDevice],
+  );
+
+  // Show loading state while data is being fetched - AFTER ALL HOOKS
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+        <span className="text-lg">Загрузка данных...</span>
+      </div>
+    );
+  }
 
   const loadTVInterfacesForDevice = async (deviceId: string) => {
     setLoadingTVInterfaces(true);
@@ -421,7 +551,7 @@ const StepsManager = () => {
       // Показываем пользователю информацию об ошибке
       if (error instanceof Error && error.message.includes("Сетевая ошибка")) {
         // Можно добавить toast уведомление
-        console.error("П��облемы с подключением к серверу");
+        console.error("П��облемы с подключением к с��рверу");
       }
     } finally {
       setLoadingTVInterfaces(false);
@@ -466,12 +596,12 @@ const StepsManager = () => {
       console.warn(
         `⚠️ TV interface ${tvInterface.id} not found in current list, reloading...`,
       );
-      if (selectedDeviceId) {
-        await loadTVInterfacesForDevice(selectedDeviceId);
+      if (formData.deviceId) {
+        await loadTVInterfacesForDevice(formData.deviceId);
       }
       toast({
         title: "Интерфейс не найден",
-        description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список обновлён.`,
+        description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список обн��влён.`,
         variant: "destructive",
       });
       return;
@@ -515,12 +645,12 @@ const StepsManager = () => {
           console.log(
             "🔄 Interface not found, reloading TV interfaces list...",
           );
-          if (selectedDeviceId) {
-            await loadTVInterfacesForDevice(selectedDeviceId);
+          if (formData.deviceId) {
+            await loadTVInterfacesForDevice(formData.deviceId);
           }
           toast({
             title: "Интерфейс не найден",
-            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Список интерфейсов обновлён.`,
+            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Спис��к интерфейсов обновлён.`,
             variant: "destructive",
           });
           return; // Don't open editor for non-existent interface
@@ -567,10 +697,17 @@ const StepsManager = () => {
   };
 
   const getAvailableRemotes = () => {
-    if (formData.deviceId) {
-      return getRemotesForDevice(formData.deviceId);
-    }
-    return getActiveRemotes();
+    const result = formData.deviceId
+      ? getRemotesForDevice(formData.deviceId)
+      : getActiveRemotes();
+
+    console.log("🔍 getAvailableRemotes called:", {
+      selectedDeviceId: formData.deviceId,
+      returnedRemotes: result,
+      resultLength: result.length,
+    });
+
+    return result;
   };
 
   const getFilteredRemotes = () => {
@@ -808,23 +945,6 @@ const StepsManager = () => {
     setCustomRemoteImage(null);
   };
 
-  const handleFieldChange = useCallback((field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  }, []);
-
-  const handleDeviceChange = useCallback(
-    (value: string) => {
-      const defaultRemote = getDefaultRemoteForDevice(value);
-      setFormData((prev) => ({
-        ...prev,
-        deviceId: value,
-        problemId: "",
-        remoteId: defaultRemote?.id || "none",
-      }));
-    },
-    [getDefaultRemoteForDevice],
-  );
-
   const getDeviceName = (deviceId: string) => {
     const device = devices.find((d) => d.id === deviceId);
     return device?.name || "Неизв��стная приставка";
@@ -906,7 +1026,7 @@ const StepsManager = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingButton ? "Отменить выбор" : "Выбрать позицию"}
+                  {isPickingButton ? "Отменить выбор" : "Выбрать п��зицию"}
                 </Button>
                 <Button
                   variant="outline"
@@ -929,7 +1049,7 @@ const StepsManager = () => {
               {isPickingButton && (
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <p className="text-sm text-blue-700 dark:text-blue-300">
-                    Кликнит�� на изображение пульта, чтобы указать позицию
+                    Кликнит�� на изображение пульта, чтобы указать позици��
                     кнопки
                   </p>
                 </div>
@@ -960,7 +1080,7 @@ const StepsManager = () => {
             Управление шагами
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание шагов диагностики с привязкой к приставкам и проблемам
+            Создан��е шагов диагностики с привязкой к приставкам и проблемам
           </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -1201,8 +1321,9 @@ const StepsManager = () => {
                               )}
                               {step.buttonPosition && (
                                 <span>
-                                  Пози��ия: ({Math.round(step.buttonPosition.x)}
-                                  , {Math.round(step.buttonPosition.y)})
+                                  Пози���ия: (
+                                  {Math.round(step.buttonPosition.x)},{" "}
+                                  {Math.round(step.buttonPosition.y)})
                                 </span>
                               )}
                               {step.highlightTVArea && (
