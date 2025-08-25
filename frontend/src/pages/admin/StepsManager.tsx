@@ -322,7 +322,7 @@ const StepsManager = () => {
       setLoading(true);
 
       // Load steps
-      const stepsResponse = await stepsApi.getAll();
+      const stepsResponse = await stepsApi.getSteps(1, 1000); // Get first 1000 steps
       setSteps(stepsResponse?.data || []);
 
       // Load remotes
@@ -496,7 +496,7 @@ const StepsManager = () => {
       );
       setTVInterfaces([]);
 
-      // Показываем пользователю информацию об ошибке
+      // Показываем пользоват��лю информацию об ошибке
       if (error instanceof Error && error.message.includes("Сетевая ошибка")) {
         // Можно добавить toast уведомление
         console.error("П��облемы с подключением к серверу");
@@ -1045,7 +1045,7 @@ const StepsManager = () => {
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Plus className="h-4 w-4 mr-2" />
-              Создать шаг
+              Созда��ь шаг
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
@@ -1129,7 +1129,7 @@ const StepsManager = () => {
 
               <Select value={filterProblem} onValueChange={setFilterProblem}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Пр��блема" />
+                  <SelectValue placeholder="Проблема" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все проблемы</SelectItem>
@@ -1190,7 +1190,7 @@ const StepsManager = () => {
                 {getDeviceName(group.deviceId)} -{" "}
                 {getProblemTitle(group.problemId)}
                 <Badge variant="secondary" className="ml-2">
-                  {group.steps.length} шаго��
+                  {group.steps.length} шагов
                 </Badge>
               </CardTitle>
             </CardHeader>
