@@ -18,7 +18,9 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-// Removed useData import - no longer using DataContext
+import { useRemotes } from "@/hooks/useRemotes";
+import { useEffect, useState } from "react";
+import type { Remote } from "@/types";
 
 interface RemoteControlProps {
   highlightButton?: string;
@@ -37,14 +39,38 @@ const RemoteControl = ({
   className,
   showButtonPosition,
 }: RemoteControlProps) => {
-  // Mock functions for removed static functionality
-  const getRemoteById = (id: string) => null;
-  const getDefaultRemote = () => null;
+  const { getRemoteById, getDefaultRemoteForDevice } = useRemotes();
+  const [remote, setRemote] = useState<Remote | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
-  // Get the specific remote or fall back to default
-  const remote = remoteId ? getRemoteById(remoteId) : getDefaultRemote();
-  const useCustomRemote =
-    remote && remote.imageData && remote.buttons.length > 0;
+  // Load remote data
+  useEffect(() => {
+    const loadRemote = async () => {
+      if (!remoteId) return;
+
+      setIsLoading(true);
+      try {
+        const remoteData = await getRemoteById(remoteId);
+        if (remoteData) {
+          // Normalize data structure
+          const normalizedRemote = {
+            ...remoteData,
+            imageData: remoteData.imageData || remoteData.image_data,
+            buttons: remoteData.buttons || []
+          };
+          setRemote(normalizedRemote);
+        }
+      } catch (error) {
+        console.error('Error loading remote:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadRemote();
+  }, [remoteId, getRemoteById]);
+
+  const useCustomRemote = remote && remote.imageData && remote.buttons && remote.buttons.length > 0;
 
   const handleButtonClick = (buttonId: string) => {
     if (onButtonClick) {

@@ -155,18 +155,17 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
   ]);
 
   const drawAreas = (ctx: CanvasRenderingContext2D) => {
-    if (!showAreas || !canvasRef.current) return;
+    if (!showAreas || !canvasRef.current || !imageDimensions.width || !imageDimensions.height) return;
 
     const canvas = canvasRef.current;
-    const scaleX = canvas.width / imageDimensions.width;
-    const scaleY = canvas.height / imageDimensions.height;
 
     // Draw highlight areas
     highlightAreas.forEach((area) => {
-      const x = area.x * scaleX;
-      const y = area.y * scaleY;
-      const width = area.width * scaleX;
-      const height = area.height * scaleY;
+      // Convert from percentage coordinates to canvas coordinates
+      const x = (area.x / 100) * canvas.width;
+      const y = (area.y / 100) * canvas.height;
+      const width = (area.width / 100) * canvas.width;
+      const height = (area.height / 100) * canvas.height;
 
       ctx.save();
       ctx.fillStyle = area.color || "#fbbf24";
@@ -198,10 +197,11 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
     // Draw clickable areas
     clickableAreas.forEach((area) => {
-      const x = area.x * scaleX;
-      const y = area.y * scaleY;
-      const width = area.width * scaleX;
-      const height = area.height * scaleY;
+      // Convert from percentage coordinates to canvas coordinates
+      const x = (area.x / 100) * canvas.width;
+      const y = (area.y / 100) * canvas.height;
+      const width = (area.width / 100) * canvas.width;
+      const height = (area.height / 100) * canvas.height;
 
       ctx.strokeStyle = area.color || "#3b82f6";
       ctx.lineWidth = 2;
@@ -270,16 +270,23 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     };
   };
 
-  const convertToImageCoordinates = (canvasX: number, canvasY: number) => {
-    if (!canvasRef.current) return { x: 0, y: 0 };
+  const convertToPercentageCoordinates = (canvasX: number, canvasY: number) => {
+    if (!canvasRef.current || !imageDimensions.width || !imageDimensions.height) {
+      return { x: 0, y: 0 };
+    }
 
     const canvas = canvasRef.current;
+    // Convert canvas coordinates to image coordinates first
     const scaleX = imageDimensions.width / canvas.width;
     const scaleY = imageDimensions.height / canvas.height;
 
+    const imageX = canvasX * scaleX;
+    const imageY = canvasY * scaleY;
+
+    // Then convert to percentages (0-100)
     return {
-      x: Math.round(canvasX * scaleX),
-      y: Math.round(canvasY * scaleY),
+      x: Math.round((imageX / imageDimensions.width) * 10000) / 100, // 2 decimal places
+      y: Math.round((imageY / imageDimensions.height) * 10000) / 100,
     };
   };
 
@@ -345,17 +352,17 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
     const coords = getCanvasCoordinates(e.clientX, e.clientY);
 
-    // Convert to image coordinates
-    const startImg = convertToImageCoordinates(
+    // Convert to percentage coordinates
+    const startPercent = convertToPercentageCoordinates(
       drawingArea.startX,
       drawingArea.startY,
     );
-    const endImg = convertToImageCoordinates(coords.x, coords.y);
+    const endPercent = convertToPercentageCoordinates(coords.x, coords.y);
 
-    const x = Math.min(startImg.x, endImg.x);
-    const y = Math.min(startImg.y, endImg.y);
-    const width = Math.abs(endImg.x - startImg.x);
-    const height = Math.abs(endImg.y - startImg.y);
+    const x = Math.min(startPercent.x, endPercent.x);
+    const y = Math.min(startPercent.y, endPercent.y);
+    const width = Math.abs(endPercent.x - startPercent.x);
+    const height = Math.abs(endPercent.y - startPercent.y);
 
     // Only create area if it has meaningful size
     if (width > 10 && height > 10) {
