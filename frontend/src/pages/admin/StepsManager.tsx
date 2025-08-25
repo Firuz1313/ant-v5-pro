@@ -396,12 +396,29 @@ const StepsManager = () => {
     }
   };
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
-  const getActiveRemotes = () => remotes.filter((r: any) => r.is_active);
+
+  const getActiveRemotes = () => {
+    console.log("🔍 getActiveRemotes called:", {
+      totalRemotes: remotes.length,
+      remotesArray: remotes,
+      activeRemotes: remotes.filter((r: any) => r.is_active)
+    });
+    return remotes.filter((r: any) => r.is_active);
+  };
+
   const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
+
   const getProblemsForDevice = (deviceId: string) =>
     problems.filter((p: any) => p.device_id === deviceId);
-  const getRemotesForDevice = (deviceId: string) =>
-    remotes.filter((r: any) => r.device_id === deviceId);
+
+  const getRemotesForDevice = (deviceId: string) => {
+    console.log("🔍 getRemotesForDevice called:", {
+      deviceId,
+      totalRemotes: remotes.length,
+      remotesForDevice: remotes.filter((r: any) => r.device_id === deviceId)
+    });
+    return remotes.filter((r: any) => r.device_id === deviceId);
+  };
   const getDefaultRemoteForDevice = (deviceId: string) =>
     remotes.find((r: any) => r.device_id === deviceId && r.is_default);
 
@@ -445,7 +462,7 @@ const StepsManager = () => {
     highlightRemoteButton: "none",
     highlightTVArea: "none",
     tvInterface: "home" as DiagnosticStep["tvInterface"],
-    tvInterfaceId: "none", // Добавлено для выбора ��озданного интерфейса
+    tvInterfaceId: "none", // Добавле��о для выбора ��озданного интерфейса
     requiredAction: "",
     hint: "",
     remoteId: "none",
@@ -625,7 +642,7 @@ const StepsManager = () => {
       );
       toast({
         title: "Предупреждение",
-        description: `Не удалось загрузить по��ные данные интерфейса ${tvInterface.name}. Используются кэшированные данные.`,
+        description: `Не удалось загрузить по��ные данные интерфейса ${tvInterface.name}. Используют��я кэшированные данные.`,
         variant: "destructive",
       });
       setSelectedTVInterface(tvInterface);
