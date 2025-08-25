@@ -621,9 +621,9 @@ const StepsManager = () => {
           console.log(
             "🔄 Interface not found, reloading TV interfaces list...",
           );
-          if (selectedDeviceId) {
-            await loadTVInterfacesForDevice(selectedDeviceId);
-          }
+          if (formData.deviceId) {
+          await loadTVInterfacesForDevice(formData.deviceId);
+        }
           toast({
             title: "Интерфейс не найден",
             description: `TV интерфе��с "${tvInterface.name}" больше не существует. Список интерфейсов обновлён.`,
