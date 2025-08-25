@@ -448,17 +448,7 @@ const StepsManager = () => {
     useState<TVInterface | null>(null);
   const [loadingTVInterfaces, setLoadingTVInterfaces] = useState(false);
 
-  // Show loading state while data is being fetched
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">Загрузка данных...</span>
-      </div>
-    );
-  }
-
-  // Form data state - moved before useEffect to fix initialization order
+  // Form data state - ALL useState hooks must be before conditional returns
   const [formData, setFormData] = useState({
     deviceId: "",
     problemId: "",
@@ -481,6 +471,16 @@ const StepsManager = () => {
   const [customRemoteImage, setCustomRemoteImage] = useState<string | null>(
     null,
   );
+
+  // Show loading state while data is being fetched - AFTER ALL HOOKS
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+        <span className="text-lg">Загрузка данных...</span>
+      </div>
+    );
+  }
 
   // Load TV interfaces when device changes
   useEffect(() => {
@@ -633,7 +633,7 @@ const StepsManager = () => {
           }
           toast({
             title: "Интерфейс не найден",
-            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Список интерфейсов обновлён.`,
+            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Спис��к интерфейсов обновлён.`,
             variant: "destructive",
           });
           return; // Don't open editor for non-existent interface
