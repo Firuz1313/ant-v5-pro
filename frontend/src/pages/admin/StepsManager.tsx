@@ -179,7 +179,7 @@ const StepFormFieldsComponent = React.memo(
               <SelectItem value="none">Без и��терф��йса</SelectItem>
               {loadingTVInterfaces ? (
                 <SelectItem value="loading" disabled>
-                  Загрузк��...
+                  Загрузка...
                 </SelectItem>
               ) : (
                 tvInterfaces.map((tvInterface) => (
@@ -420,6 +420,16 @@ const StepsManager = () => {
     remotes.filter((r: any) => r.device_id === deviceId);
   const getDefaultRemoteForDevice = (deviceId: string) =>
     remotes.find((r: any) => r.device_id === deviceId && r.is_default);
+
+  // Show loading state while data is being fetched
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+        <span className="text-lg">Загрузка данных...</span>
+      </div>
+    );
+  }
   const { toast } = useToast();
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -1167,7 +1177,7 @@ const StepsManager = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все пульты</SelectItem>
-                  <SelectItem value="none">Б��з пульта</SelectItem>
+                  <SelectItem value="none">Без пульта</SelectItem>
                   {getFilteredRemotes().map((remote) => {
                     const device = devices.find(
                       (d) => d.id === remote.deviceId,
