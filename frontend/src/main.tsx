@@ -8,7 +8,10 @@ import "./index.css";
 if (import.meta.env.DEV) {
   window.addEventListener("error", (e) => {
     if (e.message.includes("ResizeObserver loop")) {
-      console.warn("ResizeObserver loop detected - this indicates a potential performance issue:", e);
+      console.warn(
+        "ResizeObserver loop detected - this indicates a potential performance issue:",
+        e,
+      );
       // Don't suppress in development to help identify issues
       // e.stopImmediatePropagation();
     }

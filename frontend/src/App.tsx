@@ -33,13 +33,15 @@ function App() {
   // Apply dark mode by default for ANT Support theme
   useEffect(() => {
     // Ensure dark mode is applied (ANT Support uses dark theme primarily)
-    const isDark = localStorage.getItem('theme') === 'dark' ||
-                  (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    const isDark =
+      localStorage.getItem("theme") === "dark" ||
+      (!localStorage.getItem("theme") &&
+        window.matchMedia("(prefers-color-scheme: dark)").matches);
 
     if (isDark) {
-      document.documentElement.classList.add('dark');
+      document.documentElement.classList.add("dark");
     } else {
-      document.documentElement.classList.remove('dark');
+      document.documentElement.classList.remove("dark");
     }
   }, []);
 

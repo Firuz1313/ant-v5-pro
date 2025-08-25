@@ -56,12 +56,12 @@ const RemoteControl = ({
           const normalizedRemote = {
             ...remoteData,
             imageData: remoteData.imageData || remoteData.image_data,
-            buttons: remoteData.buttons || []
+            buttons: remoteData.buttons || [],
           };
           setRemote(normalizedRemote);
         }
       } catch (error) {
-        console.error('Error loading remote:', error);
+        console.error("Error loading remote:", error);
       } finally {
         setIsLoading(false);
       }
@@ -70,7 +70,8 @@ const RemoteControl = ({
     loadRemote();
   }, [remoteId, getRemoteById]);
 
-  const useCustomRemote = remote && remote.imageData && remote.buttons && remote.buttons.length > 0;
+  const useCustomRemote =
+    remote && remote.imageData && remote.buttons && remote.buttons.length > 0;
 
   const handleButtonClick = (buttonId: string) => {
     if (onButtonClick) {

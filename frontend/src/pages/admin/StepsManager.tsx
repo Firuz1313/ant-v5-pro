@@ -355,7 +355,7 @@ const StepsManager = () => {
     const result: any = {};
     for (const [key, value] of Object.entries(obj)) {
       // Convert camelCase to snake_case
-      const snakeKey = key.replace(/([A-Z])/g, '_$1').toLowerCase();
+      const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
       result[snakeKey] = value;
     }
     return result;
@@ -373,35 +373,49 @@ const StepsManager = () => {
 
       // Ensure ID is included (backend validation requires it)
       if (!stepPayload.id) {
-        stepPayload.id = step.id || `step-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        stepPayload.id =
+          step.id ||
+          `step-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
       }
 
       // Convert empty strings to undefined for optional fields
-      if (stepPayload.required_action === '') {
+      if (stepPayload.required_action === "") {
         delete stepPayload.required_action;
       }
-      if (stepPayload.hint === '') {
+      if (stepPayload.hint === "") {
         delete stepPayload.hint;
       }
-      if (stepPayload.description === '') {
+      if (stepPayload.description === "") {
         delete stepPayload.description;
       }
 
       // Remove fields that should not be sent if they are 'none' or undefined
-      if (stepPayload.remote_id === 'none' || stepPayload.remote_id === undefined) {
+      if (
+        stepPayload.remote_id === "none" ||
+        stepPayload.remote_id === undefined
+      ) {
         delete stepPayload.remote_id;
       }
-      if (stepPayload.tv_interface_id === 'none' || stepPayload.tv_interface_id === undefined) {
+      if (
+        stepPayload.tv_interface_id === "none" ||
+        stepPayload.tv_interface_id === undefined
+      ) {
         delete stepPayload.tv_interface_id;
       }
-      if (stepPayload.highlight_remote_button === 'none' || stepPayload.highlight_remote_button === undefined) {
+      if (
+        stepPayload.highlight_remote_button === "none" ||
+        stepPayload.highlight_remote_button === undefined
+      ) {
         delete stepPayload.highlight_remote_button;
       }
-      if (stepPayload.highlight_tv_area === 'none' || stepPayload.highlight_tv_area === undefined) {
+      if (
+        stepPayload.highlight_tv_area === "none" ||
+        stepPayload.highlight_tv_area === undefined
+      ) {
         delete stepPayload.highlight_tv_area;
       }
 
-      console.log('📤 Sending step payload:', stepPayload);
+      console.log("📤 Sending step payload:", stepPayload);
 
       const response = await stepsApi.createStep(stepPayload);
       const newStep = response.data;
@@ -412,7 +426,10 @@ const StepsManager = () => {
       // Show user-friendly error message
       toast({
         title: "Ошибка создания шага",
-        description: error instanceof Error ? error.message : "Не удалось создать шаг. Проверьте заполнение всех обязательных полей.",
+        description:
+          error instanceof Error
+            ? error.message
+            : "Не удалось создать шаг. Проверьте заполнение всех обязательных полей.",
         variant: "destructive",
       });
       throw error;
@@ -429,31 +446,31 @@ const StepsManager = () => {
       delete updatePayload.updated_at;
 
       // Convert empty strings to undefined for optional fields
-      if (updatePayload.required_action === '') {
+      if (updatePayload.required_action === "") {
         delete updatePayload.required_action;
       }
-      if (updatePayload.hint === '') {
+      if (updatePayload.hint === "") {
         delete updatePayload.hint;
       }
-      if (updatePayload.description === '') {
+      if (updatePayload.description === "") {
         delete updatePayload.description;
       }
 
       // Remove fields that should not be sent if they are 'none' or undefined
-      if (updatePayload.remote_id === 'none') {
+      if (updatePayload.remote_id === "none") {
         delete updatePayload.remote_id;
       }
-      if (updatePayload.tv_interface_id === 'none') {
+      if (updatePayload.tv_interface_id === "none") {
         delete updatePayload.tv_interface_id;
       }
-      if (updatePayload.highlight_remote_button === 'none') {
+      if (updatePayload.highlight_remote_button === "none") {
         delete updatePayload.highlight_remote_button;
       }
-      if (updatePayload.highlight_tv_area === 'none') {
+      if (updatePayload.highlight_tv_area === "none") {
         delete updatePayload.highlight_tv_area;
       }
 
-      console.log('📤 Sending update payload:', updatePayload);
+      console.log("📤 Sending update payload:", updatePayload);
 
       const response = await stepsApi.updateStep(id, updatePayload);
       const updatedStep = response.data;
@@ -467,7 +484,8 @@ const StepsManager = () => {
       console.error("Error updating step:", error);
       toast({
         title: "Ошибка обновления шага",
-        description: error instanceof Error ? error.message : "Не удалось обновить шаг.",
+        description:
+          error instanceof Error ? error.message : "Не удалось обновить шаг.",
         variant: "destructive",
       });
       throw error;
@@ -823,10 +841,16 @@ const StepsManager = () => {
         : 0;
 
     // Validate required fields before creating step
-    if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
+    if (
+      !formData.deviceId ||
+      !formData.problemId ||
+      !formData.title ||
+      !formData.instruction
+    ) {
       toast({
         title: "Ошибка валидации",
-        description: "Заполните все обязательные поля: устройство, проблема, название и инструкция.",
+        description:
+          "Заполните все обязательные поля: устройство, проблема, название и инструкция.",
         variant: "destructive",
       });
       return;

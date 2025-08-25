@@ -159,11 +159,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
       };
       img.src = screenshotSrc;
     }
-  }, [
-    tempScreenshot,
-    tvInterface.screenshotData,
-    tvInterface.screenshot_data,
-  ]);
+  }, [tempScreenshot, tvInterface.screenshotData, tvInterface.screenshot_data]);
 
   // Separate effect for redrawing areas when they change (without resizing canvas)
   useEffect(() => {
@@ -174,8 +170,17 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     }
   }, [clickableAreas, highlightAreas, showAreas, imageLoaded]);
 
-  const drawAreasWithDimensions = (ctx: CanvasRenderingContext2D, dimensions: { width: number; height: number }) => {
-    if (!showAreas || !canvasRef.current || !dimensions.width || !dimensions.height) return;
+  const drawAreasWithDimensions = (
+    ctx: CanvasRenderingContext2D,
+    dimensions: { width: number; height: number },
+  ) => {
+    if (
+      !showAreas ||
+      !canvasRef.current ||
+      !dimensions.width ||
+      !dimensions.height
+    )
+      return;
 
     const canvas = canvasRef.current;
 
@@ -534,12 +539,12 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     try {
       // Validate file size (max 5MB)
       if (file.size > 5 * 1024 * 1024) {
-        throw new Error('Размер файла не должен превышать 5MB');
+        throw new Error("Размер файла не должен превышать 5MB");
       }
 
       // Validate file type
-      if (!file.type.startsWith('image/')) {
-        throw new Error('Поддерживаются только изображения');
+      if (!file.type.startsWith("image/")) {
+        throw new Error("Поддерживаются только изображения");
       }
 
       const reader = new FileReader();
@@ -552,12 +557,14 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         }
       };
       reader.onerror = () => {
-        throw new Error('Ошибка чтения файла');
+        throw new Error("Ошибка чтения файла");
       };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Ошибка загрузки скриншота:", error);
-      alert(error instanceof Error ? error.message : 'Ошибка загрузки скриншота');
+      alert(
+        error instanceof Error ? error.message : "Ошибка загрузки скриншота",
+      );
     } finally {
       setIsUploading(false);
     }
@@ -581,7 +588,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
       setTempScreenshot(null);
       setImageLoaded(false); // Перезагружаем изображение
 
-      console.log('Screenshot saved successfully');
+      console.log("Screenshot saved successfully");
     } catch (error) {
       console.error("Ошибка сохранения скриншота:", error);
       // В случае ошибки возвращаем временный скриншот
