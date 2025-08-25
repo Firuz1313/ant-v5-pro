@@ -463,8 +463,8 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     const width = Math.abs(endPercent.x - startPercent.x);
     const height = Math.abs(endPercent.y - startPercent.y);
 
-    // Only create area if it has meaningful size
-    if (width > 10 && height > 10) {
+    // Only create area if it has meaningful size (use smaller threshold for percentage coordinates)
+    if (width > 1 && height > 1) {
       const newArea = {
         id: `area-${Date.now()}`,
         x,
@@ -519,6 +519,16 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
   const handleScreenshotUpload = async (file: File) => {
     setIsUploading(true);
     try {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error('Размер файла не должен превышать 5MB');
+      }
+
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        throw new Error('Поддерживаются только изображения');
+      }
+
       const reader = new FileReader();
       reader.onload = (event) => {
         const result = event.target?.result as string;
@@ -528,9 +538,13 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
           handleSaveScreenshot(result);
         }
       };
+      reader.onerror = () => {
+        throw new Error('Ошибка чтения файла');
+      };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Ошибка загрузки скриншота:", error);
+      alert(error instanceof Error ? error.message : 'Ошибка загрузки скриншота');
     } finally {
       setIsUploading(false);
     }
@@ -538,9 +552,10 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
   const handleSaveScreenshot = async (screenshotData: string) => {
     try {
-      // Обновляем интерфейс через API
+      // Обновляем интерфейс через API с нормализацией ключей
       await tvInterfacesAPI.update(tvInterface.id, {
         screenshotData,
+        screenshot_data: screenshotData, // Поддерживаем оба формата
       });
 
       // Обновляем локальное состояние
@@ -548,9 +563,16 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         screenshotData,
         screenshot_data: screenshotData,
       });
+
+      // Очищаем временный скриншот
+      setTempScreenshot(null);
       setImageLoaded(false); // Перезагружаем изображение
+
+      console.log('Screenshot saved successfully');
     } catch (error) {
       console.error("Ошибка сохранения скриншота:", error);
+      // В случае ошибки возвращаем временный скриншот
+      setTempScreenshot(screenshotData);
     }
   };
 
@@ -572,7 +594,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     ctx.textAlign = "center";
     ctx.fillText("Главное меню", 400, 80);
 
-    // Рисуем псевдо-элементы интерфейса
+    // Рисуем псевдо-эле��енты интерфейса
     const items = [
       { x: 100, y: 150, text: "Каналы", color: "#3b82f6" },
       { x: 300, y: 150, text: "Настройки", color: "#10b981" },
