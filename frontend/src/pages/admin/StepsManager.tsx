@@ -179,7 +179,7 @@ const StepFormFieldsComponent = React.memo(
               <SelectItem value="none">Без и��терф��йса</SelectItem>
               {loadingTVInterfaces ? (
                 <SelectItem value="loading" disabled>
-                  Загрузка...
+                  Загрузк��...
                 </SelectItem>
               ) : (
                 tvInterfaces.map((tvInterface) => (
@@ -306,15 +306,111 @@ const StepsManager = () => {
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
 
-  // Temporarily using empty arrays for removed static data
-  const steps: DiagnosticStep[] = [];
-  const remotes: any[] = [];
+  // Local state for steps and remotes
+  const [steps, setSteps] = useState<DiagnosticStep[]>([]);
+  const [remotes, setRemotes] = useState<any[]>([]);
+  const [loading, setLoading] = useState(true);
 
-  // Mock functions for removed static functionality
-  const createStep = async (step: DiagnosticStep) => {};
-  const updateStep = async (id: string, data: any) => {};
-  const deleteStep = async (id: string) => {};
-  const reorderSteps = async (problemId: string, stepIds: string[]) => {};
+  // Load initial data
+  useEffect(() => {
+    loadInitialData();
+  }, []);
+
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+
+      // Load steps
+      const stepsResponse = await fetch('/api/v1/steps');
+      if (stepsResponse.ok) {
+        const stepsData = await stepsResponse.json();
+        setSteps(stepsData.data || []);
+      }
+
+      // Load remotes
+      const remotesResponse = await fetch('/api/v1/remotes');
+      if (remotesResponse.ok) {
+        const remotesData = await remotesResponse.json();
+        setRemotes(remotesData.data || []);
+      }
+    } catch (error) {
+      console.error("Error loading initial data:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Step management functions
+  const createStep = async (step: DiagnosticStep) => {
+    try {
+      const response = await fetch('/api/v1/steps', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(step)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setSteps(prev => [...prev, result.data]);
+        return result.data;
+      }
+    } catch (error) {
+      console.error("Error creating step:", error);
+      throw error;
+    }
+  };
+
+  const updateStep = async (id: string, data: any) => {
+    try {
+      const response = await fetch(`/api/v1/steps/${id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+
+      if (response.ok) {
+        const result = await response.json();
+        setSteps(prev => prev.map(step => step.id === id ? { ...step, ...result.data } : step));
+        return result.data;
+      }
+    } catch (error) {
+      console.error("Error updating step:", error);
+      throw error;
+    }
+  };
+
+  const deleteStep = async (id: string) => {
+    try {
+      const response = await fetch(`/api/v1/steps/${id}`, {
+        method: 'DELETE'
+      });
+
+      if (response.ok) {
+        setSteps(prev => prev.filter(step => step.id !== id));
+      }
+    } catch (error) {
+      console.error("Error deleting step:", error);
+      throw error;
+    }
+  };
+
+  const reorderSteps = async (problemId: string, stepIds: string[]) => {
+    try {
+      const response = await fetch('/api/v1/steps/reorder', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ problemId, stepIds })
+      });
+
+      if (response.ok) {
+        // Reload steps to get updated order
+        await loadInitialData();
+      }
+    } catch (error) {
+      console.error("Error reordering steps:", error);
+      throw error;
+    }
+  };
   const getActiveDevices = () => devices.filter((d: any) => d.is_active);
   const getActiveRemotes = () => remotes.filter((r: any) => r.is_active);
   const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
@@ -1071,7 +1167,7 @@ const StepsManager = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все пульты</SelectItem>
-                  <SelectItem value="none">Без пульта</SelectItem>
+                  <SelectItem value="none">Б��з пульта</SelectItem>
                   {getFilteredRemotes().map((remote) => {
                     const device = devices.find(
                       (d) => d.id === remote.deviceId,
