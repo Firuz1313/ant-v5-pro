@@ -343,17 +343,9 @@ const StepsManager = () => {
   // Step management functions
   const createStep = async (step: DiagnosticStep) => {
     try {
-      const response = await fetch('/api/v1/steps', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(step)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setSteps(prev => [...prev, result.data]);
-        return result.data;
-      }
+      const result = await stepsApi.createStep(step);
+      setSteps(prev => [...prev, result]);
+      return result;
     } catch (error) {
       console.error("Error creating step:", error);
       throw error;
@@ -362,17 +354,9 @@ const StepsManager = () => {
 
   const updateStep = async (id: string, data: any) => {
     try {
-      const response = await fetch(`/api/v1/steps/${id}`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(data)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        setSteps(prev => prev.map(step => step.id === id ? { ...step, ...result.data } : step));
-        return result.data;
-      }
+      const result = await stepsApi.updateStep(id, data);
+      setSteps(prev => prev.map(step => step.id === id ? { ...step, ...result } : step));
+      return result;
     } catch (error) {
       console.error("Error updating step:", error);
       throw error;
@@ -381,13 +365,8 @@ const StepsManager = () => {
 
   const deleteStep = async (id: string) => {
     try {
-      const response = await fetch(`/api/v1/steps/${id}`, {
-        method: 'DELETE'
-      });
-
-      if (response.ok) {
-        setSteps(prev => prev.filter(step => step.id !== id));
-      }
+      await stepsApi.deleteStep(id);
+      setSteps(prev => prev.filter(step => step.id !== id));
     } catch (error) {
       console.error("Error deleting step:", error);
       throw error;
@@ -396,16 +375,9 @@ const StepsManager = () => {
 
   const reorderSteps = async (problemId: string, stepIds: string[]) => {
     try {
-      const response = await fetch('/api/v1/steps/reorder', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ problemId, stepIds })
-      });
-
-      if (response.ok) {
-        // Reload steps to get updated order
-        await loadInitialData();
-      }
+      await stepsApi.reorderSteps(problemId, stepIds);
+      // Reload steps to get updated order
+      await loadInitialData();
     } catch (error) {
       console.error("Error reordering steps:", error);
       throw error;
@@ -1157,7 +1129,7 @@ const StepsManager = () => {
 
               <Select value={filterProblem} onValueChange={setFilterProblem}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Проблема" />
+                  <SelectValue placeholder="Пр��блема" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все проблемы</SelectItem>
@@ -1218,7 +1190,7 @@ const StepsManager = () => {
                 {getDeviceName(group.deviceId)} -{" "}
                 {getProblemTitle(group.problemId)}
                 <Badge variant="secondary" className="ml-2">
-                  {group.steps.length} шагов
+                  {group.steps.length} шаго��
                 </Badge>
               </CardTitle>
             </CardHeader>
