@@ -105,6 +105,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
   const [tempScreenshot, setTempScreenshot] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  // Separate effect for image loading and canvas sizing (only when image changes)
   useEffect(() => {
     const screenshotSrc =
       tempScreenshot ||
@@ -133,21 +134,28 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
           displayWidth = displayHeight * aspectRatio;
         }
 
-        canvas.width = displayWidth;
-        canvas.height = displayHeight;
+        // Use requestAnimationFrame to avoid ResizeObserver loops
+        requestAnimationFrame(() => {
+          canvas.width = displayWidth;
+          canvas.height = displayHeight;
 
-        // Update both state and ref synchronously
-        const newDimensions = { width: img.width, height: img.height };
-        setImageDimensions(newDimensions);
-        imageDimensionsRef.current = newDimensions;
-        imageRef.current = img;
-        setImageLoaded(true);
+          // Set CSS size to match canvas buffer to prevent layout mismatches
+          canvas.style.width = `${displayWidth}px`;
+          canvas.style.height = `${displayHeight}px`;
 
-        // Draw the image
-        ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+          // Update both state and ref
+          const newDimensions = { width: img.width, height: img.height };
+          setImageDimensions(newDimensions);
+          imageDimensionsRef.current = newDimensions;
+          imageRef.current = img;
+          setImageLoaded(true);
 
-        // Draw existing areas using the current dimensions
-        drawAreasWithDimensions(ctx, newDimensions);
+          // Draw the image
+          ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+
+          // Draw existing areas using the current dimensions
+          drawAreasWithDimensions(ctx, newDimensions);
+        });
       };
       img.src = screenshotSrc;
     }
@@ -155,10 +163,16 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     tempScreenshot,
     tvInterface.screenshotData,
     tvInterface.screenshot_data,
-    clickableAreas,
-    highlightAreas,
-    showAreas,
   ]);
+
+  // Separate effect for redrawing areas when they change (without resizing canvas)
+  useEffect(() => {
+    if (imageLoaded && imageRef.current && canvasRef.current) {
+      requestAnimationFrame(() => {
+        redrawCanvas();
+      });
+    }
+  }, [clickableAreas, highlightAreas, showAreas, imageLoaded]);
 
   const drawAreasWithDimensions = (ctx: CanvasRenderingContext2D, dimensions: { width: number; height: number }) => {
     if (!showAreas || !canvasRef.current || !dimensions.width || !dimensions.height) return;
@@ -278,6 +292,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.drawImage(imageRef.current, 0, 0, canvas.width, canvas.height);
+    drawAreas(ctx);
 
     // Draw highlight areas
     highlightAreas.forEach((area) => {
@@ -438,12 +453,10 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         : null,
     );
 
-    // Redraw canvas efficiently
-    redrawCanvas();
-    const ctx = canvasRef.current?.getContext("2d");
-    if (ctx) {
-      drawAreas(ctx);
-    }
+    // Redraw canvas efficiently without triggering resize
+    requestAnimationFrame(() => {
+      redrawCanvas();
+    });
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
@@ -592,7 +605,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     ctx.fillStyle = "#ffffff";
     ctx.font = "bold 32px Arial";
     ctx.textAlign = "center";
-    ctx.fillText("Главное меню", 400, 80);
+    ctx.fillText("Главно�� меню", 400, 80);
 
     // Рисуем псевдо-эле��енты интерфейса
     const items = [
