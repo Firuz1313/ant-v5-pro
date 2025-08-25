@@ -377,7 +377,7 @@ const StepsManager = () => {
 
   const reorderSteps = async (problemId: string, stepIds: string[]) => {
     try {
-      await stepsApi.reorderSteps(problemId, stepIds);
+      const response = await stepsApi.reorderSteps(problemId, stepIds);
       // Reload steps to get updated order
       await loadInitialData();
     } catch (error) {
@@ -551,7 +551,7 @@ const StepsManager = () => {
       }
       toast({
         title: "Интерфейс не найден",
-        description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список обновлён.`,
+        description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список обн��влён.`,
         variant: "destructive",
       });
       return;
