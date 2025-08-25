@@ -257,7 +257,7 @@ const StepFormFieldsComponent = React.memo(
       </div>
 
       <div>
-        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>По��сказка</Label>
+        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
         <Textarea
           id={isEdit ? "edit-hint" : "hint"}
           value={formData.hint}
@@ -322,18 +322,17 @@ const StepsManager = () => {
       setLoading(true);
 
       // Load steps
-      const stepsResponse = await fetch('/api/v1/steps');
-      if (stepsResponse.ok) {
-        const stepsData = await stepsResponse.json();
-        setSteps(stepsData.data || []);
-      }
+      const stepsResponse = await stepsApi.getAll();
+      setSteps(stepsResponse?.data || []);
 
       // Load remotes
-      const remotesResponse = await fetch('/api/v1/remotes');
-      if (remotesResponse.ok) {
-        const remotesData = await remotesResponse.json();
-        setRemotes(remotesData.data || []);
-      }
+      const remotesResponse = await remotesApi.getAll();
+      setRemotes(remotesResponse?.data || []);
+
+      console.log("✅ Loaded data:", {
+        steps: stepsResponse?.data?.length || 0,
+        remotes: remotesResponse?.data?.length || 0
+      });
     } catch (error) {
       console.error("Error loading initial data:", error);
     } finally {
@@ -528,7 +527,7 @@ const StepsManager = () => {
       // Показываем пользователю информацию об ошибке
       if (error instanceof Error && error.message.includes("Сетевая ошибка")) {
         // Можно добавить toast уведомление
-        console.error("П��облемы с подк��ючением к серверу");
+        console.error("П��облемы с подключением к серверу");
       }
     } finally {
       setLoadingTVInterfaces(false);
