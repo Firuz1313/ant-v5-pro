@@ -156,7 +156,7 @@ app.use(express.urlencoded({ extended: true, limit: "100mb", parameterLimit: 100
 app.use((req, res, next) => {
   // Увеличиваем таймаут для TV interface операций
   if (req.url.includes('/tv-interfaces') && (req.method === 'PUT' || req.method === 'POST')) {
-    req.setTimeout(120000, () => {
+    req.setTimeout(180000, () => { // 180 seconds (3 minutes)
       console.log(`⏰ Request timeout for TV interface operation: ${req.method} ${req.url}`);
       if (!res.headersSent) {
         res.status(408).json({
@@ -166,7 +166,7 @@ app.use((req, res, next) => {
         });
       }
     });
-    res.setTimeout(120000, () => {
+    res.setTimeout(180000, () => { // 180 seconds (3 minutes)
       console.log(`⏰ Response timeout for TV interface operation: ${req.method} ${req.url}`);
     });
   }
@@ -234,7 +234,7 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-// Функция инициализации сервера
+// Функция инициализации ��ервера
 async function startServer() {
   try {
     // Исправляем схему tv_interfaces при старте
