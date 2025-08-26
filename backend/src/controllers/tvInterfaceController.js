@@ -195,7 +195,7 @@ export const createTVInterface = async (req, res) => {
     const dbOperationTimeout = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error('Database operation timeout - операция создания превысила лимит времени'));
-      }, 240000); // 4 минуты для операции БД
+      }, 540000); // 9 минут для операции БД (увеличено для больших изображений)
 
       tvInterfaceModel.create(tvInterfaceData)
         .then(result => {
@@ -269,7 +269,7 @@ export const createTVInterface = async (req, res) => {
     if (error.message.includes('out of memory') || error.message.includes('ENOMEM')) {
       return res.status(413).json({
         success: false,
-        error: 'Недостаточно памяти для обработки запроса',
+        error: 'Недостаточно памяти для обработки запрос��',
         details: 'Размер данных слишком вели�� для обработки. Попробуйте уменьшить размер изображения.',
         timestamp: new Date().toISOString()
       });
@@ -562,7 +562,7 @@ export const duplicateTVInterface = async (req, res) => {
   }
 };
 
-// Получить статистику TV интерфейсов
+// Полу��ить статистику TV интерфейсов
 export const getTVInterfaceStats = async (req, res) => {
   try {
     const stats = await tvInterfaceModel.getStats();
