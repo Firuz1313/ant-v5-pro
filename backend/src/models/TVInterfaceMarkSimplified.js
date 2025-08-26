@@ -10,7 +10,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
   }
 
   /**
-   * Получить все отметки для TV интерфейса с безопасным запросом
+   * Получить все отметки для TV интерфейса с безопасным за��росом
    */
   async getByTVInterfaceId(tvInterfaceId, options = {}) {
     try {
@@ -125,8 +125,14 @@ class TVInterfaceMarkSimplified extends BaseModel {
       const columnsResult = await this.query(columnsQuery);
       const existingColumns = columnsResult.rows.map(row => row.column_name);
 
+      // Генерируем ID в том же формате, что и TV interfaces
+      const timestamp = Date.now().toString(36);
+      const randomPart = Math.random().toString(36).substr(2, 9);
+      const markId = `tim_${timestamp}_${randomPart}`;
+
       const now = new Date().toISOString();
       const markData = {
+        id: markId, // Используем кастомный ID вместо UUID
         tv_interface_id: data.tv_interface_id,
         name: data.name.trim(),
         description: data.description?.trim() || "",
@@ -173,8 +179,20 @@ class TVInterfaceMarkSimplified extends BaseModel {
         markData.tags = JSON.stringify(data.tags || []);
       }
 
-      const result = await super.create(markData);
-      return await this.getById(result.id);
+      // Строим прямой INSERT запрос с нашими данными
+      const columns = Object.keys(markData);
+      const values = Object.values(markData);
+      const placeholders = columns.map((_, index) => `$${index + 1}`);
+
+      const insertQuery = `
+        INSERT INTO ${this.tableName} (${columns.join(", ")})
+        VALUES (${placeholders.join(", ")})
+        RETURNING *
+      `;
+
+      console.log('🔧 Creating mark with custom ID:', markId);
+      const result = await this.query(insertQuery, values);
+      return await this.getById(result.rows[0].id);
     } catch (error) {
       console.error("Error creating TV interface mark:", error);
       throw error;
