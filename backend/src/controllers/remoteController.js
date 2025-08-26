@@ -1,5 +1,6 @@
 import Remote from "../models/Remote.js";
 import { v4 as uuidv4 } from "uuid";
+import { seedDefaultRemotes as seedRemotesUtil } from "../utils/seedDefaultRemotes.js";
 
 const remoteModel = new Remote();
 
@@ -279,7 +280,7 @@ export const deleteRemote = async (req, res) => {
     console.error("Error in deleteRemote:", error);
     res.status(500).json({
       success: false,
-      error: "Ошибка при удалении пульта",
+      error: "Ошибка при удален��и пульта",
       details: error.message,
       timestamp: new Date().toISOString(),
     });
@@ -324,7 +325,7 @@ export const getDefaultRemoteForDevice = async (req, res) => {
     if (!remote) {
       return res.status(404).json({
         success: false,
-        error: "Пульт по умолчанию не найден для этого устройства",
+        error: "Пульт по умолча��ию не найден для этого устройства",
         timestamp: new Date().toISOString(),
       });
     }
@@ -458,6 +459,31 @@ export const getRemoteStats = async (req, res) => {
   }
 };
 
+/**
+ * Создание пультов по умолчанию для устройств
+ * POST /api/v1/remotes/seed-defaults
+ */
+export const seedDefaultRemotes = async (req, res) => {
+  try {
+    console.log("Starting default remotes seeding...");
+    await seedRemotesUtil();
+
+    res.json({
+      success: true,
+      message: "Пульты по умолчанию созданы успешно",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error in seedDefaultRemotes:", error);
+    res.status(500).json({
+      success: false,
+      error: "Ошибка при создании пультов по умолчанию",
+      details: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+};
+
 export default {
   getRemotes,
   getRemoteById,
@@ -470,4 +496,5 @@ export default {
   duplicateRemote,
   incrementRemoteUsage,
   getRemoteStats,
+  seedDefaultRemotes,
 };

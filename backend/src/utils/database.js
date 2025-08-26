@@ -272,6 +272,245 @@ export async function runMigrations() {
   }
 }
 
+// Функция исправления схемы diagnostic_steps
+export async function fixDiagnosticStepsSchema() {
+  try {
+    console.log("🔧 Проверка и исправление схемы diagnostic_steps...");
+
+    // Проверяем какие колонки существуют
+    const columnsQuery = `
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = 'diagnostic_steps'
+      AND column_name IN (
+        'device_id', 'instruction', 'instruction_text', 'tv_interface',
+        'validation_rules', 'success_condition', 'failure_actions',
+        'warning_text', 'success_text', 'media', 'next_step_conditions', 'hint', 'button_position'
+      );
+    `;
+
+    const existingColumns = await query(columnsQuery);
+    const columnNames = existingColumns.rows.map((row) => row.column_name);
+
+    const hasDeviceId = columnNames.includes("device_id");
+    const hasInstruction = columnNames.includes("instruction");
+    const hasInstructionText = columnNames.includes("instruction_text");
+    const hasTvInterface = columnNames.includes("tv_interface");
+    const hasValidationRules = columnNames.includes("validation_rules");
+    const hasSuccessCondition = columnNames.includes("success_condition");
+    const hasFailureActions = columnNames.includes("failure_actions");
+    const hasWarningText = columnNames.includes("warning_text");
+    const hasSuccessText = columnNames.includes("success_text");
+    const hasMedia = columnNames.includes("media");
+    const hasNextStepConditions = columnNames.includes("next_step_conditions");
+    const hasHint = columnNames.includes("hint");
+    const hasButtonPosition = columnNames.includes("button_position");
+
+    // Добавляем недостающую колонку device_id
+    if (!hasDeviceId) {
+      console.log("⚠️  device_id column missing, adding it...");
+
+      // First, add the column as nullable
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN device_id VARCHAR(255) REFERENCES devices(id) ON DELETE CASCADE
+      `);
+
+      // Update existing records to set device_id from their associated problem
+      await query(`
+        UPDATE diagnostic_steps
+        SET device_id = p.device_id
+        FROM problems p
+        WHERE diagnostic_steps.problem_id = p.id AND diagnostic_steps.device_id IS NULL
+      `);
+
+      // Now make it NOT NULL
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ALTER COLUMN device_id SET NOT NULL
+      `);
+
+      console.log("✅ Добавлена колонка device_id");
+    } else {
+      console.log("✅ Колонка device_id уже существует");
+    }
+
+    // Fix instruction column name mismatch
+    if (hasInstructionText && !hasInstruction) {
+      console.log(
+        "⚠️  Found instruction_text column, renaming to instruction...",
+      );
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        RENAME COLUMN instruction_text TO instruction
+      `);
+
+      console.log("✅ Переименована колонка instruction_text в instruction");
+    } else if (!hasInstruction && !hasInstructionText) {
+      console.log("⚠️  instruction column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN instruction TEXT NOT NULL DEFAULT ''
+      `);
+
+      console.log("✅ Добавлена колонка instruction");
+    } else {
+      console.log("✅ Колонка instruction уже существует");
+    }
+
+    // Add missing tv_interface column
+    if (!hasTvInterface) {
+      console.log("⚠️  tv_interface column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN tv_interface VARCHAR(255)
+      `);
+
+      console.log("✅ Добавлена колонка tv_interface");
+    } else {
+      console.log("✅ Колонка tv_interface уже существует");
+    }
+
+    // Add missing validation_rules column
+    if (!hasValidationRules) {
+      console.log("⚠️  validation_rules column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN validation_rules JSONB DEFAULT '[]'::jsonb
+      `);
+
+      console.log("✅ Добавлена колонка validation_rules");
+    } else {
+      console.log("✅ Колонка validation_rules уже существует");
+    }
+
+    // Add missing success_condition column
+    if (!hasSuccessCondition) {
+      console.log("⚠️  success_condition column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN success_condition VARCHAR(500)
+      `);
+
+      console.log("✅ Добавлена колонка success_condition");
+    } else {
+      console.log("✅ Колонка success_condition уже существует");
+    }
+
+    // Add missing failure_actions column
+    if (!hasFailureActions) {
+      console.log("⚠️  failure_actions column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN failure_actions JSONB DEFAULT '[]'::jsonb
+      `);
+
+      console.log("✅ Добавлена колонка failure_actions");
+    } else {
+      console.log("✅ Колонка failure_actions уже существует");
+    }
+
+    // Add missing warning_text column
+    if (!hasWarningText) {
+      console.log("⚠️  warning_text column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN warning_text TEXT
+      `);
+
+      console.log("✅ Добавлена колонка warning_text");
+    } else {
+      console.log("✅ Колонка warning_text уже существует");
+    }
+
+    // Add missing success_text column
+    if (!hasSuccessText) {
+      console.log("⚠️  success_text column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN success_text TEXT
+      `);
+
+      console.log("✅ Добавлена колонка success_text");
+    } else {
+      console.log("✅ Колонка success_text уже существует");
+    }
+
+    // Add missing media column
+    if (!hasMedia) {
+      console.log("⚠️  media column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN media JSONB DEFAULT '[]'::jsonb
+      `);
+
+      console.log("✅ Добавлена колонка media");
+    } else {
+      console.log("✅ Колонка media уже существует");
+    }
+
+    // Add missing next_step_conditions column
+    if (!hasNextStepConditions) {
+      console.log("⚠️  next_step_conditions column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN next_step_conditions JSONB DEFAULT '[]'::jsonb
+      `);
+
+      console.log("✅ Добавлена колонка next_step_conditions");
+    } else {
+      console.log("✅ Колонка next_step_conditions уже существует");
+    }
+
+    // Add missing hint column
+    if (!hasHint) {
+      console.log("⚠️  hint column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN hint TEXT
+      `);
+
+      console.log("✅ Добавлена колонка hint");
+    } else {
+      console.log("✅ Колонка hint уже существует");
+    }
+
+    // Add missing button_position column
+    if (!hasButtonPosition) {
+      console.log("⚠️  button_position column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN button_position JSONB
+      `);
+
+      console.log("✅ Добавлена колонка button_position");
+    } else {
+      console.log("✅ Колонка button_position уже существует");
+    }
+
+    console.log("🎉 Схема diagnostic_steps исправлена");
+    return true;
+  } catch (error) {
+    console.error(
+      "❌ Ошибка исправления схемы diagnostic_steps:",
+      error.message,
+    );
+    throw error;
+  }
+}
+
 // Функция исправления схемы tv_interfaces
 export async function fixTVInterfacesSchema() {
   try {

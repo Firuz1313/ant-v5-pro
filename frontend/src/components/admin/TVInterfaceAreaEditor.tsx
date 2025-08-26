@@ -100,14 +100,27 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     width: 0,
     height: 0,
   });
+  const imageDimensionsRef = useRef({ width: 0, height: 0 });
+  const imageRef = useRef<HTMLImageElement | null>(null);
   const [tempScreenshot, setTempScreenshot] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
 
+  // Separate effect for image loading and canvas sizing (only when image changes)
   useEffect(() => {
     const screenshotSrc =
       tempScreenshot ||
       tvInterface.screenshotData ||
       tvInterface.screenshot_data;
+
+    console.log("📺 TV Interface Editor Image Loading:", {
+      tempScreenshot: !!tempScreenshot,
+      screenshotData: !!tvInterface.screenshotData,
+      screenshot_data: !!tvInterface.screenshot_data,
+      finalSrc: !!screenshotSrc,
+      interfaceId: tvInterface.id,
+      interfaceName: tvInterface.name,
+    });
+
     if (screenshotSrc && canvasRef.current) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
@@ -115,6 +128,12 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
       const img = new Image();
       img.onload = () => {
+        console.log("✅ TV Interface image loaded successfully:", {
+          width: img.width,
+          height: img.height,
+          src: screenshotSrc.substring(0, 50) + "...",
+        });
+
         // Set canvas size to match container while maintaining aspect ratio
         const container = containerRef.current;
         if (!container) return;
@@ -131,42 +150,72 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
           displayWidth = displayHeight * aspectRatio;
         }
 
-        canvas.width = displayWidth;
-        canvas.height = displayHeight;
+        // Use requestAnimationFrame to avoid ResizeObserver loops
+        requestAnimationFrame(() => {
+          canvas.width = displayWidth;
+          canvas.height = displayHeight;
 
-        setImageDimensions({ width: img.width, height: img.height });
-        setImageLoaded(true);
+          // Set CSS size to match canvas buffer to prevent layout mismatches
+          canvas.style.width = `${displayWidth}px`;
+          canvas.style.height = `${displayHeight}px`;
 
-        // Draw the image
-        ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+          // Update both state and ref
+          const newDimensions = { width: img.width, height: img.height };
+          setImageDimensions(newDimensions);
+          imageDimensionsRef.current = newDimensions;
+          imageRef.current = img;
+          setImageLoaded(true);
 
-        // Draw existing areas
-        drawAreas(ctx);
+          // Draw the image
+          ctx.drawImage(img, 0, 0, displayWidth, displayHeight);
+
+          // Draw existing areas using the current dimensions
+          drawAreasWithDimensions(ctx, newDimensions);
+        });
       };
-      img.src = screenshotSrc;
-    }
-  }, [
-    tempScreenshot,
-    tvInterface.screenshotData,
-    tvInterface.screenshot_data,
-    clickableAreas,
-    highlightAreas,
-    showAreas,
-  ]);
 
-  const drawAreas = (ctx: CanvasRenderingContext2D) => {
-    if (!showAreas || !canvasRef.current) return;
+      img.onerror = (error) => {
+        console.error("❌ Failed to load TV interface image:", error);
+        setImageLoaded(false);
+      };
+
+      img.src = screenshotSrc;
+    } else {
+      console.warn("⚠️ No screenshot source available for TV interface");
+      setImageLoaded(false);
+    }
+  }, [tempScreenshot, tvInterface.screenshotData, tvInterface.screenshot_data]);
+
+  // Separate effect for redrawing areas when they change (without resizing canvas)
+  useEffect(() => {
+    if (imageLoaded && imageRef.current && canvasRef.current) {
+      requestAnimationFrame(() => {
+        redrawCanvas();
+      });
+    }
+  }, [clickableAreas, highlightAreas, showAreas, imageLoaded]);
+
+  const drawAreasWithDimensions = (
+    ctx: CanvasRenderingContext2D,
+    dimensions: { width: number; height: number },
+  ) => {
+    if (
+      !showAreas ||
+      !canvasRef.current ||
+      !dimensions.width ||
+      !dimensions.height
+    )
+      return;
 
     const canvas = canvasRef.current;
-    const scaleX = canvas.width / imageDimensions.width;
-    const scaleY = canvas.height / imageDimensions.height;
 
     // Draw highlight areas
     highlightAreas.forEach((area) => {
-      const x = area.x * scaleX;
-      const y = area.y * scaleY;
-      const width = area.width * scaleX;
-      const height = area.height * scaleY;
+      // Convert from percentage coordinates to canvas coordinates
+      const x = (area.x / 100) * canvas.width;
+      const y = (area.y / 100) * canvas.height;
+      const width = (area.width / 100) * canvas.width;
+      const height = (area.height / 100) * canvas.height;
 
       ctx.save();
       ctx.fillStyle = area.color || "#fbbf24";
@@ -198,10 +247,126 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
     // Draw clickable areas
     clickableAreas.forEach((area) => {
-      const x = area.x * scaleX;
-      const y = area.y * scaleY;
-      const width = area.width * scaleX;
-      const height = area.height * scaleY;
+      // Convert from percentage coordinates to canvas coordinates
+      const x = (area.x / 100) * canvas.width;
+      const y = (area.y / 100) * canvas.height;
+      const width = (area.width / 100) * canvas.width;
+      const height = (area.height / 100) * canvas.height;
+
+      ctx.strokeStyle = area.color || "#3b82f6";
+      ctx.lineWidth = 2;
+      ctx.setLineDash(selectedAreaId === area.id ? [5, 5] : []);
+
+      if (area.shape === "circle") {
+        ctx.beginPath();
+        ctx.ellipse(
+          x + width / 2,
+          y + height / 2,
+          width / 2,
+          height / 2,
+          0,
+          0,
+          2 * Math.PI,
+        );
+        ctx.stroke();
+      } else {
+        ctx.strokeRect(x, y, width, height);
+      }
+
+      // Draw label
+      ctx.fillStyle = area.color || "#3b82f6";
+      ctx.font = "12px Inter, sans-serif";
+      ctx.fillText(area.label, x, y - 5);
+    });
+
+    // Draw current drawing area
+    if (drawingArea && isDrawing) {
+      const { startX, startY, currentX, currentY } = drawingArea;
+      const x = Math.min(startX, currentX);
+      const y = Math.min(startY, currentY);
+      const width = Math.abs(currentX - startX);
+      const height = Math.abs(currentY - startY);
+
+      ctx.strokeStyle = newAreaData.color;
+      ctx.lineWidth = 2;
+      ctx.setLineDash([3, 3]);
+
+      if (currentTool === "circle") {
+        ctx.beginPath();
+        ctx.ellipse(
+          x + width / 2,
+          y + height / 2,
+          width / 2,
+          height / 2,
+          0,
+          0,
+          2 * Math.PI,
+        );
+        ctx.stroke();
+      } else {
+        ctx.strokeRect(x, y, width, height);
+      }
+    }
+  };
+
+  const drawAreas = (ctx: CanvasRenderingContext2D) => {
+    drawAreasWithDimensions(ctx, imageDimensionsRef.current);
+  };
+
+  const redrawCanvas = () => {
+    if (!canvasRef.current || !imageRef.current) return;
+
+    const canvas = canvasRef.current;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.drawImage(imageRef.current, 0, 0, canvas.width, canvas.height);
+    drawAreas(ctx);
+
+    // Draw highlight areas
+    highlightAreas.forEach((area) => {
+      // Convert from percentage coordinates to canvas coordinates
+      const x = (area.x / 100) * canvas.width;
+      const y = (area.y / 100) * canvas.height;
+      const width = (area.width / 100) * canvas.width;
+      const height = (area.height / 100) * canvas.height;
+
+      ctx.save();
+      ctx.fillStyle = area.color || "#fbbf24";
+      ctx.globalAlpha = area.opacity || 0.3;
+
+      if (area.shape === "circle") {
+        ctx.beginPath();
+        ctx.ellipse(
+          x + width / 2,
+          y + height / 2,
+          width / 2,
+          height / 2,
+          0,
+          0,
+          2 * Math.PI,
+        );
+        ctx.fill();
+      } else {
+        ctx.fillRect(x, y, width, height);
+      }
+
+      ctx.restore();
+
+      // Draw label
+      ctx.fillStyle = area.color || "#fbbf24";
+      ctx.font = "12px Inter, sans-serif";
+      ctx.fillText(area.label, x, y - 5);
+    });
+
+    // Draw clickable areas
+    clickableAreas.forEach((area) => {
+      // Convert from percentage coordinates to canvas coordinates
+      const x = (area.x / 100) * canvas.width;
+      const y = (area.y / 100) * canvas.height;
+      const width = (area.width / 100) * canvas.width;
+      const height = (area.height / 100) * canvas.height;
 
       ctx.strokeStyle = area.color || "#3b82f6";
       ctx.lineWidth = 2;
@@ -270,16 +435,24 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     };
   };
 
-  const convertToImageCoordinates = (canvasX: number, canvasY: number) => {
-    if (!canvasRef.current) return { x: 0, y: 0 };
+  const convertToPercentageCoordinates = (canvasX: number, canvasY: number) => {
+    const dimensions = imageDimensionsRef.current;
+    if (!canvasRef.current || !dimensions.width || !dimensions.height) {
+      return { x: 0, y: 0 };
+    }
 
     const canvas = canvasRef.current;
-    const scaleX = imageDimensions.width / canvas.width;
-    const scaleY = imageDimensions.height / canvas.height;
+    // Convert canvas coordinates to image coordinates first
+    const scaleX = dimensions.width / canvas.width;
+    const scaleY = dimensions.height / canvas.height;
 
+    const imageX = canvasX * scaleX;
+    const imageY = canvasY * scaleY;
+
+    // Then convert to percentages (0-100)
     return {
-      x: Math.round(canvasX * scaleX),
-      y: Math.round(canvasY * scaleY),
+      x: Math.round((imageX / dimensions.width) * 10000) / 100, // 2 decimal places
+      y: Math.round((imageY / dimensions.height) * 10000) / 100,
     };
   };
 
@@ -310,34 +483,10 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         : null,
     );
 
-    // Redraw canvas
-    const screenshotSrc =
-      tempScreenshot ||
-      tvInterface.screenshotData ||
-      tvInterface.screenshot_data;
-    if (canvasRef.current && screenshotSrc) {
-      const ctx = canvasRef.current.getContext("2d");
-      if (ctx) {
-        const img = new Image();
-        img.onload = () => {
-          ctx.clearRect(
-            0,
-            0,
-            canvasRef.current!.width,
-            canvasRef.current!.height,
-          );
-          ctx.drawImage(
-            img,
-            0,
-            0,
-            canvasRef.current!.width,
-            canvasRef.current!.height,
-          );
-          drawAreas(ctx);
-        };
-        img.src = screenshotSrc;
-      }
-    }
+    // Redraw canvas efficiently without triggering resize
+    requestAnimationFrame(() => {
+      redrawCanvas();
+    });
   };
 
   const handleMouseUp = (e: React.MouseEvent) => {
@@ -345,20 +494,20 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
     const coords = getCanvasCoordinates(e.clientX, e.clientY);
 
-    // Convert to image coordinates
-    const startImg = convertToImageCoordinates(
+    // Convert to percentage coordinates
+    const startPercent = convertToPercentageCoordinates(
       drawingArea.startX,
       drawingArea.startY,
     );
-    const endImg = convertToImageCoordinates(coords.x, coords.y);
+    const endPercent = convertToPercentageCoordinates(coords.x, coords.y);
 
-    const x = Math.min(startImg.x, endImg.x);
-    const y = Math.min(startImg.y, endImg.y);
-    const width = Math.abs(endImg.x - startImg.x);
-    const height = Math.abs(endImg.y - startImg.y);
+    const x = Math.min(startPercent.x, endPercent.x);
+    const y = Math.min(startPercent.y, endPercent.y);
+    const width = Math.abs(endPercent.x - startPercent.x);
+    const height = Math.abs(endPercent.y - startPercent.y);
 
-    // Only create area if it has meaningful size
-    if (width > 10 && height > 10) {
+    // Only create area if it has meaningful size (use smaller threshold for percentage coordinates)
+    if (width > 1 && height > 1) {
       const newArea = {
         id: `area-${Date.now()}`,
         x,
@@ -413,6 +562,16 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
   const handleScreenshotUpload = async (file: File) => {
     setIsUploading(true);
     try {
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        throw new Error("Размер файла не должен превышать 5MB");
+      }
+
+      // Validate file type
+      if (!file.type.startsWith("image/")) {
+        throw new Error("Поддерживаются только изображения");
+      }
+
       const reader = new FileReader();
       reader.onload = (event) => {
         const result = event.target?.result as string;
@@ -422,9 +581,15 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
           handleSaveScreenshot(result);
         }
       };
+      reader.onerror = () => {
+        throw new Error("Ошибка чтения файла");
+      };
       reader.readAsDataURL(file);
     } catch (error) {
       console.error("Ошибка загрузки скриншота:", error);
+      alert(
+        error instanceof Error ? error.message : "Ошибка загрузки скриншота",
+      );
     } finally {
       setIsUploading(false);
     }
@@ -432,9 +597,10 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
   const handleSaveScreenshot = async (screenshotData: string) => {
     try {
-      // Обновляем интерфейс через API
+      // Обновляем интерфейс через API с нормализацией ключей
       await tvInterfacesAPI.update(tvInterface.id, {
         screenshotData,
+        screenshot_data: screenshotData, // Поддерживаем оба формата
       });
 
       // Обновляем локальное состояние
@@ -442,63 +608,112 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         screenshotData,
         screenshot_data: screenshotData,
       });
+
+      // Очищаем временный скриншот
+      setTempScreenshot(null);
       setImageLoaded(false); // Перезагружаем изображение
+
+      console.log("Screenshot saved successfully");
     } catch (error) {
       console.error("Ошибка сохранения скриншота:", error);
+      // В случае ошибки возвращаем временный скриншот
+      setTempScreenshot(screenshotData);
     }
   };
 
   const createTestScreenshot = () => {
     const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 600;
+    canvas.width = 1920;
+    canvas.height = 1080;
     const ctx = canvas.getContext("2d");
 
     if (!ctx) return null;
 
-    // Заливаем фон
-    ctx.fillStyle = "#1a1a1a";
-    ctx.fillRect(0, 0, 800, 600);
+    // Заливаем фон градиентом
+    const gradient = ctx.createLinearGradient(0, 0, 1920, 1080);
+    gradient.addColorStop(0, "#1e3a8a");
+    gradient.addColorStop(1, "#1e1b4b");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1920, 1080);
 
     // Рисуем заголовок
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 32px Arial";
+    ctx.font = "bold 64px Arial";
     ctx.textAlign = "center";
-    ctx.fillText("Главное меню", 400, 80);
+    ctx.fillText(`${tvInterface.name || "TV Интерфейс"}`, 960, 120);
 
-    // Рисуем псевдо-элементы интерфейса
+    // Добавляем подзаголовок
+    ctx.font = "32px Arial";
+    ctx.fillStyle = "#d1d5db";
+    ctx.fillText("Главное меню", 960, 180);
+
+    // Рисуем элементы интерфейса
     const items = [
-      { x: 100, y: 150, text: "Каналы", color: "#3b82f6" },
-      { x: 300, y: 150, text: "Настройки", color: "#10b981" },
-      { x: 500, y: 150, text: "Приложения", color: "#f59e0b" },
-      { x: 100, y: 320, text: "Фильмы", color: "#ef4444" },
-      { x: 300, y: 320, text: "Музыка", color: "#8b5cf6" },
-      { x: 500, y: 320, text: "Игры", color: "#06b6d4" },
+      { x: 200, y: 300, text: "Каналы", icon: "📺", color: "#3b82f6" },
+      { x: 520, y: 300, text: "Настройки", icon: "⚙️", color: "#10b981" },
+      { x: 840, y: 300, text: "Приложения", icon: "📱", color: "#f59e0b" },
+      { x: 1160, y: 300, text: "Поиск", icon: "🔍", color: "#06b6d4" },
+      { x: 200, y: 600, text: "Фильмы", icon: "🎬", color: "#ef4444" },
+      { x: 520, y: 600, text: "Музыка", icon: "🎵", color: "#8b5cf6" },
+      { x: 840, y: 600, text: "Игры", icon: "🎮", color: "#f97316" },
+      { x: 1160, y: 600, text: "Записи", icon: "📹", color: "#84cc16" },
     ];
 
     items.forEach((item) => {
-      // Рису��м блок
+      // Рисуем блок с округленными углами
       ctx.fillStyle = item.color;
-      ctx.fillRect(item.x, item.y, 150, 120);
+      ctx.beginPath();
+      ctx.roundRect(item.x, item.y, 280, 200, 20);
+      ctx.fill();
+
+      // Рисуем тень
+      ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 5;
 
       // Рамка
       ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(item.x, item.y, 150, 120);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(item.x, item.y, 280, 200, 20);
+      ctx.stroke();
+
+      // Сбрасываем тень
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Иконка
+      ctx.font = "48px Arial";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(item.icon, item.x + 140, item.y + 80);
 
       // Текст
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 16px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText(item.text, item.x + 75, item.y + 70);
+      ctx.font = "bold 24px Arial";
+      ctx.fillText(item.text, item.x + 140, item.y + 130);
     });
 
-    // Добавляем время в углу
+    // Добавляем статус бар
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, 1920, 60);
+
+    // Время
     ctx.fillStyle = "#ffffff";
-    ctx.font = "18px Arial";
+    ctx.font = "24px Arial";
     ctx.textAlign = "right";
     const now = new Date();
-    ctx.fillText(now.toLocaleTimeString(), 780, 30);
+    ctx.fillText(now.toLocaleTimeString(), 1880, 35);
+
+    // Сигнал
+    ctx.textAlign = "left";
+    ctx.fillText("WiFi: ●●●●", 40, 35);
+
+    // Центральный текст
+    ctx.textAlign = "center";
+    ctx.fillText("ANT TV System", 960, 35);
 
     return canvas.toDataURL("image/png");
   };
@@ -532,6 +747,33 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     },
   });
 
+  // Auto-generate test screenshot if none available
+  useEffect(() => {
+    const shouldAutoGenerate =
+      !tvInterface.screenshotData &&
+      !tvInterface.screenshot_data &&
+      !tempScreenshot &&
+      !isUploading;
+
+    if (shouldAutoGenerate) {
+      console.log(
+        "🎯 Auto-generating test screenshot for interface:",
+        tvInterface.name,
+      );
+      const testScreenshot = createTestScreenshot();
+      if (testScreenshot) {
+        setTempScreenshot(testScreenshot);
+        // Don't auto-save, just show temporarily
+      }
+    }
+  }, [
+    tvInterface.id,
+    tvInterface.screenshotData,
+    tvInterface.screenshot_data,
+    tempScreenshot,
+    isUploading,
+  ]);
+
   if (
     !tvInterface.screenshotData &&
     !tvInterface.screenshot_data &&
@@ -542,73 +784,11 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         <CardContent className="flex flex-col items-center justify-center h-96 space-y-4">
           <div className="text-center text-gray-500">
             <Target className="h-12 w-12 mx-auto mb-4" />
-            <p className="text-lg font-medium mb-2">
-              Нет скриншота для редактирования областей
-            </p>
+            <p className="text-lg font-medium mb-2">Создание интерфейса...</p>
             <p className="text-sm text-gray-400 mb-4">
-              Загрузите скриншот интерфейса, чтобы начать работу с областями
+              Создаём тестовый скриншот для редактирования областей
             </p>
-            <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-              <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                <strong>Отладка:</strong> Интерфейс "{tvInterface.name}" (ID:{" "}
-                {tvInterface.id})
-                <br />
-                screenshotData: {tvInterface.screenshotData ? "✓" : "✗"}
-                <br />
-                screenshot_data: {tvInterface.screenshot_data ? "✓" : "✗"}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col space-y-2">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleScreenshotUpload(file);
-                }
-              }}
-              className="hidden"
-              id="screenshot-upload"
-              disabled={isUploading}
-            />
-            <Button asChild variant="outline" disabled={isUploading}>
-              <label htmlFor="screenshot-upload" className="cursor-pointer">
-                <Plus className="h-4 w-4 mr-2" />
-                {isUploading ? "Загружается..." : "Загрузить скриншот"}
-              </label>
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                const testScreenshot = createTestScreenshot();
-                if (testScreenshot) {
-                  handleSaveScreenshot(testScreenshot);
-                }
-              }}
-            >
-              <ImageIcon className="h-4 w-4 mr-2" />
-              Создать тестовый скри��шот
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                // Переходим в TV Interface Builder для добавления скриншота
-                window.open(
-                  `/admin/tv-interface-builder?edit=${tvInterface.id}`,
-                  "_blank",
-                );
-              }}
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Редактировать в TV Builder
-            </Button>
-            <p className="text-xs text-gray-400 text-center">
-              Поддерживаются форматы: JPG, PNG, GIF
-              <br />
-              Или добавьте скриншот через TV Interface Builder
-            </p>
+            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
           </div>
         </CardContent>
       </Card>
@@ -722,6 +902,20 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
                   <EyeOff className="h-4 w-4" />
                 )}
               </Button>
+              {tempScreenshot && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    if (tempScreenshot) {
+                      handleSaveScreenshot(tempScreenshot);
+                    }
+                  }}
+                >
+                  <Save className="h-4 w-4 mr-1" />
+                  Сохранить скриншот
+                </Button>
+              )}
               <Button variant="default" size="sm" onClick={handleSave}>
                 <Save className="h-4 w-4 mr-1" />
                 Сохранить области

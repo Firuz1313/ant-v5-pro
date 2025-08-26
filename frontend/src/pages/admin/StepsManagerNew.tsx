@@ -90,6 +90,25 @@ const StepsManagerNew = () => {
   const { devices } = useDevices();
   const { problems } = useProblems();
 
+  // Debug information
+  useEffect(() => {
+    if (devices && devices.length > 0) {
+      console.log(
+        "🔍 Available devices:",
+        devices.map((d) => ({ id: d.id, name: d.name })),
+      );
+    }
+  }, [devices]);
+
+  useEffect(() => {
+    if (problems && problems.length > 0) {
+      console.log(
+        "🔍 Available problems:",
+        problems.map((p) => ({ id: p.id, title: p.title })),
+      );
+    }
+  }, [problems]);
+
   // Local state for steps and remotes
   const [steps, setSteps] = useState<DiagnosticStep[]>([]);
   const [remotes, setRemotes] = useState<any[]>([]);
@@ -100,17 +119,54 @@ const StepsManagerNew = () => {
     loadInitialData();
   }, []);
 
+  // Helper function to convert snake_case to camelCase
+  const convertToCamelCase = (obj: any): any => {
+    if (obj === null || obj === undefined || typeof obj !== "object") {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(convertToCamelCase);
+    }
+
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      // Convert snake_case to camelCase
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) =>
+        letter.toUpperCase(),
+      );
+      result[camelKey] =
+        typeof value === "object" ? convertToCamelCase(value) : value;
+    }
+    return result;
+  };
+
   const loadInitialData = async () => {
     try {
       setLoading(true);
 
-      // Load steps
-      const stepsResponse = await stepsApi.getAll();
-      setSteps(stepsResponse || []);
+      // Load steps using correct API method
+      const stepsResponse = await stepsApi.getSteps(1, 1000); // Get first 1000 steps
+      console.log("🔍 Raw steps response:", stepsResponse);
+
+      // Extract data and convert snake_case to camelCase
+      const rawStepsData = stepsResponse?.data || [];
+      const convertedSteps = convertToCamelCase(rawStepsData);
+      console.log("🔍 Converted steps:", convertedSteps);
+      console.log(
+        "🔍 Steps deviceId/problemId:",
+        (convertedSteps || []).map((s) => ({
+          id: s.id,
+          deviceId: s.deviceId,
+          problemId: s.problemId,
+        })),
+      );
+      setSteps(convertedSteps || []);
 
       // Load remotes
       const remotesResponse = await remotesApi.getAll();
-      setRemotes(remotesResponse || []);
+      const remotesData = remotesResponse?.data || remotesResponse || [];
+      setRemotes(Array.isArray(remotesData) ? remotesData : []);
     } catch (error) {
       console.error("Error loading initial data:", error);
     } finally {
@@ -185,7 +241,7 @@ const StepsManagerNew = () => {
     }
   };
 
-  // Загрузка отметок для TV ��нтерфейса
+  // Загрузка отметок для TV ��нтерфе��са
 
   // Сох��анение отметок TV интерфейса
   const saveTVInterfaceMarks = async (marks: TVInterfaceMark[]) => {
@@ -336,6 +392,26 @@ const StepsManagerNew = () => {
     }
   };
 
+  // Helper function to convert camelCase to snake_case for API
+  const convertToSnakeCase = (obj: any): any => {
+    if (obj === null || obj === undefined || typeof obj !== "object") {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(convertToSnakeCase);
+    }
+
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      // Convert camelCase to snake_case
+      const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+      result[snakeKey] =
+        typeof value === "object" ? convertToSnakeCase(value) : value;
+    }
+    return result;
+  };
+
   const handleCreate = async () => {
     try {
       const deviceSteps = steps.filter(
@@ -379,8 +455,14 @@ const StepsManagerNew = () => {
         isActive: true,
       };
 
+      // Convert to snake_case for API
+      const stepPayload = convertToSnakeCase(stepData);
+      // Remove step_number to let backend auto-assign
+      delete stepPayload.step_number;
+
       // Create step via API
-      const createdStep = await stepsApi.createStep(stepData);
+      const response = await stepsApi.createStep(stepPayload);
+      const createdStep = response?.data;
 
       // If step has TV interface markings, save them
       if (
@@ -434,7 +516,9 @@ const StepsManagerNew = () => {
     };
 
     try {
-      await stepsApi.updateStep(selectedStep.id, updatedData);
+      // Convert to snake_case for API
+      const updatePayload = convertToSnakeCase(updatedData);
+      await stepsApi.updateStep(selectedStep.id, updatePayload);
 
       // If step has TV interface markings, update them
       if (
@@ -694,11 +778,25 @@ const StepsManagerNew = () => {
 
   const getDeviceName = (deviceId: string) => {
     const device = (devices || []).find((d) => d.id === deviceId);
+    if (!device) {
+      console.log(`🔍 Device not found for ID: "${deviceId}"`);
+      console.log(
+        "Available devices:",
+        (devices || []).map((d) => ({ id: d.id, name: d.name })),
+      );
+    }
     return device?.name || "Неизвестная приставка";
   };
 
   const getProblemTitle = (problemId: string) => {
     const problem = (problems || []).find((p) => p.id === problemId);
+    if (!problem) {
+      console.log(`🔍 Problem not found for ID: "${problemId}"`);
+      console.log(
+        "Available problems:",
+        (problems || []).map((p) => ({ id: p.id, title: p.title })),
+      );
+    }
     return problem?.title || "Неизвестная проблема";
   };
 
@@ -789,7 +887,9 @@ const StepsManagerNew = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingRemoteButton ? "Отменить выбор" : "Выбрать позицию"}
+                  {isPickingRemoteButton
+                    ? "Отменить выбо��"
+                    : "Выбрать позицию"}
                 </Button>
                 <Button
                   variant="outline"

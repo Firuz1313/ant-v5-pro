@@ -124,14 +124,21 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
 
   // Editor state
   const [marks, setMarks] = useState<TVInterfaceMark[]>(initialMarks);
-  const [selectedMark, setSelectedMark] = useState<TVInterfaceMark | null>(null);
+  const [selectedMark, setSelectedMark] = useState<TVInterfaceMark | null>(
+    null,
+  );
   const [editingMark, setEditingMark] = useState<TVInterfaceMark | null>(null);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
 
   // Tool state
-  const [activeTool, setActiveTool] = useState<"select" | "point" | "rectangle" | "circle" | "polygon">("select");
+  const [activeTool, setActiveTool] = useState<
+    "select" | "point" | "rectangle" | "circle" | "polygon"
+  >("select");
   const [isDrawing, setIsDrawing] = useState(false);
-  const [drawingStart, setDrawingStart] = useState<{ x: number; y: number } | null>(null);
+  const [drawingStart, setDrawingStart] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
   const [tempPoints, setTempPoints] = useState<{ x: number; y: number }[]>([]);
 
   // Canvas state
@@ -161,7 +168,14 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     hint_text: "",
     tooltip_text: "",
     warning_text: "",
-    animation: "none" as "pulse" | "glow" | "bounce" | "shake" | "fade" | "blink" | "none",
+    animation: "none" as
+      | "pulse"
+      | "glow"
+      | "bounce"
+      | "shake"
+      | "fade"
+      | "blink"
+      | "none",
     animation_duration: 1000,
     animation_delay: 0,
     priority: "normal" as "low" | "normal" | "high" | "critical",
@@ -211,48 +225,72 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
-    // Set canvas size
-    canvas.width = canvasSize.width * scale;
-    canvas.height = canvasSize.height * scale;
+    // Use requestAnimationFrame to prevent ResizeObserver loops
+    requestAnimationFrame(() => {
+      // Set canvas size
+      canvas.width = canvasSize.width * scale;
+      canvas.height = canvasSize.height * scale;
 
-    // Clear canvas
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
+      // Set CSS size to match canvas buffer
+      canvas.style.width = `${canvasSize.width * scale}px`;
+      canvas.style.height = `${canvasSize.height * scale}px`;
 
-    // Save context
-    ctx.save();
+      // Clear canvas
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-    // Apply transformations
-    ctx.scale(scale, scale);
-    ctx.translate(offset.x, offset.y);
+      // Save context
+      ctx.save();
 
-    // Draw image
-    ctx.drawImage(img, 0, 0, canvasSize.width, canvasSize.height);
+      // Apply transformations
+      ctx.scale(scale, scale);
+      ctx.translate(offset.x, offset.y);
 
-    // Draw marks
-    marks.filter(mark => mark.is_visible).forEach((mark) => {
-      drawMark(ctx, mark, mark.id === selectedMark?.id);
+      // Draw image
+      ctx.drawImage(img, 0, 0, canvasSize.width, canvasSize.height);
+
+      // Draw marks
+      marks
+        .filter((mark) => mark.is_visible)
+        .forEach((mark) => {
+          drawMark(ctx, mark, mark.id === selectedMark?.id);
+        });
+
+      // Draw temporary shapes while drawing
+      if (isDrawing && drawingStart && activeTool !== "select") {
+        drawTemporaryShape(ctx);
+      }
+
+      // Draw polygon temp points
+      if (activeTool === "polygon" && tempPoints.length > 0) {
+        drawPolygonPreview(ctx);
+      }
+
+      // Restore context
+      ctx.restore();
     });
+  }, [
+    marks,
+    selectedMark,
+    scale,
+    offset,
+    imageLoaded,
+    canvasSize,
+    isDrawing,
+    drawingStart,
+    tempPoints,
+    activeTool,
+  ]);
 
-    // Draw temporary shapes while drawing
-    if (isDrawing && drawingStart && activeTool !== "select") {
-      drawTemporaryShape(ctx);
-    }
-
-    // Draw polygon temp points
-    if (activeTool === "polygon" && tempPoints.length > 0) {
-      drawPolygonPreview(ctx);
-    }
-
-    // Restore context
-    ctx.restore();
-  }, [marks, selectedMark, scale, offset, imageLoaded, canvasSize, isDrawing, drawingStart, tempPoints, activeTool]);
-
-  const drawMark = (ctx: CanvasRenderingContext2D, mark: TVInterfaceMark, isSelected: boolean) => {
+  const drawMark = (
+    ctx: CanvasRenderingContext2D,
+    mark: TVInterfaceMark,
+    isSelected: boolean,
+  ) => {
     ctx.save();
 
     // Set styles
     ctx.fillStyle = mark.background_color || "rgba(59, 130, 246, 0.2)";
-    ctx.strokeStyle = isSelected ? "#ef4444" : (mark.border_color || mark.color);
+    ctx.strokeStyle = isSelected ? "#ef4444" : mark.border_color || mark.color;
     ctx.lineWidth = isSelected ? mark.border_width + 2 : mark.border_width;
     ctx.globalAlpha = mark.opacity;
 
@@ -268,22 +306,40 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
           const radius = Math.max(size.width, size.height) / 2;
           ctx.arc(pos.x, pos.y, radius, 0, Math.PI * 2);
         } else {
-          ctx.ellipse(pos.x, pos.y, size.width / 2, size.height / 2, 0, 0, Math.PI * 2);
+          ctx.ellipse(
+            pos.x,
+            pos.y,
+            size.width / 2,
+            size.height / 2,
+            0,
+            0,
+            Math.PI * 2,
+          );
         }
         ctx.fill();
         ctx.stroke();
         break;
 
       case "rectangle":
-        ctx.fillRect(pos.x - size.width / 2, pos.y - size.height / 2, size.width, size.height);
-        ctx.strokeRect(pos.x - size.width / 2, pos.y - size.height / 2, size.width, size.height);
+        ctx.fillRect(
+          pos.x - size.width / 2,
+          pos.y - size.height / 2,
+          size.width,
+          size.height,
+        );
+        ctx.strokeRect(
+          pos.x - size.width / 2,
+          pos.y - size.height / 2,
+          size.width,
+          size.height,
+        );
         break;
 
       case "polygon":
         if (mark.coordinates && mark.coordinates.length > 2) {
           ctx.beginPath();
           ctx.moveTo(mark.coordinates[0].x, mark.coordinates[0].y);
-          mark.coordinates.slice(1).forEach(point => {
+          mark.coordinates.slice(1).forEach((point) => {
             ctx.lineTo(point.x, point.y);
           });
           ctx.closePath();
@@ -306,7 +362,10 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     ctx.restore();
   };
 
-  const drawSelectionHandles = (ctx: CanvasRenderingContext2D, mark: TVInterfaceMark) => {
+  const drawSelectionHandles = (
+    ctx: CanvasRenderingContext2D,
+    mark: TVInterfaceMark,
+  ) => {
     ctx.save();
     ctx.fillStyle = "#ef4444";
     ctx.strokeStyle = "#ffffff";
@@ -325,28 +384,62 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
         { x: pos.x - size.width / 2, y: pos.y + size.height / 2 }, // bottom-left
       ];
 
-      handles.forEach(handle => {
-        ctx.fillRect(handle.x - handleSize / 2, handle.y - handleSize / 2, handleSize, handleSize);
-        ctx.strokeRect(handle.x - handleSize / 2, handle.y - handleSize / 2, handleSize, handleSize);
+      handles.forEach((handle) => {
+        ctx.fillRect(
+          handle.x - handleSize / 2,
+          handle.y - handleSize / 2,
+          handleSize,
+          handleSize,
+        );
+        ctx.strokeRect(
+          handle.x - handleSize / 2,
+          handle.y - handleSize / 2,
+          handleSize,
+          handleSize,
+        );
       });
     } else if (mark.shape === "polygon" && mark.coordinates) {
-      mark.coordinates.forEach(point => {
-        ctx.fillRect(point.x - handleSize / 2, point.y - handleSize / 2, handleSize, handleSize);
-        ctx.strokeRect(point.x - handleSize / 2, point.y - handleSize / 2, handleSize, handleSize);
+      mark.coordinates.forEach((point) => {
+        ctx.fillRect(
+          point.x - handleSize / 2,
+          point.y - handleSize / 2,
+          handleSize,
+          handleSize,
+        );
+        ctx.strokeRect(
+          point.x - handleSize / 2,
+          point.y - handleSize / 2,
+          handleSize,
+          handleSize,
+        );
       });
     } else {
       // Circle/ellipse - draw center handle
       const pos = mark.position;
-      ctx.fillRect(pos.x - handleSize / 2, pos.y - handleSize / 2, handleSize, handleSize);
-      ctx.strokeRect(pos.x - handleSize / 2, pos.y - handleSize / 2, handleSize, handleSize);
+      ctx.fillRect(
+        pos.x - handleSize / 2,
+        pos.y - handleSize / 2,
+        handleSize,
+        handleSize,
+      );
+      ctx.strokeRect(
+        pos.x - handleSize / 2,
+        pos.y - handleSize / 2,
+        handleSize,
+        handleSize,
+      );
     }
 
     ctx.restore();
   };
 
-  const drawMarkLabel = (ctx: CanvasRenderingContext2D, mark: TVInterfaceMark, isSelected: boolean) => {
+  const drawMarkLabel = (
+    ctx: CanvasRenderingContext2D,
+    mark: TVInterfaceMark,
+    isSelected: boolean,
+  ) => {
     ctx.save();
-    
+
     const fontSize = 12 / scale; // Scale font inversely to zoom
     ctx.font = `${fontSize}px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif`;
     ctx.fillStyle = isSelected ? "#ef4444" : "#1f2937";
@@ -387,7 +480,8 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
 
       case "circle":
         const radius = Math.sqrt(
-          Math.pow(currentPos.x - drawingStart.x, 2) + Math.pow(currentPos.y - drawingStart.y, 2)
+          Math.pow(currentPos.x - drawingStart.x, 2) +
+            Math.pow(currentPos.y - drawingStart.y, 2),
         );
         ctx.beginPath();
         ctx.arc(drawingStart.x, drawingStart.y, radius, 0, Math.PI * 2);
@@ -410,7 +504,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
 
     ctx.beginPath();
     ctx.moveTo(tempPoints[0].x, tempPoints[0].y);
-    tempPoints.slice(1).forEach(point => {
+    tempPoints.slice(1).forEach((point) => {
       ctx.lineTo(point.x, point.y);
     });
 
@@ -422,7 +516,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     // Draw points
     ctx.setLineDash([]);
     ctx.fillStyle = "#3b82f6";
-    tempPoints.forEach(point => {
+    tempPoints.forEach((point) => {
       ctx.fillRect(point.x - 3, point.y - 3, 6, 6);
     });
 
@@ -434,8 +528,8 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     if (!canvas) return { x: 0, y: 0 };
 
     const rect = canvas.getBoundingClientRect();
-    const x = ((event.clientX - rect.left) / scale - offset.x);
-    const y = ((event.clientY - rect.top) / scale - offset.y);
+    const x = (event.clientX - rect.left) / scale - offset.x;
+    const y = (event.clientY - rect.top) / scale - offset.y;
 
     return { x, y };
   };
@@ -458,7 +552,9 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     }
   };
 
-  const handleCanvasMouseDown = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCanvasMouseDown = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+  ) => {
     if (readonly) return;
 
     const coords = getCanvasCoordinates(event);
@@ -486,7 +582,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
 
   const handleSelectClick = (coords: { x: number; y: number }) => {
     // Find clicked mark
-    const clickedMark = marks.find(mark => isPointInMark(coords, mark));
+    const clickedMark = marks.find((mark) => isPointInMark(coords, mark));
     setSelectedMark(clickedMark || null);
   };
 
@@ -512,17 +608,21 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
       }
       setTempPoints([]);
     } else {
-      setTempPoints(prev => [...prev, coords]);
+      setTempPoints((prev) => [...prev, coords]);
     }
   };
 
-  const handleRectangleComplete = (start: { x: number; y: number }, end: { x: number; y: number }) => {
+  const handleRectangleComplete = (
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+  ) => {
     const width = Math.abs(end.x - start.x);
     const height = Math.abs(end.y - start.y);
     const centerX = (start.x + end.x) / 2;
     const centerY = (start.y + end.y) / 2;
 
-    if (width > 5 && height > 5) { // Minimum size check
+    if (width > 5 && height > 5) {
+      // Minimum size check
       createMark({
         mark_type: "zone",
         shape: "rectangle",
@@ -532,12 +632,16 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     }
   };
 
-  const handleCircleComplete = (start: { x: number; y: number }, end: { x: number; y: number }) => {
+  const handleCircleComplete = (
+    start: { x: number; y: number },
+    end: { x: number; y: number },
+  ) => {
     const radius = Math.sqrt(
-      Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2)
+      Math.pow(end.x - start.x, 2) + Math.pow(end.y - start.y, 2),
     );
 
-    if (radius > 5) { // Minimum radius check
+    if (radius > 5) {
+      // Minimum radius check
       createMark({
         mark_type: "zone",
         shape: "circle",
@@ -547,14 +651,19 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     }
   };
 
-  const isPointInMark = (point: { x: number; y: number }, mark: TVInterfaceMark): boolean => {
+  const isPointInMark = (
+    point: { x: number; y: number },
+    mark: TVInterfaceMark,
+  ): boolean => {
     const pos = mark.position;
     const size = mark.size || { width: 20, height: 20 };
 
     switch (mark.shape) {
       case "circle":
         const radius = Math.max(size.width, size.height) / 2;
-        const distance = Math.sqrt(Math.pow(point.x - pos.x, 2) + Math.pow(point.y - pos.y, 2));
+        const distance = Math.sqrt(
+          Math.pow(point.x - pos.x, 2) + Math.pow(point.y - pos.y, 2),
+        );
         return distance <= radius;
 
       case "rectangle":
@@ -573,7 +682,10 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
         for (let i = 0, j = coords.length - 1; i < coords.length; j = i++) {
           if (
             coords[i].y > point.y !== coords[j].y > point.y &&
-            point.x < ((coords[j].x - coords[i].x) * (point.y - coords[i].y)) / (coords[j].y - coords[i].y) + coords[i].x
+            point.x <
+              ((coords[j].x - coords[i].x) * (point.y - coords[i].y)) /
+                (coords[j].y - coords[i].y) +
+                coords[i].x
           ) {
             inside = !inside;
           }
@@ -613,7 +725,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
       ...partialMark,
     };
 
-    setMarks(prev => [...prev, newMark]);
+    setMarks((prev) => [...prev, newMark]);
     setSelectedMark(newMark);
     setActiveTool("select");
 
@@ -624,21 +736,21 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
   };
 
   const updateMark = (markId: string, updates: Partial<TVInterfaceMark>) => {
-    setMarks(prev =>
-      prev.map(mark =>
+    setMarks((prev) =>
+      prev.map((mark) =>
         mark.id === markId
           ? { ...mark, ...updates, updated_at: new Date().toISOString() }
-          : mark
-      )
+          : mark,
+      ),
     );
 
     if (selectedMark?.id === markId) {
-      setSelectedMark(prev => prev ? { ...prev, ...updates } : null);
+      setSelectedMark((prev) => (prev ? { ...prev, ...updates } : null));
     }
   };
 
   const deleteMark = (markId: string) => {
-    setMarks(prev => prev.filter(mark => mark.id !== markId));
+    setMarks((prev) => prev.filter((mark) => mark.id !== markId));
     if (selectedMark?.id === markId) {
       setSelectedMark(null);
     }
@@ -704,8 +816,8 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     });
   };
 
-  const handleZoomIn = () => setScale(prev => Math.min(prev * 1.2, 5));
-  const handleZoomOut = () => setScale(prev => Math.max(prev / 1.2, 0.1));
+  const handleZoomIn = () => setScale((prev) => Math.min(prev * 1.2, 5));
+  const handleZoomOut = () => setScale((prev) => Math.max(prev / 1.2, 0.1));
   const handleResetView = () => {
     setScale(1);
     setOffset({ x: 0, y: 0 });
@@ -714,11 +826,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
   return (
     <div className={`tv-interface-editor ${className}`}>
       {/* Hidden image element for loading */}
-      <img
-        ref={imageRef}
-        style={{ display: "none" }}
-        alt="TV Interface"
-      />
+      <img ref={imageRef} style={{ display: "none" }} alt="TV Interface" />
 
       {/* Toolbar */}
       {showControls && (
@@ -807,9 +915,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
               {/* Selected mark info */}
               {selectedMark && (
                 <div className="flex items-center gap-2 ml-auto">
-                  <Badge variant="outline">
-                    {selectedMark.name}
-                  </Badge>
+                  <Badge variant="outline">{selectedMark.name}</Badge>
                   {!readonly && (
                     <DropdownMenu>
                       <DropdownMenuTrigger asChild>
@@ -818,12 +924,18 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                         </Button>
                       </DropdownMenuTrigger>
                       <DropdownMenuContent>
-                        <DropdownMenuItem onClick={() => openEditDialog(selectedMark)}>
+                        <DropdownMenuItem
+                          onClick={() => openEditDialog(selectedMark)}
+                        >
                           <Edit3 className="h-4 w-4 mr-2" />
                           Редактировать
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
-                          onClick={() => updateMark(selectedMark.id, { is_visible: !selectedMark.is_visible })}
+                        <DropdownMenuItem
+                          onClick={() =>
+                            updateMark(selectedMark.id, {
+                              is_visible: !selectedMark.is_visible,
+                            })
+                          }
                         >
                           {selectedMark.is_visible ? (
                             <>
@@ -837,7 +949,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                             </>
                           )}
                         </DropdownMenuItem>
-                        <DropdownMenuItem 
+                        <DropdownMenuItem
                           onClick={() => deleteMark(selectedMark.id)}
                           className="text-red-600"
                         >
@@ -929,7 +1041,8 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                   <div className="flex items-center justify-between mt-2 text-xs text-gray-500">
                     <span>{mark.shape}</span>
                     <span>
-                      ({Math.round(mark.position.x)}, {Math.round(mark.position.y)})
+                      ({Math.round(mark.position.x)},{" "}
+                      {Math.round(mark.position.y)})
                     </span>
                   </div>
                 </div>
@@ -954,7 +1067,9 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Input
                   id="mark-name"
                   value={markForm.name}
-                  onChange={(e) => setMarkForm(prev => ({ ...prev, name: e.target.value }))}
+                  onChange={(e) =>
+                    setMarkForm((prev) => ({ ...prev, name: e.target.value }))
+                  }
                   placeholder="Название отметки"
                 />
               </div>
@@ -964,7 +1079,12 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Textarea
                   id="mark-description"
                   value={markForm.description}
-                  onChange={(e) => setMarkForm(prev => ({ ...prev, description: e.target.value }))}
+                  onChange={(e) =>
+                    setMarkForm((prev) => ({
+                      ...prev,
+                      description: e.target.value,
+                    }))
+                  }
                   placeholder="Описание отметки"
                   rows={3}
                 />
@@ -976,7 +1096,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                   <Select
                     value={markForm.mark_type}
                     onValueChange={(value: "point" | "zone" | "area") =>
-                      setMarkForm(prev => ({ ...prev, mark_type: value }))
+                      setMarkForm((prev) => ({ ...prev, mark_type: value }))
                     }
                   >
                     <SelectTrigger>
@@ -994,9 +1114,9 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                   <Label>Приоритет</Label>
                   <Select
                     value={markForm.priority}
-                    onValueChange={(value: "low" | "normal" | "high" | "critical") =>
-                      setMarkForm(prev => ({ ...prev, priority: value }))
-                    }
+                    onValueChange={(
+                      value: "low" | "normal" | "high" | "critical",
+                    ) => setMarkForm((prev) => ({ ...prev, priority: value }))}
                   >
                     <SelectTrigger>
                       <SelectValue />
@@ -1019,7 +1139,12 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Input
                   id="action-value"
                   value={markForm.action_value}
-                  onChange={(e) => setMarkForm(prev => ({ ...prev, action_value: e.target.value }))}
+                  onChange={(e) =>
+                    setMarkForm((prev) => ({
+                      ...prev,
+                      action_value: e.target.value,
+                    }))
+                  }
                   placeholder="Значение или данные действия"
                 />
               </div>
@@ -1029,7 +1154,12 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Textarea
                   id="action-description"
                   value={markForm.action_description}
-                  onChange={(e) => setMarkForm(prev => ({ ...prev, action_description: e.target.value }))}
+                  onChange={(e) =>
+                    setMarkForm((prev) => ({
+                      ...prev,
+                      action_description: e.target.value,
+                    }))
+                  }
                   placeholder="Что должен сделать пользователь"
                   rows={2}
                 />
@@ -1040,7 +1170,12 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Textarea
                   id="hint-text"
                   value={markForm.hint_text}
-                  onChange={(e) => setMarkForm(prev => ({ ...prev, hint_text: e.target.value }))}
+                  onChange={(e) =>
+                    setMarkForm((prev) => ({
+                      ...prev,
+                      hint_text: e.target.value,
+                    }))
+                  }
                   placeholder="Подсказка для пользователя"
                   rows={2}
                 />
@@ -1051,8 +1186,13 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Input
                   id="expected-result"
                   value={markForm.expected_result}
-                  onChange={(e) => setMarkForm(prev => ({ ...prev, expected_result: e.target.value }))}
-                  placeholder="Что должно произойти"
+                  onChange={(e) =>
+                    setMarkForm((prev) => ({
+                      ...prev,
+                      expected_result: e.target.value,
+                    }))
+                  }
+                  placeholder="Что должно пр��изойти"
                 />
               </div>
             </div>
@@ -1068,7 +1208,9 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                   id="mark-color"
                   type="color"
                   value={markForm.color}
-                  onChange={(e) => setMarkForm(prev => ({ ...prev, color: e.target.value }))}
+                  onChange={(e) =>
+                    setMarkForm((prev) => ({ ...prev, color: e.target.value }))
+                  }
                 />
               </div>
 
@@ -1080,7 +1222,12 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                   min="1"
                   max="10"
                   value={markForm.border_width}
-                  onChange={(e) => setMarkForm(prev => ({ ...prev, border_width: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setMarkForm((prev) => ({
+                      ...prev,
+                      border_width: Number(e.target.value),
+                    }))
+                  }
                 />
               </div>
 
@@ -1093,7 +1240,12 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                   max="1"
                   step="0.1"
                   value={markForm.opacity}
-                  onChange={(e) => setMarkForm(prev => ({ ...prev, opacity: Number(e.target.value) }))}
+                  onChange={(e) =>
+                    setMarkForm((prev) => ({
+                      ...prev,
+                      opacity: Number(e.target.value),
+                    }))
+                  }
                 />
               </div>
 
@@ -1101,7 +1253,9 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
                 <Label>Анимация</Label>
                 <Select
                   value={markForm.animation}
-                  onValueChange={(value: any) => setMarkForm(prev => ({ ...prev, animation: value }))}
+                  onValueChange={(value: any) =>
+                    setMarkForm((prev) => ({ ...prev, animation: value }))
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue />
@@ -1121,12 +1275,13 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
           </div>
 
           <div className="flex justify-end gap-2 pt-4">
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
               Отмена
             </Button>
-            <Button onClick={saveMarkEdit}>
-              Сохранить
-            </Button>
+            <Button onClick={saveMarkEdit}>Сохранить</Button>
           </div>
         </DialogContent>
       </Dialog>

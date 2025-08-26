@@ -154,7 +154,7 @@ const StepFormFieldsComponent = React.memo(
 
       <div>
         <Label htmlFor={isEdit ? "edit-instruction" : "instruction"}>
-          Инструкция
+          Инст��укция
         </Label>
         <Textarea
           id={isEdit ? "edit-instruction" : "instruction"}
@@ -282,7 +282,7 @@ interface DiagnosticStep {
   id: string;
   problemId: string;
   deviceId: string;
-  stepNumber: number;
+  stepNumber?: number; // Optional - backend will auto-assign
   title: string;
   description: string;
   instruction: string;
@@ -295,8 +295,8 @@ interface DiagnosticStep {
   remoteId?: string;
   buttonPosition?: { x: number; y: number };
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string; // Optional - backend will auto-assign
+  updatedAt?: string; // Optional - backend will auto-assign
 }
 
 const StepsManager = () => {
@@ -350,22 +350,130 @@ const StepsManager = () => {
     }
   };
 
+  // Helper function to convert camelCase to snake_case for API
+  const convertToSnakeCase = (obj: any): any => {
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      // Convert camelCase to snake_case
+      const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+      result[snakeKey] = value;
+    }
+    return result;
+  };
+
   // Step management functions
   const createStep = async (step: DiagnosticStep) => {
     try {
-      const response = await stepsApi.createStep(step);
+      // Convert camelCase to snake_case for backend validation
+      const stepPayload = convertToSnakeCase(step);
+
+      // Remove frontend-only fields and let backend set timestamps
+      delete stepPayload.created_at;
+      delete stepPayload.updated_at;
+      // Remove step_number to let backend auto-assign
+      delete stepPayload.step_number;
+
+      // Ensure ID is included (backend validation requires it)
+      if (!stepPayload.id) {
+        stepPayload.id =
+          step.id ||
+          `step-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+      }
+
+      // Convert empty strings to undefined for optional fields
+      if (stepPayload.required_action === "") {
+        delete stepPayload.required_action;
+      }
+      if (stepPayload.hint === "") {
+        delete stepPayload.hint;
+      }
+      if (stepPayload.description === "") {
+        delete stepPayload.description;
+      }
+
+      // Remove fields that should not be sent if they are 'none' or undefined
+      if (
+        stepPayload.remote_id === "none" ||
+        stepPayload.remote_id === undefined
+      ) {
+        delete stepPayload.remote_id;
+      }
+      if (
+        stepPayload.tv_interface_id === "none" ||
+        stepPayload.tv_interface_id === undefined
+      ) {
+        delete stepPayload.tv_interface_id;
+      }
+      if (
+        stepPayload.highlight_remote_button === "none" ||
+        stepPayload.highlight_remote_button === undefined
+      ) {
+        delete stepPayload.highlight_remote_button;
+      }
+      if (
+        stepPayload.highlight_tv_area === "none" ||
+        stepPayload.highlight_tv_area === undefined
+      ) {
+        delete stepPayload.highlight_tv_area;
+      }
+
+      console.log(
+        "📤 Sending step payload (backend will auto-assign step_number):",
+        stepPayload,
+      );
+
+      const response = await stepsApi.createStep(stepPayload);
       const newStep = response.data;
-      setSteps((prev) => [...prev, newStep]);
+
+      // Refresh the steps data to ensure we have the latest state
+      console.log("✅ Step created successfully, refreshing data...");
+      await loadInitialData();
+
       return newStep;
     } catch (error) {
       console.error("Error creating step:", error);
+      // Don't show toast here - let handleCreate handle error messaging
       throw error;
     }
   };
 
   const updateStep = async (id: string, data: any) => {
     try {
-      const response = await stepsApi.updateStep(id, data);
+      // Convert camelCase to snake_case for backend validation
+      const updatePayload = convertToSnakeCase(data);
+
+      // Remove frontend-only fields
+      delete updatePayload.created_at;
+      delete updatePayload.updated_at;
+
+      // Convert empty strings to undefined for optional fields
+      if (updatePayload.required_action === "") {
+        delete updatePayload.required_action;
+      }
+      if (updatePayload.hint === "") {
+        delete updatePayload.hint;
+      }
+      if (updatePayload.description === "") {
+        delete updatePayload.description;
+      }
+
+      // Remove fields that should not be sent if they are 'none' or undefined
+      if (updatePayload.remote_id === "none") {
+        delete updatePayload.remote_id;
+      }
+      if (updatePayload.tv_interface_id === "none") {
+        delete updatePayload.tv_interface_id;
+      }
+      if (updatePayload.highlight_remote_button === "none") {
+        delete updatePayload.highlight_remote_button;
+      }
+      if (updatePayload.highlight_tv_area === "none") {
+        delete updatePayload.highlight_tv_area;
+      }
+
+      console.log("📤 Sending update payload:", updatePayload);
+
+      const response = await stepsApi.updateStep(id, updatePayload);
       const updatedStep = response.data;
       setSteps((prev) =>
         prev.map((step) =>
@@ -375,6 +483,12 @@ const StepsManager = () => {
       return updatedStep;
     } catch (error) {
       console.error("Error updating step:", error);
+      toast({
+        title: "Ошибка обновления шага",
+        description:
+          error instanceof Error ? error.message : "Не удалось обновить шаг.",
+        variant: "destructive",
+      });
       throw error;
     }
   };
@@ -441,6 +555,7 @@ const StepsManager = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isRemoteEditorOpen, setIsRemoteEditorOpen] = useState(false);
   const [isTVInterfaceEditorOpen, setIsTVInterfaceEditorOpen] = useState(false);
+  const [isCreatingStep, setIsCreatingStep] = useState(false);
 
   // TV Interfaces state
   const [tvInterfaces, setTVInterfaces] = useState<TVInterface[]>([]);
@@ -551,7 +666,7 @@ const StepsManager = () => {
       // Показываем пользователю информацию об ошибке
       if (error instanceof Error && error.message.includes("Сетевая ошибка")) {
         // Можно добавить toast уведомление
-        console.error("П��облемы с подключением к с��рверу");
+        console.error("П��облемы с подклю��ением к с��рверу");
       }
     } finally {
       setLoadingTVInterfaces(false);
@@ -601,7 +716,7 @@ const StepsManager = () => {
       }
       toast({
         title: "Интерфейс не найден",
-        description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список обн��влён.`,
+        description: `TV интерфей�� "${tvInterface.name}" больше не доступен. Список обн��влён.`,
         variant: "destructive",
       });
       return;
@@ -650,7 +765,7 @@ const StepsManager = () => {
           }
           toast({
             title: "Интерфейс не найден",
-            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Спис��к интерфейсов обновлён.`,
+            description: `TV интерфе��с "${tvInterface.name}" больш�� не существует. Спис��к интерфейсов обновлён.`,
             variant: "destructive",
           });
           return; // Don't open editor for non-existent interface
@@ -664,7 +779,7 @@ const StepsManager = () => {
         error,
       );
       toast({
-        title: "Предупреждение",
+        title: "Предупрежд��ние",
         description: `Не удалось загрузить по��ные данные интерфейса ${tvInterface.name}. Используются кэшированные данные.`,
         variant: "destructive",
       });
@@ -717,46 +832,89 @@ const StepsManager = () => {
     return getRemotesForDevice(filterDevice);
   };
 
+  // Remove calculateNextStepNumber function - let backend handle auto-numbering
+
   const handleCreate = async () => {
-    const deviceSteps = steps.filter(
-      (s) =>
-        s.deviceId === formData.deviceId && s.problemId === formData.problemId,
-    );
-    const maxStepNumber =
-      deviceSteps.length > 0
-        ? Math.max(...deviceSteps.map((s) => s.stepNumber))
-        : 0;
+    // Prevent multiple simultaneous creation attempts
+    if (isCreatingStep) {
+      console.log(
+        "⏸️ Step creation already in progress, ignoring duplicate request",
+      );
+      return;
+    }
 
-    const newStep: DiagnosticStep = {
-      id: `step-${formData.deviceId}-${formData.problemId}-${Date.now()}`,
-      ...formData,
-      highlightRemoteButton:
-        formData.highlightRemoteButton === "none"
-          ? undefined
-          : formData.highlightRemoteButton,
-      highlightTVArea:
-        formData.highlightTVArea === "none"
-          ? undefined
-          : formData.highlightTVArea,
-      remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
-      tvInterfaceId:
-        formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
-      buttonPosition:
-        formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
-          ? undefined
-          : formData.buttonPosition,
-      stepNumber: maxStepNumber + 1,
-      isActive: true,
-      createdAt: new Date().toISOString().split("T")[0],
-      updatedAt: new Date().toISOString().split("T")[0],
-    };
+    // Validate required fields before creating step
+    if (
+      !formData.deviceId ||
+      !formData.problemId ||
+      !formData.title ||
+      !formData.instruction
+    ) {
+      toast({
+        title: "Ошибка валидации",
+        description:
+          "Заполните все обязательные поля: устройство, проблема, на��вание и инструкция.",
+        variant: "destructive",
+      });
+      return;
+    }
 
+    setIsCreatingStep(true);
     try {
-      await createStep(newStep);
+      // Let backend handle step numbering automatically - don't send stepNumber
+      const newStep: DiagnosticStep = {
+        id: `step-${formData.deviceId}-${formData.problemId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        ...formData,
+        highlightRemoteButton:
+          formData.highlightRemoteButton === "none"
+            ? undefined
+            : formData.highlightRemoteButton,
+        highlightTVArea:
+          formData.highlightTVArea === "none"
+            ? undefined
+            : formData.highlightTVArea,
+        remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
+        tvInterfaceId:
+          formData.tvInterfaceId === "none"
+            ? undefined
+            : formData.tvInterfaceId,
+        buttonPosition:
+          formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
+            ? undefined
+            : formData.buttonPosition,
+        // stepNumber: removed - let backend auto-assign
+        isActive: true,
+        // Don't set timestamps - let backend handle them
+      };
+
+      console.log(
+        "📝 Creating step with data (backend will auto-assign step number):",
+        {
+          id: newStep.id,
+          deviceId: newStep.deviceId,
+          problemId: newStep.problemId,
+          title: newStep.title,
+        },
+      );
+
+      const createdStep = await createStep(newStep);
       setIsCreateDialogOpen(false);
       resetForm();
+
+      toast({
+        title: "Шаг создан",
+        description: `Шаг "${createdStep.title}" успешно создан с номером ${createdStep.step_number || createdStep.stepNumber}.`,
+      });
     } catch (error) {
       console.error("Error creating step:", error);
+      toast({
+        title: "Ошибка создания шага",
+        description:
+          error instanceof Error ? error.message : "Не удалось создать шаг.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsCreatingStep(false);
     }
   };
 
@@ -803,9 +961,9 @@ const StepsManager = () => {
     const reorderedSteps = remainingSteps.map((step) => {
       if (
         step.problemId === stepToDelete.problemId &&
-        step.stepNumber > stepToDelete.stepNumber
+        (step.stepNumber || 0) > (stepToDelete.stepNumber || 0)
       ) {
-        return { ...step, stepNumber: step.stepNumber - 1 };
+        return { ...step, stepNumber: (step.stepNumber || 0) - 1 };
       }
       return step;
     });
@@ -838,7 +996,7 @@ const StepsManager = () => {
 
     const problemSteps = steps
       .filter((s) => s.problemId === step.problemId)
-      .sort((a, b) => a.stepNumber - b.stepNumber);
+      .sort((a, b) => (a.stepNumber || 0) - (b.stepNumber || 0));
 
     const currentIndex = problemSteps.findIndex((s) => s.id === stepId);
     const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
@@ -847,10 +1005,10 @@ const StepsManager = () => {
 
     const updatedSteps = steps.map((s) => {
       if (s.id === stepId) {
-        return { ...s, stepNumber: problemSteps[newIndex].stepNumber };
+        return { ...s, stepNumber: problemSteps[newIndex].stepNumber || 0 };
       }
       if (s.id === problemSteps[newIndex].id) {
-        return { ...s, stepNumber: step.stepNumber };
+        return { ...s, stepNumber: step.stepNumber || 0 };
       }
       return s;
     });
@@ -871,11 +1029,11 @@ const StepsManager = () => {
   const openEditDialog = (step: DiagnosticStep) => {
     setSelectedStep(step);
     setFormData({
-      deviceId: step.deviceId,
-      problemId: step.problemId,
-      title: step.title,
-      description: step.description,
-      instruction: step.instruction,
+      deviceId: step.deviceId || "",
+      problemId: step.problemId || "",
+      title: step.title || "",
+      description: step.description || "",
+      instruction: step.instruction || "",
       highlightRemoteButton: step.highlightRemoteButton || "none",
       highlightTVArea: step.highlightTVArea || "none",
       tvInterface: step.tvInterface || "home",
@@ -888,11 +1046,52 @@ const StepsManager = () => {
     setIsEditDialogOpen(true);
   };
 
-  const openRemoteEditor = () => {
-    const remote = getRemoteById(formData.remoteId);
-    if (remote) {
-      setSelectedRemote(remote);
-      setIsRemoteEditorOpen(true);
+  const openRemoteEditor = async () => {
+    if (!formData.remoteId || formData.remoteId === "none") {
+      toast({
+        title: "Пульт не выбран",
+        description: "Выберите пульт из списка перед редактированием позиции.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Try to get remote from local data first
+      let remote = remotes.find((r) => r.id === formData.remoteId);
+
+      if (!remote) {
+        // If not found in local data, try to fetch from API
+        console.log(`🔄 Fetching remote ${formData.remoteId} from API...`);
+        const response = await remotesApi.getById(formData.remoteId);
+        remote = response?.data || response;
+      }
+
+      if (remote) {
+        console.log("🎮 Opening remote editor with remote:", {
+          id: remote.id,
+          name: remote.name,
+          hasImageData: !!(remote.imageData || remote.image_data),
+          dimensions: remote.dimensions,
+          buttons: remote.buttons?.length || 0,
+        });
+
+        setSelectedRemote(remote);
+        setIsRemoteEditorOpen(true);
+      } else {
+        toast({
+          title: "Пульт не найден",
+          description: `Не удалось загрузить данны�� пульт�� ${formData.remoteId}.`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error loading remote:", error);
+      toast({
+        title: "Ошибка загрузки",
+        description: "Не удалось загрузить данные о пульте.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -926,6 +1125,127 @@ const StepsManager = () => {
     }
   };
 
+  const createTestRemoteImage = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 400;
+    canvas.height = 800;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return null;
+
+    // Заливаем фон пульта
+    const gradient = ctx.createLinearGradient(0, 0, 0, 800);
+    gradient.addColorStop(0, "#2d3748");
+    gradient.addColorStop(1, "#1a202c");
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.roundRect(20, 20, 360, 760, 30);
+    ctx.fill();
+
+    // Рамка пульта
+    ctx.strokeStyle = "#4a5568";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Кнопка питания (красная, сверху)
+    ctx.fillStyle = "#e53e3e";
+    ctx.beginPath();
+    ctx.arc(200, 80, 25, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = "#c53030";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Цифровые кнопки 1-9
+    const numberButtons = [
+      { x: 120, y: 150, num: "1" },
+      { x: 200, y: 150, num: "2" },
+      { x: 280, y: 150, num: "3" },
+      { x: 120, y: 210, num: "4" },
+      { x: 200, y: 210, num: "5" },
+      { x: 280, y: 210, num: "6" },
+      { x: 120, y: 270, num: "7" },
+      { x: 200, y: 270, num: "8" },
+      { x: 280, y: 270, num: "9" },
+      { x: 200, y: 330, num: "0" },
+    ];
+
+    numberButtons.forEach((btn) => {
+      ctx.fillStyle = "#4a5568";
+      ctx.beginPath();
+      ctx.roundRect(btn.x - 25, btn.y - 20, 50, 40, 8);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 20px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(btn.num, btn.x, btn.y + 7);
+    });
+
+    // Навигационные кнопки (D-pad)
+    const dpadCenter = { x: 200, y: 450 };
+
+    // Центральная кнопка OK
+    ctx.fillStyle = "#3182ce";
+    ctx.beginPath();
+    ctx.arc(dpadCenter.x, dpadCenter.y, 30, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 14px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("OK", dpadCenter.x, dpadCenter.y + 5);
+
+    // Стрелки навигации
+    const navButtons = [
+      { x: dpadCenter.x, y: dpadCenter.y - 60, text: "▲" },
+      { x: dpadCenter.x, y: dpadCenter.y + 60, text: "▼" },
+      { x: dpadCenter.x - 60, y: dpadCenter.y, text: "◀" },
+      { x: dpadCenter.x + 60, y: dpadCenter.y, text: "▶" },
+    ];
+
+    navButtons.forEach((btn) => {
+      ctx.fillStyle = "#4a5568";
+      ctx.beginPath();
+      ctx.roundRect(btn.x - 20, btn.y - 15, 40, 30, 6);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "20px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(btn.text, btn.x, btn.y + 7);
+    });
+
+    // Функциональные кнопки внизу
+    const funcButtons = [
+      { x: 120, y: 580, text: "HOME", color: "#38a169" },
+      { x: 200, y: 580, text: "MENU", color: "#d69e2e" },
+      { x: 280, y: 580, text: "BACK", color: "#718096" },
+      { x: 120, y: 640, text: "V-", color: "#4a5568" },
+      { x: 200, y: 640, text: "MUTE", color: "#e53e3e" },
+      { x: 280, y: 640, text: "V+", color: "#4a5568" },
+    ];
+
+    funcButtons.forEach((btn) => {
+      ctx.fillStyle = btn.color;
+      ctx.beginPath();
+      ctx.roundRect(btn.x - 30, btn.y - 15, 60, 30, 6);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 10px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(btn.text, btn.x, btn.y + 3);
+    });
+
+    // Брендинг внизу
+    ctx.fillStyle = "#a0aec0";
+    ctx.font = "14px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(selectedRemote?.name || "Universal Remote", 200, 750);
+
+    return canvas.toDataURL("image/png");
+  };
+
   const resetForm = () => {
     setFormData({
       deviceId: "",
@@ -952,7 +1272,7 @@ const StepsManager = () => {
 
   const getProblemTitle = (problemId: string) => {
     const problem = problems.find((p) => p.id === problemId);
-    return problem?.title || "Неизвестная проблема";
+    return problem?.title || "Неизвестная проб��ема";
   };
 
   const getGroupedSteps = () => {
@@ -977,32 +1297,87 @@ const StepsManager = () => {
   };
 
   const renderRemoteEditor = () => {
-    const remoteImage = customRemoteImage || selectedRemote?.imageData;
+    const remoteImage =
+      customRemoteImage ||
+      selectedRemote?.imageData ||
+      selectedRemote?.image_data;
+
+    console.log("🎮 Remote Editor Debug:", {
+      selectedRemote: selectedRemote
+        ? {
+            id: selectedRemote.id,
+            name: selectedRemote.name,
+            hasImageData: !!selectedRemote.imageData,
+            hasImage_data: !!selectedRemote.image_data,
+            imageDataLength:
+              selectedRemote.imageData?.length ||
+              selectedRemote.image_data?.length ||
+              0,
+          }
+        : null,
+      customRemoteImage: !!customRemoteImage,
+      finalRemoteImage: !!remoteImage,
+    });
 
     return (
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Canvas Area */}
         <div className="flex-1">
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 relative">
-            <canvas
-              ref={canvasRef}
-              width={400}
-              height={600}
-              className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair mx-auto"
-              style={{
-                backgroundImage: remoteImage ? `url(${remoteImage})` : "none",
-                backgroundSize: "contain",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-                backgroundColor: remoteImage ? "transparent" : "#f3f4f6",
-              }}
-              onClick={handleCanvasClick}
-            />
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 relative min-h-[600px]">
+            {remoteImage ? (
+              <canvas
+                ref={canvasRef}
+                width={400}
+                height={600}
+                className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair mx-auto"
+                style={{
+                  backgroundImage: `url(${remoteImage})`,
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                  backgroundColor: "transparent",
+                }}
+                onClick={handleCanvasClick}
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-[400px] h-[600px] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
+                  <div className="text-gray-500 dark:text-gray-400 space-y-2">
+                    <div className="text-4xl">📱</div>
+                    <p className="text-lg font-medium">
+                      Изображение пульта не найдено
+                    </p>
+                    <p className="text-sm">
+                      Загрузите изображение пульта, чтобы выбрать позицию кнопки
+                    </p>
+                    {selectedRemote && (
+                      <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-xs">
+                        <p>
+                          <strong>Отладка:</strong> Пульт "{selectedRemote.name}
+                          " (ID: {selectedRemote.id})
+                        </p>
+                        <p>imageData: {selectedRemote.imageData ? "✓" : "✗"}</p>
+                        <p>
+                          image_data: {selectedRemote.image_data ? "✓" : "✗"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <canvas
+                  ref={canvasRef}
+                  width={400}
+                  height={600}
+                  className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair mx-auto opacity-0 absolute"
+                  onClick={handleCanvasClick}
+                />
+              </div>
+            )}
 
             {/* Show selected position */}
             {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
               <div
-                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
                 style={{
                   left: `${(formData.buttonPosition.x / 400) * 100}%`,
                   top: `${(formData.buttonPosition.y / 600) * 100}%`,
@@ -1024,6 +1399,7 @@ const StepsManager = () => {
                   variant={isPickingButton ? "default" : "outline"}
                   onClick={() => setIsPickingButton(!isPickingButton)}
                   className="w-full"
+                  disabled={!remoteImage}
                 >
                   <Target className="h-4 w-4 mr-2" />
                   {isPickingButton ? "Отменить выбор" : "Выбрать п��зицию"}
@@ -1034,8 +1410,23 @@ const StepsManager = () => {
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  Загруз��ть изображение
+                  За��руз��ть изображение
                 </Button>
+                {!remoteImage && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      const testImage = createTestRemoteImage();
+                      if (testImage) {
+                        setCustomRemoteImage(testImage);
+                      }
+                    }}
+                    className="w-full"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Создать тестовый пульт
+                  </Button>
+                )}
               </div>
 
               <input
@@ -1046,7 +1437,34 @@ const StepsManager = () => {
                 className="hidden"
               />
 
-              {isPickingButton && (
+              {!remoteImage && (
+                <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-2">
+                    ⚠️ Изображение пульта отсутствует
+                  </p>
+                  <p className="text-xs text-yellow-600 dark:text-yellow-400 mb-3">
+                    Загрузите изображение или создайте тестовый пульт для выбора
+                    позиции кнопки.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // Открываем редактор пультов в новой вкладке
+                      window.open(
+                        `/admin/remote-builder?edit=${selectedRemote?.id}`,
+                        "_blank",
+                      );
+                    }}
+                    className="w-full text-xs"
+                  >
+                    <Settings className="h-3 w-3 mr-1" />
+                    Редакти��овать в Remote Builder
+                  </Button>
+                </div>
+              )}
+
+              {isPickingButton && remoteImage && (
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <p className="text-sm text-blue-700 dark:text-blue-300">
                     Кликнит�� на изображение пульта, чтобы указать позици��
@@ -1118,10 +1536,13 @@ const StepsManager = () => {
               <Button
                 onClick={handleCreate}
                 disabled={
-                  !formData.deviceId || !formData.problemId || !formData.title
+                  !formData.deviceId ||
+                  !formData.problemId ||
+                  !formData.title ||
+                  isCreatingStep
                 }
               >
-                Создать
+                {isCreatingStep ? "Создание..." : "Создать"}
               </Button>
             </div>
           </DialogContent>
@@ -1155,7 +1576,7 @@ const StepsManager = () => {
                   <SelectValue placeholder="Приставка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все приставки</SelectItem>
+                  <SelectItem value="all">Все пристав���и</SelectItem>
                   {getActiveDevices().map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       <div className="flex items-center">
@@ -1239,7 +1660,7 @@ const StepsManager = () => {
             <CardContent>
               <div className="space-y-3">
                 {group.steps
-                  .sort((a, b) => a.stepNumber - b.stepNumber)
+                  .sort((a, b) => (a.stepNumber || 0) - (b.stepNumber || 0))
                   .map((step) => (
                     <div
                       key={step.id}
@@ -1250,7 +1671,7 @@ const StepsManager = () => {
                           <div className="flex items-center space-x-2">
                             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                               <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                                {step.stepNumber}
+                                {step.stepNumber || 0}
                               </span>
                             </div>
                             <div className="flex flex-col space-y-1">
@@ -1259,7 +1680,7 @@ const StepsManager = () => {
                                 size="icon"
                                 className="h-6 w-6"
                                 onClick={() => handleMoveStep(step.id, "up")}
-                                disabled={step.stepNumber === 1}
+                                disabled={(step.stepNumber || 0) === 1}
                               >
                                 <ArrowUp className="h-3 w-3" />
                               </Button>
@@ -1269,7 +1690,7 @@ const StepsManager = () => {
                                 className="h-6 w-6"
                                 onClick={() => handleMoveStep(step.id, "down")}
                                 disabled={
-                                  step.stepNumber === group.steps.length
+                                  (step.stepNumber || 0) === group.steps.length
                                 }
                               >
                                 <ArrowDown className="h-3 w-3" />
@@ -1465,7 +1886,7 @@ const StepsManager = () => {
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Редактор областей интерфейса: {selectedTVInterface?.name}
+              Редактор областей инте��фейса: {selectedTVInterface?.name}
             </DialogTitle>
           </DialogHeader>
           {selectedTVInterface && (

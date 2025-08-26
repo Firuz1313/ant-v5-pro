@@ -195,11 +195,14 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-// Функция инициализации сервера
+// Функция инициализации сервер��
 async function startServer() {
   try {
-    // Исправляем схему tv_interfaces при старте
-    const { fixTVInterfacesSchema } = await import("./utils/database.js");
+    // Исправляем схему diagnostic_steps и tv_interfaces при старте
+    const { fixDiagnosticStepsSchema, fixTVInterfacesSchema } = await import(
+      "./utils/database.js"
+    );
+    await fixDiagnosticStepsSchema();
     await fixTVInterfacesSchema();
   } catch (error) {
     console.error(

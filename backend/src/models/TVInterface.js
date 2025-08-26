@@ -51,7 +51,7 @@ class TVInterface extends BaseModel {
 
       const params = [];
 
-      // Фильтр по device_id
+      // Фильтр п�� device_id
       if (filters.device_id) {
         query += ` AND ti.device_id = $${params.length + 1}`;
         params.push(filters.device_id);
@@ -197,8 +197,8 @@ class TVInterface extends BaseModel {
   // Об��овить интерфейс
   async update(id, data) {
     try {
-      // Проверяем существование интерфейса
-      const existing = await this.getById(id);
+      // Проверяем существование интерфейса (включая неактивные для админ-операций)
+      const existing = await this.getById(id, true);
       if (!existing) {
         throw new Error("TV интерфейс не найден");
       }
@@ -237,7 +237,7 @@ class TVInterface extends BaseModel {
       await super.updateById(id, updateData);
 
       // Возвращаем обновленный интерфейс с данными устройства
-      const updated = await this.getById(id);
+      const updated = await this.getById(id, true);
       return updated;
     } catch (error) {
       console.error("Error updating TV interface:", error);
@@ -325,7 +325,7 @@ class TVInterface extends BaseModel {
     }
   }
 
-  // Дублировать интерфейс
+  // Дублировать инт��рфейс
   async duplicate(id, newName) {
     try {
       const original = await this.getById(id);

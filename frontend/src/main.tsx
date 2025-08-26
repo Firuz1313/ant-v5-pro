@@ -4,12 +4,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import App from "./App.tsx";
 import "./index.css";
 
-// Suppress harmless ResizeObserver warnings
-window.addEventListener("error", (e) => {
-  if (e.message.includes("ResizeObserver loop")) {
-    e.stopImmediatePropagation();
-  }
-});
+// ResizeObserver loop detection (for development)
+if (import.meta.env.DEV) {
+  window.addEventListener("error", (e) => {
+    if (e.message.includes("ResizeObserver loop")) {
+      console.warn(
+        "ResizeObserver loop detected - this indicates a potential performance issue:",
+        e,
+      );
+      // Don't suppress in development to help identify issues
+      // e.stopImmediatePropagation();
+    }
+  });
+}
 
 // Suppress React Router future flag warnings
 const originalWarn = console.warn;
