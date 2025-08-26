@@ -5,6 +5,10 @@ import {
   analyzeSlowQueries,
   cleanupLargeScreenshots
 } from '../controllers/optimizationController.js';
+import {
+  diagnoseTVInterfaceMarksTable,
+  createMinimalTVInterfaceMarksTable
+} from '../controllers/tvInterfaceMarkDiagnosticController.js';
 import requestLogger from '../middleware/requestLogger.js';
 
 const router = express.Router();
@@ -40,6 +44,20 @@ router.get('/tv-interfaces/analyze-queries', analyzeSlowQueries);
  * @query {number} maxSizeMB - Maximum screenshot size in MB (default: 5)
  */
 router.get('/tv-interfaces/cleanup-screenshots', cleanupLargeScreenshots);
+
+/**
+ * @route GET /api/v1/optimization/tv-interface-marks/diagnose
+ * @desc Diagnose TV interface marks table structure
+ * @access Admin
+ */
+router.get('/tv-interface-marks/diagnose', diagnoseTVInterfaceMarksTable);
+
+/**
+ * @route POST /api/v1/optimization/tv-interface-marks/create-minimal
+ * @desc Create minimal TV interface marks table structure
+ * @access Admin
+ */
+router.post('/tv-interface-marks/create-minimal', createMinimalTVInterfaceMarksTable);
 
 // Middleware для обработки ошибок маршрутов
 router.use((error, req, res, next) => {
