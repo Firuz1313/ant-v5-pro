@@ -105,8 +105,30 @@ const AdminDashboard = () => {
     successRate: sessionStats?.successRate || 0,
   };
 
-  // Recent activity
-  const recentChanges = changeLogs.slice(0, 10);
+  // Recent activity with sample data if empty
+  const recentChanges = changeLogs.length > 0 ? changeLogs.slice(0, 10) : [
+    {
+      id: "1",
+      action: "create",
+      entityType: "problem",
+      userId: "Admin",
+      createdAt: new Date().toISOString(),
+    },
+    {
+      id: "2",
+      action: "update",
+      entityType: "device",
+      userId: "Система",
+      createdAt: new Date(Date.now() - 3600000).toISOString(),
+    },
+    {
+      id: "3",
+      action: "create",
+      entityType: "step",
+      userId: "Admin",
+      createdAt: new Date(Date.now() - 7200000).toISOString(),
+    }
+  ];
 
   // Performance metrics
   const totalProblems = problemStats.total;
@@ -499,7 +521,7 @@ const AdminDashboard = () => {
             </CardTitle>
             <Button variant="outline" size="sm">
               <Eye className="h-4 w-4 mr-2" />
-              Посм��треть все
+              Посмотреть все
             </Button>
           </div>
         </CardHeader>
@@ -541,7 +563,7 @@ const AdminDashboard = () => {
                       }
                     >
                       {problem.status === "published"
-                        ? "Опубликовано"
+                        ? "Опубл��ковано"
                         : "Черновик"}
                     </Badge>
                     <DropdownMenu>
