@@ -423,7 +423,7 @@ export async function fixDiagnosticStepsSchema() {
         ADD COLUMN warning_text TEXT
       `);
 
-      console.log("✅ Добавлена коло��ка warning_text");
+      console.log("✅ Добавлена колонка warning_text");
     } else {
       console.log("✅ Колонка warning_text уже существует");
     }
@@ -482,6 +482,20 @@ export async function fixDiagnosticStepsSchema() {
       console.log("✅ Добавлена колонка hint");
     } else {
       console.log("✅ Колонка hint уже существует");
+    }
+
+    // Add missing button_position column
+    if (!hasButtonPosition) {
+      console.log("⚠️  button_position column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN button_position JSONB
+      `);
+
+      console.log("✅ Добавлена колонка button_position");
+    } else {
+      console.log("✅ Колонка button_position уже существует");
     }
 
     console.log("🎉 Схема diagnostic_steps исправлена");
