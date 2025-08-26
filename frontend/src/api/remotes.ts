@@ -103,7 +103,8 @@ export const remotesApi = {
 
       return await apiClient.get(url);
     } catch (error) {
-      throw handleApiError(error, "Failed to fetch remotes");
+      console.error("Failed to fetch remotes:", error);
+      throw error;
     }
   },
 
@@ -115,7 +116,8 @@ export const remotesApi = {
       const response = await apiClient.get(`/remotes/${id}`);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, `Failed to fetch remote ${id}`);
+      console.error(`Failed to fetch remote ${id}:`, error);
+      throw error;
     }
   },
 
@@ -127,7 +129,8 @@ export const remotesApi = {
       const response = await apiClient.post("/remotes", data);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, "Failed to create remote");
+      console.error("Failed to create remote:", error);
+      throw error;
     }
   },
 
@@ -139,7 +142,8 @@ export const remotesApi = {
       const response = await apiClient.put(`/remotes/${id}`, data);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, `Failed to update remote ${id}`);
+      console.error(`Failed to update remote ${id}:`, error);
+      throw error;
     }
   },
 
@@ -151,7 +155,8 @@ export const remotesApi = {
       const response = await apiClient.delete(`/remotes/${id}`);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, `Failed to delete remote ${id}`);
+      console.error(`Failed to delete remote ${id}:`, error);
+      throw error;
     }
   },
 
@@ -163,10 +168,8 @@ export const remotesApi = {
       const response = await apiClient.get(`/remotes/device/${deviceId}`);
       return response.data;
     } catch (error) {
-      throw handleApiError(
-        error,
-        `Failed to fetch remotes for device ${deviceId}`,
-      );
+      console.error(`Failed to fetch remotes for device ${deviceId}:`, error);
+      throw error;
     }
   },
 
@@ -192,10 +195,8 @@ export const remotesApi = {
     try {
       await apiClient.post(`/remotes/${remoteId}/set-default/${deviceId}`);
     } catch (error) {
-      throw handleApiError(
-        error,
-        `Failed to set remote ${remoteId} as default for device ${deviceId}`,
-      );
+      console.error(`Failed to set remote ${remoteId} as default for device ${deviceId}:`, error);
+      throw error;
     }
   },
 
@@ -207,7 +208,8 @@ export const remotesApi = {
       const response = await apiClient.post(`/remotes/${id}/duplicate`, data);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, `Failed to duplicate remote ${id}`);
+      console.error(`Failed to duplicate remote ${id}:`, error);
+      throw error;
     }
   },
 
@@ -219,7 +221,8 @@ export const remotesApi = {
       const response = await apiClient.post(`/remotes/${id}/use`);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, `Failed to increment usage for remote ${id}`);
+      console.error(`Failed to increment usage for remote ${id}:`, error);
+      throw error;
     }
   },
 
@@ -234,12 +237,13 @@ export const remotesApi = {
       const response = await apiClient.get(url);
       return response.data;
     } catch (error) {
-      throw handleApiError(error, "Failed to fetch remote stats");
+      console.error("Failed to fetch remote stats:", error);
+      throw error;
     }
   },
 
   /**
-   * Поиск пультов
+   * П��иск пультов
    */
   async search(
     query: string,
@@ -248,10 +252,8 @@ export const remotesApi = {
     try {
       return await this.getAll({ ...filters, search: query });
     } catch (error) {
-      throw handleApiError(
-        error,
-        `Failed to search remotes with query: ${query}`,
-      );
+      console.error(`Failed to search remotes with query: ${query}:`, error);
+      throw error;
     }
   },
 };
