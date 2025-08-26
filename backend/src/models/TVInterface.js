@@ -35,12 +35,26 @@ class TVInterface extends BaseModel {
     };
   }
 
-  // Получить все интерфейсы с возможностью фильтрации
+  // Получить все интерфейсы с возможностью фильтрации (оптимизированная версия)
   async getAll(filters = {}) {
+    const startTime = Date.now();
     try {
+      console.log('🔍 Starting optimized TV interfaces list query');
+
+      // Исключаем screenshot_data из списочного запроса для оптимизации
       let query = `
-        SELECT 
-          ti.*,
+        SELECT
+          ti.id,
+          ti.name,
+          ti.description,
+          ti.type,
+          ti.device_id,
+          ti.screenshot_url,
+          LENGTH(ti.screenshot_data) as screenshot_data_size,
+          CASE WHEN ti.screenshot_data IS NOT NULL THEN true ELSE false END as has_screenshot_data,
+          ti.is_active,
+          ti.created_at,
+          ti.updated_at,
           d.name as device_name,
           d.brand as device_brand,
           d.model as device_model
@@ -89,9 +103,15 @@ class TVInterface extends BaseModel {
       }
 
       const result = await this.query(query, params);
+
+      const duration = Date.now() - startTime;
+      console.log(`✅ Optimized TV interfaces list query completed in ${duration}ms`);
+      console.log(`📊 Returned ${result.rows.length} interfaces (screenshot_data excluded for performance)`);
+
       return result.rows;
     } catch (error) {
-      console.error("Error getting TV interfaces:", error);
+      const duration = Date.now() - startTime;
+      console.error(`❌ TV interfaces list query failed after ${duration}ms:`, error);
       throw error;
     }
   }
@@ -119,7 +139,7 @@ class TVInterface extends BaseModel {
     }
   }
 
-  // Создать новый инте��фейс (оптимизированная версия)
+  // Создать новый интерфейс (оптимизированная версия)
   async create(data) {
     const startTime = Date.now();
     try {
@@ -224,7 +244,7 @@ class TVInterface extends BaseModel {
           [data.device_id],
         );
         if (deviceExists.rows.length === 0) {
-          throw new Error("Выбранное устройство не найдено");
+          throw new Error("Выбранное устройст��о не найдено");
         }
       }
 
@@ -251,7 +271,7 @@ class TVInterface extends BaseModel {
         updateData.highlight_areas = JSON.stringify(data.highlight_areas);
       if (data.is_active !== undefined) updateData.is_active = data.is_active;
 
-      // Объединенный запрос: обновление + в��зврат с JOIN в одной операци��
+      // Объединенный запрос: обновление + возврат с JOIN в одн��й операци��
       const updateFields = [];
       const updateValues = [];
       let paramIndex = 1;
@@ -288,7 +308,7 @@ class TVInterface extends BaseModel {
       `;
       const deviceResult = await this.query(deviceQuery, [updatedInterface.device_id]);
 
-      // Объ��диняем результат
+      // Объединяем результат
       const result = {
         ...updatedInterface,
         device_name: deviceResult.rows[0]?.device_name || null,
@@ -328,11 +348,14 @@ class TVInterface extends BaseModel {
     }
   }
 
-  // Получить интерфейс по ID с данными устройства
+  // Получить интерфейс по ID с полными данными включая screenshot_data
   async getById(id) {
+    const startTime = Date.now();
     try {
+      console.log(`🔍 Starting TV interface by ID query: ${id}`);
+
       const query = `
-        SELECT 
+        SELECT
           ti.*,
           d.name as device_name,
           d.brand as device_brand,
@@ -349,6 +372,12 @@ class TVInterface extends BaseModel {
       }
 
       const tvInterface = result.rows[0];
+
+      // Логируем размер screenshot_data если он есть
+      if (tvInterface.screenshot_data) {
+        const sizeInMB = (tvInterface.screenshot_data.length / 1024 / 1024).toFixed(2);
+        console.log(`📷 Interface ${id} has screenshot data: ${sizeInMB}MB`);
+      }
 
       // Парсим JSON поля если они существуют
       if (tvInterface.hasOwnProperty("clickable_areas")) {
@@ -383,9 +412,57 @@ class TVInterface extends BaseModel {
         tvInterface.highlight_areas = [];
       }
 
+      const duration = Date.now() - startTime;
+      console.log(`✅ TV interface by ID query completed in ${duration}ms`);
+
       return tvInterface;
     } catch (error) {
-      console.error("Error getting TV interface by ID:", error);
+      const duration = Date.now() - startTime;
+      console.error(`❌ TV interface by ID query failed after ${duration}ms:`, error);
+      throw error;
+    }
+  }
+
+  // Получить интерфейс по ID без screenshot_data для оптимизации
+  async getByIdLightweight(id) {
+    const startTime = Date.now();
+    try {
+      console.log(`🔍 Starting lightweight TV interface query: ${id}`);
+
+      const query = `
+        SELECT
+          ti.id,
+          ti.name,
+          ti.description,
+          ti.type,
+          ti.device_id,
+          ti.screenshot_url,
+          LENGTH(ti.screenshot_data) as screenshot_data_size,
+          CASE WHEN ti.screenshot_data IS NOT NULL THEN true ELSE false END as has_screenshot_data,
+          ti.is_active,
+          ti.created_at,
+          ti.updated_at,
+          d.name as device_name,
+          d.brand as device_brand,
+          d.model as device_model
+        FROM ${this.tableName} ti
+        LEFT JOIN devices d ON ti.device_id = d.id
+        WHERE ti.id = $1 AND ti.is_active = true
+      `;
+
+      const result = await this.query(query, [id]);
+
+      if (result.rows.length === 0) {
+        return null;
+      }
+
+      const duration = Date.now() - startTime;
+      console.log(`✅ Lightweight TV interface query completed in ${duration}ms`);
+
+      return result.rows[0];
+    } catch (error) {
+      const duration = Date.now() - startTime;
+      console.error(`❌ Lightweight TV interface query failed after ${duration}ms:`, error);
       throw error;
     }
   }
