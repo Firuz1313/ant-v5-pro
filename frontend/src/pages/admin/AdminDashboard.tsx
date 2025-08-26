@@ -41,7 +41,6 @@ const AdminDashboard = () => {
   const { data: devicesResponse } = useDevices();
   const { data: problemsResponse } = useProblems();
   const { data: stepsResponse } = useSteps(1, 1000); // Get all steps
-  const { data: stepStatsResponse } = useStepStats();
   const { data: activeSessionsResponse } = useActiveSessions();
   const { data: sessionStatsResponse } = useSessionStats();
 
@@ -51,7 +50,6 @@ const AdminDashboard = () => {
   const steps = stepsResponse?.data || [];
   const activeSessions = activeSessionsResponse?.data || [];
   const sessionStats = sessionStatsResponse?.data;
-  const stepStats = stepStatsResponse?.data;
 
   // Mock data for features not yet implemented
   const remotes: any[] = [];
@@ -304,7 +302,7 @@ const AdminDashboard = () => {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg font-semibold">Среднее время решения</CardTitle>
+            <CardTitle className="text-lg font-semibold">Среднее вр��мя решения</CardTitle>
           </CardHeader>
           <CardContent>
             <div className="text-3xl font-bold text-primary">
