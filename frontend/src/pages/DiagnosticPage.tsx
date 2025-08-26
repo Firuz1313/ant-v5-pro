@@ -58,19 +58,29 @@ const DiagnosticPage = () => {
         const stepsResponse = await stepsApi.getStepsByProblem(problemId);
         setSteps(stepsResponse?.data || []);
 
-        // Load default remote for device
+        // Load remote for device (try default first, then any remote)
         try {
+          console.log(`Loading default remote for device: ${deviceId}`);
           const defaultRemote = await remotesApi.getDefaultForDevice(deviceId);
+          console.log("Default remote found:", defaultRemote);
           setRemote(defaultRemote);
         } catch (error) {
+          console.log("No default remote found, trying to get any remote for device:", error);
           // If no default remote, try to get any remote for the device
           try {
             const deviceRemotes = await remotesApi.getByDevice(deviceId);
+            console.log("Device remotes found:", deviceRemotes);
             if (deviceRemotes && deviceRemotes.length > 0) {
+              console.log("Using first available remote:", deviceRemotes[0]);
               setRemote(deviceRemotes[0]);
+            } else {
+              console.log("No remotes available for this device");
+              // You could set a default state or show a message here
+              setRemote(null);
             }
           } catch (err) {
-            console.log("No remotes found for device");
+            console.error("Error loading device remotes:", err);
+            setRemote(null);
           }
         }
       } catch (error) {
@@ -122,7 +132,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600">
         <div className="text-center text-white">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или проблема не найдены</p>
+          <p>Устройство или проблема не найден��</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -257,7 +267,7 @@ const DiagnosticPage = () => {
                   />
                 ) : (
                   <div className="text-center text-gray-400 py-8">
-                    <p>Пульт не найден</p>
+                    <p>Пульт не ��айден</p>
                   </div>
                 )}
               </CardContent>
