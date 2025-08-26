@@ -73,7 +73,7 @@ interface DiagnosticStep {
   instruction: string;
   highlightRemoteButton?: string;
   highlightTVArea?: string;
-  tvInterfaceId?: string; // Обновлено для работы с настоя��ими интерфейсами
+  tvInterfaceId?: string; // О��новлено для работы с настоя��ими интерфейсами
   requiredAction?: string;
   hint?: string;
   remoteId?: string;
@@ -106,6 +106,12 @@ const StepsManagerNew = () => {
 
       // Load steps
       const stepsResponse = await stepsApi.getAll();
+      console.log('🔍 Loaded steps:', stepsResponse);
+      console.log('🔍 Steps deviceId/problemId:', (stepsResponse || []).map(s => ({
+        id: s.id,
+        deviceId: s.deviceId,
+        problemId: s.problemId
+      })));
       setSteps(stepsResponse || []);
 
       // Load remotes
@@ -707,7 +713,7 @@ const StepsManagerNew = () => {
       console.log(`🔍 Problem not found for ID: "${problemId}"`);
       console.log('Available problems:', (problems || []).map(p => ({ id: p.id, title: p.title })));
     }
-    return problem?.title || "Неизвестная проблема";
+    return problem?.title || "Неизвестная проб��ема";
   };
 
   const getRemoteById = (remoteId: string) => {
@@ -1097,7 +1103,7 @@ const StepsManagerNew = () => {
               <SelectItem value="none">Без интерфейса</SelectItem>
               {isLoadingTVInterfaces ? (
                 <SelectItem value="loading" disabled>
-                  Загруз��а...
+                  Загрузка...
                 </SelectItem>
               ) : (
                 getAvailableTVInterfaces().map((tvInterface) => (
