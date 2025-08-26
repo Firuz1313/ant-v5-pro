@@ -762,7 +762,7 @@ const StepsManager = () => {
           }
           toast({
             title: "Интерфейс не найден",
-            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Спис��к интерфейсов обновлён.`,
+            description: `TV интерфе��с "${tvInterface.name}" больш�� не существует. Спис��к интерфейсов обновлён.`,
             variant: "destructive",
           });
           return; // Don't open editor for non-existent interface
@@ -848,7 +848,7 @@ const StepsManager = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обязательные поля: устройство, проблема, название и инструкция.",
+          "Заполните все обязательные поля: устройство, проблема, на��вание и инструкция.",
         variant: "destructive",
       });
       return;
@@ -951,9 +951,9 @@ const StepsManager = () => {
     const reorderedSteps = remainingSteps.map((step) => {
       if (
         step.problemId === stepToDelete.problemId &&
-        step.stepNumber > stepToDelete.stepNumber
+        (step.stepNumber || 0) > (stepToDelete.stepNumber || 0)
       ) {
-        return { ...step, stepNumber: step.stepNumber - 1 };
+        return { ...step, stepNumber: (step.stepNumber || 0) - 1 };
       }
       return step;
     });
@@ -995,10 +995,10 @@ const StepsManager = () => {
 
     const updatedSteps = steps.map((s) => {
       if (s.id === stepId) {
-        return { ...s, stepNumber: problemSteps[newIndex].stepNumber };
+        return { ...s, stepNumber: problemSteps[newIndex].stepNumber || 0 };
       }
       if (s.id === problemSteps[newIndex].id) {
-        return { ...s, stepNumber: step.stepNumber };
+        return { ...s, stepNumber: step.stepNumber || 0 };
       }
       return s;
     });
@@ -1626,7 +1626,7 @@ const StepsManager = () => {
             <CardContent>
               <div className="space-y-3">
                 {group.steps
-                  .sort((a, b) => a.stepNumber - b.stepNumber)
+                  .sort((a, b) => (a.stepNumber || 0) - (b.stepNumber || 0))
                   .map((step) => (
                     <div
                       key={step.id}
@@ -1637,7 +1637,7 @@ const StepsManager = () => {
                           <div className="flex items-center space-x-2">
                             <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
                               <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                                {step.stepNumber}
+                                {step.stepNumber || 0}
                               </span>
                             </div>
                             <div className="flex flex-col space-y-1">
@@ -1646,7 +1646,7 @@ const StepsManager = () => {
                                 size="icon"
                                 className="h-6 w-6"
                                 onClick={() => handleMoveStep(step.id, "up")}
-                                disabled={step.stepNumber === 1}
+                                disabled={(step.stepNumber || 0) === 1}
                               >
                                 <ArrowUp className="h-3 w-3" />
                               </Button>
@@ -1656,7 +1656,7 @@ const StepsManager = () => {
                                 className="h-6 w-6"
                                 onClick={() => handleMoveStep(step.id, "down")}
                                 disabled={
-                                  step.stepNumber === group.steps.length
+                                  (step.stepNumber || 0) === group.steps.length
                                 }
                               >
                                 <ArrowDown className="h-3 w-3" />
