@@ -586,7 +586,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error("Ошибка загрузки скриншот��:", error);
+      console.error("Ошибка загрузки скриншота:", error);
       alert(
         error instanceof Error ? error.message : "Ошибка загрузки скриншота",
       );
@@ -654,7 +654,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
       { x: 840, y: 300, text: "Приложения", icon: "📱", color: "#f59e0b" },
       { x: 1160, y: 300, text: "Поиск", icon: "🔍", color: "#06b6d4" },
       { x: 200, y: 600, text: "Фильмы", icon: "🎬", color: "#ef4444" },
-      { x: 520, y: 600, text: "Музыка", icon: "🎵", color: "#8b5cf6" },
+      { x: 520, y: 600, text: "Музыка", icon: "���", color: "#8b5cf6" },
       { x: 840, y: 600, text: "Игры", icon: "🎮", color: "#f97316" },
       { x: 1160, y: 600, text: "Записи", icon: "📹", color: "#84cc16" },
     ];
@@ -747,6 +747,24 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
     },
   });
 
+  // Auto-generate test screenshot if none available
+  useEffect(() => {
+    const shouldAutoGenerate =
+      !tvInterface.screenshotData &&
+      !tvInterface.screenshot_data &&
+      !tempScreenshot &&
+      !isUploading;
+
+    if (shouldAutoGenerate) {
+      console.log("🎯 Auto-generating test screenshot for interface:", tvInterface.name);
+      const testScreenshot = createTestScreenshot();
+      if (testScreenshot) {
+        setTempScreenshot(testScreenshot);
+        // Don't auto-save, just show temporarily
+      }
+    }
+  }, [tvInterface.id, tvInterface.screenshotData, tvInterface.screenshot_data, tempScreenshot, isUploading]);
+
   if (
     !tvInterface.screenshotData &&
     !tvInterface.screenshot_data &&
@@ -758,73 +776,12 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
           <div className="text-center text-gray-500">
             <Target className="h-12 w-12 mx-auto mb-4" />
             <p className="text-lg font-medium mb-2">
-              Нет скриншота для редактирования областей
+              Создание интерфейса...
             </p>
             <p className="text-sm text-gray-400 mb-4">
-              Загрузите скриншот интерфейса, чтобы начать работу с областями
+              Создаём тестовый скриншот для редактирования областей
             </p>
-            <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
-              <p className="text-xs text-yellow-700 dark:text-yellow-300">
-                <strong>Отладка:</strong> Интерфейс "{tvInterface.name}" (ID:{" "}
-                {tvInterface.id})
-                <br />
-                screenshotData: {tvInterface.screenshotData ? "✓" : "✗"}
-                <br />
-                screenshot_data: {tvInterface.screenshot_data ? "✓" : "���"}
-              </p>
-            </div>
-          </div>
-          <div className="flex flex-col space-y-2">
-            <input
-              type="file"
-              accept="image/*"
-              onChange={(e) => {
-                const file = e.target.files?.[0];
-                if (file) {
-                  handleScreenshotUpload(file);
-                }
-              }}
-              className="hidden"
-              id="screenshot-upload"
-              disabled={isUploading}
-            />
-            <Button asChild variant="outline" disabled={isUploading}>
-              <label htmlFor="screenshot-upload" className="cursor-pointer">
-                <Plus className="h-4 w-4 mr-2" />
-                {isUploading ? "Загружается..." : "Загрузить скриншот"}
-              </label>
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                const testScreenshot = createTestScreenshot();
-                if (testScreenshot) {
-                  setTempScreenshot(testScreenshot);
-                  handleSaveScreenshot(testScreenshot);
-                }
-              }}
-            >
-              <ImageIcon className="h-4 w-4 mr-2" />
-              Создать тестовый скриншот
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => {
-                // Переходим в TV Interface Builder для добавления скриншота
-                window.open(
-                  `/admin/tv-interface-builder?edit=${tvInterface.id}`,
-                  "_blank",
-                );
-              }}
-            >
-              <Settings className="h-4 w-4 mr-2" />
-              Редактировать в TV Builder
-            </Button>
-            <p className="text-xs text-gray-400 text-center">
-              Поддерживаются форматы: JPG, PNG, GIF
-              <br />
-              Или добавьте скриншот через TV Interface Builder
-            </p>
+            <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mx-auto"></div>
           </div>
         </CardContent>
       </Card>
