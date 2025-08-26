@@ -465,7 +465,7 @@ const AdminDashboard = () => {
                   size="sm"
                 >
                   <Settings className="h-4 w-4 mr-2" />
-                  Общие настройк��
+                  Общие настройк����
                 </Button>
                 <Button
                   className="w-full justify-start"
@@ -508,7 +508,7 @@ const AdminDashboard = () => {
             {problems.slice(0, 5).map((problem) => {
               const device = devices.find((d) => d.id === problem.deviceId);
               const problemSteps = steps.filter(
-                (s) => s.problemId === problem.id,
+                (s) => s.problemId === problem.id || s.problem_id === problem.id,
               );
 
               return (
