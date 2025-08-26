@@ -269,7 +269,7 @@ class DiagnosticSession extends BaseModel {
    */
   async getSessionStats(filters = {}) {
     try {
-      let whereConditions = ['ds.is_active = true'];
+      let whereConditions = [];
       const values = [];
       let paramIndex = 1;
 
@@ -328,7 +328,7 @@ class DiagnosticSession extends BaseModel {
         avg_completion_rate: stats.avg_completion_rate ? Math.round(parseFloat(stats.avg_completion_rate)) : 0
       };
     } catch (error) {
-      console.error('Ошибка получения стати��тики сессий:', error.message);
+      console.error('Оши��ка получения стати��тики сессий:', error.message);
       throw error;
     }
   }
