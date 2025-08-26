@@ -82,6 +82,80 @@ export interface StepInsertRequest {
   [key: string]: any;
 }
 
+// Transform camelCase to snake_case for backend
+const transformToBackend = (data: any) => {
+  const transformed: any = {};
+  
+  // Direct field mappings
+  const fieldMappings: Record<string, string> = {
+    problemId: 'problem_id',
+    deviceId: 'device_id',
+    stepNumber: 'step_number',
+    estimatedTime: 'estimated_time',
+    highlightRemoteButton: 'highlight_remote_button',
+    highlightTVArea: 'highlight_tv_area',
+    tvInterfaceId: 'tv_interface_id',
+    remoteId: 'remote_id',
+    actionType: 'action_type',
+    buttonPosition: 'button_position',
+    svgPath: 'svg_path',
+    zoneId: 'zone_id',
+    requiredAction: 'required_action',
+    validationRules: 'validation_rules',
+    successCondition: 'success_condition',
+    failureActions: 'failure_actions',
+    warningText: 'warning_text',
+    successText: 'success_text',
+    nextStepConditions: 'next_step_conditions',
+    isActive: 'is_active'
+  };
+
+  Object.keys(data).forEach(key => {
+    const backendKey = fieldMappings[key] || key;
+    transformed[backendKey] = data[key];
+  });
+
+  return transformed;
+};
+
+// Transform snake_case to camelCase for frontend
+const transformFromBackend = (data: any): any => {
+  if (!data) return data;
+  
+  const fieldMappings: Record<string, string> = {
+    problem_id: 'problemId',
+    device_id: 'deviceId',
+    step_number: 'stepNumber',
+    estimated_time: 'estimatedTime',
+    highlight_remote_button: 'highlightRemoteButton',
+    highlight_tv_area: 'highlightTVArea',
+    tv_interface_id: 'tvInterfaceId',
+    remote_id: 'remoteId',
+    action_type: 'actionType',
+    button_position: 'buttonPosition',
+    svg_path: 'svgPath',
+    zone_id: 'zoneId',
+    required_action: 'requiredAction',
+    validation_rules: 'validationRules',
+    success_condition: 'successCondition',
+    failure_actions: 'failureActions',
+    warning_text: 'warningText',
+    success_text: 'successText',
+    next_step_conditions: 'nextStepConditions',
+    is_active: 'isActive',
+    created_at: 'createdAt',
+    updated_at: 'updatedAt'
+  };
+
+  const transformed: any = {};
+  Object.keys(data).forEach(key => {
+    const frontendKey = fieldMappings[key] || key;
+    transformed[frontendKey] = data[key];
+  });
+
+  return transformed;
+};
+
 export class StepsApi {
   private readonly basePath = "/steps";
 
@@ -93,13 +167,36 @@ export class StepsApi {
     limit: number = 20,
     filters: StepFilters = {},
   ): Promise<PaginatedResponse<StepWithDetails>> {
-    return apiClient.get<PaginatedResponse<StepWithDetails>>(this.basePath, {
+    const response = await apiClient.get<PaginatedResponse<StepWithDetails>>(this.basePath, {
       params: {
         page,
         limit,
+        problem_id: filters.problemId,
+        device_id: filters.deviceId,
+        include_details: filters.includeDetails,
         ...filters,
       },
     });
+
+    // Transform data from backend
+    if (response.data && Array.isArray(response.data)) {
+      response.data = response.data.map(transformFromBackend);
+    }
+
+    return response;
+  }
+
+  /**
+   * Получение всех шагов (для совместимости)
+   */
+  async getAll(): Promise<StepWithDetails[]> {
+    try {
+      const response = await this.getSteps(1, 1000);
+      return response.data || [];
+    } catch (error) {
+      console.error('Error getting all steps:', error);
+      return [];
+    }
   }
 
   /**
@@ -110,18 +207,38 @@ export class StepsApi {
     includeDetails: boolean = false,
     includeStats: boolean = false,
   ): Promise<APIResponse<StepWithDetails & { usageStats?: StepUsageStats }>> {
-    return apiClient.get<
+    const response = await apiClient.get<
       APIResponse<StepWithDetails & { usageStats?: StepUsageStats }>
     >(`${this.basePath}/${id}`, {
       params: { include_details: includeDetails, include_stats: includeStats },
     });
+
+    // Transform data from backend
+    if (response.data) {
+      response.data = transformFromBackend(response.data);
+    }
+
+    return response;
   }
 
   /**
    * Создание нового шага
    */
   async createStep(data: StepCreateData): Promise<APIResponse<Step>> {
-    return apiClient.post<APIResponse<Step>>(this.basePath, data);
+    console.log('Creating step with data:', data);
+    
+    // Transform data for backend
+    const backendData = transformToBackend(data);
+    console.log('Transformed data for backend:', backendData);
+
+    const response = await apiClient.post<APIResponse<Step>>(this.basePath, backendData);
+
+    // Transform response from backend
+    if (response.data) {
+      response.data = transformFromBackend(response.data);
+    }
+
+    return response;
   }
 
   /**
@@ -131,7 +248,20 @@ export class StepsApi {
     id: string,
     data: StepUpdateData,
   ): Promise<APIResponse<Step>> {
-    return apiClient.put<APIResponse<Step>>(`${this.basePath}/${id}`, data);
+    console.log('Updating step with data:', data);
+    
+    // Transform data for backend
+    const backendData = transformToBackend(data);
+    console.log('Transformed data for backend:', backendData);
+
+    const response = await apiClient.put<APIResponse<Step>>(`${this.basePath}/${id}`, backendData);
+
+    // Transform response from backend
+    if (response.data) {
+      response.data = transformFromBackend(response.data);
+    }
+
+    return response;
   }
 
   /**
@@ -142,16 +272,30 @@ export class StepsApi {
     force: boolean = false,
     reorder: boolean = true,
   ): Promise<APIResponse<Step>> {
-    return apiClient.delete<APIResponse<Step>>(`${this.basePath}/${id}`, {
+    const response = await apiClient.delete<APIResponse<Step>>(`${this.basePath}/${id}`, {
       params: { force, reorder },
     });
+
+    // Transform response from backend
+    if (response.data) {
+      response.data = transformFromBackend(response.data);
+    }
+
+    return response;
   }
 
   /**
    * Восстановление архивированного шага
    */
   async restoreStep(id: string): Promise<APIResponse<Step>> {
-    return apiClient.post<APIResponse<Step>>(`${this.basePath}/${id}/restore`);
+    const response = await apiClient.post<APIResponse<Step>>(`${this.basePath}/${id}/restore`);
+
+    // Transform response from backend
+    if (response.data) {
+      response.data = transformFromBackend(response.data);
+    }
+
+    return response;
   }
 
   /**
@@ -161,12 +305,19 @@ export class StepsApi {
     problemId: string,
     isActive: boolean = true,
   ): Promise<APIResponse<StepWithDetails[]>> {
-    return apiClient.get<APIResponse<StepWithDetails[]>>(
+    const response = await apiClient.get<APIResponse<StepWithDetails[]>>(
       `${this.basePath}/problem/${problemId}`,
       {
         params: { is_active: isActive },
       },
     );
+
+    // Transform data from backend
+    if (response.data && Array.isArray(response.data)) {
+      response.data = response.data.map(transformFromBackend);
+    }
+
+    return response;
   }
 
   /**
@@ -177,12 +328,19 @@ export class StepsApi {
     limit: number = 20,
     offset: number = 0,
   ): Promise<APIResponse<StepWithDetails[]>> {
-    return apiClient.get<APIResponse<StepWithDetails[]>>(
+    const response = await apiClient.get<APIResponse<StepWithDetails[]>>(
       `${this.basePath}/search`,
       {
         params: { q: query, limit, offset },
       },
     );
+
+    // Transform data from backend
+    if (response.data && Array.isArray(response.data)) {
+      response.data = response.data.map(transformFromBackend);
+    }
+
+    return response;
   }
 
   /**
@@ -192,10 +350,17 @@ export class StepsApi {
     problemId: string,
     stepIds: string[],
   ): Promise<APIResponse<Step[]>> {
-    return apiClient.put<APIResponse<Step[]>>(`${this.basePath}/reorder`, {
+    const response = await apiClient.put<APIResponse<Step[]>>(`${this.basePath}/reorder`, {
       problem_id: problemId,
       step_ids: stepIds,
     });
+
+    // Transform data from backend
+    if (response.data && Array.isArray(response.data)) {
+      response.data = response.data.map(transformFromBackend);
+    }
+
+    return response;
   }
 
   /**
@@ -206,11 +371,20 @@ export class StepsApi {
     afterStepNumber: number,
     stepData: Omit<StepCreateData, "problemId">,
   ): Promise<APIResponse<Step>> {
-    return apiClient.post<APIResponse<Step>>(`${this.basePath}/insert`, {
+    const backendData = transformToBackend(stepData);
+    
+    const response = await apiClient.post<APIResponse<Step>>(`${this.basePath}/insert`, {
       problem_id: problemId,
       after_step_number: afterStepNumber,
-      ...stepData,
+      ...backendData,
     });
+
+    // Transform response from backend
+    if (response.data) {
+      response.data = transformFromBackend(response.data);
+    }
+
+    return response;
   }
 
   /**
@@ -220,26 +394,47 @@ export class StepsApi {
     id: string,
     targetProblemId?: string,
   ): Promise<APIResponse<Step>> {
-    return apiClient.post<APIResponse<Step>>(
+    const response = await apiClient.post<APIResponse<Step>>(
       `${this.basePath}/${id}/duplicate`,
       {
         target_problem_id: targetProblemId,
       },
     );
+
+    // Transform response from backend
+    if (response.data) {
+      response.data = transformFromBackend(response.data);
+    }
+
+    return response;
   }
 
   /**
    * Получение следующего шага
    */
   async getNextStep(id: string): Promise<APIResponse<Step>> {
-    return apiClient.get<APIResponse<Step>>(`${this.basePath}/${id}/next`);
+    const response = await apiClient.get<APIResponse<Step>>(`${this.basePath}/${id}/next`);
+
+    // Transform response from backend
+    if (response.data) {
+      response.data = transformFromBackend(response.data);
+    }
+
+    return response;
   }
 
   /**
    * Получение предыдущего шага
    */
   async getPreviousStep(id: string): Promise<APIResponse<Step>> {
-    return apiClient.get<APIResponse<Step>>(`${this.basePath}/${id}/previous`);
+    const response = await apiClient.get<APIResponse<Step>>(`${this.basePath}/${id}/previous`);
+
+    // Transform response from backend
+    if (response.data) {
+      response.data = transformFromBackend(response.data);
+    }
+
+    return response;
   }
 
   /**
@@ -263,12 +458,19 @@ export class StepsApi {
   }
 
   /**
-   * Автоматическое исправление нумерации шагов
+   * Автоматическое испр��вление нумерации шагов
    */
   async fixStepNumbering(problemId: string): Promise<APIResponse<Step[]>> {
-    return apiClient.post<APIResponse<Step[]>>(
+    const response = await apiClient.post<APIResponse<Step[]>>(
       `${this.basePath}/fix-numbering/${problemId}`,
     );
+
+    // Transform data from backend
+    if (response.data && Array.isArray(response.data)) {
+      response.data = response.data.map(transformFromBackend);
+    }
+
+    return response;
   }
 }
 
