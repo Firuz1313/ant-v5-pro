@@ -195,7 +195,7 @@ class DiagnosticSession extends BaseModel {
   }
 
   /**
-   * Получение сессии с детальным прогрессом
+   * Получение сессии с де��альным прогрессом
    */
   async findByIdWithProgress(sessionId) {
     try {
@@ -244,9 +244,7 @@ class DiagnosticSession extends BaseModel {
       return {
         ...session,
         steps_progress: stepsResult.rows,
-        completion_percentage: session.total_steps > 0 
-          ? Math.round((session.completed_steps / session.total_steps) * 100) 
-          : 0
+        completion_percentage: 0
       };
     } catch (error) {
       console.error('Ошибка получения сессии с прогрессом:', error.message);
