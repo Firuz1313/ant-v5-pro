@@ -762,7 +762,7 @@ const StepsManager = () => {
           }
           toast({
             title: "Интерфейс не найден",
-            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Спис��к инт��рфейсов обновлён.`,
+            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Спис��к интерфейсов обновлён.`,
             variant: "destructive",
           });
           return; // Don't open editor for non-existent interface
@@ -986,7 +986,7 @@ const StepsManager = () => {
 
     const problemSteps = steps
       .filter((s) => s.problemId === step.problemId)
-      .sort((a, b) => a.stepNumber - b.stepNumber);
+      .sort((a, b) => (a.stepNumber || 0) - (b.stepNumber || 0));
 
     const currentIndex = problemSteps.findIndex((s) => s.id === stepId);
     const newIndex = direction === "up" ? currentIndex - 1 : currentIndex + 1;
@@ -1071,7 +1071,7 @@ const StepsManager = () => {
       } else {
         toast({
           title: "Пульт не найден",
-          description: `Не удалось загрузить данны�� пульта ${formData.remoteId}.`,
+          description: `Не удалось загрузить данны�� пульт�� ${formData.remoteId}.`,
           variant: "destructive",
         });
       }
@@ -1175,7 +1175,7 @@ const StepsManager = () => {
     // Навигационные кнопки (D-pad)
     const dpadCenter = { x: 200, y: 450 };
 
-    // Центральная ��нопка OK
+    // Центральная кнопка OK
     ctx.fillStyle = "#3182ce";
     ctx.beginPath();
     ctx.arc(dpadCenter.x, dpadCenter.y, 30, 0, 2 * Math.PI);
@@ -1257,7 +1257,7 @@ const StepsManager = () => {
 
   const getDeviceName = (deviceId: string) => {
     const device = devices.find((d) => d.id === deviceId);
-    return device?.name || "Неизв����тная приставка";
+    return device?.name || "Неизв��стная приставка";
   };
 
   const getProblemTitle = (problemId: string) => {
@@ -1383,7 +1383,7 @@ const StepsManager = () => {
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  З����руз��ть изображение
+                  За��руз��ть изображение
                 </Button>
                 {!remoteImage && (
                   <Button
@@ -1428,7 +1428,7 @@ const StepsManager = () => {
                     className="w-full text-xs"
                   >
                     <Settings className="h-3 w-3 mr-1" />
-                    Редактировать в Remote Builder
+                    Редакти��овать в Remote Builder
                   </Button>
                 </div>
               )}
@@ -1542,7 +1542,7 @@ const StepsManager = () => {
                   <SelectValue placeholder="Приставка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все приста�����и</SelectItem>
+                  <SelectItem value="all">Все пристав���и</SelectItem>
                   {getActiveDevices().map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       <div className="flex items-center">
