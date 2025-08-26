@@ -136,19 +136,19 @@ export const createTVInterface = async (req, res) => {
       const sizeInMB = (screenshotSize / 1024 / 1024).toFixed(2);
       console.log(`📷 Screenshot data size: ${sizeInMB}MB`);
 
-      // Предупреждение для очень больших файлов
+      // Проверка лимита размера файла (50MB)
       if (screenshotSize > 50 * 1024 * 1024) { // 50MB
-        console.warn(`⚠️ Large screenshot data detected (${sizeInMB}MB) - this may take longer to process`);
-      }
-
-      // Проверка лимита размера файла (10MB)
-      if (screenshotSize > 10 * 1024 * 1024) { // 10MB
         return res.status(413).json({
           success: false,
-          error: 'Размер скриншота превышает лимит 10МБ',
-          details: `Размер загружаемого скриншота: ${sizeInMB}МБ. Максимальный размер: 10МБ`,
+          error: 'Размер скриншота превышает лимит 50МБ',
+          details: `Размер загружаемого скриншота: ${sizeInMB}МБ. Максимальный размер: 50МБ`,
           timestamp: new Date().toISOString()
         });
+      }
+
+      // Предупреждение для больших файлов
+      if (screenshotSize > 20 * 1024 * 1024) { // 20MB
+        console.warn(`⚠️ Large screenshot detected (${sizeInMB}MB) - this will take longer to process and store`);
       }
     }
 
@@ -239,7 +239,7 @@ export const createTVInterface = async (req, res) => {
         details: 'Создание интерфейса заняло слишком много времени. Возможные причины: большой размер изображения, проблемы с сетью или высокая нагрузка на сервер.',
         suggestions: [
           'Попробуйте уменьшить размер изображения',
-          'Попробуйте позже, когда нагрузка на сервер будет меньше',
+          'Попробуйте позже, когда нагрузка на сервер будет мен��ше',
           'Обратитесь к администратору, если проблема повторяется'
         ],
         processingTime: `${duration}ms`,
@@ -299,7 +299,7 @@ export const updateTVInterface = async (req, res) => {
     console.log(`🔄 Starting TV interface update: ${id}`);
     console.log(`📊 Update data size: ${JSON.stringify(updateData).length} characters`);
 
-    // Проверяем размер screenshot_data и предупреждаем о больших файлах
+    // Проверяем размер screenshot_data и предупреждаем о больших файл��х
     if (updateData.screenshot_data) {
       const screenshotSize = updateData.screenshot_data.length;
       const sizeInMB = (screenshotSize / 1024 / 1024).toFixed(2);
@@ -331,7 +331,7 @@ export const updateTVInterface = async (req, res) => {
 
     console.log(`🔍 Calling optimized model update for TV interface: ${id}`);
 
-    // Создаем Promise с таймаутом для операции базы данных
+    // Создаем Promise с та��маутом для операции базы данных
     const dbOperationTimeout = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error('Database operation timeout - опе��ация превысила лимит времени'));
@@ -425,7 +425,7 @@ export const updateTVInterface = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      error: 'Ошибка при обновлении TV интерфейса',
+      error: 'Ошибка при обновлении TV интер��ейса',
       details: error.message,
       processingTime: `${duration}ms`,
       timestamp: new Date().toISOString()
