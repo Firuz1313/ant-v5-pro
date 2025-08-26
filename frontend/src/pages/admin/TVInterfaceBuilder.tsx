@@ -105,23 +105,25 @@ const TVInterfaceBuilder = () => {
   const loadTVInterfaces = async () => {
     setIsLoading(true);
     try {
-      console.log('📡 Loading TV interfaces...');
+      console.log("📡 Loading TV interfaces...");
       const response = await tvInterfacesAPI.getAll();
-      console.log('📡 TV interfaces response:', response);
+      console.log("📡 TV interfaces response:", response);
 
       if (response.success && response.data) {
         // Нормализуем данные с бэкенда
         const normalizedInterfaces = response.data.map((iface) => {
           const normalized = tvInterfaceUtils.normalizeFromBackend(iface);
-          console.log('📡 Normalized interface:', normalized.id, {
+          console.log("📡 Normalized interface:", normalized.id, {
             hasScreenshot: tvInterfaceUtils.hasScreenshot(normalized),
-            screenshotUrl: tvInterfaceUtils.getScreenshotUrl(normalized)?.substring(0, 50) + '...',
-            createdAt: normalized.createdAt || normalized.created_at
+            screenshotUrl:
+              tvInterfaceUtils.getScreenshotUrl(normalized)?.substring(0, 50) +
+              "...",
+            createdAt: normalized.createdAt || normalized.created_at,
           });
           return normalized;
         });
         setTVInterfaces(normalizedInterfaces);
-        console.log('📡 Total interfaces loaded:', normalizedInterfaces.length);
+        console.log("📡 Total interfaces loaded:", normalizedInterfaces.length);
       } else {
         toast({
           title: "Ошибка",
@@ -251,16 +253,18 @@ const TVInterfaceBuilder = () => {
 
     setIsLoading(true);
     try {
-      console.log('📤 Creating TV interface with data:', {
+      console.log("📤 Creating TV interface with data:", {
         name: formData.name,
         type: formData.type,
         deviceId: formData.deviceId,
         hasScreenshot: !!formData.screenshotData,
-        screenshotSize: formData.screenshotData ? Math.round(formData.screenshotData.length / 1024) + 'KB' : 'None'
+        screenshotSize: formData.screenshotData
+          ? Math.round(formData.screenshotData.length / 1024) + "KB"
+          : "None",
       });
 
       const response = await tvInterfacesAPI.create(formData);
-      console.log('📤 Create response:', response);
+      console.log("📤 Create response:", response);
 
       if (response.success) {
         toast({
@@ -272,7 +276,7 @@ const TVInterfaceBuilder = () => {
 
         // Форсированная перезагрузка через небольшую задержку
         setTimeout(() => {
-          console.log('🔄 Force reloading interfaces after create...');
+          console.log("🔄 Force reloading interfaces after create...");
           loadTVInterfaces();
         }, 500);
       } else {
@@ -316,16 +320,18 @@ const TVInterfaceBuilder = () => {
         updateData.screenshotData = formData.screenshotData;
       }
 
-      console.log('📤 Updating TV interface:', selectedInterface.id, {
+      console.log("📤 Updating TV interface:", selectedInterface.id, {
         hasNewScreenshot: !!updateData.screenshotData,
-        screenshotSize: updateData.screenshotData ? Math.round(updateData.screenshotData.length / 1024) + 'KB' : 'None'
+        screenshotSize: updateData.screenshotData
+          ? Math.round(updateData.screenshotData.length / 1024) + "KB"
+          : "None",
       });
 
       const response = await tvInterfacesAPI.update(
         selectedInterface.id,
         updateData,
       );
-      console.log('📤 Update response:', response);
+      console.log("📤 Update response:", response);
 
       if (response.success) {
         toast({
@@ -337,7 +343,7 @@ const TVInterfaceBuilder = () => {
 
         // Форсированная перезагрузка через небольшую задержку
         setTimeout(() => {
-          console.log('🔄 Force reloading interfaces after update...');
+          console.log("🔄 Force reloading interfaces after update...");
           loadTVInterfaces();
         }, 500);
       } else {
@@ -830,7 +836,8 @@ const TVInterfaceBuilder = () => {
               <CardContent className="p-0">
                 {/* Interface Preview */}
                 <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative">
-                  {tvInterfaceUtils.hasScreenshot(tvInterface) && tvInterfaceUtils.getScreenshotUrl(tvInterface) ? (
+                  {tvInterfaceUtils.hasScreenshot(tvInterface) &&
+                  tvInterfaceUtils.getScreenshotUrl(tvInterface) ? (
                     <img
                       src={tvInterfaceUtils.getScreenshotUrl(tvInterface)!}
                       alt={tvInterface.name}
@@ -840,7 +847,9 @@ const TVInterfaceBuilder = () => {
                     <div className="text-center">
                       <ImageIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
                       <p className="text-sm text-gray-500">Скриншот есть</p>
-                      <p className="text-xs text-gray-400">Открыть для просмотра</p>
+                      <p className="text-xs text-gray-400">
+                        Открыть для просмотра
+                      </p>
                     </div>
                   ) : (
                     <div className="text-center">
@@ -892,11 +901,14 @@ const TVInterfaceBuilder = () => {
                   <div className="text-xs text-gray-500">
                     Создан:{" "}
                     {(() => {
-                      const dateStr = tvInterface.createdAt || tvInterface.created_at;
+                      const dateStr =
+                        tvInterface.createdAt || tvInterface.created_at;
                       if (!dateStr) return "Неизвестно";
                       try {
                         const date = new Date(dateStr);
-                        return isNaN(date.getTime()) ? "Неизвестно" : date.toLocaleDateString("ru");
+                        return isNaN(date.getTime())
+                          ? "Неизвестно"
+                          : date.toLocaleDateString("ru");
                       } catch {
                         return "Неизвестно";
                       }

@@ -6,7 +6,13 @@ import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { tvInterfacesAPI } from "@/api/tvInterfaces";
 import { TVInterface, tvInterfaceUtils } from "@/types/tvInterface";
-import { Search, Bug, Image as ImageIcon, AlertCircle, CheckCircle } from "lucide-react";
+import {
+  Search,
+  Bug,
+  Image as ImageIcon,
+  AlertCircle,
+  CheckCircle,
+} from "lucide-react";
 
 const TVInterfaceDiagnostics = () => {
   const { toast } = useToast();
@@ -26,7 +32,9 @@ const TVInterfaceDiagnostics = () => {
     try {
       const response = await tvInterfacesAPI.getAll();
       if (response.success && response.data) {
-        const foundInterface = response.data.find(iface => iface.name === name);
+        const foundInterface = response.data.find(
+          (iface) => iface.name === name,
+        );
         if (foundInterface) {
           setInterfaceId(foundInterface.id);
           await loadInterface(foundInterface.id);
@@ -52,12 +60,13 @@ const TVInterfaceDiagnostics = () => {
     try {
       // Получаем интерфейс по ID
       const response = await tvInterfacesAPI.getById(id);
-      console.log('🔍 Interface raw response:', response);
+      console.log("🔍 Interface raw response:", response);
 
       if (response.success && response.data) {
         const rawInterface = response.data;
-        const normalizedInterface = tvInterfaceUtils.normalizeFromBackend(rawInterface);
-        
+        const normalizedInterface =
+          tvInterfaceUtils.normalizeFromBackend(rawInterface);
+
         setInterface(normalizedInterface);
 
         // Выполняем диагностику
@@ -70,12 +79,16 @@ const TVInterfaceDiagnostics = () => {
             created_at: rawInterface.created_at,
             updated_at: rawInterface.updated_at,
             screenshot_url: rawInterface.screenshot_url,
-            screenshot_data_length: rawInterface.screenshot_data ? rawInterface.screenshot_data.length : 0,
-            screenshot_data_preview: rawInterface.screenshot_data ? rawInterface.screenshot_data.substring(0, 100) + '...' : null,
+            screenshot_data_length: rawInterface.screenshot_data
+              ? rawInterface.screenshot_data.length
+              : 0,
+            screenshot_data_preview: rawInterface.screenshot_data
+              ? rawInterface.screenshot_data.substring(0, 100) + "..."
+              : null,
             device_name: rawInterface.device_name,
-            is_active: rawInterface.is_active
+            is_active: rawInterface.is_active,
           },
-          
+
           // Нормализованные данные
           normalized: {
             id: normalizedInterface.id,
@@ -84,35 +97,47 @@ const TVInterfaceDiagnostics = () => {
             createdAt: normalizedInterface.createdAt,
             updatedAt: normalizedInterface.updatedAt,
             screenshotUrl: normalizedInterface.screenshotUrl,
-            screenshotData_length: normalizedInterface.screenshotData ? normalizedInterface.screenshotData.length : 0,
-            screenshotData_preview: normalizedInterface.screenshotData ? normalizedInterface.screenshotData.substring(0, 100) + '...' : null,
+            screenshotData_length: normalizedInterface.screenshotData
+              ? normalizedInterface.screenshotData.length
+              : 0,
+            screenshotData_preview: normalizedInterface.screenshotData
+              ? normalizedInterface.screenshotData.substring(0, 100) + "..."
+              : null,
             deviceName: normalizedInterface.deviceName,
-            isActive: normalizedInterface.isActive
+            isActive: normalizedInterface.isActive,
           },
 
           // Результаты утилит
           utils: {
             hasScreenshot: tvInterfaceUtils.hasScreenshot(normalizedInterface),
-            screenshotUrl: tvInterfaceUtils.getScreenshotUrl(normalizedInterface),
-            isActive: tvInterfaceUtils.isActive(normalizedInterface)
+            screenshotUrl:
+              tvInterfaceUtils.getScreenshotUrl(normalizedInterface),
+            isActive: tvInterfaceUtils.isActive(normalizedInterface),
           },
 
           // Проверки
           checks: {
             hasRawScreenshotData: !!rawInterface.screenshot_data,
             hasNormalizedScreenshotData: !!normalizedInterface.screenshotData,
-            screenshotDataMatches: rawInterface.screenshot_data === normalizedInterface.screenshotData,
-            validBase64: rawInterface.screenshot_data ? rawInterface.screenshot_data.startsWith('data:image/') : false,
+            screenshotDataMatches:
+              rawInterface.screenshot_data ===
+              normalizedInterface.screenshotData,
+            validBase64: rawInterface.screenshot_data
+              ? rawInterface.screenshot_data.startsWith("data:image/")
+              : false,
             dateValidation: {
-              created_at_valid: rawInterface.created_at ? !isNaN(new Date(rawInterface.created_at).getTime()) : false,
-              updated_at_valid: rawInterface.updated_at ? !isNaN(new Date(rawInterface.updated_at).getTime()) : false
-            }
-          }
+              created_at_valid: rawInterface.created_at
+                ? !isNaN(new Date(rawInterface.created_at).getTime())
+                : false,
+              updated_at_valid: rawInterface.updated_at
+                ? !isNaN(new Date(rawInterface.updated_at).getTime())
+                : false,
+            },
+          },
         };
 
         setDiagnosticResults(diagnostics);
-        console.log('🔍 Diagnostic results:', diagnostics);
-
+        console.log("🔍 Diagnostic results:", diagnostics);
       } else {
         toast({
           title: "Ошибка",
@@ -133,11 +158,11 @@ const TVInterfaceDiagnostics = () => {
   };
 
   const formatBytes = (bytes: number) => {
-    if (bytes === 0) return '0 Bytes';
+    if (bytes === 0) return "0 Bytes";
     const k = 1024;
-    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const sizes = ["Bytes", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
-    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
   };
 
   const StatusIcon = ({ status }: { status: boolean }) => {
@@ -179,7 +204,10 @@ const TVInterfaceDiagnostics = () => {
               />
             </div>
             <div className="flex items-end">
-              <Button onClick={() => loadInterface(interfaceId)} disabled={isLoading}>
+              <Button
+                onClick={() => loadInterface(interfaceId)}
+                disabled={isLoading}
+              >
                 <Search className="h-4 w-4 mr-2" />
                 Диагностировать
               </Button>
@@ -191,7 +219,6 @@ const TVInterfaceDiagnostics = () => {
       {/* Results */}
       {interface_ && diagnosticResults && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          
           {/* Interface Preview */}
           <Card>
             <CardHeader>
@@ -201,10 +228,12 @@ const TVInterfaceDiagnostics = () => {
               <div className="space-y-4">
                 <div>
                   <h3 className="font-semibold">{interface_.name}</h3>
-                  <p className="text-sm text-gray-600">{interface_.description}</p>
+                  <p className="text-sm text-gray-600">
+                    {interface_.description}
+                  </p>
                   <p className="text-xs text-gray-500">ID: {interface_.id}</p>
                 </div>
-                
+
                 <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative border rounded">
                   {tvInterfaceUtils.hasScreenshot(interface_) ? (
                     <img
@@ -212,9 +241,10 @@ const TVInterfaceDiagnostics = () => {
                       alt={interface_.name}
                       className="w-full h-full object-cover rounded"
                       onError={(e) => {
-                        console.error('🖼️ Image load error:', e);
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling!.style.display = 'block';
+                        console.error("🖼️ Image load error:", e);
+                        e.currentTarget.style.display = "none";
+                        e.currentTarget.nextElementSibling!.style.display =
+                          "block";
                       }}
                     />
                   ) : (
@@ -235,29 +265,46 @@ const TVInterfaceDiagnostics = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                
                 <div>
                   <h4 className="font-medium mb-2">Основные проверки</h4>
                   <div className="space-y-2">
                     <div className="flex items-center space-x-2">
-                      <StatusIcon status={diagnosticResults.checks.hasRawScreenshotData} />
-                      <span className="text-sm">Есть исходные данные скриншота</span>
+                      <StatusIcon
+                        status={diagnosticResults.checks.hasRawScreenshotData}
+                      />
+                      <span className="text-sm">
+                        Есть исходные данные скриншота
+                      </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <StatusIcon status={diagnosticResults.checks.hasNormalizedScreenshotData} />
-                      <span className="text-sm">Есть нормализованные данные скриншота</span>
+                      <StatusIcon
+                        status={
+                          diagnosticResults.checks.hasNormalizedScreenshotData
+                        }
+                      />
+                      <span className="text-sm">
+                        Есть нормализованные данные скриншота
+                      </span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <StatusIcon status={diagnosticResults.checks.validBase64} />
+                      <StatusIcon
+                        status={diagnosticResults.checks.validBase64}
+                      />
                       <span className="text-sm">Валидный Base64 формат</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <StatusIcon status={diagnosticResults.utils.hasScreenshot} />
+                      <StatusIcon
+                        status={diagnosticResults.utils.hasScreenshot}
+                      />
                       <span className="text-sm">Утилита hasScreenshot()</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <StatusIcon status={!!diagnosticResults.utils.screenshotUrl} />
-                      <span className="text-sm">Утилита getScreenshotUrl()</span>
+                      <StatusIcon
+                        status={!!diagnosticResults.utils.screenshotUrl}
+                      />
+                      <span className="text-sm">
+                        Утилита getScreenshotUrl()
+                      </span>
                     </div>
                   </div>
                 </div>
@@ -265,8 +312,18 @@ const TVInterfaceDiagnostics = () => {
                 <div>
                   <h4 className="font-medium mb-2">Размеры данных</h4>
                   <div className="text-sm space-y-1">
-                    <div>Исходные данные: {formatBytes(diagnosticResults.raw.screenshot_data_length)}</div>
-                    <div>Нормализованные: {formatBytes(diagnosticResults.normalized.screenshotData_length)}</div>
+                    <div>
+                      Исходные данные:{" "}
+                      {formatBytes(
+                        diagnosticResults.raw.screenshot_data_length,
+                      )}
+                    </div>
+                    <div>
+                      Нормализованные:{" "}
+                      {formatBytes(
+                        diagnosticResults.normalized.screenshotData_length,
+                      )}
+                    </div>
                   </div>
                 </div>
 
@@ -274,16 +331,25 @@ const TVInterfaceDiagnostics = () => {
                   <h4 className="font-medium mb-2">Даты</h4>
                   <div className="text-sm space-y-1">
                     <div className="flex items-center space-x-2">
-                      <StatusIcon status={diagnosticResults.checks.dateValidation.created_at_valid} />
+                      <StatusIcon
+                        status={
+                          diagnosticResults.checks.dateValidation
+                            .created_at_valid
+                        }
+                      />
                       <span>Создано: {diagnosticResults.raw.created_at}</span>
                     </div>
                     <div className="flex items-center space-x-2">
-                      <StatusIcon status={diagnosticResults.checks.dateValidation.updated_at_valid} />
+                      <StatusIcon
+                        status={
+                          diagnosticResults.checks.dateValidation
+                            .updated_at_valid
+                        }
+                      />
                       <span>Обновлено: {diagnosticResults.raw.updated_at}</span>
                     </div>
                   </div>
                 </div>
-
               </div>
             </CardContent>
           </Card>
@@ -296,13 +362,17 @@ const TVInterfaceDiagnostics = () => {
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <h4 className="font-medium mb-2">Исходные данные (Backend)</h4>
+                  <h4 className="font-medium mb-2">
+                    Исходные данные (Backend)
+                  </h4>
                   <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-auto max-h-40">
                     {JSON.stringify(diagnosticResults.raw, null, 2)}
                   </pre>
                 </div>
                 <div>
-                  <h4 className="font-medium mb-2">Нормализованные данные (Frontend)</h4>
+                  <h4 className="font-medium mb-2">
+                    Нормализованные данные (Frontend)
+                  </h4>
                   <pre className="text-xs bg-gray-100 dark:bg-gray-800 p-2 rounded overflow-auto max-h-40">
                     {JSON.stringify(diagnosticResults.normalized, null, 2)}
                   </pre>
@@ -310,7 +380,6 @@ const TVInterfaceDiagnostics = () => {
               </div>
             </CardContent>
           </Card>
-
         </div>
       )}
     </div>

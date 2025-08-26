@@ -39,7 +39,7 @@ class TVInterface extends BaseModel {
   async getAll(filters = {}) {
     const startTime = Date.now();
     try {
-      console.log('🔍 Starting optimized TV interfaces list query');
+      console.log("🔍 Starting optimized TV interfaces list query");
 
       // Включаем screenshot_data для изображений размером до 2MB, для больших - только метаданные
       let query = `
@@ -109,13 +109,20 @@ class TVInterface extends BaseModel {
       const result = await this.query(query, params);
 
       const duration = Date.now() - startTime;
-      console.log(`✅ Optimized TV interfaces list query completed in ${duration}ms`);
-      console.log(`📊 Returned ${result.rows.length} interfaces (screenshot_data excluded for performance)`);
+      console.log(
+        `✅ Optimized TV interfaces list query completed in ${duration}ms`,
+      );
+      console.log(
+        `📊 Returned ${result.rows.length} interfaces (screenshot_data excluded for performance)`,
+      );
 
       return result.rows;
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(`❌ TV interfaces list query failed after ${duration}ms:`, error);
+      console.error(
+        `❌ TV interfaces list query failed after ${duration}ms:`,
+        error,
+      );
       throw error;
     }
   }
@@ -166,7 +173,9 @@ class TVInterface extends BaseModel {
       if (data.screenshot_data) {
         const screenshotSize = data.screenshot_data.length;
         const sizeInMB = (screenshotSize / 1024 / 1024).toFixed(2);
-        console.log(`📷 Processing screenshot data during create: ${sizeInMB}MB`);
+        console.log(
+          `📷 Processing screenshot data during create: ${sizeInMB}MB`,
+        );
       }
 
       // Проверяем существование устройства
@@ -225,12 +234,17 @@ class TVInterface extends BaseModel {
       const created = await this.getById(result.id);
 
       const duration = Date.now() - startTime;
-      console.log(`✅ Optimized TV interface creation completed in ${duration}ms`);
+      console.log(
+        `✅ Optimized TV interface creation completed in ${duration}ms`,
+      );
 
       return created;
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(`❌ TV interface creation failed after ${duration}ms:`, error.message);
+      console.error(
+        `❌ TV interface creation failed after ${duration}ms:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -280,7 +294,7 @@ class TVInterface extends BaseModel {
       const updateValues = [];
       let paramIndex = 1;
 
-      Object.keys(updateData).forEach(key => {
+      Object.keys(updateData).forEach((key) => {
         updateFields.push(`${key} = $${paramIndex}`);
         updateValues.push(updateData[key]);
         paramIndex++;
@@ -290,7 +304,7 @@ class TVInterface extends BaseModel {
 
       const query = `
         UPDATE ${this.tableName}
-        SET ${updateFields.join(', ')}
+        SET ${updateFields.join(", ")}
         WHERE id = $${paramIndex} AND is_active = true
         RETURNING *
       `;
@@ -310,14 +324,16 @@ class TVInterface extends BaseModel {
         FROM devices
         WHERE id = $1
       `;
-      const deviceResult = await this.query(deviceQuery, [updatedInterface.device_id]);
+      const deviceResult = await this.query(deviceQuery, [
+        updatedInterface.device_id,
+      ]);
 
       // Объед��няем результат
       const result = {
         ...updatedInterface,
         device_name: deviceResult.rows[0]?.device_name || null,
         device_brand: deviceResult.rows[0]?.device_brand || null,
-        device_model: deviceResult.rows[0]?.device_model || null
+        device_model: deviceResult.rows[0]?.device_model || null,
       };
 
       // Парсим JSON поля если они существуют
@@ -342,12 +358,17 @@ class TVInterface extends BaseModel {
       }
 
       const duration = Date.now() - startTime;
-      console.log(`✅ Optimized TV interface update completed in ${duration}ms`);
+      console.log(
+        `✅ Optimized TV interface update completed in ${duration}ms`,
+      );
 
       return result;
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(`❌ TV interface update failed after ${duration}ms:`, error.message);
+      console.error(
+        `❌ TV interface update failed after ${duration}ms:`,
+        error.message,
+      );
       throw error;
     }
   }
@@ -379,7 +400,11 @@ class TVInterface extends BaseModel {
 
       // Логируем размер screenshot_data если он есть
       if (tvInterface.screenshot_data) {
-        const sizeInMB = (tvInterface.screenshot_data.length / 1024 / 1024).toFixed(2);
+        const sizeInMB = (
+          tvInterface.screenshot_data.length /
+          1024 /
+          1024
+        ).toFixed(2);
         console.log(`📷 Interface ${id} has screenshot data: ${sizeInMB}MB`);
       }
 
@@ -422,7 +447,10 @@ class TVInterface extends BaseModel {
       return tvInterface;
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(`❌ TV interface by ID query failed after ${duration}ms:`, error);
+      console.error(
+        `❌ TV interface by ID query failed after ${duration}ms:`,
+        error,
+      );
       throw error;
     }
   }
@@ -461,12 +489,17 @@ class TVInterface extends BaseModel {
       }
 
       const duration = Date.now() - startTime;
-      console.log(`✅ Lightweight TV interface query completed in ${duration}ms`);
+      console.log(
+        `✅ Lightweight TV interface query completed in ${duration}ms`,
+      );
 
       return result.rows[0];
     } catch (error) {
       const duration = Date.now() - startTime;
-      console.error(`❌ Lightweight TV interface query failed after ${duration}ms:`, error);
+      console.error(
+        `❌ Lightweight TV interface query failed after ${duration}ms:`,
+        error,
+      );
       throw error;
     }
   }

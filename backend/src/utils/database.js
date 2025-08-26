@@ -395,7 +395,10 @@ export async function createTVInterfaceMarksTable() {
 
     return true;
   } catch (error) {
-    console.error("❌ Ошибка создания таблицы tv_interface_marks:", error.message);
+    console.error(
+      "❌ Ошибка создания таблицы tv_interface_marks:",
+      error.message,
+    );
     throw error;
   }
 }

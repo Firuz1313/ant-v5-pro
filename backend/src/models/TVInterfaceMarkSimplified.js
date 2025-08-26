@@ -21,17 +21,32 @@ class TVInterfaceMarkSimplified extends BaseModel {
         WHERE table_name = 'tv_interface_marks'
       `;
       const columnsResult = await this.query(columnsQuery);
-      const existingColumns = columnsResult.rows.map(row => row.column_name);
-      
-      console.log('📋 Existing columns in tv_interface_marks:', existingColumns);
+      const existingColumns = columnsResult.rows.map((row) => row.column_name);
+
+      console.log(
+        "📋 Existing columns in tv_interface_marks:",
+        existingColumns,
+      );
 
       // Строим запрос только с существующими колонками
-      const baseColumns = ['id', 'tv_interface_id', 'name', 'description', 'position', 'color', 'is_active', 'created_at', 'updated_at'];
-      const safeColumns = baseColumns.filter(col => existingColumns.includes(col));
-      
+      const baseColumns = [
+        "id",
+        "tv_interface_id",
+        "name",
+        "description",
+        "position",
+        "color",
+        "is_active",
+        "created_at",
+        "updated_at",
+      ];
+      const safeColumns = baseColumns.filter((col) =>
+        existingColumns.includes(col),
+      );
+
       let query = `
         SELECT 
-          ${safeColumns.map(col => `tim.${col}`).join(', ')}
+          ${safeColumns.map((col) => `tim.${col}`).join(", ")}
         FROM ${this.tableName} tim
         WHERE tim.tv_interface_id = $1
       `;
@@ -39,7 +54,10 @@ class TVInterfaceMarkSimplified extends BaseModel {
       const params = [tvInterfaceId];
 
       // Добавляем фильтры только если колонки существуют
-      if (options.is_active !== undefined && existingColumns.includes('is_active')) {
+      if (
+        options.is_active !== undefined &&
+        existingColumns.includes("is_active")
+      ) {
         query += ` AND tim.is_active = $${params.length + 1}`;
         params.push(options.is_active);
       }
@@ -47,7 +65,9 @@ class TVInterfaceMarkSimplified extends BaseModel {
       query += ` ORDER BY tim.created_at ASC`;
 
       const result = await this.query(query, params);
-      return result.rows.map(row => this.normalizeMarkData(row, existingColumns));
+      return result.rows.map((row) =>
+        this.normalizeMarkData(row, existingColumns),
+      );
     } catch (error) {
       console.error("Error getting TV interface marks:", error);
       throw error;
@@ -66,10 +86,10 @@ class TVInterfaceMarkSimplified extends BaseModel {
         WHERE table_name = 'tv_interface_marks' AND column_name = 'step_id'
       `;
       const columnsResult = await this.query(columnsQuery);
-      
+
       if (columnsResult.rows.length === 0) {
         // Колонка step_id не существует, возвращаем пустой массив
-        console.log('⚠️ Column step_id does not exist, returning empty array');
+        console.log("⚠️ Column step_id does not exist, returning empty array");
         return [];
       }
 
@@ -81,7 +101,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
       `;
 
       const result = await this.query(query, [stepId]);
-      return result.rows.map(row => this.normalizeMarkData(row));
+      return result.rows.map((row) => this.normalizeMarkData(row));
     } catch (error) {
       console.error("Error getting marks by step ID:", error);
       // Возвращаем пустой массив вместо ошибки
@@ -110,7 +130,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
       // Проверяем существование TV интерфейса
       const tvInterfaceExists = await this.query(
         "SELECT id FROM tv_interfaces WHERE id = $1",
-        [data.tv_interface_id]
+        [data.tv_interface_id],
       );
       if (tvInterfaceExists.rows.length === 0) {
         throw new Error("TV интерфейс не найден");
@@ -123,7 +143,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
         WHERE table_name = 'tv_interface_marks'
       `;
       const columnsResult = await this.query(columnsQuery);
-      const existingColumns = columnsResult.rows.map(row => row.column_name);
+      const existingColumns = columnsResult.rows.map((row) => row.column_name);
 
       // Генерируем ID в том же формате, что и TV interfaces
       const timestamp = Date.now().toString(36);
@@ -143,39 +163,41 @@ class TVInterfaceMarkSimplified extends BaseModel {
       };
 
       // Добавляем дополнительные поля только если они существуют в таблице
-      if (existingColumns.includes('step_id')) {
+      if (existingColumns.includes("step_id")) {
         markData.step_id = data.step_id || null;
       }
-      
-      if (existingColumns.includes('mark_type')) {
+
+      if (existingColumns.includes("mark_type")) {
         markData.mark_type = data.mark_type || "point";
       }
-      
-      if (existingColumns.includes('shape')) {
+
+      if (existingColumns.includes("shape")) {
         markData.shape = data.shape || "circle";
       }
-      
-      if (existingColumns.includes('size')) {
-        markData.size = data.size ? JSON.stringify(data.size) : JSON.stringify({ width: 20, height: 20 });
+
+      if (existingColumns.includes("size")) {
+        markData.size = data.size
+          ? JSON.stringify(data.size)
+          : JSON.stringify({ width: 20, height: 20 });
       }
-      
-      if (existingColumns.includes('is_active')) {
+
+      if (existingColumns.includes("is_active")) {
         markData.is_active = data.is_active !== false;
       }
-      
-      if (existingColumns.includes('is_visible')) {
+
+      if (existingColumns.includes("is_visible")) {
         markData.is_visible = data.is_visible !== false;
       }
 
-      if (existingColumns.includes('display_order')) {
+      if (existingColumns.includes("display_order")) {
         markData.display_order = data.display_order || 0;
       }
 
-      if (existingColumns.includes('metadata')) {
+      if (existingColumns.includes("metadata")) {
         markData.metadata = JSON.stringify(data.metadata || {});
       }
 
-      if (existingColumns.includes('tags')) {
+      if (existingColumns.includes("tags")) {
         markData.tags = JSON.stringify(data.tags || []);
       }
 
@@ -190,7 +212,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
         RETURNING *
       `;
 
-      console.log('🔧 Creating mark with custom ID:', markId);
+      console.log("🔧 Creating mark with custom ID:", markId);
       const result = await this.query(insertQuery, values);
       return await this.getById(result.rows[0].id);
     } catch (error) {
@@ -216,7 +238,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
         WHERE table_name = 'tv_interface_marks'
       `;
       const columnsResult = await this.query(columnsQuery);
-      const existingColumns = columnsResult.rows.map(row => row.column_name);
+      const existingColumns = columnsResult.rows.map((row) => row.column_name);
 
       const updateData = {
         updated_at: new Date().toISOString(),
@@ -224,39 +246,53 @@ class TVInterfaceMarkSimplified extends BaseModel {
 
       // Обновляем только переданные поля если они существуют в таблице
       if (data.name !== undefined) updateData.name = data.name.trim();
-      if (data.description !== undefined) updateData.description = data.description?.trim() || "";
-      if (data.position !== undefined) updateData.position = JSON.stringify(data.position);
+      if (data.description !== undefined)
+        updateData.description = data.description?.trim() || "";
+      if (data.position !== undefined)
+        updateData.position = JSON.stringify(data.position);
       if (data.color !== undefined) updateData.color = data.color;
-      
-      if (data.mark_type !== undefined && existingColumns.includes('mark_type')) {
+
+      if (
+        data.mark_type !== undefined &&
+        existingColumns.includes("mark_type")
+      ) {
         updateData.mark_type = data.mark_type;
       }
-      
-      if (data.shape !== undefined && existingColumns.includes('shape')) {
+
+      if (data.shape !== undefined && existingColumns.includes("shape")) {
         updateData.shape = data.shape;
       }
-      
-      if (data.size !== undefined && existingColumns.includes('size')) {
+
+      if (data.size !== undefined && existingColumns.includes("size")) {
         updateData.size = JSON.stringify(data.size);
       }
-      
-      if (data.is_active !== undefined && existingColumns.includes('is_active')) {
+
+      if (
+        data.is_active !== undefined &&
+        existingColumns.includes("is_active")
+      ) {
         updateData.is_active = data.is_active;
       }
-      
-      if (data.is_visible !== undefined && existingColumns.includes('is_visible')) {
+
+      if (
+        data.is_visible !== undefined &&
+        existingColumns.includes("is_visible")
+      ) {
         updateData.is_visible = data.is_visible;
       }
 
-      if (data.display_order !== undefined && existingColumns.includes('display_order')) {
+      if (
+        data.display_order !== undefined &&
+        existingColumns.includes("display_order")
+      ) {
         updateData.display_order = data.display_order;
       }
 
-      if (data.metadata !== undefined && existingColumns.includes('metadata')) {
+      if (data.metadata !== undefined && existingColumns.includes("metadata")) {
         updateData.metadata = JSON.stringify(data.metadata);
       }
 
-      if (data.tags !== undefined && existingColumns.includes('tags')) {
+      if (data.tags !== undefined && existingColumns.includes("tags")) {
         updateData.tags = JSON.stringify(data.tags);
       }
 
@@ -280,7 +316,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
         WHERE table_name = 'tv_interface_marks'
       `;
       const columnsResult = await this.query(columnsQuery);
-      const existingColumns = columnsResult.rows.map(row => row.column_name);
+      const existingColumns = columnsResult.rows.map((row) => row.column_name);
 
       const query = `SELECT * FROM ${this.tableName} WHERE id = $1`;
       const result = await this.query(query, [id]);
@@ -322,9 +358,11 @@ class TVInterfaceMarkSimplified extends BaseModel {
         WHERE table_name = 'tv_interface_marks' AND column_name = 'step_id'
       `;
       const columnsResult = await this.query(columnsQuery);
-      
+
       if (columnsResult.rows.length === 0) {
-        console.log('⚠️ Column step_id does not exist, cannot delete by step ID');
+        console.log(
+          "⚠️ Column step_id does not exist, cannot delete by step ID",
+        );
         return 0;
       }
 
@@ -349,9 +387,9 @@ class TVInterfaceMarkSimplified extends BaseModel {
         WHERE table_name = 'tv_interface_marks' AND column_name = 'display_order'
       `;
       const columnsResult = await this.query(columnsQuery);
-      
+
       if (columnsResult.rows.length === 0) {
-        console.log('⚠️ Column display_order does not exist, cannot reorder');
+        console.log("⚠️ Column display_order does not exist, cannot reorder");
         return true;
       }
 
@@ -359,7 +397,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
       for (let i = 0; i < markIds.length; i++) {
         await this.query(
           `UPDATE ${this.tableName} SET display_order = $1, updated_at = NOW() WHERE id = $2 AND tv_interface_id = $3`,
-          [i, markIds[i], tvInterfaceId]
+          [i, markIds[i], tvInterfaceId],
         );
       }
 
@@ -380,7 +418,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
 
     // Безопасный парсинг JSON полей
     try {
-      if (mark.position && typeof mark.position === 'string') {
+      if (mark.position && typeof mark.position === "string") {
         normalized.position = JSON.parse(mark.position);
       }
     } catch (e) {
@@ -388,7 +426,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
     }
 
     try {
-      if (mark.size && typeof mark.size === 'string') {
+      if (mark.size && typeof mark.size === "string") {
         normalized.size = JSON.parse(mark.size);
       }
     } catch (e) {
@@ -396,7 +434,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
     }
 
     try {
-      if (mark.coordinates && typeof mark.coordinates === 'string') {
+      if (mark.coordinates && typeof mark.coordinates === "string") {
         normalized.coordinates = JSON.parse(mark.coordinates);
       }
     } catch (e) {
@@ -404,7 +442,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
     }
 
     try {
-      if (mark.metadata && typeof mark.metadata === 'string') {
+      if (mark.metadata && typeof mark.metadata === "string") {
         normalized.metadata = JSON.parse(mark.metadata);
       }
     } catch (e) {
@@ -412,7 +450,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
     }
 
     try {
-      if (mark.tags && typeof mark.tags === 'string') {
+      if (mark.tags && typeof mark.tags === "string") {
         normalized.tags = JSON.parse(mark.tags);
       }
     } catch (e) {
@@ -434,35 +472,47 @@ class TVInterfaceMarkSimplified extends BaseModel {
         WHERE table_name = 'tv_interface_marks'
       `;
       const columnsResult = await this.query(columnsQuery);
-      const existingColumns = columnsResult.rows.map(row => row.column_name);
+      const existingColumns = columnsResult.rows.map((row) => row.column_name);
 
       // Создаем базовый запрос статистики
       let query = `SELECT COUNT(*) as total FROM ${this.tableName}`;
-      
+
       // Добавляем дополнительную статистику только для существующих колонок
-      const statFields = ['COUNT(*) as total'];
-      
-      if (existingColumns.includes('is_active')) {
-        statFields.push('COUNT(CASE WHEN is_active = true THEN 1 END) as active');
-      }
-      
-      if (existingColumns.includes('is_visible')) {
-        statFields.push('COUNT(CASE WHEN is_visible = true THEN 1 END) as visible');
-      }
-      
-      if (existingColumns.includes('mark_type')) {
-        statFields.push('COUNT(CASE WHEN mark_type = \'point\' THEN 1 END) as points');
-        statFields.push('COUNT(CASE WHEN mark_type = \'zone\' THEN 1 END) as zones');
-        statFields.push('COUNT(CASE WHEN mark_type = \'area\' THEN 1 END) as areas');
-      }
-      
-      statFields.push('COUNT(DISTINCT tv_interface_id) as interfaces_with_marks');
-      
-      if (existingColumns.includes('step_id')) {
-        statFields.push('COUNT(DISTINCT step_id) as steps_with_marks');
+      const statFields = ["COUNT(*) as total"];
+
+      if (existingColumns.includes("is_active")) {
+        statFields.push(
+          "COUNT(CASE WHEN is_active = true THEN 1 END) as active",
+        );
       }
 
-      query = `SELECT ${statFields.join(', ')} FROM ${this.tableName}`;
+      if (existingColumns.includes("is_visible")) {
+        statFields.push(
+          "COUNT(CASE WHEN is_visible = true THEN 1 END) as visible",
+        );
+      }
+
+      if (existingColumns.includes("mark_type")) {
+        statFields.push(
+          "COUNT(CASE WHEN mark_type = 'point' THEN 1 END) as points",
+        );
+        statFields.push(
+          "COUNT(CASE WHEN mark_type = 'zone' THEN 1 END) as zones",
+        );
+        statFields.push(
+          "COUNT(CASE WHEN mark_type = 'area' THEN 1 END) as areas",
+        );
+      }
+
+      statFields.push(
+        "COUNT(DISTINCT tv_interface_id) as interfaces_with_marks",
+      );
+
+      if (existingColumns.includes("step_id")) {
+        statFields.push("COUNT(DISTINCT step_id) as steps_with_marks");
+      }
+
+      query = `SELECT ${statFields.join(", ")} FROM ${this.tableName}`;
 
       const result = await this.query(query);
       return result.rows[0];
@@ -473,7 +523,7 @@ class TVInterfaceMarkSimplified extends BaseModel {
         total: 0,
         active: 0,
         visible: 0,
-        interfaces_with_marks: 0
+        interfaces_with_marks: 0,
       };
     }
   }
