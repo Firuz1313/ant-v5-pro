@@ -146,11 +146,11 @@ const TVInterfaceBuilder = () => {
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: "Ош��бка",
-        description: "Размер файла не должен превышать 5 МБ",
+        title: "Ошибка",
+        description: "Размер файла не должен превышать 10 МБ",
         variant: "destructive",
       });
       return;
@@ -261,7 +261,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error creating TV interface:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при создании TV интерфейса",
+        description: "П��оизошла ошибка при создании TV интерфейса",
         variant: "destructive",
       });
     } finally {
@@ -848,9 +848,16 @@ const TVInterfaceBuilder = () => {
 
                   <div className="text-xs text-gray-500">
                     Создан:{" "}
-                    {new Date(
-                      tvInterface.createdAt || tvInterface.created_at!,
-                    ).toLocaleDateString("ru")}
+                    {(() => {
+                      const dateStr = tvInterface.createdAt || tvInterface.created_at;
+                      if (!dateStr) return "Неизвестно";
+                      try {
+                        const date = new Date(dateStr);
+                        return isNaN(date.getTime()) ? "Неизвестно" : date.toLocaleDateString("ru");
+                      } catch {
+                        return "Неизвестно";
+                      }
+                    })()}
                   </div>
 
                   {/* Actions */}
