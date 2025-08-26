@@ -240,12 +240,12 @@ const AdminDashboard = () => {
             <CheckCircle className="h-4 w-4 text-green-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stepStats.active}</div>
+            <div className="text-2xl font-bold">{stepStatsData.active}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-blue-600">{stepStats.total}</span> всего
+              <span className="text-blue-600">{stepStatsData.total}</span> всего
             </p>
             <Progress
-              value={(stepStats.active / stepStats.total) * 100}
+              value={stepStatsData.total > 0 ? (stepStatsData.active / stepStatsData.total) * 100 : 0}
               className="mt-3"
             />
           </CardContent>
@@ -259,11 +259,11 @@ const AdminDashboard = () => {
             <Activity className="h-4 w-4 text-purple-600" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{activeSessions.length}</div>
+            <div className="text-2xl font-bold">{sessionStatsData.active}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-green-600">+12%</span> за сегодня
+              <span className="text-green-600">+{Math.round(sessionStatsData.successRate)}%</span> успешность
             </p>
-            <Progress value={75} className="mt-3" />
+            <Progress value={sessionStatsData.successRate} className="mt-3" />
           </CardContent>
         </Card>
       </div>
@@ -373,7 +373,7 @@ const AdminDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Clock className="h-5 w-5 mr-2" />
-              Последние ��зменения
+              Последние изменения
             </CardTitle>
           </CardHeader>
           <CardContent>
