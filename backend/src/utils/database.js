@@ -277,7 +277,7 @@ export async function fixDiagnosticStepsSchema() {
   try {
     console.log("🔧 Проверка и исправление схемы diagnostic_steps...");
 
-    // Проверяем какие колонки существуют
+    // Проверяем какие кол��нки существуют
     const columnsQuery = `
       SELECT column_name
       FROM information_schema.columns
@@ -368,6 +368,104 @@ export async function fixDiagnosticStepsSchema() {
       console.log("✅ Добавлена колонка tv_interface");
     } else {
       console.log("✅ Колонка tv_interface уже существует");
+    }
+
+    // Add missing validation_rules column
+    if (!hasValidationRules) {
+      console.log("⚠️  validation_rules column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN validation_rules JSONB DEFAULT '[]'::jsonb
+      `);
+
+      console.log("✅ Добавлена колонка validation_rules");
+    } else {
+      console.log("✅ Колонка validation_rules уже существует");
+    }
+
+    // Add missing success_condition column
+    if (!hasSuccessCondition) {
+      console.log("⚠️  success_condition column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN success_condition VARCHAR(500)
+      `);
+
+      console.log("✅ Добавлена колонка success_condition");
+    } else {
+      console.log("✅ Колонка success_condition уже существует");
+    }
+
+    // Add missing failure_actions column
+    if (!hasFailureActions) {
+      console.log("⚠️  failure_actions column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN failure_actions JSONB DEFAULT '[]'::jsonb
+      `);
+
+      console.log("✅ Добавлена колонка failure_actions");
+    } else {
+      console.log("✅ Колонка failure_actions уже существует");
+    }
+
+    // Add missing warning_text column
+    if (!hasWarningText) {
+      console.log("⚠️  warning_text column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN warning_text TEXT
+      `);
+
+      console.log("✅ Добавлена колонка warning_text");
+    } else {
+      console.log("✅ Колонка warning_text уже существует");
+    }
+
+    // Add missing success_text column
+    if (!hasSuccessText) {
+      console.log("⚠️  success_text column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN success_text TEXT
+      `);
+
+      console.log("✅ Добавлена колонка success_text");
+    } else {
+      console.log("✅ Колонка success_text уже существует");
+    }
+
+    // Add missing media column
+    if (!hasMedia) {
+      console.log("⚠️  media column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN media JSONB DEFAULT '[]'::jsonb
+      `);
+
+      console.log("✅ Добавлена колонка media");
+    } else {
+      console.log("✅ Колонка media уже существует");
+    }
+
+    // Add missing next_step_conditions column
+    if (!hasNextStepConditions) {
+      console.log("⚠️  next_step_conditions column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN next_step_conditions JSONB DEFAULT '[]'::jsonb
+      `);
+
+      console.log("✅ Добавлена колонка next_step_conditions");
+    } else {
+      console.log("✅ Колонка next_step_conditions уже существует");
     }
 
     console.log("🎉 Схема diagnostic_steps исправлена");
@@ -477,7 +575,7 @@ export async function cleanupOldData(daysToKeep = 90) {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    // Удаляем ст��рые сессии
+    // Удаляем старые сессии
     const sessionsResult = await query(
       `
       DELETE FROM diagnostic_sessions 
