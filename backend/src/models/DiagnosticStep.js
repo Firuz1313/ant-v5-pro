@@ -370,10 +370,9 @@ class DiagnosticStep extends BaseModel {
       const sql = `
         SELECT
           COUNT(ss.id) as session_steps_count,
-          COUNT(CASE WHEN sess.end_time IS NULL THEN 1 END) as active_sessions_count
+          0 as active_sessions_count
         FROM diagnostic_steps ds
         LEFT JOIN session_steps ss ON ds.id::text = ss.step_id::text
-        LEFT JOIN diagnostic_sessions sess ON ss.session_id::text = sess.id::text AND sess.end_time IS NULL
         WHERE ds.id = $1
         GROUP BY ds.id
       `;
@@ -389,13 +388,13 @@ class DiagnosticStep extends BaseModel {
       if (activeSessionsCount > 0) {
         return {
           canDelete: false,
-          reason: `��евозможно удалить шаг, используемый в ${activeSessionsCount} активных сессиях диагностики`
+          reason: `Невозможно удалить шаг, используемый в ${activeSessionsCount} активных сессиях диагностики`
         };
       }
 
       return { canDelete: true };
     } catch (error) {
-      console.error('Ошибка проверки возможности удаления шага:', error.message);
+      console.error('Ошибка проверки в��зможности удаления шага:', error.message);
       throw error;
     }
   }
@@ -474,7 +473,7 @@ class DiagnosticStep extends BaseModel {
   async fixStepNumbering(problemId) {
     try {
       return await transaction(async (client) => {
-        // Получаем все шаги проблемы, от��ортированные по текущей нумерации
+        // Получаем все шаги проблемы, отсортированные по текущей нумерации
         const stepsResult = await client.query(`
           SELECT id, step_number 
           FROM diagnostic_steps 
