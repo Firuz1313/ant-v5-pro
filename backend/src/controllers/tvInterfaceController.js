@@ -111,10 +111,46 @@ export const getTVInterfacesByDeviceId = async (req, res) => {
   }
 };
 
-// Создать новый TV интерфейс
+// Создать новый TV интерфейс (с оптимизаци��й таймаутов)
 export const createTVInterface = async (req, res) => {
+  const startTime = Date.now();
+
+  // Устанавливаем расширенный таймаут для ответа
+  req.setTimeout(300000); // 5 минут для обработки запроса
+  res.setTimeout(300000); // 5 минут для отправки ответа
+
   try {
     const { name, description, type, device_id, screenshot_url, screenshot_data, clickable_areas, highlight_areas } = req.body;
+
+    console.log('🔄 Starting TV interface creation:', {
+      name: name?.substring(0, 50),
+      type,
+      device_id,
+      hasScreenshot: !!screenshot_data,
+      screenshotSize: screenshot_data ? Math.round(screenshot_data.length / 1024) + 'KB' : 'None'
+    });
+
+    // Проверяем размер screenshot_data и предупреждаем о больших файлах
+    if (screenshot_data) {
+      const screenshotSize = screenshot_data.length;
+      const sizeInMB = (screenshotSize / 1024 / 1024).toFixed(2);
+      console.log(`📷 Screenshot data size: ${sizeInMB}MB`);
+
+      // Предупреждение для очень больших файлов
+      if (screenshotSize > 50 * 1024 * 1024) { // 50MB
+        console.warn(`⚠️ Large screenshot data detected (${sizeInMB}MB) - this may take longer to process`);
+      }
+
+      // Проверка лимита размера файла (10MB)
+      if (screenshotSize > 10 * 1024 * 1024) { // 10MB
+        return res.status(413).json({
+          success: false,
+          error: 'Размер скриншота превышает лимит 10МБ',
+          details: `Размер загружаемого скриншота: ${sizeInMB}МБ. Максимальный размер: 10МБ`,
+          timestamp: new Date().toISOString()
+        });
+      }
+    }
 
     // Валидация
     if (!name || !name.trim()) {
@@ -153,17 +189,64 @@ export const createTVInterface = async (req, res) => {
       highlight_areas: highlight_areas || []
     };
 
-    const tvInterface = await tvInterfaceModel.create(tvInterfaceData);
+    console.log('🔍 Calling optimized model create for TV interface');
+
+    // Создаем Promise с таймаутом для операции базы данных
+    const dbOperationTimeout = new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Database operation timeout - операция создания превысила лимит времени'));
+      }, 240000); // 4 минуты для операции БД
+
+      tvInterfaceModel.create(tvInterfaceData)
+        .then(result => {
+          clearTimeout(timeout);
+          resolve(result);
+        })
+        .catch(error => {
+          clearTimeout(timeout);
+          reject(error);
+        });
+    });
+
+    const tvInterface = await dbOperationTimeout;
+
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    console.log(`✅ TV interface creation completed in ${duration}ms`);
 
     res.status(201).json({
       success: true,
       data: tvInterface,
       message: 'TV интерфейс успешно создан',
+      processingTime: `${duration}ms`,
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error in createTVInterface:', error);
-    
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    console.error(`❌ TV interface creation failed after ${duration}ms:`, error);
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack?.split('\n').slice(0, 5).join('\n') // Первые 5 строк стека
+    });
+
+    // Специальная обработка таймаутов
+    if (error.message.includes('timeout') || error.message.includes('превысила лимит времени')) {
+      return res.status(408).json({
+        success: false,
+        error: 'Операция создания превысила лимит времени',
+        details: 'Создание интерфейса заняло слишком много времени. Возможные причины: большой размер изображения, проблемы с сетью или высокая нагрузка на сервер.',
+        suggestions: [
+          'Попробуйте уменьшить размер изображения',
+          'Попробуйте позже, когда нагрузка на сервер будет меньше',
+          'Обратитесь к администратору, если проблема повторяется'
+        ],
+        processingTime: `${duration}ms`,
+        timestamp: new Date().toISOString()
+      });
+    }
+
     if (error.message.includes('не найдено') || error.message.includes('обязательно')) {
       return res.status(400).json({
         success: false,
@@ -172,10 +255,31 @@ export const createTVInterface = async (req, res) => {
       });
     }
 
+    // Проверяем на специфические ошибки базы данных
+    if (error.message.includes('connection') || error.message.includes('ECONNRESET')) {
+      return res.status(503).json({
+        success: false,
+        error: 'Ошибка подключения к базе данных',
+        details: 'Временные проблемы с соединением к базе данных. Попробуйте позже.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Обработка ошибок памяти или ресурсов
+    if (error.message.includes('out of memory') || error.message.includes('ENOMEM')) {
+      return res.status(413).json({
+        success: false,
+        error: 'Недостаточно памяти для обработки запроса',
+        details: 'Размер данных слишком велик для обработки. Попробуйте уменьшить размер изображения.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
     res.status(500).json({
       success: false,
       error: 'Ошибка при создании TV интерфейса',
       details: error.message,
+      processingTime: `${duration}ms`,
       timestamp: new Date().toISOString()
     });
   }

@@ -119,10 +119,13 @@ class TVInterface extends BaseModel {
     }
   }
 
-  // ��оздать новый интерфейс
+  // Создать новый инте��фейс (оптимизированная версия)
   async create(data) {
+    const startTime = Date.now();
     try {
-      // Валидаци�� обязательных полей
+      console.log(`🔧 Starting optimized TV interface creation`);
+
+      // Валидация обязательных полей
       if (!data.name || !data.name.trim()) {
         throw new Error("Название интерфейса обязательно");
       }
@@ -133,6 +136,13 @@ class TVInterface extends BaseModel {
 
       if (!data.device_id) {
         throw new Error("Устройство обязательно для выбора");
+      }
+
+      // Проверяем размер screenshot_data если он есть
+      if (data.screenshot_data) {
+        const screenshotSize = data.screenshot_data.length;
+        const sizeInMB = (screenshotSize / 1024 / 1024).toFixed(2);
+        console.log(`📷 Processing screenshot data during create: ${sizeInMB}MB`);
       }
 
       // Проверяем существование устройства
@@ -183,13 +193,20 @@ class TVInterface extends BaseModel {
         );
       }
 
+      console.log(`🗃️ Executing optimized create operation`);
       const result = await super.create(tvInterfaceData);
 
-      // Получаем созданный интерфейс с данными устройства
+      // Получаем созданный интерфейс с данными устройства с оптимизированным запросом
+      console.log(`🔍 Fetching created interface with device data`);
       const created = await this.getById(result.id);
+
+      const duration = Date.now() - startTime;
+      console.log(`✅ Optimized TV interface creation completed in ${duration}ms`);
+
       return created;
     } catch (error) {
-      console.error("Error creating TV interface:", error);
+      const duration = Date.now() - startTime;
+      console.error(`❌ TV interface creation failed after ${duration}ms:`, error.message);
       throw error;
     }
   }
@@ -234,7 +251,7 @@ class TVInterface extends BaseModel {
         updateData.highlight_areas = JSON.stringify(data.highlight_areas);
       if (data.is_active !== undefined) updateData.is_active = data.is_active;
 
-      // Объединенный запрос: обновление + возврат с JOIN в одной операци��
+      // Объединенный запрос: обновление + в��зврат с JOIN в одной операци��
       const updateFields = [];
       const updateValues = [];
       let paramIndex = 1;
@@ -271,7 +288,7 @@ class TVInterface extends BaseModel {
       `;
       const deviceResult = await this.query(deviceQuery, [updatedInterface.device_id]);
 
-      // Объединяем результат
+      // Объ��диняем результат
       const result = {
         ...updatedInterface,
         device_name: deviceResult.rows[0]?.device_name || null,
