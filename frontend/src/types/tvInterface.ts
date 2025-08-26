@@ -3,7 +3,7 @@
 // Тип интерфейса
 export type TVInterfaceType = 'home' | 'settings' | 'channels' | 'apps' | 'guide' | 'no-signal' | 'error' | 'custom';
 
-// Кликабельная область
+// Кликабельная област��
 export interface ClickableArea {
   id: string;
   name: string;
@@ -185,26 +185,26 @@ export const tvInterfaceUtils = {
       name: backendData.name,
       description: backendData.description || '',
       type: backendData.type,
-      deviceId: backendData.device_id,
-      device_id: backendData.device_id,
-      deviceName: backendData.device_name,
-      device_name: backendData.device_name,
+      deviceId: backendData.deviceId || backendData.device_id, // Поддержка обоих форматов
+      device_id: backendData.device_id || backendData.deviceId, // Поддержка обоих форматов
+      deviceName: backendData.deviceName || backendData.device_name,
+      device_name: backendData.device_name || backendData.deviceName,
       device_brand: backendData.device_brand,
       device_model: backendData.device_model,
-      screenshotUrl: backendData.screenshot_url,
-      screenshot_url: backendData.screenshot_url,
-      screenshotData: backendData.screenshot_data,
-      screenshot_data: backendData.screenshot_data,
+      screenshotUrl: backendData.screenshotUrl || backendData.screenshot_url,
+      screenshot_url: backendData.screenshot_url || backendData.screenshotUrl,
+      screenshotData: backendData.screenshotData || backendData.screenshot_data,
+      screenshot_data: backendData.screenshot_data || backendData.screenshotData,
       clickableAreas: Array.isArray(backendData.clickable_areas) ? backendData.clickable_areas : [],
       clickable_areas: Array.isArray(backendData.clickable_areas) ? backendData.clickable_areas : [],
       highlightAreas: Array.isArray(backendData.highlight_areas) ? backendData.highlight_areas : [],
       highlight_areas: Array.isArray(backendData.highlight_areas) ? backendData.highlight_areas : [],
-      isActive: backendData.is_active !== false,
-      is_active: backendData.is_active,
-      createdAt: backendData.created_at,
-      created_at: backendData.created_at,
-      updatedAt: backendData.updated_at,
-      updated_at: backendData.updated_at
+      isActive: backendData.isActive !== false && backendData.is_active !== false,
+      is_active: backendData.is_active !== false && backendData.isActive !== false,
+      createdAt: backendData.createdAt || backendData.created_at,
+      created_at: backendData.created_at || backendData.createdAt,
+      updatedAt: backendData.updatedAt || backendData.updated_at,
+      updated_at: backendData.updated_at || backendData.updatedAt
     };
   },
 
