@@ -111,6 +111,16 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
       tempScreenshot ||
       tvInterface.screenshotData ||
       tvInterface.screenshot_data;
+
+    console.log("📺 TV Interface Editor Image Loading:", {
+      tempScreenshot: !!tempScreenshot,
+      screenshotData: !!tvInterface.screenshotData,
+      screenshot_data: !!tvInterface.screenshot_data,
+      finalSrc: !!screenshotSrc,
+      interfaceId: tvInterface.id,
+      interfaceName: tvInterface.name
+    });
+
     if (screenshotSrc && canvasRef.current) {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext("2d");
@@ -118,6 +128,12 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
       const img = new Image();
       img.onload = () => {
+        console.log("✅ TV Interface image loaded successfully:", {
+          width: img.width,
+          height: img.height,
+          src: screenshotSrc.substring(0, 50) + "..."
+        });
+
         // Set canvas size to match container while maintaining aspect ratio
         const container = containerRef.current;
         if (!container) return;
@@ -157,7 +173,16 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
           drawAreasWithDimensions(ctx, newDimensions);
         });
       };
+
+      img.onerror = (error) => {
+        console.error("❌ Failed to load TV interface image:", error);
+        setImageLoaded(false);
+      };
+
       img.src = screenshotSrc;
+    } else {
+      console.warn("⚠️ No screenshot source available for TV interface");
+      setImageLoaded(false);
     }
   }, [tempScreenshot, tvInterface.screenshotData, tvInterface.screenshot_data]);
 
