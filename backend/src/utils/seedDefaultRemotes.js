@@ -1,11 +1,10 @@
-import { Database } from "../../config/database.js";
+import { query, transaction } from "./database.js";
 import { v4 as uuidv4 } from "uuid";
 
 /**
  * Seed default remotes for devices that don't have any default remotes
  */
 export const seedDefaultRemotes = async () => {
-  const db = new Database();
   
   try {
     await db.connect();
