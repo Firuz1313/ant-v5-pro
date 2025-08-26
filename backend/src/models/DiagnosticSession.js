@@ -188,7 +188,7 @@ class DiagnosticSession extends BaseModel {
         FROM diagnostic_sessions ds
         LEFT JOIN devices d ON ds.device_id = d.id
         LEFT JOIN problems p ON ds.problem_id = p.id
-        WHERE ds.is_active = true AND ds.end_time IS NULL
+        WHERE ds.duration IS NULL
         ORDER BY ds.created_at DESC
         LIMIT $1 OFFSET $2
       `;
