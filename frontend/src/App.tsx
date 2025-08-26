@@ -24,6 +24,8 @@ import AdminDashboard from "@/pages/admin/AdminDashboard";
 import DeviceManager from "@/pages/admin/DeviceManager";
 import ProblemsManager from "@/pages/admin/ProblemsManager";
 import StepsManager from "@/pages/admin/StepsManager";
+import StepsManagerFixed from "@/pages/admin/StepsManagerFixed";
+import StepsManagerAccess from "@/pages/admin/StepsManagerAccess";
 import RemoteBuilder from "@/pages/admin/RemoteBuilder";
 import TVInterfaceBuilder from "@/pages/admin/TVInterfaceBuilder";
 import UsersManager from "@/pages/admin/UsersManager";
