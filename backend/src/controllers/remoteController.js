@@ -265,7 +265,7 @@ export const deleteRemote = async (req, res) => {
     if (!deletedRemote) {
       return res.status(404).json({
         success: false,
-        error: "Пульт не найден",
+        error: "Пуль�� не найден",
         timestamp: new Date().toISOString(),
       });
     }
@@ -314,7 +314,7 @@ export const getRemotesByDevice = async (req, res) => {
 };
 
 /**
- * Получение пульта по умолчанию для устройства
+ * По��учение пульта по умолчанию для устройства
  * GET /api/v1/remotes/device/:deviceId/default
  */
 export const getDefaultRemoteForDevice = async (req, res) => {
@@ -452,7 +452,32 @@ export const getRemoteStats = async (req, res) => {
     console.error("Error in getRemoteStats:", error);
     res.status(500).json({
       success: false,
-      error: "Ошибка при получении статистики пультов",
+      error: "Ошибка при получении ст��тистики пультов",
+      details: error.message,
+      timestamp: new Date().toISOString(),
+    });
+  }
+};
+
+/**
+ * Создание пультов по умолчанию для устройств
+ * POST /api/v1/remotes/seed-defaults
+ */
+export const seedDefaultRemotes = async (req, res) => {
+  try {
+    console.log("Starting default remotes seeding...");
+    await seedRemotesUtil();
+
+    res.json({
+      success: true,
+      message: "Пульты по умолчанию созданы успешно",
+      timestamp: new Date().toISOString(),
+    });
+  } catch (error) {
+    console.error("Error in seedDefaultRemotes:", error);
+    res.status(500).json({
+      success: false,
+      error: "Ошибка при создании пультов по умолчанию",
       details: error.message,
       timestamp: new Date().toISOString(),
     });
