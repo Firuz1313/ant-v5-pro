@@ -41,7 +41,7 @@ class TVInterface extends BaseModel {
     try {
       console.log('🔍 Starting optimized TV interfaces list query');
 
-      // Исключаем screenshot_data из списочного запроса для оптимизации
+      // Включаем screenshot_data для изображений размером до 2MB, для больших - только метаданные
       let query = `
         SELECT
           ti.id,
@@ -50,6 +50,10 @@ class TVInterface extends BaseModel {
           ti.type,
           ti.device_id,
           ti.screenshot_url,
+          CASE
+            WHEN LENGTH(ti.screenshot_data) <= 2097152 THEN ti.screenshot_data
+            ELSE NULL
+          END as screenshot_data,
           LENGTH(ti.screenshot_data) as screenshot_data_size,
           CASE WHEN ti.screenshot_data IS NOT NULL THEN true ELSE false END as has_screenshot_data,
           ti.is_active,
@@ -271,7 +275,7 @@ class TVInterface extends BaseModel {
         updateData.highlight_areas = JSON.stringify(data.highlight_areas);
       if (data.is_active !== undefined) updateData.is_active = data.is_active;
 
-      // Объединенный запрос: обновление + возврат с JOIN в одн��й операци��
+      // Объединенный запрос: обновление + возвр��т с JOIN в одн��й операци��
       const updateFields = [];
       const updateValues = [];
       let paramIndex = 1;
@@ -308,7 +312,7 @@ class TVInterface extends BaseModel {
       `;
       const deviceResult = await this.query(deviceQuery, [updatedInterface.device_id]);
 
-      // Объединяем результат
+      // Объед��няем результат
       const result = {
         ...updatedInterface,
         device_name: deviceResult.rows[0]?.device_name || null,
