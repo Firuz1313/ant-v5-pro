@@ -368,6 +368,17 @@ export class ApiClient {
         console.error(`📡 Request method:`, fetchOptions.method || "GET");
 
         if (error.name === "AbortError") {
+          // Special handling for TV interface timeouts (less aggressive retry)
+          if (endpoint.includes('/tv-interfaces') && (options.method === 'PUT' || options.method === 'POST')) {
+            console.error(`⏱️ TV interface operation timeout after ${timeout}ms`);
+            throw new ApiError(
+              "TV interface operation timeout. This may be due to large image data or server load. Try reducing image size or try again later.",
+              408,
+              undefined,
+              "TV_INTERFACE_TIMEOUT"
+            );
+          }
+
           // Check if this is a timeout during potential database reconnection
           if (retryCount < 2) {
             console.log(
