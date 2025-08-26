@@ -72,7 +72,7 @@ pool.on("acquire", (client) => {
 
 pool.on("release", (client) => {
   if (process.env.DEBUG_SQL === "true") {
-    console.log("📊 ��лиент возвращен в pool");
+    console.log("📊 Клиент возвращен в pool");
   }
 });
 
@@ -247,7 +247,7 @@ export async function runMigrations() {
         continue;
       }
 
-      console.log(`🔄 Выполнение ��играции: ${filename}`);
+      console.log(`🔄 Выполнение миграции: ${filename}`);
 
       const migrationPath = path.join(migrationsDir, filename);
       const migrationSQL = fs.readFileSync(migrationPath, "utf8");
@@ -467,6 +467,20 @@ export async function fixDiagnosticStepsSchema() {
       console.log("✅ Добавлена колонка next_step_conditions");
     } else {
       console.log("✅ Колонка next_step_conditions уже существует");
+    }
+
+    // Add missing hint column
+    if (!hasHint) {
+      console.log("⚠️  hint column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN hint TEXT
+      `);
+
+      console.log("✅ Добавлена колонка hint");
+    } else {
+      console.log("✅ Колонка hint уже существует");
     }
 
     console.log("🎉 Схема diagnostic_steps исправлена");
