@@ -161,7 +161,7 @@ export class ApiClient {
     let specialTimeout = this.timeout;
     if (endpoint.includes('/tv-interfaces') &&
         (options.method === 'PUT' || options.method === 'POST')) {
-      specialTimeout = 300000; // 5 minutes for TV interface operations (increased from 3 minutes)
+      specialTimeout = 600000; // 10 minutes for TV interface operations (increased for large images)
       console.log(`⏱️ Using extended timeout (${specialTimeout}ms) for TV interface operation`);
 
       // Log warning for potentially large operations
