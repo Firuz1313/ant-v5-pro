@@ -72,7 +72,7 @@ export const getTVInterfaceById = async (req, res) => {
     console.error('Error in getTVInterfaceById:', error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при получении TV интерфейса',
+      error: 'Ошибка при получени�� TV интерфейса',
       details: error.message,
       timestamp: new Date().toISOString()
     });
@@ -116,8 +116,8 @@ export const createTVInterface = async (req, res) => {
   const startTime = Date.now();
 
   // Устанавливаем расширенный таймаут для ответа
-  req.setTimeout(300000); // 5 минут для обработки запроса
-  res.setTimeout(300000); // 5 минут для отправки ответа
+  req.setTimeout(600000); // 10 минут для обработки запроса
+  res.setTimeout(600000); // 10 минут для отправки ответа
 
   try {
     const { name, description, type, device_id, screenshot_url, screenshot_data, clickable_areas, highlight_areas } = req.body;
@@ -270,7 +270,7 @@ export const createTVInterface = async (req, res) => {
       return res.status(413).json({
         success: false,
         error: 'Недостаточно памяти для обработки запроса',
-        details: 'Размер данных слишком велик для обработки. Попробуйте уменьшить размер изображения.',
+        details: 'Размер данных слишком вели�� для обработки. Попробуйте уменьшить размер изображения.',
         timestamp: new Date().toISOString()
       });
     }
