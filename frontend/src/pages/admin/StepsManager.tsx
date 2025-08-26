@@ -289,7 +289,7 @@ interface DiagnosticStep {
   highlightRemoteButton?: string;
   highlightTVArea?: string;
   tvInterface?: "home" | "settings" | "channels" | "no-signal";
-  tvInterfaceId?: string; // ID созда��ного TV интерфейса
+  tvInterfaceId?: string; // ID созданного TV интерфейса
   requiredAction?: string;
   hint?: string;
   remoteId?: string;
@@ -1103,7 +1103,7 @@ const StepsManager = () => {
 
     if (!ctx) return null;
 
-    // Заливаем фон пульта
+    // Залив��ем фон пульта
     const gradient = ctx.createLinearGradient(0, 0, 0, 800);
     gradient.addColorStop(0, "#2d3748");
     gradient.addColorStop(1, "#1a202c");
@@ -1352,6 +1352,7 @@ const StepsManager = () => {
                   variant={isPickingButton ? "default" : "outline"}
                   onClick={() => setIsPickingButton(!isPickingButton)}
                   className="w-full"
+                  disabled={!remoteImage}
                 >
                   <Target className="h-4 w-4 mr-2" />
                   {isPickingButton ? "Отменить выбор" : "Выбрать п��зицию"}
@@ -1364,6 +1365,21 @@ const StepsManager = () => {
                   <ImageIcon className="h-4 w-4 mr-2" />
                   Загруз��ть изображение
                 </Button>
+                {!remoteImage && (
+                  <Button
+                    variant="secondary"
+                    onClick={() => {
+                      const testImage = createTestRemoteImage();
+                      if (testImage) {
+                        setCustomRemoteImage(testImage);
+                      }
+                    }}
+                    className="w-full"
+                  >
+                    <Settings className="h-4 w-4 mr-2" />
+                    Создать тестовый пульт
+                  </Button>
+                )}
               </div>
 
               <input
@@ -1408,7 +1424,7 @@ const StepsManager = () => {
             Управление шагами
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создан��е шагов диагностики с привязкой к приставкам и проблемам
+            Создан��е шагов диагностики с привязкой к приставкам и пробл��мам
           </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -1642,7 +1658,7 @@ const StepsManager = () => {
                             <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
                               {step.remoteId && (
                                 <span>
-                                  Пульт:{" "}
+                                  Пуль��:{" "}
                                   {getRemoteById(step.remoteId)?.name ||
                                     "Неизвестный"}
                                 </span>
@@ -1736,7 +1752,7 @@ const StepsManager = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Редактироват�� шаг</DialogTitle>
+            <DialogTitle>Ред��ктироват�� шаг</DialogTitle>
           </DialogHeader>
           <StepFormFieldsComponent
             isEdit={true}
