@@ -118,7 +118,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
       screenshot_data: !!tvInterface.screenshot_data,
       finalSrc: !!screenshotSrc,
       interfaceId: tvInterface.id,
-      interfaceName: tvInterface.name
+      interfaceName: tvInterface.name,
     });
 
     if (screenshotSrc && canvasRef.current) {
@@ -131,7 +131,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         console.log("✅ TV Interface image loaded successfully:", {
           width: img.width,
           height: img.height,
-          src: screenshotSrc.substring(0, 50) + "..."
+          src: screenshotSrc.substring(0, 50) + "...",
         });
 
         // Set canvas size to match container while maintaining aspect ratio
@@ -756,14 +756,23 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
       !isUploading;
 
     if (shouldAutoGenerate) {
-      console.log("🎯 Auto-generating test screenshot for interface:", tvInterface.name);
+      console.log(
+        "🎯 Auto-generating test screenshot for interface:",
+        tvInterface.name,
+      );
       const testScreenshot = createTestScreenshot();
       if (testScreenshot) {
         setTempScreenshot(testScreenshot);
         // Don't auto-save, just show temporarily
       }
     }
-  }, [tvInterface.id, tvInterface.screenshotData, tvInterface.screenshot_data, tempScreenshot, isUploading]);
+  }, [
+    tvInterface.id,
+    tvInterface.screenshotData,
+    tvInterface.screenshot_data,
+    tempScreenshot,
+    isUploading,
+  ]);
 
   if (
     !tvInterface.screenshotData &&
@@ -775,9 +784,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
         <CardContent className="flex flex-col items-center justify-center h-96 space-y-4">
           <div className="text-center text-gray-500">
             <Target className="h-12 w-12 mx-auto mb-4" />
-            <p className="text-lg font-medium mb-2">
-              Создание интерфейса...
-            </p>
+            <p className="text-lg font-medium mb-2">Создание интерфейса...</p>
             <p className="text-sm text-gray-400 mb-4">
               Создаём тестовый скриншот для редактирования областей
             </p>

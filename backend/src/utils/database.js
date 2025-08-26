@@ -290,7 +290,7 @@ export async function fixDiagnosticStepsSchema() {
     `;
 
     const existingColumns = await query(columnsQuery);
-    const columnNames = existingColumns.rows.map(row => row.column_name);
+    const columnNames = existingColumns.rows.map((row) => row.column_name);
 
     const hasDeviceId = columnNames.includes("device_id");
     const hasInstruction = columnNames.includes("instruction");
@@ -337,7 +337,9 @@ export async function fixDiagnosticStepsSchema() {
 
     // Fix instruction column name mismatch
     if (hasInstructionText && !hasInstruction) {
-      console.log("⚠️  Found instruction_text column, renaming to instruction...");
+      console.log(
+        "⚠️  Found instruction_text column, renaming to instruction...",
+      );
 
       await query(`
         ALTER TABLE diagnostic_steps
@@ -501,7 +503,10 @@ export async function fixDiagnosticStepsSchema() {
     console.log("🎉 Схема diagnostic_steps исправлена");
     return true;
   } catch (error) {
-    console.error("❌ Ошибка исправления схемы diagnostic_steps:", error.message);
+    console.error(
+      "❌ Ошибка исправления схемы diagnostic_steps:",
+      error.message,
+    );
     throw error;
   }
 }

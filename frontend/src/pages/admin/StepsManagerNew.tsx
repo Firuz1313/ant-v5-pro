@@ -93,13 +93,19 @@ const StepsManagerNew = () => {
   // Debug information
   useEffect(() => {
     if (devices && devices.length > 0) {
-      console.log('🔍 Available devices:', devices.map(d => ({ id: d.id, name: d.name })));
+      console.log(
+        "🔍 Available devices:",
+        devices.map((d) => ({ id: d.id, name: d.name })),
+      );
     }
   }, [devices]);
 
   useEffect(() => {
     if (problems && problems.length > 0) {
-      console.log('🔍 Available problems:', problems.map(p => ({ id: p.id, title: p.title })));
+      console.log(
+        "🔍 Available problems:",
+        problems.map((p) => ({ id: p.id, title: p.title })),
+      );
     }
   }, [problems]);
 
@@ -115,7 +121,7 @@ const StepsManagerNew = () => {
 
   // Helper function to convert snake_case to camelCase
   const convertToCamelCase = (obj: any): any => {
-    if (obj === null || obj === undefined || typeof obj !== 'object') {
+    if (obj === null || obj === undefined || typeof obj !== "object") {
       return obj;
     }
 
@@ -126,8 +132,11 @@ const StepsManagerNew = () => {
     const result: any = {};
     for (const [key, value] of Object.entries(obj)) {
       // Convert snake_case to camelCase
-      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
-      result[camelKey] = typeof value === 'object' ? convertToCamelCase(value) : value;
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) =>
+        letter.toUpperCase(),
+      );
+      result[camelKey] =
+        typeof value === "object" ? convertToCamelCase(value) : value;
     }
     return result;
   };
@@ -138,17 +147,20 @@ const StepsManagerNew = () => {
 
       // Load steps using correct API method
       const stepsResponse = await stepsApi.getSteps(1, 1000); // Get first 1000 steps
-      console.log('🔍 Raw steps response:', stepsResponse);
+      console.log("🔍 Raw steps response:", stepsResponse);
 
       // Extract data and convert snake_case to camelCase
       const rawStepsData = stepsResponse?.data || [];
       const convertedSteps = convertToCamelCase(rawStepsData);
-      console.log('🔍 Converted steps:', convertedSteps);
-      console.log('🔍 Steps deviceId/problemId:', (convertedSteps || []).map(s => ({
-        id: s.id,
-        deviceId: s.deviceId,
-        problemId: s.problemId
-      })));
+      console.log("🔍 Converted steps:", convertedSteps);
+      console.log(
+        "🔍 Steps deviceId/problemId:",
+        (convertedSteps || []).map((s) => ({
+          id: s.id,
+          deviceId: s.deviceId,
+          problemId: s.problemId,
+        })),
+      );
       setSteps(convertedSteps || []);
 
       // Load remotes
@@ -382,7 +394,7 @@ const StepsManagerNew = () => {
 
   // Helper function to convert camelCase to snake_case for API
   const convertToSnakeCase = (obj: any): any => {
-    if (obj === null || obj === undefined || typeof obj !== 'object') {
+    if (obj === null || obj === undefined || typeof obj !== "object") {
       return obj;
     }
 
@@ -394,7 +406,8 @@ const StepsManagerNew = () => {
     for (const [key, value] of Object.entries(obj)) {
       // Convert camelCase to snake_case
       const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
-      result[snakeKey] = typeof value === 'object' ? convertToSnakeCase(value) : value;
+      result[snakeKey] =
+        typeof value === "object" ? convertToSnakeCase(value) : value;
     }
     return result;
   };
@@ -767,7 +780,10 @@ const StepsManagerNew = () => {
     const device = (devices || []).find((d) => d.id === deviceId);
     if (!device) {
       console.log(`🔍 Device not found for ID: "${deviceId}"`);
-      console.log('Available devices:', (devices || []).map(d => ({ id: d.id, name: d.name })));
+      console.log(
+        "Available devices:",
+        (devices || []).map((d) => ({ id: d.id, name: d.name })),
+      );
     }
     return device?.name || "Неизвестная приставка";
   };
@@ -776,7 +792,10 @@ const StepsManagerNew = () => {
     const problem = (problems || []).find((p) => p.id === problemId);
     if (!problem) {
       console.log(`🔍 Problem not found for ID: "${problemId}"`);
-      console.log('Available problems:', (problems || []).map(p => ({ id: p.id, title: p.title })));
+      console.log(
+        "Available problems:",
+        (problems || []).map((p) => ({ id: p.id, title: p.title })),
+      );
     }
     return problem?.title || "Неизвестная проблема";
   };
@@ -868,7 +887,9 @@ const StepsManagerNew = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingRemoteButton ? "Отменить выбо��" : "Выбрать позицию"}
+                  {isPickingRemoteButton
+                    ? "Отменить выбо��"
+                    : "Выбрать позицию"}
                 </Button>
                 <Button
                   variant="outline"

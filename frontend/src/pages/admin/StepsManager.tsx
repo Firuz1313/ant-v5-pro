@@ -417,7 +417,10 @@ const StepsManager = () => {
         delete stepPayload.highlight_tv_area;
       }
 
-      console.log("📤 Sending step payload (backend will auto-assign step_number):", stepPayload);
+      console.log(
+        "📤 Sending step payload (backend will auto-assign step_number):",
+        stepPayload,
+      );
 
       const response = await stepsApi.createStep(stepPayload);
       const newStep = response.data;
@@ -834,7 +837,9 @@ const StepsManager = () => {
   const handleCreate = async () => {
     // Prevent multiple simultaneous creation attempts
     if (isCreatingStep) {
-      console.log("⏸️ Step creation already in progress, ignoring duplicate request");
+      console.log(
+        "⏸️ Step creation already in progress, ignoring duplicate request",
+      );
       return;
     }
 
@@ -870,7 +875,9 @@ const StepsManager = () => {
             : formData.highlightTVArea,
         remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
         tvInterfaceId:
-          formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
+          formData.tvInterfaceId === "none"
+            ? undefined
+            : formData.tvInterfaceId,
         buttonPosition:
           formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
             ? undefined
@@ -880,12 +887,15 @@ const StepsManager = () => {
         // Don't set timestamps - let backend handle them
       };
 
-      console.log("📝 Creating step with data (backend will auto-assign step number):", {
-        id: newStep.id,
-        deviceId: newStep.deviceId,
-        problemId: newStep.problemId,
-        title: newStep.title
-      });
+      console.log(
+        "📝 Creating step with data (backend will auto-assign step number):",
+        {
+          id: newStep.id,
+          deviceId: newStep.deviceId,
+          problemId: newStep.problemId,
+          title: newStep.title,
+        },
+      );
 
       const createdStep = await createStep(newStep);
       setIsCreateDialogOpen(false);
@@ -895,12 +905,12 @@ const StepsManager = () => {
         title: "Шаг создан",
         description: `Шаг "${createdStep.title}" успешно создан с номером ${createdStep.step_number || createdStep.stepNumber}.`,
       });
-
     } catch (error) {
       console.error("Error creating step:", error);
       toast({
         title: "Ошибка создания шага",
-        description: error instanceof Error ? error.message : "Не удалось создать шаг.",
+        description:
+          error instanceof Error ? error.message : "Не удалось создать шаг.",
         variant: "destructive",
       });
     } finally {
@@ -1063,7 +1073,7 @@ const StepsManager = () => {
           name: remote.name,
           hasImageData: !!(remote.imageData || remote.image_data),
           dimensions: remote.dimensions,
-          buttons: remote.buttons?.length || 0
+          buttons: remote.buttons?.length || 0,
         });
 
         setSelectedRemote(remote);
@@ -1157,7 +1167,7 @@ const StepsManager = () => {
       { x: 120, y: 270, num: "7" },
       { x: 200, y: 270, num: "8" },
       { x: 280, y: 270, num: "9" },
-      { x: 200, y: 330, num: "0" }
+      { x: 200, y: 330, num: "0" },
     ];
 
     numberButtons.forEach((btn) => {
@@ -1190,7 +1200,7 @@ const StepsManager = () => {
       { x: dpadCenter.x, y: dpadCenter.y - 60, text: "▲" },
       { x: dpadCenter.x, y: dpadCenter.y + 60, text: "▼" },
       { x: dpadCenter.x - 60, y: dpadCenter.y, text: "◀" },
-      { x: dpadCenter.x + 60, y: dpadCenter.y, text: "▶" }
+      { x: dpadCenter.x + 60, y: dpadCenter.y, text: "▶" },
     ];
 
     navButtons.forEach((btn) => {
@@ -1287,18 +1297,26 @@ const StepsManager = () => {
   };
 
   const renderRemoteEditor = () => {
-    const remoteImage = customRemoteImage || selectedRemote?.imageData || selectedRemote?.image_data;
+    const remoteImage =
+      customRemoteImage ||
+      selectedRemote?.imageData ||
+      selectedRemote?.image_data;
 
     console.log("🎮 Remote Editor Debug:", {
-      selectedRemote: selectedRemote ? {
-        id: selectedRemote.id,
-        name: selectedRemote.name,
-        hasImageData: !!selectedRemote.imageData,
-        hasImage_data: !!selectedRemote.image_data,
-        imageDataLength: selectedRemote.imageData?.length || selectedRemote.image_data?.length || 0
-      } : null,
+      selectedRemote: selectedRemote
+        ? {
+            id: selectedRemote.id,
+            name: selectedRemote.name,
+            hasImageData: !!selectedRemote.imageData,
+            hasImage_data: !!selectedRemote.image_data,
+            imageDataLength:
+              selectedRemote.imageData?.length ||
+              selectedRemote.image_data?.length ||
+              0,
+          }
+        : null,
       customRemoteImage: !!customRemoteImage,
-      finalRemoteImage: !!remoteImage
+      finalRemoteImage: !!remoteImage,
     });
 
     return (
@@ -1326,13 +1344,22 @@ const StepsManager = () => {
                 <div className="w-[400px] h-[600px] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
                   <div className="text-gray-500 dark:text-gray-400 space-y-2">
                     <div className="text-4xl">📱</div>
-                    <p className="text-lg font-medium">Изображение пульта не найдено</p>
-                    <p className="text-sm">Загрузите изображение пульта, чтобы выбрать позицию кнопки</p>
+                    <p className="text-lg font-medium">
+                      Изображение пульта не найдено
+                    </p>
+                    <p className="text-sm">
+                      Загрузите изображение пульта, чтобы выбрать позицию кнопки
+                    </p>
                     {selectedRemote && (
                       <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-xs">
-                        <p><strong>Отладка:</strong> Пульт "{selectedRemote.name}" (ID: {selectedRemote.id})</p>
+                        <p>
+                          <strong>Отладка:</strong> Пульт "{selectedRemote.name}
+                          " (ID: {selectedRemote.id})
+                        </p>
                         <p>imageData: {selectedRemote.imageData ? "✓" : "✗"}</p>
-                        <p>image_data: {selectedRemote.image_data ? "✓" : "✗"}</p>
+                        <p>
+                          image_data: {selectedRemote.image_data ? "✓" : "✗"}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -1416,14 +1443,18 @@ const StepsManager = () => {
                     ⚠️ Изображение пульта отсутствует
                   </p>
                   <p className="text-xs text-yellow-600 dark:text-yellow-400 mb-3">
-                    Загрузите изображение или создайте тестовый пульт для выбора позиции кнопки.
+                    Загрузите изображение или создайте тестовый пульт для выбора
+                    позиции кнопки.
                   </p>
                   <Button
                     variant="outline"
                     size="sm"
                     onClick={() => {
                       // Открываем редактор пультов в новой вкладке
-                      window.open(`/admin/remote-builder?edit=${selectedRemote?.id}`, '_blank');
+                      window.open(
+                        `/admin/remote-builder?edit=${selectedRemote?.id}`,
+                        "_blank",
+                      );
                     }}
                     className="w-full text-xs"
                   >
@@ -1505,7 +1536,10 @@ const StepsManager = () => {
               <Button
                 onClick={handleCreate}
                 disabled={
-                  !formData.deviceId || !formData.problemId || !formData.title || isCreatingStep
+                  !formData.deviceId ||
+                  !formData.problemId ||
+                  !formData.title ||
+                  isCreatingStep
                 }
               >
                 {isCreatingStep ? "Создание..." : "Создать"}

@@ -65,7 +65,10 @@ const DiagnosticPage = () => {
           console.log("Default remote found:", defaultRemote);
           setRemote(defaultRemote);
         } catch (error) {
-          console.log("No default remote found, trying to get any remote for device:", error);
+          console.log(
+            "No default remote found, trying to get any remote for device:",
+            error,
+          );
           // If no default remote, try to get any remote for the device
           try {
             const deviceRemotes = await remotesApi.getByDevice(deviceId);
@@ -74,15 +77,23 @@ const DiagnosticPage = () => {
               console.log("Using first available remote:", deviceRemotes[0]);
               setRemote(deviceRemotes[0]);
             } else {
-              console.log("No remotes available for this device, trying to seed defaults...");
+              console.log(
+                "No remotes available for this device, trying to seed defaults...",
+              );
               // If no remotes exist for this device, try to seed default remotes
               try {
                 await remotesApi.seedDefaultRemotes();
-                console.log("Default remotes seeded, trying to load default remote again...");
+                console.log(
+                  "Default remotes seeded, trying to load default remote again...",
+                );
 
                 // Try to load default remote again after seeding
-                const newDefaultRemote = await remotesApi.getDefaultForDevice(deviceId);
-                console.log("New default remote found after seeding:", newDefaultRemote);
+                const newDefaultRemote =
+                  await remotesApi.getDefaultForDevice(deviceId);
+                console.log(
+                  "New default remote found after seeding:",
+                  newDefaultRemote,
+                );
                 setRemote(newDefaultRemote);
               } catch (seedError) {
                 console.error("Failed to seed default remotes:", seedError);

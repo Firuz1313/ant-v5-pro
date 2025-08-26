@@ -199,7 +199,9 @@ process.on("SIGINT", () => {
 async function startServer() {
   try {
     // Исправляем схему diagnostic_steps и tv_interfaces при старте
-    const { fixDiagnosticStepsSchema, fixTVInterfacesSchema } = await import("./utils/database.js");
+    const { fixDiagnosticStepsSchema, fixTVInterfacesSchema } = await import(
+      "./utils/database.js"
+    );
     await fixDiagnosticStepsSchema();
     await fixTVInterfacesSchema();
   } catch (error) {

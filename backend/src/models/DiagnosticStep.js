@@ -1,12 +1,12 @@
-import BaseModel from './BaseModel.js';
-import { query, transaction } from '../utils/database.js';
+import BaseModel from "./BaseModel.js";
+import { query, transaction } from "../utils/database.js";
 
 /**
  * Модель для работы с диагностическими шагами
  */
 class DiagnosticStep extends BaseModel {
   constructor() {
-    super('diagnostic_steps');
+    super("diagnostic_steps");
   }
 
   /**
@@ -30,7 +30,7 @@ class DiagnosticStep extends BaseModel {
         FROM diagnostic_steps ds
         LEFT JOIN remotes r ON ds.remote_id = r.id
         LEFT JOIN tv_interfaces tv ON ds.tv_interface_id = tv.id
-        WHERE ds.problem_id = $1 ${options.is_active !== undefined ? 'AND ds.is_active = $2' : ''}
+        WHERE ds.problem_id = $1 ${options.is_active !== undefined ? "AND ds.is_active = $2" : ""}
         ORDER BY ds.step_number ASC
       `;
 
@@ -42,7 +42,7 @@ class DiagnosticStep extends BaseModel {
       const result = await query(sql, values);
       return result.rows;
     } catch (error) {
-      console.error('Ошибка получения шагов по проблеме:', error.message);
+      console.error("Ошибка получения шагов по проблеме:", error.message);
       throw error;
     }
   }
@@ -77,7 +77,7 @@ class DiagnosticStep extends BaseModel {
       const result = await query(sql, [id]);
       return result.rows[0] || null;
     } catch (error) {
-      console.error('Ошибка получения шага с деталями:', error.message);
+      console.error("Ошибка получения шага с деталями:", error.message);
       throw error;
     }
   }
@@ -90,8 +90,8 @@ class DiagnosticStep extends BaseModel {
       return await transaction(async (client) => {
         // Получаем максимальный номер шага для данной проблемы
         const maxNumberResult = await client.query(
-          'SELECT COALESCE(MAX(step_number), 0) as max_number FROM diagnostic_steps WHERE problem_id = $1',
-          [data.problem_id]
+          "SELECT COALESCE(MAX(step_number), 0) as max_number FROM diagnostic_steps WHERE problem_id = $1",
+          [data.problem_id],
         );
 
         const nextStepNumber = parseInt(maxNumberResult.rows[0].max_number) + 1;
@@ -99,7 +99,7 @@ class DiagnosticStep extends BaseModel {
         // Создаем шаг с новым номером
         const stepData = {
           ...data,
-          step_number: data.step_number || nextStepNumber
+          step_number: data.step_number || nextStepNumber,
         };
 
         const prepared = this.prepareForInsert(stepData);
@@ -109,7 +109,7 @@ class DiagnosticStep extends BaseModel {
         return result.rows[0];
       });
     } catch (error) {
-      console.error('Ошибка создания шага с автонумерацией:', error.message);
+      console.error("Ошибка создания шага с автонумерацией:", error.message);
       throw error;
     }
   }
@@ -126,12 +126,15 @@ class DiagnosticStep extends BaseModel {
           const stepId = stepIds[i];
           const newStepNumber = i + 1;
 
-          const result = await client.query(`
+          const result = await client.query(
+            `
             UPDATE diagnostic_steps 
             SET step_number = $1, updated_at = $2
             WHERE id = $3 AND problem_id = $4
             RETURNING *
-          `, [newStepNumber, this.createTimestamp(), stepId, problemId]);
+          `,
+            [newStepNumber, this.createTimestamp(), stepId, problemId],
+          );
 
           if (result.rows[0]) {
             results.push(result.rows[0]);
@@ -141,7 +144,7 @@ class DiagnosticStep extends BaseModel {
         return results;
       });
     } catch (error) {
-      console.error('Ошибка переупорядочивания шагов:', error.message);
+      console.error("Ошибка переупорядочивания шагов:", error.message);
       throw error;
     }
   }
@@ -153,17 +156,20 @@ class DiagnosticStep extends BaseModel {
     try {
       return await transaction(async (client) => {
         // Сдвигаем все шаги после указанной позиции
-        await client.query(`
+        await client.query(
+          `
           UPDATE diagnostic_steps 
           SET step_number = step_number + 1, updated_at = $1
           WHERE problem_id = $2 AND step_number > $3
-        `, [this.createTimestamp(), problemId, afterStepNumber]);
+        `,
+          [this.createTimestamp(), problemId, afterStepNumber],
+        );
 
         // Создаем новый шаг
         const newStepData = {
           ...stepData,
           problem_id: problemId,
-          step_number: afterStepNumber + 1
+          step_number: afterStepNumber + 1,
         };
 
         const prepared = this.prepareForInsert(newStepData);
@@ -173,7 +179,7 @@ class DiagnosticStep extends BaseModel {
         return result.rows[0];
       });
     } catch (error) {
-      console.error('Ошибка вставки шага:', error.message);
+      console.error("Ошибка вставки шага:", error.message);
       throw error;
     }
   }
@@ -186,33 +192,39 @@ class DiagnosticStep extends BaseModel {
       return await transaction(async (client) => {
         // Получаем информацию о шаге перед удалением
         const stepResult = await client.query(
-          'SELECT problem_id, step_number FROM diagnostic_steps WHERE id = $1',
-          [stepId]
+          "SELECT problem_id, step_number FROM diagnostic_steps WHERE id = $1",
+          [stepId],
         );
 
         if (stepResult.rows.length === 0) {
-          throw new Error('Шаг не найден');
+          throw new Error("Шаг не найден");
         }
 
         const { problem_id, step_number } = stepResult.rows[0];
 
         // Удаляем шаг
         const deleteResult = await client.query(
-          'DELETE FROM diagnostic_steps WHERE id = $1 RETURNING *',
-          [stepId]
+          "DELETE FROM diagnostic_steps WHERE id = $1 RETURNING *",
+          [stepId],
         );
 
         // Сдвигаем номера всех последующих шагов
-        await client.query(`
+        await client.query(
+          `
           UPDATE diagnostic_steps 
           SET step_number = step_number - 1, updated_at = $1
           WHERE problem_id = $2 AND step_number > $3
-        `, [this.createTimestamp(), problem_id, step_number]);
+        `,
+          [this.createTimestamp(), problem_id, step_number],
+        );
 
         return deleteResult.rows[0];
       });
     } catch (error) {
-      console.error('Ошибка удаления шага с переупорядочиванием:', error.message);
+      console.error(
+        "Ошибка удаления шага с переупорядочиванием:",
+        error.message,
+      );
       throw error;
     }
   }
@@ -225,12 +237,12 @@ class DiagnosticStep extends BaseModel {
       return await transaction(async (client) => {
         // Получаем оригинальный шаг
         const originalResult = await client.query(
-          'SELECT * FROM diagnostic_steps WHERE id = $1',
-          [stepId]
+          "SELECT * FROM diagnostic_steps WHERE id = $1",
+          [stepId],
         );
 
         if (originalResult.rows.length === 0) {
-          throw new Error('Шаг не найден');
+          throw new Error("Шаг не найден");
         }
 
         const original = originalResult.rows[0];
@@ -238,8 +250,8 @@ class DiagnosticStep extends BaseModel {
 
         // Получаем максимальный номер шага для целевой проблемы
         const maxNumberResult = await client.query(
-          'SELECT COALESCE(MAX(step_number), 0) as max_number FROM diagnostic_steps WHERE problem_id = $1',
-          [problemId]
+          "SELECT COALESCE(MAX(step_number), 0) as max_number FROM diagnostic_steps WHERE problem_id = $1",
+          [problemId],
         );
 
         const nextStepNumber = parseInt(maxNumberResult.rows[0].max_number) + 1;
@@ -252,19 +264,19 @@ class DiagnosticStep extends BaseModel {
           step_number: nextStepNumber,
           title: `${original.title} (копия)`,
           created_at: this.createTimestamp(),
-          updated_at: this.createTimestamp()
+          updated_at: this.createTimestamp(),
         };
 
         delete newStep.id; // Удаляем, чтобы использовать новый сгенерированный
         const prepared = this.prepareForInsert(newStep);
-        
+
         const { sql, values } = this.buildInsertQuery(prepared);
         const result = await client.query(sql, values);
 
         return result.rows[0];
       });
     } catch (error) {
-      console.error('Ошибка дублирования шага:', error.message);
+      console.error("Ошибка дублирования шага:", error.message);
       throw error;
     }
   }
@@ -298,12 +310,12 @@ class DiagnosticStep extends BaseModel {
       const offset = options.offset || 0;
 
       const result = await query(sql, [searchTerm, limit, offset]);
-      return result.rows.map(row => ({
+      return result.rows.map((row) => ({
         ...row,
-        rank: parseFloat(row.rank || 0)
+        rank: parseFloat(row.rank || 0),
       }));
     } catch (error) {
-      console.error('Ошибка поиска шагов:', error.message);
+      console.error("Ошибка поиска шагов:", error.message);
       throw error;
     }
   }
@@ -338,26 +350,38 @@ class DiagnosticStep extends BaseModel {
           avg_time_spent: null,
           min_time_spent: null,
           max_time_spent: null,
-          success_rate: 0
+          success_rate: 0,
         };
       }
 
       const stats = result.rows[0];
       const totalExecutions = parseInt(stats.total_executions || 0);
       const successfulExecutions = parseInt(stats.successful_executions || 0);
-      
+
       return {
         total_executions: totalExecutions,
         successful_executions: successfulExecutions,
         failed_executions: parseInt(stats.failed_executions || 0),
         skipped_executions: parseInt(stats.skipped_executions || 0),
-        avg_time_spent: stats.avg_time_spent ? Math.round(parseFloat(stats.avg_time_spent)) : null,
-        min_time_spent: stats.min_time_spent ? parseInt(stats.min_time_spent) : null,
-        max_time_spent: stats.max_time_spent ? parseInt(stats.max_time_spent) : null,
-        success_rate: totalExecutions > 0 ? Math.round((successfulExecutions / totalExecutions) * 100) : 0
+        avg_time_spent: stats.avg_time_spent
+          ? Math.round(parseFloat(stats.avg_time_spent))
+          : null,
+        min_time_spent: stats.min_time_spent
+          ? parseInt(stats.min_time_spent)
+          : null,
+        max_time_spent: stats.max_time_spent
+          ? parseInt(stats.max_time_spent)
+          : null,
+        success_rate:
+          totalExecutions > 0
+            ? Math.round((successfulExecutions / totalExecutions) * 100)
+            : 0,
       };
     } catch (error) {
-      console.error('Ошибка получения статистики использования шага:', error.message);
+      console.error(
+        "Ошибка получения статистики использования шага:",
+        error.message,
+      );
       throw error;
     }
   }
@@ -379,7 +403,7 @@ class DiagnosticStep extends BaseModel {
 
       const result = await query(sql, [id]);
       if (result.rows.length === 0) {
-        return { canDelete: false, reason: 'Шаг не найден' };
+        return { canDelete: false, reason: "Шаг не найден" };
       }
 
       const stats = result.rows[0];
@@ -388,13 +412,16 @@ class DiagnosticStep extends BaseModel {
       if (activeSessionsCount > 0) {
         return {
           canDelete: false,
-          reason: `Невозможно удалить шаг, используемый в ${activeSessionsCount} активных сессиях диагностики`
+          reason: `Невозможно удалить шаг, используемый в ${activeSessionsCount} активных сессиях диагностики`,
         };
       }
 
       return { canDelete: true };
     } catch (error) {
-      console.error('Ошибка проверки в��зможности удаления шага:', error.message);
+      console.error(
+        "Ошибка проверки в��зможности удаления шага:",
+        error.message,
+      );
       throw error;
     }
   }
@@ -416,7 +443,7 @@ class DiagnosticStep extends BaseModel {
       const result = await query(sql, [currentStepId]);
       return result.rows[0] || null;
     } catch (error) {
-      console.error('Ошибка получения следующего шага:', error.message);
+      console.error("Ошибка получения следующего шага:", error.message);
       throw error;
     }
   }
@@ -438,7 +465,7 @@ class DiagnosticStep extends BaseModel {
       const result = await query(sql, [currentStepId]);
       return result.rows[0] || null;
     } catch (error) {
-      console.error('Ошибка получения предыдущего шага:', error.message);
+      console.error("Ошибка получения предыдущего шага:", error.message);
       throw error;
     }
   }
@@ -459,10 +486,10 @@ class DiagnosticStep extends BaseModel {
       const result = await query(sql, [problemId]);
       return {
         isValid: result.rows.length === 0,
-        duplicates: result.rows
+        duplicates: result.rows,
       };
     } catch (error) {
-      console.error('Ошибка валидации порядка шагов:', error.message);
+      console.error("Ошибка валидации порядка шагов:", error.message);
       throw error;
     }
   }
@@ -474,12 +501,15 @@ class DiagnosticStep extends BaseModel {
     try {
       return await transaction(async (client) => {
         // Получаем все шаги проблемы, отсортированные по текущей нумерации
-        const stepsResult = await client.query(`
+        const stepsResult = await client.query(
+          `
           SELECT id, step_number 
           FROM diagnostic_steps 
           WHERE problem_id = $1 AND is_active = true
           ORDER BY step_number ASC, created_at ASC
-        `, [problemId]);
+        `,
+          [problemId],
+        );
 
         const results = [];
 
@@ -489,12 +519,15 @@ class DiagnosticStep extends BaseModel {
           const newStepNumber = i + 1;
 
           if (step.step_number !== newStepNumber) {
-            const result = await client.query(`
+            const result = await client.query(
+              `
               UPDATE diagnostic_steps 
               SET step_number = $1, updated_at = $2
               WHERE id = $3
               RETURNING *
-            `, [newStepNumber, this.createTimestamp(), step.id]);
+            `,
+              [newStepNumber, this.createTimestamp(), step.id],
+            );
 
             results.push(result.rows[0]);
           }
@@ -503,7 +536,7 @@ class DiagnosticStep extends BaseModel {
         return results;
       });
     } catch (error) {
-      console.error('Ошибка исправления нумерации шагов:', error.message);
+      console.error("Ошибка исправления нумерации шагов:", error.message);
       throw error;
     }
   }

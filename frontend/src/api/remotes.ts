@@ -183,7 +183,10 @@ export const remotesApi = {
       );
       return response.data;
     } catch (error) {
-      console.error(`Failed to fetch default remote for device ${deviceId}:`, error);
+      console.error(
+        `Failed to fetch default remote for device ${deviceId}:`,
+        error,
+      );
       throw error; // Re-throw the original error to maintain error type
     }
   },
@@ -195,7 +198,10 @@ export const remotesApi = {
     try {
       await apiClient.post(`/remotes/${remoteId}/set-default/${deviceId}`);
     } catch (error) {
-      console.error(`Failed to set remote ${remoteId} as default for device ${deviceId}:`, error);
+      console.error(
+        `Failed to set remote ${remoteId} as default for device ${deviceId}:`,
+        error,
+      );
       throw error;
     }
   },

@@ -53,13 +53,17 @@ const RemoteControl = ({
         const remoteData = await getRemoteById(remoteId);
         console.log("🎮 RemoteControl loading remote:", {
           remoteId,
-          remoteData: remoteData ? {
-            id: remoteData.id,
-            name: remoteData.name,
-            hasImageData: !!(remoteData.imageData || remoteData.image_data),
-            hasButtons: Array.isArray(remoteData.buttons) && remoteData.buttons.length > 0,
-            dimensions: remoteData.dimensions
-          } : null
+          remoteData: remoteData
+            ? {
+                id: remoteData.id,
+                name: remoteData.name,
+                hasImageData: !!(remoteData.imageData || remoteData.image_data),
+                hasButtons:
+                  Array.isArray(remoteData.buttons) &&
+                  remoteData.buttons.length > 0,
+                dimensions: remoteData.dimensions,
+              }
+            : null,
         });
 
         if (remoteData) {
@@ -113,7 +117,9 @@ const RemoteControl = ({
           <div
             className="relative w-full max-w-[260px] h-full min-h-[600px] lg:min-h-[700px] bg-cover bg-center bg-no-repeat rounded-3xl shadow-2xl border-4 border-gray-700"
             style={{
-              backgroundImage: remote.imageData ? `url(${remote.imageData})` : "none",
+              backgroundImage: remote.imageData
+                ? `url(${remote.imageData})`
+                : "none",
               backgroundColor: remote.imageData ? "transparent" : "#374151",
             }}
           >
@@ -121,8 +127,12 @@ const RemoteControl = ({
             {!remote.imageData && (
               <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
                 <div className="text-6xl mb-4">📱</div>
-                <p className="text-white text-lg font-semibold mb-2">{remote.name}</p>
-                <p className="text-gray-300 text-sm">Изображение пульта не найдено</p>
+                <p className="text-white text-lg font-semibold mb-2">
+                  {remote.name}
+                </p>
+                <p className="text-gray-300 text-sm">
+                  Изображение пульта не найдено
+                </p>
               </div>
             )}
 
