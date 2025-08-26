@@ -304,6 +304,7 @@ export async function fixDiagnosticStepsSchema() {
     const hasMedia = columnNames.includes("media");
     const hasNextStepConditions = columnNames.includes("next_step_conditions");
     const hasHint = columnNames.includes("hint");
+    const hasButtonPosition = columnNames.includes("button_position");
 
     // Добавляем недостающую колонку device_id
     if (!hasDeviceId) {
@@ -373,7 +374,7 @@ export async function fixDiagnosticStepsSchema() {
 
     // Add missing validation_rules column
     if (!hasValidationRules) {
-      console.log("⚠���  validation_rules column missing, adding it...");
+      console.log("⚠️  validation_rules column missing, adding it...");
 
       await query(`
         ALTER TABLE diagnostic_steps
@@ -422,7 +423,7 @@ export async function fixDiagnosticStepsSchema() {
         ADD COLUMN warning_text TEXT
       `);
 
-      console.log("✅ Добавлена колонка warning_text");
+      console.log("✅ Добавлена коло��ка warning_text");
     } else {
       console.log("✅ Колонка warning_text уже существует");
     }
@@ -582,7 +583,7 @@ export async function closePool() {
   }
 }
 
-// Функция очистк�� старых данных (maintenance)
+// Функция очистки старых данных (maintenance)
 export async function cleanupOldData(daysToKeep = 90) {
   try {
     console.log(`🧹 Очистка данных старше ${daysToKeep} дней...`);
