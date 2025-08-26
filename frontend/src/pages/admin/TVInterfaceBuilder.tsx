@@ -813,7 +813,7 @@ const TVInterfaceBuilder = () => {
               selectedDeviceFilter !== "all" ||
               selectedTypeFilter !== "all"
                 ? "Попробуйте изменить фильтры поиска"
-                : "Соз��айте первый TV интерфейс для начала работы"}
+                : "Соз��айте первый TV интерфейс для начала ��аботы"}
             </p>
             {!searchTerm &&
               selectedDeviceFilter === "all" &&
@@ -830,12 +830,18 @@ const TVInterfaceBuilder = () => {
               <CardContent className="p-0">
                 {/* Interface Preview */}
                 <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative">
-                  {tvInterfaceUtils.hasScreenshot(tvInterface) ? (
+                  {tvInterfaceUtils.hasScreenshot(tvInterface) && tvInterfaceUtils.getScreenshotUrl(tvInterface) ? (
                     <img
                       src={tvInterfaceUtils.getScreenshotUrl(tvInterface)!}
                       alt={tvInterface.name}
                       className="w-full h-full object-cover"
                     />
+                  ) : tvInterfaceUtils.hasScreenshot(tvInterface) ? (
+                    <div className="text-center">
+                      <ImageIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-500">Скриншот есть</p>
+                      <p className="text-xs text-gray-400">Открыть для просмотра</p>
+                    </div>
                   ) : (
                     <div className="text-center">
                       <ImageIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
