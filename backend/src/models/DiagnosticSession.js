@@ -300,15 +300,15 @@ class DiagnosticSession extends BaseModel {
       const sql = `
         SELECT
           COUNT(*) as total_sessions,
-          COUNT(CASE WHEN ds.end_time IS NOT NULL AND ds.completed_steps >= ds.total_steps THEN 1 END) as successful_sessions,
-          COUNT(CASE WHEN ds.end_time IS NOT NULL AND ds.completed_steps < ds.total_steps THEN 1 END) as failed_sessions,
-          COUNT(CASE WHEN ds.end_time IS NULL THEN 1 END) as active_sessions,
+          COUNT(CASE WHEN ds.duration IS NOT NULL AND ds.completed_steps >= ds.total_steps THEN 1 END) as successful_sessions,
+          COUNT(CASE WHEN ds.duration IS NOT NULL AND ds.completed_steps < ds.total_steps THEN 1 END) as failed_sessions,
+          COUNT(CASE WHEN ds.duration IS NULL THEN 1 END) as active_sessions,
           AVG(CASE WHEN ds.duration IS NOT NULL THEN ds.duration END) as avg_duration,
           MIN(CASE WHEN ds.duration IS NOT NULL THEN ds.duration END) as min_duration,
           MAX(CASE WHEN ds.duration IS NOT NULL THEN ds.duration END) as max_duration,
           AVG(ds.completed_steps::float / NULLIF(ds.total_steps, 0) * 100) as avg_completion_rate
         FROM diagnostic_sessions ds
-        WHERE ${whereConditions.join(' AND ')}
+        WHERE ${whereConditions.length > 0 ? whereConditions.join(' AND ') : '1=1'}
       `;
 
       const result = await query(sql, values);
