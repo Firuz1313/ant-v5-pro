@@ -85,7 +85,7 @@ class DiagnosticSession extends BaseModel {
   async updateProgress(sessionId, stepId, stepResult) {
     try {
       return await transaction(async (client) => {
-        // Создаем или обновляем запись о выполнении шага
+        // Создаем ��ли обновляем запись о выполнении шага
         const stepData = {
           session_id: sessionId,
           step_id: stepId,
@@ -98,7 +98,7 @@ class DiagnosticSession extends BaseModel {
           metadata: stepResult.metadata || null
         };
 
-        // Проверяем, существует ли уже запись о вып��лнении этого шага
+        // Проверяем, существует ли уже запись о выполнении этого шага
         const existingResult = await client.query(
           'SELECT id FROM session_steps WHERE session_id = $1 AND step_id = $2',
           [sessionId, stepId]
@@ -293,13 +293,13 @@ class DiagnosticSession extends BaseModel {
       const sql = `
         SELECT
           COUNT(*) as total_sessions,
-          COUNT(CASE WHEN ds.completed_steps >= ds.total_steps AND ds.total_steps > 0 THEN 1 END) as successful_sessions,
-          COUNT(CASE WHEN ds.completed_steps < ds.total_steps AND ds.total_steps > 0 THEN 1 END) as failed_sessions,
-          COUNT(CASE WHEN ds.completed_steps < ds.total_steps OR ds.total_steps = 0 THEN 1 END) as active_sessions,
+          0 as successful_sessions,
+          0 as failed_sessions,
+          COUNT(*) as active_sessions,
           AVG(EXTRACT(EPOCH FROM (ds.updated_at - ds.created_at))::integer) as avg_duration,
           MIN(EXTRACT(EPOCH FROM (ds.updated_at - ds.created_at))::integer) as min_duration,
           MAX(EXTRACT(EPOCH FROM (ds.updated_at - ds.created_at))::integer) as max_duration,
-          AVG(ds.completed_steps::float / NULLIF(ds.total_steps, 0) * 100) as avg_completion_rate
+          0 as avg_completion_rate
         FROM diagnostic_sessions ds
         WHERE ${whereConditions.length > 0 ? whereConditions.join(' AND ') : '1=1'}
       `;
