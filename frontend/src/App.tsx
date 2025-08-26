@@ -139,7 +139,23 @@ function App() {
           path="/admin/steps"
           element={
             <AdminLayout>
+              <StepsManagerAccess />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/steps-old"
+          element={
+            <AdminLayout>
               <StepsManager />
+            </AdminLayout>
+          }
+        />
+        <Route
+          path="/admin/steps-fixed"
+          element={
+            <AdminLayout>
+              <StepsManagerFixed />
             </AdminLayout>
           }
         />
