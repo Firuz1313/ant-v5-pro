@@ -177,7 +177,7 @@ const StepFormFieldsComponent = React.memo(
               <SelectValue placeholder="Выберите интерфейс" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="none">Без и��терф��йса</SelectItem>
+              <SelectItem value="none">Без и���терф��йса</SelectItem>
               {loadingTVInterfaces ? (
                 <SelectItem value="loading" disabled>
                   Загрузка...
@@ -300,12 +300,24 @@ interface DiagnosticStep {
 }
 
 const StepsManager = () => {
-  const { data: devicesResponse } = useDevices();
-  const { data: problemsResponse } = useProblems();
+  const { data: devicesResponse, isLoading: devicesLoading, error: devicesError } = useDevices();
+  const { data: problemsResponse, isLoading: problemsLoading, error: problemsError } = useProblems();
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
+
+  // Debug logging
+  console.log("🔍 StepsManager data:", {
+    devicesResponse,
+    problemsResponse,
+    devices: devices.length,
+    problems: problems.length,
+    devicesLoading,
+    problemsLoading,
+    devicesError,
+    problemsError
+  });
 
   // Local state for steps and remotes
   const [steps, setSteps] = useState<DiagnosticStep[]>([]);
