@@ -160,7 +160,7 @@ app.use((req, res, next) => {
       if (!res.headersSent) {
         res.status(408).json({
           success: false,
-          error: 'Request timeout - операция заняла слишком много времени',
+          error: 'Request timeout - операци�� заняла слишком много времени',
           timestamp: new Date().toISOString()
         });
       }
@@ -237,8 +237,9 @@ process.on("SIGINT", () => {
 async function startServer() {
   try {
     // Исправляем схему tv_interfaces при старте
-    const { fixTVInterfacesSchema } = await import("./utils/database.js");
+    const { fixTVInterfacesSchema, createTVInterfaceMarksTable } = await import("./utils/database.js");
     await fixTVInterfacesSchema();
+    await createTVInterfaceMarksTable();
   } catch (error) {
     console.error(
       "⚠️ Ошибка исправления схемы, продолжаем запуск:",
