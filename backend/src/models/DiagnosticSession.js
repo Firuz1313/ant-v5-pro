@@ -87,7 +87,7 @@ class DiagnosticSession extends BaseModel {
   }
 
   /**
-   * Обновление прогресса сессии
+   * Обновление пр��гресса сессии
    */
   async updateProgress(sessionId, stepId, stepResult) {
     try {
@@ -454,8 +454,7 @@ class DiagnosticSession extends BaseModel {
           AVG(CASE WHEN duration IS NOT NULL THEN duration END) as avg_duration,
           AVG(completed_steps::float / NULLIF(total_steps, 0) * 100) as avg_completion_rate
         FROM diagnostic_sessions
-        WHERE is_active = true 
-          AND start_time >= NOW() - INTERVAL '${limit} ${period}s'
+        WHERE created_at >= NOW() - INTERVAL '${limit} ${period}s'
         GROUP BY ${groupBy}
         ORDER BY period_start DESC
         LIMIT $1
