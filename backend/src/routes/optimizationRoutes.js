@@ -12,6 +12,10 @@ import {
 import {
   fixTVInterfaceIdFormat
 } from '../controllers/tvInterfaceMarkFixController.js';
+import {
+  fullTableDiagnosis,
+  fixAllUuidColumns
+} from '../controllers/tvInterfaceMarkTableFixController.js';
 import requestLogger from '../middleware/requestLogger.js';
 
 const router = express.Router();
@@ -68,6 +72,20 @@ router.post('/tv-interface-marks/create-minimal', createMinimalTVInterfaceMarksT
  * @access Admin
  */
 router.post('/tv-interface-marks/fix-id-format', fixTVInterfaceIdFormat);
+
+/**
+ * @route GET /api/v1/optimization/tv-interface-marks/full-diagnosis
+ * @desc Full diagnosis of tv_interface_marks table structure
+ * @access Admin
+ */
+router.get('/tv-interface-marks/full-diagnosis', fullTableDiagnosis);
+
+/**
+ * @route POST /api/v1/optimization/tv-interface-marks/fix-all-uuid
+ * @desc Fix all UUID columns to VARCHAR format
+ * @access Admin
+ */
+router.post('/tv-interface-marks/fix-all-uuid', fixAllUuidColumns);
 
 // Middleware для обработки ошибок маршрутов
 router.use((error, req, res, next) => {
