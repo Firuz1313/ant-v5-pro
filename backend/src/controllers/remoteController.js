@@ -265,7 +265,7 @@ export const deleteRemote = async (req, res) => {
     if (!deletedRemote) {
       return res.status(404).json({
         success: false,
-        error: "Пуль�� не найден",
+        error: "Пульт не найден",
         timestamp: new Date().toISOString(),
       });
     }
@@ -280,7 +280,7 @@ export const deleteRemote = async (req, res) => {
     console.error("Error in deleteRemote:", error);
     res.status(500).json({
       success: false,
-      error: "Ошибка при удалении пульта",
+      error: "Ошибка при удален��и пульта",
       details: error.message,
       timestamp: new Date().toISOString(),
     });
@@ -314,7 +314,7 @@ export const getRemotesByDevice = async (req, res) => {
 };
 
 /**
- * По��учение пульта по умолчанию для устройства
+ * Получение пульта по умолчанию для устройства
  * GET /api/v1/remotes/device/:deviceId/default
  */
 export const getDefaultRemoteForDevice = async (req, res) => {
@@ -325,7 +325,7 @@ export const getDefaultRemoteForDevice = async (req, res) => {
     if (!remote) {
       return res.status(404).json({
         success: false,
-        error: "Пульт по умолчанию не найден для этого устройства",
+        error: "Пульт по умолча��ию не найден для этого устройства",
         timestamp: new Date().toISOString(),
       });
     }
@@ -452,7 +452,7 @@ export const getRemoteStats = async (req, res) => {
     console.error("Error in getRemoteStats:", error);
     res.status(500).json({
       success: false,
-      error: "Ошибка при получении ст��тистики пультов",
+      error: "Ошибка при получении статистики пультов",
       details: error.message,
       timestamp: new Date().toISOString(),
     });
@@ -496,4 +496,5 @@ export default {
   duplicateRemote,
   incrementRemoteUsage,
   getRemoteStats,
+  seedDefaultRemotes,
 };
