@@ -71,13 +71,15 @@ export class ApiClient {
     timeout?: number,
   ): Promise<Response> {
     return new Promise((resolve, reject) => {
+      const actualTimeout = timeout || this.timeout;
       console.log(`📡 Using XMLHttpRequest fallback for: ${url}`);
+      console.log(`⏱️ XHR timeout set to: ${actualTimeout}ms`);
 
       const xhr = new XMLHttpRequest();
       const method = options.method || "GET";
 
       xhr.open(method, url);
-      xhr.timeout = timeout || this.timeout;
+      xhr.timeout = actualTimeout;
 
       // Set headers
       const headers = (options.headers as Record<string, string>) || {};
