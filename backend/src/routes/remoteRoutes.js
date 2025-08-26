@@ -11,6 +11,7 @@ import {
   duplicateRemote,
   incrementRemoteUsage,
   getRemoteStats,
+  seedDefaultRemotes,
 } from "../controllers/remoteController.js";
 const router = express.Router();
 
