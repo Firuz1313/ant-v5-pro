@@ -194,17 +194,14 @@ class TVInterface extends BaseModel {
     }
   }
 
-  // Об��овить интерфейс
+  // Обновить интерфейс (оптимизированная версия)
   async update(id, data) {
+    const startTime = Date.now();
     try {
-      // Проверяем существование интерфейса
-      const existing = await this.getById(id);
-      if (!existing) {
-        throw new Error("TV интерфейс не найден");
-      }
+      console.log(`🔧 Starting optimized TV interface update: ${id}`);
 
-      // Валидация device_id если он изменяется
-      if (data.device_id && data.device_id !== existing.device_id) {
+      // Валидация device_id если он передан (без дополнительного запроса к текущему интерфейсу)
+      if (data.device_id) {
         const deviceExists = await this.query(
           "SELECT id FROM devices WHERE id = $1",
           [data.device_id],
@@ -218,7 +215,7 @@ class TVInterface extends BaseModel {
         updated_at: new Date().toISOString(),
       };
 
-      // Обновляем только переданные пол��
+      // Обновляем только переданные поля
       if (data.name !== undefined) updateData.name = data.name.trim();
       if (data.description !== undefined)
         updateData.description = data.description?.trim() || "";
@@ -226,21 +223,90 @@ class TVInterface extends BaseModel {
       if (data.device_id !== undefined) updateData.device_id = data.device_id;
       if (data.screenshot_url !== undefined)
         updateData.screenshot_url = data.screenshot_url;
-      if (data.screenshot_data !== undefined)
+      if (data.screenshot_data !== undefined) {
         updateData.screenshot_data = data.screenshot_data;
+        const sizeInMB = (data.screenshot_data.length / 1024 / 1024).toFixed(2);
+        console.log(`📷 Processing screenshot data: ${sizeInMB}MB`);
+      }
       if (data.clickable_areas !== undefined)
         updateData.clickable_areas = JSON.stringify(data.clickable_areas);
       if (data.highlight_areas !== undefined)
         updateData.highlight_areas = JSON.stringify(data.highlight_areas);
       if (data.is_active !== undefined) updateData.is_active = data.is_active;
 
-      await super.updateById(id, updateData);
+      // Объединенный запрос: обновление + возврат с JOIN в одной операци��
+      const updateFields = [];
+      const updateValues = [];
+      let paramIndex = 1;
 
-      // Возвращаем обновленный интерфейс с данными устройства
-      const updated = await this.getById(id);
-      return updated;
+      Object.keys(updateData).forEach(key => {
+        updateFields.push(`${key} = $${paramIndex}`);
+        updateValues.push(updateData[key]);
+        paramIndex++;
+      });
+
+      updateValues.push(id); // ID для WHERE условия
+
+      const query = `
+        UPDATE ${this.tableName}
+        SET ${updateFields.join(', ')}
+        WHERE id = $${paramIndex} AND is_active = true
+        RETURNING *
+      `;
+
+      console.log(`🗃️ Executing optimized update query`);
+      const updateResult = await this.query(query, updateValues);
+
+      if (updateResult.rows.length === 0) {
+        throw new Error("TV интерфейс не найден или уже удален");
+      }
+
+      const updatedInterface = updateResult.rows[0];
+
+      // Получаем данные устройства отдельным быстрым запросом только если нужно
+      const deviceQuery = `
+        SELECT name as device_name, brand as device_brand, model as device_model
+        FROM devices
+        WHERE id = $1
+      `;
+      const deviceResult = await this.query(deviceQuery, [updatedInterface.device_id]);
+
+      // Объединяем результат
+      const result = {
+        ...updatedInterface,
+        device_name: deviceResult.rows[0]?.device_name || null,
+        device_brand: deviceResult.rows[0]?.device_brand || null,
+        device_model: deviceResult.rows[0]?.device_model || null
+      };
+
+      // Парсим JSON поля если они существуют
+      if (result.clickable_areas) {
+        try {
+          result.clickable_areas = JSON.parse(result.clickable_areas);
+        } catch (e) {
+          result.clickable_areas = [];
+        }
+      } else {
+        result.clickable_areas = [];
+      }
+
+      if (result.highlight_areas) {
+        try {
+          result.highlight_areas = JSON.parse(result.highlight_areas);
+        } catch (e) {
+          result.highlight_areas = [];
+        }
+      } else {
+        result.highlight_areas = [];
+      }
+
+      const duration = Date.now() - startTime;
+      console.log(`✅ Optimized TV interface update completed in ${duration}ms`);
+
+      return result;
     } catch (error) {
-      console.error("Error updating TV interface:", error);
+      const duration = Date.now() - startTime;
+      console.error(`❌ TV interface update failed after ${duration}ms:`, error.message);
       throw error;
     }
   }
