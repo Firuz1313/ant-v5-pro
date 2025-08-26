@@ -58,7 +58,7 @@ const DiagnosticPage = () => {
         const stepsResponse = await stepsApi.getStepsByProblem(problemId);
         setSteps(stepsResponse?.data || []);
 
-        // Load remote for device (try default first, then any remote)
+        // Load remote for device (try default first, then any remote, then seed defaults)
         try {
           console.log(`Loading default remote for device: ${deviceId}`);
           const defaultRemote = await remotesApi.getDefaultForDevice(deviceId);
@@ -74,9 +74,20 @@ const DiagnosticPage = () => {
               console.log("Using first available remote:", deviceRemotes[0]);
               setRemote(deviceRemotes[0]);
             } else {
-              console.log("No remotes available for this device");
-              // You could set a default state or show a message here
-              setRemote(null);
+              console.log("No remotes available for this device, trying to seed defaults...");
+              // If no remotes exist for this device, try to seed default remotes
+              try {
+                await remotesApi.seedDefaultRemotes();
+                console.log("Default remotes seeded, trying to load default remote again...");
+
+                // Try to load default remote again after seeding
+                const newDefaultRemote = await remotesApi.getDefaultForDevice(deviceId);
+                console.log("New default remote found after seeding:", newDefaultRemote);
+                setRemote(newDefaultRemote);
+              } catch (seedError) {
+                console.error("Failed to seed default remotes:", seedError);
+                setRemote(null);
+              }
             }
           } catch (err) {
             console.error("Error loading device remotes:", err);
@@ -132,7 +143,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600">
         <div className="text-center text-white">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или проблема не найден��</p>
+          <p>Устройство или проблема не найдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -267,7 +278,7 @@ const DiagnosticPage = () => {
                   />
                 ) : (
                   <div className="text-center text-gray-400 py-8">
-                    <p>Пульт не ��айден</p>
+                    <p>Пульт не найден</p>
                   </div>
                 )}
               </CardContent>
