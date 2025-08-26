@@ -113,23 +113,48 @@ const StepsManagerNew = () => {
     loadInitialData();
   }, []);
 
+  // Helper function to convert snake_case to camelCase
+  const convertToCamelCase = (obj: any): any => {
+    if (obj === null || obj === undefined || typeof obj !== 'object') {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(convertToCamelCase);
+    }
+
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      // Convert snake_case to camelCase
+      const camelKey = key.replace(/_([a-z])/g, (_, letter) => letter.toUpperCase());
+      result[camelKey] = typeof value === 'object' ? convertToCamelCase(value) : value;
+    }
+    return result;
+  };
+
   const loadInitialData = async () => {
     try {
       setLoading(true);
 
-      // Load steps
-      const stepsResponse = await stepsApi.getAll();
-      console.log('🔍 Loaded steps:', stepsResponse);
-      console.log('🔍 Steps deviceId/problemId:', (stepsResponse || []).map(s => ({
+      // Load steps using correct API method
+      const stepsResponse = await stepsApi.getSteps(1, 1000); // Get first 1000 steps
+      console.log('🔍 Raw steps response:', stepsResponse);
+
+      // Extract data and convert snake_case to camelCase
+      const rawStepsData = stepsResponse?.data || [];
+      const convertedSteps = convertToCamelCase(rawStepsData);
+      console.log('🔍 Converted steps:', convertedSteps);
+      console.log('🔍 Steps deviceId/problemId:', (convertedSteps || []).map(s => ({
         id: s.id,
         deviceId: s.deviceId,
         problemId: s.problemId
       })));
-      setSteps(stepsResponse || []);
+      setSteps(convertedSteps || []);
 
       // Load remotes
       const remotesResponse = await remotesApi.getAll();
-      setRemotes(remotesResponse || []);
+      const remotesData = remotesResponse?.data || remotesResponse || [];
+      setRemotes(Array.isArray(remotesData) ? remotesData : []);
     } catch (error) {
       console.error("Error loading initial data:", error);
     } finally {
@@ -804,7 +829,7 @@ const StepsManagerNew = () => {
         <div className="w-full lg:w-80 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Выбор позиции на пуль��е</CardTitle>
+              <CardTitle className="text-lg">Выбор позиции на пульте</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
@@ -1388,7 +1413,7 @@ const StepsManagerNew = () => {
                           {remote.name}
                           {remote.isDefault && (
                             <span className="ml-2 text-xs text-blue-600">
-                              (по умолчани��)
+                              (по умолчанию)
                             </span>
                           )}
                         </div>
