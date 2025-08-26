@@ -104,7 +104,7 @@ export const getTVInterfacesByDeviceId = async (req, res) => {
     console.error('Error in getTVInterfacesByDeviceId:', error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при получении TV интерфейсов для устройства',
+      error: 'Ошибка при получении TV интерфейсов д��я устройства',
       details: error.message,
       timestamp: new Date().toISOString()
     });
@@ -181,20 +181,30 @@ export const createTVInterface = async (req, res) => {
   }
 };
 
-// Обновить TV интерфейс
+// Обновить TV интерфейс (с улучшенной обработкой ошибок и таймаутов)
 export const updateTVInterface = async (req, res) => {
   const startTime = Date.now();
-  try {
-    const { id } = req.params;
-    const updateData = req.body;
+  const { id } = req.params;
+  const updateData = req.body;
 
+  // Устанавливаем расширенный таймаут для ответа
+  req.setTimeout(300000); // 5 ми��ут для обработки запроса
+  res.setTimeout(300000); // 5 минут для отправки ответа
+
+  try {
     console.log(`🔄 Starting TV interface update: ${id}`);
     console.log(`📊 Update data size: ${JSON.stringify(updateData).length} characters`);
 
-    // Логируем размер screenshot_data если он есть
+    // Проверяем размер screenshot_data и предупреждаем о больших файлах
     if (updateData.screenshot_data) {
       const screenshotSize = updateData.screenshot_data.length;
-      console.log(`📷 Screenshot data size: ${(screenshotSize / 1024 / 1024).toFixed(2)}MB`);
+      const sizeInMB = (screenshotSize / 1024 / 1024).toFixed(2);
+      console.log(`📷 Screenshot data size: ${sizeInMB}MB`);
+
+      // Предупреждение для очень больших файлов
+      if (screenshotSize > 50 * 1024 * 1024) { // 50MB
+        console.warn(`⚠️ Large screenshot data detected (${sizeInMB}MB) - this may take longer to process`);
+      }
     }
 
     if (!id) {
@@ -205,8 +215,26 @@ export const updateTVInterface = async (req, res) => {
       });
     }
 
-    console.log(`🔍 Calling model update for TV interface: ${id}`);
-    const tvInterface = await tvInterfaceModel.update(id, updateData);
+    console.log(`🔍 Calling optimized model update for TV interface: ${id}`);
+
+    // Создаем Promise с таймаутом для операции базы данных
+    const dbOperationTimeout = new Promise((resolve, reject) => {
+      const timeout = setTimeout(() => {
+        reject(new Error('Database operation timeout - операция превысила лимит времени'));
+      }, 240000); // 4 минуты для операции БД
+
+      tvInterfaceModel.update(id, updateData)
+        .then(result => {
+          clearTimeout(timeout);
+          resolve(result);
+        })
+        .catch(error => {
+          clearTimeout(timeout);
+          reject(error);
+        });
+    });
+
+    const tvInterface = await dbOperationTimeout;
 
     const endTime = Date.now();
     const duration = endTime - startTime;
@@ -216,7 +244,8 @@ export const updateTVInterface = async (req, res) => {
       success: true,
       data: tvInterface,
       message: 'TV интерфейс успешно обновлен',
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
+      processingTime: `${duration}ms`
     });
   } catch (error) {
     const endTime = Date.now();
@@ -227,6 +256,22 @@ export const updateTVInterface = async (req, res) => {
       message: error.message,
       stack: error.stack?.split('\n').slice(0, 5).join('\n') // Первые 5 строк стека
     });
+
+    // Специальная обработка таймаутов
+    if (error.message.includes('timeout') || error.message.includes('превысила лимит времени')) {
+      return res.status(408).json({
+        success: false,
+        error: 'Операция превысила лимит времени',
+        details: 'Обновление интерфейса заняло слишком много времени. Возможные причины: большой размер изображения, проблемы с сетью или высокая нагрузка на сервер.',
+        suggestions: [
+          'Попробуйте уменьшить размер изображения',
+          'Попробуйте позже, когда нагрузка на сервер будет меньше',
+          'Обратитесь к администратору, если проблема повторяется'
+        ],
+        processingTime: `${duration}ms`,
+        timestamp: new Date().toISOString()
+      });
+    }
 
     if (error.message.includes('не найден')) {
       return res.status(404).json({
@@ -245,11 +290,21 @@ export const updateTVInterface = async (req, res) => {
     }
 
     // Проверяем на специфические ошибки базы данных
-    if (error.message.includes('timeout') || error.message.includes('connection')) {
+    if (error.message.includes('connection') || error.message.includes('ECONNRESET')) {
       return res.status(503).json({
         success: false,
-        error: 'Ошибка подключения к базе данных - попробуйте позже',
-        details: error.message,
+        error: 'Ошибка подключения к базе данных',
+        details: 'Временные проблемы с соединением к базе данных. Попробуйте позже.',
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Обработка ошибок памяти или ресурсов
+    if (error.message.includes('out of memory') || error.message.includes('ENOMEM')) {
+      return res.status(413).json({
+        success: false,
+        error: 'Недостаточно памяти для обработки запроса',
+        details: 'Размер данных слишком велик для обработки. Попробуйте уменьшить размер изображения.',
         timestamp: new Date().toISOString()
       });
     }
@@ -258,6 +313,7 @@ export const updateTVInterface = async (req, res) => {
       success: false,
       error: 'Ошибка при обновлении TV интерфейса',
       details: error.message,
+      processingTime: `${duration}ms`,
       timestamp: new Date().toISOString()
     });
   }
