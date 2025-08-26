@@ -160,7 +160,7 @@ const StepFormFieldsComponent = React.memo(
           id={isEdit ? "edit-instruction" : "instruction"}
           value={formData.instruction}
           onChange={(e) => handleFieldChange("instruction", e.target.value)}
-          placeholder="Подробная инструкц��я для ��ользователя"
+          placeholder="Подробная инструкция для ��ользователя"
         />
       </div>
 
@@ -568,7 +568,7 @@ const StepsManager = () => {
     highlightRemoteButton: "none",
     highlightTVArea: "none",
     tvInterface: "home" as DiagnosticStep["tvInterface"],
-    tvInterfaceId: "none", // Добавлено для выбора ��озданного интерфейса
+    tvInterfaceId: "none", // Добавлено для выбора ��озданног�� интерфейса
     requiredAction: "",
     hint: "",
     remoteId: "none",
@@ -888,6 +888,7 @@ const StepsManager = () => {
       return;
     }
 
+    setIsCreatingStep(true);
     try {
       // Calculate the next step number using fresh data
       const nextStepNumber = await calculateNextStepNumber(formData.deviceId, formData.problemId);
@@ -944,7 +945,7 @@ const StepsManager = () => {
           return handleCreate(retryCount + 1);
         } else {
           toast({
-            title: "Конфликт номеров шаг��в",
+            title: "Конфликт ��омеров шаг��в",
             description: "Не удалось создать шаг из-за конфликта номеров. Попробуйте обновить страницу и создать шаг заново.",
             variant: "destructive",
           });
@@ -1313,7 +1314,7 @@ const StepsManager = () => {
 
   const getProblemTitle = (problemId: string) => {
     const problem = problems.find((p) => p.id === problemId);
-    return problem?.title || "Неизвестная проб��ема";
+    return problem?.title || "Неи��вестная проб��ема";
   };
 
   const getGroupedSteps = () => {
