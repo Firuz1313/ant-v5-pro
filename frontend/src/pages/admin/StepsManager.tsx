@@ -726,7 +726,7 @@ const StepsManager = () => {
     }
 
     try {
-      console.log(`�� Fetching full TV interface data for: ${tvInterface.id}`);
+      console.log(`🔄 Fetching full TV interface data for: ${tvInterface.id}`);
       const response = await tvInterfacesAPI.getById(tvInterface.id);
 
       if (response.success && response.data) {
@@ -958,6 +958,8 @@ const StepsManager = () => {
           variant: "destructive",
         });
       }
+    } finally {
+      setIsCreatingStep(false);
     }
   };
 
@@ -1315,7 +1317,7 @@ const StepsManager = () => {
 
   const getProblemTitle = (problemId: string) => {
     const problem = problems.find((p) => p.id === problemId);
-    return problem?.title || "Неизвестная проб����ема";
+    return problem?.title || "Неизвестная проб��ема";
   };
 
   const getGroupedSteps = () => {
@@ -1499,7 +1501,7 @@ const StepsManager = () => {
                 formData.buttonPosition.y > 0 && (
                   <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                     <p className="text-sm text-green-700 dark:text-green-300">
-                      Позиция выбран��: ({Math.round(formData.buttonPosition.x)},{" "}
+                      Позиция выбрана: ({Math.round(formData.buttonPosition.x)},{" "}
                       {Math.round(formData.buttonPosition.y)})
                     </p>
                   </div>
@@ -1905,7 +1907,7 @@ const StepsManager = () => {
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Редактор областей интерфейса: {selectedTVInterface?.name}
+              Редактор областей инте��фейса: {selectedTVInterface?.name}
             </DialogTitle>
           </DialogHeader>
           {selectedTVInterface && (
