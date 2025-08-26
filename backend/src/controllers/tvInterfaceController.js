@@ -255,7 +255,7 @@ export const createTVInterface = async (req, res) => {
       });
     }
 
-    // Проверяем на специфические ошибки базы данных
+    // Проверяем на специфические ошибки базы ��анных
     if (error.message.includes('connection') || error.message.includes('ECONNRESET')) {
       return res.status(503).json({
         success: false,
@@ -285,7 +285,7 @@ export const createTVInterface = async (req, res) => {
   }
 };
 
-// Обновить TV интерфейс (с улучшенной обработкой ошибок и таймаутов)
+// Обновить TV интерфейс (с улучш��нной обработкой ошибок и таймаутов)
 export const updateTVInterface = async (req, res) => {
   const startTime = Date.now();
   const { id } = req.params;
@@ -340,7 +340,7 @@ export const updateTVInterface = async (req, res) => {
     const dbOperationTimeout = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
         reject(new Error('Database operation timeout - опе��ация превысила лимит времени'));
-      }, 240000); // 4 минуты для операции БД
+      }, 540000); // 9 ��инут для операции БД (увеличено для больших изображений)
 
       tvInterfaceModel.update(id, updateData)
         .then(result => {
@@ -377,11 +377,11 @@ export const updateTVInterface = async (req, res) => {
     });
 
     // Специальная обработка таймаутов
-    if (error.message.includes('timeout') || error.message.includes('превысила лимит времени')) {
+    if (error.message.includes('timeout') || error.message.includes('превысила ��имит времени')) {
       return res.status(408).json({
         success: false,
         error: 'Операция превысила лимит времени',
-        details: 'Обно��ление интерфейса заняло слишком много времени. Возможные причины: большой размер изображения, проблемы с сетью или высокая нагрузка на сервер.',
+        details: 'Обно��л��ние интерфейса заняло слишком много времени. Возможные причины: большой размер изображения, проблемы с сетью или высокая нагрузка на сервер.',
         suggestions: [
           'Попробуйте уменьшить размер изображения',
           'Попробуйте позже, когда нагрузка на сер��ер будет меньше',
