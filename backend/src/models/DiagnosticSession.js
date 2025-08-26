@@ -25,9 +25,7 @@ class DiagnosticSession extends BaseModel {
 
         // Создаем сессию
         const session = {
-          ...sessionData,
-          total_steps: totalSteps,
-          completed_steps: 0
+          ...sessionData
         };
 
         const prepared = this.prepareForInsert(session);
@@ -85,7 +83,7 @@ class DiagnosticSession extends BaseModel {
   async updateProgress(sessionId, stepId, stepResult) {
     try {
       return await transaction(async (client) => {
-        // Создаем ��ли обновляем запись о выполнении шага
+        // Создаем или обновляем запись о выполнении шага
         const stepData = {
           session_id: sessionId,
           step_id: stepId,
@@ -409,7 +407,7 @@ class DiagnosticSession extends BaseModel {
   }
 
   /**
-   * Получение аналитики по временным интервалам
+   * Получение аналитики по временным инте��валам
    */
   async getTimeAnalytics(period = 'day', limit = 30) {
     try {
