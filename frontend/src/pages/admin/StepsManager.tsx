@@ -1438,7 +1438,7 @@ const StepsManager = () => {
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  Загруз��ть изображение
+                  За��руз��ть изображение
                 </Button>
                 {!remoteImage && (
                   <Button
@@ -1560,10 +1560,10 @@ const StepsManager = () => {
               <Button
                 onClick={handleCreate}
                 disabled={
-                  !formData.deviceId || !formData.problemId || !formData.title
+                  !formData.deviceId || !formData.problemId || !formData.title || isCreatingStep
                 }
               >
-                Создать
+                {isCreatingStep ? "Создание..." : "Создать"}
               </Button>
             </div>
           </DialogContent>
@@ -1597,7 +1597,7 @@ const StepsManager = () => {
                   <SelectValue placeholder="Приставка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все пристав��и</SelectItem>
+                  <SelectItem value="all">Все пристав���и</SelectItem>
                   {getActiveDevices().map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       <div className="flex items-center">
