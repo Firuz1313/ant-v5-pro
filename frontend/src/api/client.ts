@@ -376,7 +376,7 @@ export class ApiClient {
           if (endpoint.includes('/tv-interfaces') && (options.method === 'PUT' || options.method === 'POST')) {
             console.error(`⏱️ TV interface operation timeout after ${timeout}ms`);
             throw new ApiError(
-              "TV interface operation timeout. This may be due to large image data or server load. Try reducing image size or try again later.",
+              "TV interface operation timeout after 10 minutes. This indicates very large image data or server issues. Try compressing the image to under 5MB or contact support.",
               408,
               undefined,
               "TV_INTERFACE_TIMEOUT"
