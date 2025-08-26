@@ -103,7 +103,11 @@ export class ApiClient {
       };
 
       xhr.ontimeout = () => {
-        reject(new Error("XHR request timeout"));
+        if (url.includes('/tv-interfaces')) {
+          reject(new Error("XHR request timeout - TV interface operation exceeded time limit. This may be due to large image data or server load."));
+        } else {
+          reject(new Error("XHR request timeout"));
+        }
       };
 
       // Send body if present
