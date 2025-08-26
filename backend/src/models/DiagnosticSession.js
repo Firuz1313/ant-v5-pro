@@ -186,7 +186,7 @@ class DiagnosticSession extends BaseModel {
         FROM diagnostic_sessions ds
         LEFT JOIN devices d ON ds.device_id = d.id
         LEFT JOIN problems p ON ds.problem_id = p.id
-        WHERE ds.duration IS NULL
+        WHERE ds.completed_steps < ds.total_steps OR ds.total_steps = 0
         ORDER BY ds.created_at DESC
         LIMIT $1 OFFSET $2
       `;
@@ -203,7 +203,7 @@ class DiagnosticSession extends BaseModel {
   }
 
   /**
-   * Получение сессии с детальным прогрессом
+   * Получ��ние сессии с детальным прогрессом
    */
   async findByIdWithProgress(sessionId) {
     try {
