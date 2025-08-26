@@ -72,7 +72,7 @@ pool.on("acquire", (client) => {
 
 pool.on("release", (client) => {
   if (process.env.DEBUG_SQL === "true") {
-    console.log("📊 Клиент возвращен в pool");
+    console.log("📊 К��иент возвращен в pool");
   }
 });
 
@@ -247,7 +247,7 @@ export async function runMigrations() {
         continue;
       }
 
-      console.log(`🔄 Выполнение миграции: ${filename}`);
+      console.log(`🔄 Выполнение м��грации: ${filename}`);
 
       const migrationPath = path.join(migrationsDir, filename);
       const migrationSQL = fs.readFileSync(migrationPath, "utf8");
@@ -277,7 +277,7 @@ export async function fixDiagnosticStepsSchema() {
   try {
     console.log("🔧 Проверка и исправление схемы diagnostic_steps...");
 
-    // Проверяем какие кол��нки существуют
+    // Проверяем какие колонки существуют
     const columnsQuery = `
       SELECT column_name
       FROM information_schema.columns
@@ -285,7 +285,7 @@ export async function fixDiagnosticStepsSchema() {
       AND column_name IN (
         'device_id', 'instruction', 'instruction_text', 'tv_interface',
         'validation_rules', 'success_condition', 'failure_actions',
-        'warning_text', 'success_text', 'media', 'next_step_conditions'
+        'warning_text', 'success_text', 'media', 'next_step_conditions', 'hint'
       );
     `;
 
@@ -435,7 +435,7 @@ export async function fixDiagnosticStepsSchema() {
         ADD COLUMN success_text TEXT
       `);
 
-      console.log("✅ Добавлена колонка success_text");
+      console.log("✅ До��авлена колонка success_text");
     } else {
       console.log("✅ Колонка success_text уже существует");
     }
@@ -476,7 +476,7 @@ export async function fixDiagnosticStepsSchema() {
   }
 }
 
-// Функция исправления схемы tv_interfaces
+// Функ��ия исправления схемы tv_interfaces
 export async function fixTVInterfacesSchema() {
   try {
     console.log("🔧 Проверка и исправление схемы tv_interfaces...");
@@ -671,7 +671,7 @@ export async function searchText(
   }
 }
 
-// Экспорт pool для прямого использования в с����чае необходимости
+// Экспорт pool для прямого использования в с������чае необходимости
 export { pool };
 
 export default {
