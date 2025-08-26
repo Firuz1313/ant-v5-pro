@@ -370,6 +370,8 @@ const StepsManager = () => {
       // Remove frontend-only fields and let backend set timestamps
       delete stepPayload.created_at;
       delete stepPayload.updated_at;
+      // Remove step_number to let backend auto-assign
+      delete stepPayload.step_number;
 
       // Ensure ID is included (backend validation requires it)
       if (!stepPayload.id) {
@@ -415,7 +417,7 @@ const StepsManager = () => {
         delete stepPayload.highlight_tv_area;
       }
 
-      console.log("📤 Sending step payload:", stepPayload);
+      console.log("📤 Sending step payload (backend will auto-assign step_number):", stepPayload);
 
       const response = await stepsApi.createStep(stepPayload);
       const newStep = response.data;
@@ -704,7 +706,7 @@ const StepsManager = () => {
     const interfaceExists = tvInterfaces.find((ti) => ti.id === tvInterface.id);
     if (!interfaceExists) {
       console.warn(
-        `⚠�� TV interface ${tvInterface.id} not found in current list, reloading...`,
+        `⚠️ TV interface ${tvInterface.id} not found in current list, reloading...`,
       );
       if (formData.deviceId) {
         await loadTVInterfacesForDevice(formData.deviceId);
@@ -1414,7 +1416,7 @@ const StepsManager = () => {
                     ⚠️ Изображение пульта отсутствует
                   </p>
                   <p className="text-xs text-yellow-600 dark:text-yellow-400 mb-3">
-                    Загрузите изображение или создайте тестовый пульт для выбора ��озиции кнопки.
+                    Загрузите изображение или создайте тестовый пульт для выбора позиции кнопки.
                   </p>
                   <Button
                     variant="outline"
@@ -1836,7 +1838,7 @@ const StepsManager = () => {
               Шаги не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте измени��ь филь��ры поиска или с��здайте новый шаг.
+              Попробуйте измени��ь филь��ры поиска или создайте новый шаг.
             </p>
           </CardContent>
         </Card>
