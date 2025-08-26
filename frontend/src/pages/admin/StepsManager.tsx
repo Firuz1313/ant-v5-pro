@@ -160,7 +160,7 @@ const StepFormFieldsComponent = React.memo(
           id={isEdit ? "edit-instruction" : "instruction"}
           value={formData.instruction}
           onChange={(e) => handleFieldChange("instruction", e.target.value)}
-          placeholder="Подробная инструкция для ��ользователя"
+          placeholder="Подробная инструкц��я для ��ользователя"
         />
       </div>
 
@@ -866,6 +866,12 @@ const StepsManager = () => {
   };
 
   const handleCreate = async (retryCount = 0) => {
+    // Prevent multiple simultaneous creation attempts
+    if (isCreatingStep) {
+      console.log("⏸️ Step creation already in progress, ignoring duplicate request");
+      return;
+    }
+
     // Validate required fields before creating step
     if (
       !formData.deviceId ||
