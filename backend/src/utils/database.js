@@ -52,7 +52,7 @@ if (process.env.DATABASE_URL) {
   };
 }
 
-// Создани�� pool соединений
+// Создание pool соединений
 const pool = new Pool(dbConfig);
 
 // Обработка событий pool
@@ -194,7 +194,7 @@ export async function createDatabase() {
     );
 
     if (checkResult.rows.length === 0) {
-      console.log(`�� Создание базы данных: ${dbConfig.database}`);
+      console.log(`📊 Создание базы данных: ${dbConfig.database}`);
       await client.query(`CREATE DATABASE "${dbConfig.database}"`);
       console.log("��� База данных создана ��спешно");
     } else {
@@ -281,22 +281,28 @@ export async function fixDiagnosticStepsSchema() {
     const columnsQuery = `
       SELECT column_name
       FROM information_schema.columns
-      WHERE table_name = 'diagnostic_steps' AND column_name IN ('device_id', 'instruction', 'instruction_text', 'tv_interface');
+      WHERE table_name = 'diagnostic_steps'
+      AND column_name IN (
+        'device_id', 'instruction', 'instruction_text', 'tv_interface',
+        'validation_rules', 'success_condition', 'failure_actions',
+        'warning_text', 'success_text', 'media', 'next_step_conditions'
+      );
     `;
 
     const existingColumns = await query(columnsQuery);
-    const hasDeviceId = existingColumns.rows.some(
-      (row) => row.column_name === "device_id",
-    );
-    const hasInstruction = existingColumns.rows.some(
-      (row) => row.column_name === "instruction",
-    );
-    const hasInstructionText = existingColumns.rows.some(
-      (row) => row.column_name === "instruction_text",
-    );
-    const hasTvInterface = existingColumns.rows.some(
-      (row) => row.column_name === "tv_interface",
-    );
+    const columnNames = existingColumns.rows.map(row => row.column_name);
+
+    const hasDeviceId = columnNames.includes("device_id");
+    const hasInstruction = columnNames.includes("instruction");
+    const hasInstructionText = columnNames.includes("instruction_text");
+    const hasTvInterface = columnNames.includes("tv_interface");
+    const hasValidationRules = columnNames.includes("validation_rules");
+    const hasSuccessCondition = columnNames.includes("success_condition");
+    const hasFailureActions = columnNames.includes("failure_actions");
+    const hasWarningText = columnNames.includes("warning_text");
+    const hasSuccessText = columnNames.includes("success_text");
+    const hasMedia = columnNames.includes("media");
+    const hasNextStepConditions = columnNames.includes("next_step_conditions");
 
     // Добавляем недостающую колонку device_id
     if (!hasDeviceId) {
@@ -471,7 +477,7 @@ export async function cleanupOldData(daysToKeep = 90) {
     const cutoffDate = new Date();
     cutoffDate.setDate(cutoffDate.getDate() - daysToKeep);
 
-    // Удаляем старые сессии
+    // Удаляем ст��рые сессии
     const sessionsResult = await query(
       `
       DELETE FROM diagnostic_sessions 
