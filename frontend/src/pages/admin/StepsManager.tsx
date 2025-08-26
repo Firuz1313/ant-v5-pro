@@ -148,7 +148,7 @@ const StepFormFieldsComponent = React.memo(
           id={isEdit ? "edit-description" : "description"}
           value={formData.description}
           onChange={(e) => handleFieldChange("description", e.target.value)}
-          placeholder="Краткое описание шага"
+          placeholder="��раткое описание шага"
         />
       </div>
 
@@ -419,19 +419,15 @@ const StepsManager = () => {
 
       const response = await stepsApi.createStep(stepPayload);
       const newStep = response.data;
-      setSteps((prev) => [...prev, newStep]);
+
+      // Refresh the steps data to ensure we have the latest state
+      console.log("✅ Step created successfully, refreshing data...");
+      await loadInitialData();
+
       return newStep;
     } catch (error) {
       console.error("Error creating step:", error);
-      // Show user-friendly error message
-      toast({
-        title: "Ошибка создания шага",
-        description:
-          error instanceof Error
-            ? error.message
-            : "Не удалось создать шаг. Проверьте заполнение всех обязательных полей.",
-        variant: "destructive",
-      });
+      // Don't show toast here - let handleCreate handle error messaging
       throw error;
     }
   };
