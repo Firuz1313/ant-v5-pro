@@ -351,8 +351,7 @@ class DiagnosticSession extends BaseModel {
         FROM diagnostic_sessions ds
         JOIN problems p ON ds.problem_id = p.id
         JOIN devices d ON ds.device_id = d.id
-        WHERE ds.is_active = true 
-          AND ds.start_time >= NOW() - INTERVAL '${timeframe}'
+        WHERE ds.created_at >= NOW() - INTERVAL '${timeframe}'
         GROUP BY p.id, p.title, p.category, d.name
         ORDER BY session_count DESC, successful_count DESC
         LIMIT $1
