@@ -710,10 +710,22 @@ const StepsManager = () => {
   });
 
   const getAvailableProblems = () => {
+    let availableProblems;
     if (formData.deviceId) {
-      return getProblemsForDevice(formData.deviceId);
+      availableProblems = getProblemsForDevice(formData.deviceId);
+    } else {
+      availableProblems = problems.filter((p) => p.status === "published");
     }
-    return problems.filter((p) => p.status === "published");
+
+    console.log("🔍 getAvailableProblems called:", {
+      selectedDeviceId: formData.deviceId,
+      totalProblems: problems.length,
+      problemsArray: problems,
+      availableProblems: availableProblems,
+      availableCount: availableProblems.length,
+    });
+
+    return availableProblems;
   };
 
   const getAvailableRemotes = () => {
@@ -1054,7 +1066,7 @@ const StepsManager = () => {
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  Загруз��ть изображение
+                  Загруз��ть изобр��жение
                 </Button>
               </div>
 
@@ -1485,7 +1497,7 @@ const StepsManager = () => {
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <DialogTitle>
-              Редактор областей интерфейса: {selectedTVInterface?.name}
+              Редакто�� областей интерфейса: {selectedTVInterface?.name}
             </DialogTitle>
           </DialogHeader>
           {selectedTVInterface && (
