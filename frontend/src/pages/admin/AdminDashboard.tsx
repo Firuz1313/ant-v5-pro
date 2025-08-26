@@ -40,22 +40,46 @@ import {
 const AdminDashboard = () => {
   const { data: devicesResponse } = useDevices();
   const { data: problemsResponse } = useProblems();
+  const { data: stepsResponse } = useSteps(1, 1000); // Get all steps
+  const { data: stepStatsResponse } = useStepStats();
+  const { data: activeSessionsResponse } = useActiveSessions();
+  const { data: sessionStatsResponse } = useSessionStats();
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
+  const steps = stepsResponse?.data || [];
+  const activeSessions = activeSessionsResponse?.data || [];
+  const sessionStats = sessionStatsResponse?.data;
+  const stepStats = stepStatsResponse?.data;
 
-  // Temporarily using empty arrays for removed static data
-  const steps: any[] = [];
+  // Mock data for features not yet implemented
   const remotes: any[] = [];
-  const sessions: any[] = [];
   const changeLogs: any[] = [];
   const siteSettings = null;
 
-  // Mock functions for removed static functionality
-  const getEntityStats = (entity: string) => ({ total: 0, active: 0 });
-  const getActiveSessions = () => [];
-  const refreshData = async () => {};
+  // Real functions using API data
+  const getEntityStats = (entity: string) => {
+    switch (entity) {
+      case "steps":
+        return {
+          total: steps.length,
+          active: steps.filter((s: any) => s.isActive !== false).length
+        };
+      case "remotes":
+        return { total: remotes.length, active: remotes.length };
+      default:
+        return { total: 0, active: 0 };
+    }
+  };
+
+  const getActiveSessions = () => activeSessions;
+
+  const refreshData = async () => {
+    // This will be handled by React Query refetch
+    window.location.reload();
+  };
+
   const exportData = async (options: any) => ({ downloadUrl: "" });
 
   const [isLoading, setIsLoading] = useState(false);
@@ -197,7 +221,7 @@ const AdminDashboard = () => {
             <div className="text-2xl font-bold">{problemStats.total}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">{publishedProblems}</span>{" "}
-              опу��ликованы
+              опубликованы
             </p>
             <Progress value={completionRate} className="mt-3" />
           </CardContent>
@@ -442,7 +466,7 @@ const AdminDashboard = () => {
                   size="sm"
                 >
                   <Users className="h-4 w-4 mr-2" />
-                  Управление поль��ователями
+                  Управление пользователями
                 </Button>
                 <Button
                   className="w-full justify-start"
