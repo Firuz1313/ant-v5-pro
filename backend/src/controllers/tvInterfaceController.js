@@ -79,7 +79,7 @@ export const getTVInterfaceById = async (req, res) => {
   }
 };
 
-// Получить TV интерфейсы по device_id
+// Получит�� TV интерфейсы по device_id
 export const getTVInterfacesByDeviceId = async (req, res) => {
   try {
     const { deviceId } = req.params;
@@ -116,7 +116,7 @@ export const createTVInterface = async (req, res) => {
   const startTime = Date.now();
 
   // Устанавливаем расширенный таймаут для ответа
-  req.setTimeout(600000); // 10 минут для обработки запроса
+  req.setTimeout(600000); // 10 минут для о��работки запроса
   res.setTimeout(600000); // 10 минут для отправки ответа
 
   try {
@@ -292,8 +292,8 @@ export const updateTVInterface = async (req, res) => {
   const updateData = req.body;
 
   // Устанавливаем расширенный таймаут для ответа
-  req.setTimeout(300000); // 5 минут для обработки запроса
-  res.setTimeout(300000); // 5 минут для отправки ответа
+  req.setTimeout(600000); // 10 минут для обработки запроса
+  res.setTimeout(600000); // 10 минут для отправки ответа
 
   try {
     console.log(`🔄 Starting TV interface update: ${id}`);
@@ -334,7 +334,7 @@ export const updateTVInterface = async (req, res) => {
     // Создаем Promise с таймаутом для операции базы данных
     const dbOperationTimeout = new Promise((resolve, reject) => {
       const timeout = setTimeout(() => {
-        reject(new Error('Database operation timeout - операция превысила лимит времени'));
+        reject(new Error('Database operation timeout - опе��ация превысила лимит времени'));
       }, 240000); // 4 минуты для операции БД
 
       tvInterfaceModel.update(id, updateData)
