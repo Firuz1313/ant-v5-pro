@@ -148,11 +148,11 @@ class DiagnosticSession extends BaseModel {
         const completedSteps = parseInt(completedStepsResult.rows[0].completed || 0);
 
         const sessionUpdateResult = await client.query(`
-          UPDATE diagnostic_sessions 
-          SET completed_steps = $1, updated_at = $2
-          WHERE id = $3
+          UPDATE diagnostic_sessions
+          SET updated_at = $1
+          WHERE id = $2
           RETURNING *
-        `, [completedSteps, this.createTimestamp(), sessionId]);
+        `, [this.createTimestamp(), sessionId]);
 
         return sessionUpdateResult.rows[0];
       });
