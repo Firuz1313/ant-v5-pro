@@ -568,7 +568,7 @@ const StepsManager = () => {
     highlightRemoteButton: "none",
     highlightTVArea: "none",
     tvInterface: "home" as DiagnosticStep["tvInterface"],
-    tvInterfaceId: "none", // Добавлено для выбора ��озданног�� интерфейса
+    tvInterfaceId: "none", // Добавлено для выбора ��озданного интерфейса
     requiredAction: "",
     hint: "",
     remoteId: "none",
@@ -726,7 +726,7 @@ const StepsManager = () => {
     }
 
     try {
-      console.log(`🔄 Fetching full TV interface data for: ${tvInterface.id}`);
+      console.log(`�� Fetching full TV interface data for: ${tvInterface.id}`);
       const response = await tvInterfacesAPI.getById(tvInterface.id);
 
       if (response.success && response.data) {
@@ -942,10 +942,11 @@ const StepsManager = () => {
           console.log(`🔄 Step number conflict detected, retrying... (attempt ${retryCount + 1}/2)`);
           // Wait a bit and retry with fresh data
           await new Promise(resolve => setTimeout(resolve, 1000));
+          setIsCreatingStep(false); // Reset loading state before retry
           return handleCreate(retryCount + 1);
         } else {
           toast({
-            title: "Конфликт ��омеров шаг��в",
+            title: "Конфликт номеров шаг��в",
             description: "Не удалось создать шаг из-за конфликта номеров. Попробуйте обновить страницу и создать шаг заново.",
             variant: "destructive",
           });
@@ -1314,7 +1315,7 @@ const StepsManager = () => {
 
   const getProblemTitle = (problemId: string) => {
     const problem = problems.find((p) => p.id === problemId);
-    return problem?.title || "Неи��вестная проб��ема";
+    return problem?.title || "Неизвестная проб����ема";
   };
 
   const getGroupedSteps = () => {
@@ -1498,7 +1499,7 @@ const StepsManager = () => {
                 formData.buttonPosition.y > 0 && (
                   <div className="p-3 bg-green-50 dark:bg-green-900/20 rounded-lg">
                     <p className="text-sm text-green-700 dark:text-green-300">
-                      Позиция выбрана: ({Math.round(formData.buttonPosition.x)},{" "}
+                      Позиция выбран��: ({Math.round(formData.buttonPosition.x)},{" "}
                       {Math.round(formData.buttonPosition.y)})
                     </p>
                   </div>
