@@ -411,7 +411,15 @@ const StepsManager = () => {
       throw error;
     }
   };
-  const getActiveDevices = () => devices.filter((d: any) => d.is_active);
+  const getActiveDevices = () => {
+    const activeDevices = devices.filter((d: any) => d.isActive !== false);
+    console.log("🔍 getActiveDevices called:", {
+      totalDevices: devices.length,
+      devicesArray: devices,
+      activeDevices: activeDevices,
+    });
+    return activeDevices;
+  };
 
   const getActiveRemotes = () => {
     console.log("🔍 getActiveRemotes called:", {
@@ -509,7 +517,7 @@ const StepsManager = () => {
   );
 
   // Show loading state while data is being fetched - AFTER ALL HOOKS
-  if (loading) {
+  if (loading || devicesLoading || problemsLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
