@@ -282,7 +282,7 @@ const AdminDashboard = () => {
             <div className="space-y-4">
               {devices.map((device) => {
                 const deviceProblems = problems.filter(
-                  (p) => p.deviceId === device.id,
+                  (p) => p.deviceId === device.id || p.device_id === device.id,
                 );
                 const percentage =
                   totalProblems > 0
@@ -465,7 +465,7 @@ const AdminDashboard = () => {
                   size="sm"
                 >
                   <Settings className="h-4 w-4 mr-2" />
-                  Общие настройк����
+                  Общие настройк��
                 </Button>
                 <Button
                   className="w-full justify-start"
@@ -499,7 +499,7 @@ const AdminDashboard = () => {
             </CardTitle>
             <Button variant="outline" size="sm">
               <Eye className="h-4 w-4 mr-2" />
-              Посмотреть все
+              Посм��треть все
             </Button>
           </div>
         </CardHeader>
