@@ -236,7 +236,7 @@ export const createTVInterface = async (req, res) => {
       return res.status(408).json({
         success: false,
         error: 'Операция создания превысила лимит времени',
-        details: 'Создание интерфейса заняло слишком много времени. Возможные причины: большой размер изображения, проблемы с сетью или высокая нагрузка на сервер.',
+        details: 'Создание интерфейса заняло слишком много времени. Возможные причины: большой ��азмер изображения, проблемы с сетью или высокая нагрузка на сервер.',
         suggestions: [
           'Попробуйте уменьшить размер изображения',
           'Попробуйте позже, когда нагрузка на сервер будет мен��ше',
@@ -310,14 +310,19 @@ export const updateTVInterface = async (req, res) => {
         console.warn(`⚠️ Large screenshot data detected (${sizeInMB}MB) - this may take longer to process`);
       }
 
-      // Проверка лимита размера файла (10MB)
-      if (screenshotSize > 10 * 1024 * 1024) { // 10MB
+      // Проверка лимита размера файла (50MB)
+      if (screenshotSize > 50 * 1024 * 1024) { // 50MB
         return res.status(413).json({
           success: false,
-          error: 'Размер скриншота превышает лимит 10МБ',
-          details: `Размер загружаемого скриншота: ${sizeInMB}МБ. Максимальный размер: 10МБ`,
+          error: 'Размер скриншота превышает лимит 50МБ',
+          details: `Размер загружаемого скриншота: ${sizeInMB}МБ. Максимальный размер: 50МБ`,
           timestamp: new Date().toISOString()
         });
+      }
+
+      // Предупреждение для больших файлов
+      if (screenshotSize > 20 * 1024 * 1024) { // 20MB
+        console.warn(`⚠️ Large screenshot detected (${sizeInMB}MB) - this will take longer to process and store`);
       }
     }
 
@@ -379,7 +384,7 @@ export const updateTVInterface = async (req, res) => {
         details: 'Обно��ление интерфейса заняло слишком много времени. Возможные причины: большой размер изображения, проблемы с сетью или высокая нагрузка на сервер.',
         suggestions: [
           'Попробуйте уменьшить размер изображения',
-          'Попробуйте позже, когда нагрузка на сервер будет меньше',
+          'Попробуйте позже, когда нагрузка на сер��ер будет меньше',
           'Обратитесь к администратору, если проблема повторяется'
         ],
         processingTime: `${duration}ms`,
@@ -413,7 +418,7 @@ export const updateTVInterface = async (req, res) => {
       });
     }
 
-    // Обработка ошибок памяти или ресурсов
+    // Обработка ошибок памяти или ре��урсов
     if (error.message.includes('out of memory') || error.message.includes('ENOMEM')) {
       return res.status(413).json({
         success: false,
@@ -451,7 +456,7 @@ export const deleteTVInterface = async (req, res) => {
     if (!existing) {
       return res.status(404).json({
         success: false,
-        error: 'TV интерфейс не найден',
+        error: 'TV инт��рфейс не найден',
         timestamp: new Date().toISOString()
       });
     }
