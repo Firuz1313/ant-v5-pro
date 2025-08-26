@@ -1,10 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import {
-  stepsApi,
-  StepFilters,
-  StepCreateData,
-  StepUpdateData,
-} from "../api";
+import { stepsApi, StepFilters, StepCreateData, StepUpdateData } from "../api";
 
 // Query keys
 export const stepKeys = {

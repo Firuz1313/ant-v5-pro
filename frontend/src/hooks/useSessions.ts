@@ -16,7 +16,8 @@ export const sessionKeys = {
     [...sessionKeys.details(), id, includeProgress] as const,
   active: () => [...sessionKeys.all, "active"] as const,
   stats: () => [...sessionKeys.all, "stats"] as const,
-  analytics: (period: string) => [...sessionKeys.all, "analytics", period] as const,
+  analytics: (period: string) =>
+    [...sessionKeys.all, "analytics", period] as const,
 };
 
 // Query hooks
@@ -103,18 +104,20 @@ export const useCompleteSession = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: ({ 
-      sessionId, 
-      success, 
-      feedback 
-    }: { 
-      sessionId: string; 
-      success: boolean; 
+    mutationFn: ({
+      sessionId,
+      success,
+      feedback,
+    }: {
+      sessionId: string;
+      success: boolean;
       feedback?: any;
     }) => sessionsApi.completeSession(sessionId, success, feedback),
     onSuccess: (response, { sessionId }) => {
       queryClient.invalidateQueries({ queryKey: sessionKeys.lists() });
-      queryClient.invalidateQueries({ queryKey: sessionKeys.detail(sessionId) });
+      queryClient.invalidateQueries({
+        queryKey: sessionKeys.detail(sessionId),
+      });
       queryClient.invalidateQueries({ queryKey: sessionKeys.active() });
       queryClient.invalidateQueries({ queryKey: sessionKeys.stats() });
     },
