@@ -713,7 +713,7 @@ const StepsManager = () => {
       }
       toast({
         title: "Интерфейс не найден",
-        description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список обн��влён.`,
+        description: `TV интерфей�� "${tvInterface.name}" больше не доступен. Список обн��влён.`,
         variant: "destructive",
       });
       return;
@@ -1019,11 +1019,11 @@ const StepsManager = () => {
   const openEditDialog = (step: DiagnosticStep) => {
     setSelectedStep(step);
     setFormData({
-      deviceId: step.deviceId,
-      problemId: step.problemId,
-      title: step.title,
-      description: step.description,
-      instruction: step.instruction,
+      deviceId: step.deviceId || "",
+      problemId: step.problemId || "",
+      title: step.title || "",
+      description: step.description || "",
+      instruction: step.instruction || "",
       highlightRemoteButton: step.highlightRemoteButton || "none",
       highlightTVArea: step.highlightTVArea || "none",
       tvInterface: step.tvInterface || "home",
