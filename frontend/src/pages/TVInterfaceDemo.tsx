@@ -15,7 +15,8 @@ import { useDevices } from "@/hooks/useDevices";
 import { Monitor, RefreshCw } from "lucide-react";
 
 const TVInterfaceDemo = () => {
-  const { devices } = useDevices();
+  const { data: devicesResponse } = useDevices();
+  const devices = devicesResponse?.data || [];
   const [selectedDeviceId, setSelectedDeviceId] = useState<string>("");
   const [tvInterfaces, setTVInterfaces] = useState<TVInterface[]>([]);
   const [isLoading, setIsLoading] = useState(false);
@@ -39,7 +40,7 @@ const TVInterfaceDemo = () => {
     }
   };
 
-  // Фильтруем интерфейсы для выбранного устройства
+  // Ф��льтруем интерфейсы для выбранного устройства
   const interfacesForDevice = selectedDeviceId
     ? tvInterfaces.filter((iface) => iface.deviceId === selectedDeviceId)
     : [];
@@ -221,7 +222,7 @@ const TVInterfaceDemo = () => {
                   будет показан вместо стандартного экрана
                 </li>
                 <li>
-                  Поддерживается fallback на стандартные экраны, если нет
+                  Поддерживается fallback на ��тандартные экраны, если нет
                   кастомного интерфейса
                 </li>
               </ul>

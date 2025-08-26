@@ -94,7 +94,7 @@ const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 минут
   max:
     NODE_ENV === "development" || process.env.FLY_APP_NAME
-      ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 10000 // 10000 запросов для разработки и облачных сред
+      ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 10000 // 10000 запр��сов для разработки и облачных сред
       : parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000, // 1000 для продакшена
   message: {
     error: "Слишком много запросов с этого IP, попробуйте позже.",
@@ -138,9 +138,40 @@ if (NODE_ENV === "development") {
   app.use(morgan("combined"));
 }
 
-// Парсинг JSON и URL-encoded данных
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+// Парсинг JSON и URL-encoded данных с увеличенным таймаутом
+app.use(express.json({
+  limit: "100mb", // Увеличиваем лимит до 100MB
+  parameterLimit: 100000,
+  type: ['application/json', 'application/*+json'],
+  // Добавляем обработчик для отслеживания больших запросов
+  verify: (req, res, buf, encoding) => {
+    if (buf.length > 1024 * 1024) { // Больше 1MB
+      console.log(`📦 Large request detected: ${req.method} ${req.url} - ${(buf.length / 1024 / 1024).toFixed(2)}MB`);
+    }
+  }
+}));
+app.use(express.urlencoded({ extended: true, limit: "100mb", parameterLimit: 100000 }));
+
+// Увеличиваем таймауты для сервера
+app.use((req, res, next) => {
+  // Увеличиваем таймаут для TV interface операций
+  if (req.url.includes('/tv-interfaces') && (req.method === 'PUT' || req.method === 'POST')) {
+    req.setTimeout(180000, () => { // 180 seconds (3 minutes)
+      console.log(`⏰ Request timeout for TV interface operation: ${req.method} ${req.url}`);
+      if (!res.headersSent) {
+        res.status(408).json({
+          success: false,
+          error: 'Request timeout - операци�� заняла ��лишком много времени',
+          timestamp: new Date().toISOString()
+        });
+      }
+    });
+    res.setTimeout(180000, () => { // 180 seconds (3 minutes)
+      console.log(`⏰ Response timeout for TV interface operation: ${req.method} ${req.url}`);
+    });
+  }
+  next();
+});
 
 // Преобразование camelCase ключей в snake_case для совместимости с базой данных
 app.use(decamelizeBody);
@@ -203,12 +234,13 @@ process.on("SIGINT", () => {
   process.exit(0);
 });
 
-// Функция инициализации сервера
+// Функция инициализации ��ервера
 async function startServer() {
   try {
     // Исправляем схему tv_interfaces при старте
-    const { fixTVInterfacesSchema } = await import("./utils/database.js");
+    const { fixTVInterfacesSchema, createTVInterfaceMarksTable } = await import("./utils/database.js");
     await fixTVInterfacesSchema();
+    await createTVInterfaceMarksTable();
   } catch (error) {
     console.error(
       "⚠️ Ошибка исправления схемы, продолжаем запуск:",

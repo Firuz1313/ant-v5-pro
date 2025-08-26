@@ -68,15 +68,18 @@ export class ApiClient {
   private async xhrFallback(
     url: string,
     options: RequestInit,
+    timeout?: number,
   ): Promise<Response> {
     return new Promise((resolve, reject) => {
+      const actualTimeout = timeout || this.timeout;
       console.log(`📡 Using XMLHttpRequest fallback for: ${url}`);
+      console.log(`⏱️ XHR timeout set to: ${actualTimeout}ms`);
 
       const xhr = new XMLHttpRequest();
       const method = options.method || "GET";
 
       xhr.open(method, url);
-      xhr.timeout = this.timeout;
+      xhr.timeout = actualTimeout;
 
       // Set headers
       const headers = (options.headers as Record<string, string>) || {};
@@ -150,7 +153,15 @@ export class ApiClient {
     options: RequestOptions = {},
     retryCount = 0,
   ): Promise<T> {
-    const { params, timeout = this.timeout, ...fetchOptions } = options;
+    // Special timeout handling for TV interface operations (large image data)
+    let specialTimeout = this.timeout;
+    if (endpoint.includes('/tv-interfaces') &&
+        (options.method === 'PUT' || options.method === 'POST')) {
+      specialTimeout = 180000; // 3 minutes for TV interface operations
+      console.log(`⏱️ Using extended timeout (${specialTimeout}ms) for TV interface operation`);
+    }
+
+    const { params, timeout = specialTimeout, ...fetchOptions } = options;
 
     const url = this.buildUrl(endpoint, params);
     const method = fetchOptions.method || "GET";
@@ -229,7 +240,7 @@ export class ApiClient {
         response = await this.xhrFallback(url, {
           ...fetchOptions,
           headers,
-        });
+        }, options.timeout);
       } else {
         // Try fetch first
         response = await this.originalFetch(url, {
@@ -549,7 +560,7 @@ console.log("========================");
 
 export const apiClient = new ApiClient({
   baseUrl: API_BASE_URL,
-  timeout: 60000, // Increased timeout to 60s for database reconnection scenarios
+  timeout: 90000, // Increased timeout to 90s for large requests
 });
 
 // Helper functions for common API patterns
