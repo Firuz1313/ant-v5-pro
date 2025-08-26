@@ -23,6 +23,7 @@ import errorHandler from "./middleware/errorHandler.js";
 import requestLogger from "./middleware/requestLogger.js";
 import validateRequest from "./middleware/validateRequest.js";
 import decamelizeBody from "./middleware/decamelizeBody.js";
+import camelizeResponse from "./middleware/camelizeResponse.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -143,6 +144,9 @@ app.use(express.urlencoded({ extended: true, limit: "10mb" }));
 
 // Преобразование camelCase ключей в snake_case для совместимости с базой данных
 app.use(decamelizeBody);
+
+// Преобразование snake_case ключей в camelCase в ответах для frontend
+app.use(camelizeResponse);
 
 // Статические файлы
 app.use("/media", express.static(path.join(__dirname, "../uploads")));
