@@ -94,9 +94,16 @@ const AdminDashboard = () => {
     total: problems.length,
     active: problems.filter((p: any) => p.status === "published").length,
   };
-  const stepStats = getEntityStats("steps");
+  const stepStatsData = getEntityStats("steps");
   const remoteStats = getEntityStats("remotes");
-  const activeSessions = getActiveSessions();
+  const activeSessionsList = getActiveSessions();
+
+  // Session statistics from API
+  const sessionStatsData = {
+    total: sessionStats?.totalSessions || 0,
+    active: sessionStats?.activeSessions || activeSessionsList.length,
+    successRate: sessionStats?.successRate || 0,
+  };
 
   // Recent activity
   const recentChanges = changeLogs.slice(0, 10);
@@ -366,7 +373,7 @@ const AdminDashboard = () => {
           <CardHeader>
             <CardTitle className="flex items-center">
               <Clock className="h-5 w-5 mr-2" />
-              Последние изменения
+              Последние ��зменения
             </CardTitle>
           </CardHeader>
           <CardContent>
