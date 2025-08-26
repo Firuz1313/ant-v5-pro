@@ -73,7 +73,7 @@ interface DiagnosticStep {
   instruction: string;
   highlightRemoteButton?: string;
   highlightTVArea?: string;
-  tvInterfaceId?: string; // О��новлено для работы с настоя��ими интерфейсами
+  tvInterfaceId?: string; // Обновлено для работы с настоя��ими интерфейсами
   requiredAction?: string;
   hint?: string;
   remoteId?: string;
@@ -89,6 +89,19 @@ const StepsManagerNew = () => {
   // API hooks
   const { devices } = useDevices();
   const { problems } = useProblems();
+
+  // Debug information
+  useEffect(() => {
+    if (devices && devices.length > 0) {
+      console.log('🔍 Available devices:', devices.map(d => ({ id: d.id, name: d.name })));
+    }
+  }, [devices]);
+
+  useEffect(() => {
+    if (problems && problems.length > 0) {
+      console.log('🔍 Available problems:', problems.map(p => ({ id: p.id, title: p.title })));
+    }
+  }, [problems]);
 
   // Local state for steps and remotes
   const [steps, setSteps] = useState<DiagnosticStep[]>([]);
@@ -713,7 +726,7 @@ const StepsManagerNew = () => {
       console.log(`🔍 Problem not found for ID: "${problemId}"`);
       console.log('Available problems:', (problems || []).map(p => ({ id: p.id, title: p.title })));
     }
-    return problem?.title || "Неизвестная проб��ема";
+    return problem?.title || "Неизвестная проблема";
   };
 
   const getRemoteById = (remoteId: string) => {
@@ -791,7 +804,7 @@ const StepsManagerNew = () => {
         <div className="w-full lg:w-80 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Выбор позиции на пульте</CardTitle>
+              <CardTitle className="text-lg">Выбор позиции на пуль��е</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
@@ -1375,7 +1388,7 @@ const StepsManagerNew = () => {
                           {remote.name}
                           {remote.isDefault && (
                             <span className="ml-2 text-xs text-blue-600">
-                              (по умолчанию)
+                              (по умолчани��)
                             </span>
                           )}
                         </div>
