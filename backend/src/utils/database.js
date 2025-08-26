@@ -275,18 +275,24 @@ export async function runMigrations() {
 // Функция исправления схемы diagnostic_steps
 export async function fixDiagnosticStepsSchema() {
   try {
-    console.log("🔧 Пр��верка и исправление схемы diagnostic_steps...");
+    console.log("🔧 Проверка и исправление схемы diagnostic_steps...");
 
     // Проверяем какие колонки существуют
     const columnsQuery = `
       SELECT column_name
       FROM information_schema.columns
-      WHERE table_name = 'diagnostic_steps' AND column_name = 'device_id';
+      WHERE table_name = 'diagnostic_steps' AND column_name IN ('device_id', 'instruction', 'instruction_text');
     `;
 
     const existingColumns = await query(columnsQuery);
     const hasDeviceId = existingColumns.rows.some(
       (row) => row.column_name === "device_id",
+    );
+    const hasInstruction = existingColumns.rows.some(
+      (row) => row.column_name === "instruction",
+    );
+    const hasInstructionText = existingColumns.rows.some(
+      (row) => row.column_name === "instruction_text",
     );
 
     // Добавляем недостающую колонку device_id
@@ -318,7 +324,30 @@ export async function fixDiagnosticStepsSchema() {
       console.log("✅ Колонка device_id уже существует");
     }
 
-    console.log("🎉 Схема diagnostic_steps ��справлена");
+    // Fix instruction column name mismatch
+    if (hasInstructionText && !hasInstruction) {
+      console.log("⚠️  Found instruction_text column, renaming to instruction...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        RENAME COLUMN instruction_text TO instruction
+      `);
+
+      console.log("✅ Переименована колонка instruction_text в instruction");
+    } else if (!hasInstruction && !hasInstructionText) {
+      console.log("⚠️  instruction column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN instruction TEXT NOT NULL DEFAULT ''
+      `);
+
+      console.log("✅ Добавлена колонка instruction");
+    } else {
+      console.log("✅ Колонка instruction уже существует");
+    }
+
+    console.log("🎉 Схема diagnostic_steps исправлена");
     return true;
   } catch (error) {
     console.error("❌ Ошибка исправления схемы diagnostic_steps:", error.message);
@@ -444,7 +473,7 @@ export async function cleanupOldData(daysToKeep = 90) {
     );
 
     console.log(`✅ Удалено сессий: ${sessionsResult.rowCount}`);
-    console.log(`✅ Удалено логов: ${logsResult.rowCount}`);
+    console.log(`✅ Уда��ено логов: ${logsResult.rowCount}`);
 
     // О��новляем статистику
     await query("ANALYZE");
@@ -521,7 +550,7 @@ export async function searchText(
   }
 }
 
-// Экспорт pool для прямого использования в с����чае необходимости
+// Экспорт pool д��я прямого использования в с����чае необходимости
 export { pool };
 
 export default {
