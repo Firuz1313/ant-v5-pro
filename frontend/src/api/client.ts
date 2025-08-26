@@ -68,6 +68,7 @@ export class ApiClient {
   private async xhrFallback(
     url: string,
     options: RequestInit,
+    timeout?: number,
   ): Promise<Response> {
     return new Promise((resolve, reject) => {
       console.log(`📡 Using XMLHttpRequest fallback for: ${url}`);
@@ -76,7 +77,7 @@ export class ApiClient {
       const method = options.method || "GET";
 
       xhr.open(method, url);
-      xhr.timeout = this.timeout;
+      xhr.timeout = timeout || this.timeout;
 
       // Set headers
       const headers = (options.headers as Record<string, string>) || {};
@@ -237,7 +238,7 @@ export class ApiClient {
         response = await this.xhrFallback(url, {
           ...fetchOptions,
           headers,
-        });
+        }, options.timeout);
       } else {
         // Try fetch first
         response = await this.originalFetch(url, {
