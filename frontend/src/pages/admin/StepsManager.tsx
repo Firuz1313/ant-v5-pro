@@ -704,7 +704,7 @@ const StepsManager = () => {
     const interfaceExists = tvInterfaces.find((ti) => ti.id === tvInterface.id);
     if (!interfaceExists) {
       console.warn(
-        `⚠️ TV interface ${tvInterface.id} not found in current list, reloading...`,
+        `⚠�� TV interface ${tvInterface.id} not found in current list, reloading...`,
       );
       if (formData.deviceId) {
         await loadTVInterfacesForDevice(formData.deviceId);
@@ -827,45 +827,9 @@ const StepsManager = () => {
     return getRemotesForDevice(filterDevice);
   };
 
-  const calculateNextStepNumber = async (deviceId: string, problemId: string): Promise<number> => {
-    try {
-      // Refresh steps data from server to get latest state
-      console.log("🔄 Refreshing steps data to calculate next step number...");
-      const freshStepsResponse = await stepsApi.getSteps(1, 1000);
-      const freshStepsData = freshStepsResponse?.data || freshStepsResponse || [];
-      const freshSteps = Array.isArray(freshStepsData) ? freshStepsData : [];
+  // Remove calculateNextStepNumber function - let backend handle auto-numbering
 
-      // Filter steps for the specific device and problem
-      const problemSteps = freshSteps.filter(
-        (s) => s.device_id === deviceId && s.problem_id === problemId && s.is_active
-      );
-
-      const maxStepNumber = problemSteps.length > 0
-        ? Math.max(...problemSteps.map((s) => s.step_number || s.stepNumber || 0))
-        : 0;
-
-      console.log("📊 Step number calculation:", {
-        deviceId,
-        problemId,
-        problemStepsCount: problemSteps.length,
-        maxStepNumber,
-        nextStepNumber: maxStepNumber + 1
-      });
-
-      return maxStepNumber + 1;
-    } catch (error) {
-      console.error("Error fetching fresh steps data:", error);
-      // Fallback to local data
-      const localSteps = steps.filter(
-        (s) => s.deviceId === deviceId && s.problemId === problemId
-      );
-      return localSteps.length > 0
-        ? Math.max(...localSteps.map((s) => s.stepNumber)) + 1
-        : 1;
-    }
-  };
-
-  const handleCreate = async (retryCount = 0) => {
+  const handleCreate = async () => {
     // Prevent multiple simultaneous creation attempts
     if (isCreatingStep) {
       console.log("⏸️ Step creation already in progress, ignoring duplicate request");
@@ -890,9 +854,7 @@ const StepsManager = () => {
 
     setIsCreatingStep(true);
     try {
-      // Calculate the next step number using fresh data
-      const nextStepNumber = await calculateNextStepNumber(formData.deviceId, formData.problemId);
-
+      // Let backend handle step numbering automatically - don't send stepNumber
       const newStep: DiagnosticStep = {
         id: `step-${formData.deviceId}-${formData.problemId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
         ...formData,
@@ -911,53 +873,34 @@ const StepsManager = () => {
           formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
             ? undefined
             : formData.buttonPosition,
-        stepNumber: nextStepNumber,
+        // stepNumber: removed - let backend auto-assign
         isActive: true,
         // Don't set timestamps - let backend handle them
       };
 
-      console.log("📝 Creating step with data:", {
+      console.log("📝 Creating step with data (backend will auto-assign step number):", {
         id: newStep.id,
-        stepNumber: newStep.stepNumber,
         deviceId: newStep.deviceId,
         problemId: newStep.problemId,
         title: newStep.title
       });
 
-      await createStep(newStep);
+      const createdStep = await createStep(newStep);
       setIsCreateDialogOpen(false);
       resetForm();
 
       toast({
         title: "Шаг создан",
-        description: `Шаг "${newStep.title}" усп��шно создан с номером ${newStep.stepNumber}.`,
+        description: `Шаг "${createdStep.title}" успешно создан с номером ${createdStep.step_number || createdStep.stepNumber}.`,
       });
 
     } catch (error) {
       console.error("Error creating step:", error);
-
-      // Handle specific 409 conflict error
-      if (error instanceof Error && error.message.includes("409")) {
-        if (retryCount < 2) {
-          console.log(`🔄 Step number conflict detected, retrying... (attempt ${retryCount + 1}/2)`);
-          // Wait a bit and retry with fresh data
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          setIsCreatingStep(false); // Reset loading state before retry
-          return handleCreate(retryCount + 1);
-        } else {
-          toast({
-            title: "Конфликт номеров шаг��в",
-            description: "Не удалось создать шаг из-за конфликта номеров. Попробуйте обновить страницу и создать шаг заново.",
-            variant: "destructive",
-          });
-        }
-      } else {
-        toast({
-          title: "Ошибка создания шага",
-          description: error instanceof Error ? error.message : "Не удалось создать шаг.",
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Ошибка создания шага",
+        description: error instanceof Error ? error.message : "Не удалось создать шаг.",
+        variant: "destructive",
+      });
     } finally {
       setIsCreatingStep(false);
     }
@@ -1471,7 +1414,7 @@ const StepsManager = () => {
                     ⚠️ Изображение пульта отсутствует
                   </p>
                   <p className="text-xs text-yellow-600 dark:text-yellow-400 mb-3">
-                    Загрузите изображение или создайте тестовый пульт для выбора позиции кнопки.
+                    Загрузите изображение или создайте тестовый пульт для выбора ��озиции кнопки.
                   </p>
                   <Button
                     variant="outline"
@@ -1893,7 +1836,7 @@ const StepsManager = () => {
               Шаги не найдены
             </h3>
             <p className="text-gray-600 dark:text-gray-400">
-              Попробуйте измени��ь филь��ры поиска или создайте новый шаг.
+              Попробуйте измени��ь филь��ры поиска или с��здайте новый шаг.
             </p>
           </CardContent>
         </Card>
