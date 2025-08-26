@@ -30,7 +30,7 @@ if (process.env.DATABASE_URL) {
     max: 20, // максимал����ное количество соединений в pool
     min: 2, // минимальное количество соединений
     idleTimeoutMillis: 30000, // время простоя перед закрытием ���оединения
-    connectionTimeoutMillis: 10000, // таймаут подключения
+    connectionTimeoutMillis: 10000, // таймаут подкл��чения
     maxUses: 7500, // максимальное количество использований соединения
   };
 } else {
@@ -281,7 +281,7 @@ export async function fixDiagnosticStepsSchema() {
     const columnsQuery = `
       SELECT column_name
       FROM information_schema.columns
-      WHERE table_name = 'diagnostic_steps' AND column_name IN ('device_id', 'instruction', 'instruction_text');
+      WHERE table_name = 'diagnostic_steps' AND column_name IN ('device_id', 'instruction', 'instruction_text', 'tv_interface');
     `;
 
     const existingColumns = await query(columnsQuery);
@@ -293,6 +293,9 @@ export async function fixDiagnosticStepsSchema() {
     );
     const hasInstructionText = existingColumns.rows.some(
       (row) => row.column_name === "instruction_text",
+    );
+    const hasTvInterface = existingColumns.rows.some(
+      (row) => row.column_name === "tv_interface",
     );
 
     // Добавляем недостающую колонку device_id
@@ -473,7 +476,7 @@ export async function cleanupOldData(daysToKeep = 90) {
     );
 
     console.log(`✅ Удалено сессий: ${sessionsResult.rowCount}`);
-    console.log(`✅ Уда��ено логов: ${logsResult.rowCount}`);
+    console.log(`✅ Удалено логов: ${logsResult.rowCount}`);
 
     // О��новляем статистику
     await query("ANALYZE");
@@ -550,7 +553,7 @@ export async function searchText(
   }
 }
 
-// Экспорт pool д��я прямого использования в с����чае необходимости
+// Экспорт pool для прямого использования в с����чае необходимости
 export { pool };
 
 export default {
