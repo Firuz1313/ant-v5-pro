@@ -694,11 +694,19 @@ const StepsManagerNew = () => {
 
   const getDeviceName = (deviceId: string) => {
     const device = (devices || []).find((d) => d.id === deviceId);
+    if (!device) {
+      console.log(`🔍 Device not found for ID: "${deviceId}"`);
+      console.log('Available devices:', (devices || []).map(d => ({ id: d.id, name: d.name })));
+    }
     return device?.name || "Неизвестная приставка";
   };
 
   const getProblemTitle = (problemId: string) => {
     const problem = (problems || []).find((p) => p.id === problemId);
+    if (!problem) {
+      console.log(`🔍 Problem not found for ID: "${problemId}"`);
+      console.log('Available problems:', (problems || []).map(p => ({ id: p.id, title: p.title })));
+    }
     return problem?.title || "Неизвестная проблема";
   };
 
@@ -1089,7 +1097,7 @@ const StepsManagerNew = () => {
               <SelectItem value="none">Без интерфейса</SelectItem>
               {isLoadingTVInterfaces ? (
                 <SelectItem value="loading" disabled>
-                  Загрузка...
+                  Загруз��а...
                 </SelectItem>
               ) : (
                 getAvailableTVInterfaces().map((tvInterface) => (
