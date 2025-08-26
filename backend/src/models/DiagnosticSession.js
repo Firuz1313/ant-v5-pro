@@ -15,7 +15,7 @@ class DiagnosticSession extends BaseModel {
   async createSession(sessionData) {
     try {
       return await transaction(async (client) => {
-        // Получаем количество шагов в проблеме
+        // Получа��м количество шагов в проблеме
         const stepsResult = await client.query(
           'SELECT COUNT(*) as total FROM diagnostic_steps WHERE problem_id = $1 AND is_active = true',
           [sessionData.problem_id]
@@ -286,22 +286,22 @@ class DiagnosticSession extends BaseModel {
       }
 
       if (filters.date_from) {
-        whereConditions.push(`ds.start_time >= $${paramIndex}`);
+        whereConditions.push(`ds.created_at >= $${paramIndex}`);
         values.push(filters.date_from);
         paramIndex++;
       }
 
       if (filters.date_to) {
-        whereConditions.push(`ds.start_time <= $${paramIndex}`);
+        whereConditions.push(`ds.created_at <= $${paramIndex}`);
         values.push(filters.date_to);
         paramIndex++;
       }
 
       const sql = `
-        SELECT 
+        SELECT
           COUNT(*) as total_sessions,
-          COUNT(CASE WHEN ds.success = true THEN 1 END) as successful_sessions,
-          COUNT(CASE WHEN ds.success = false THEN 1 END) as failed_sessions,
+          COUNT(CASE WHEN ds.end_time IS NOT NULL AND ds.completed_steps >= ds.total_steps THEN 1 END) as successful_sessions,
+          COUNT(CASE WHEN ds.end_time IS NOT NULL AND ds.completed_steps < ds.total_steps THEN 1 END) as failed_sessions,
           COUNT(CASE WHEN ds.end_time IS NULL THEN 1 END) as active_sessions,
           AVG(CASE WHEN ds.duration IS NOT NULL THEN ds.duration END) as avg_duration,
           MIN(CASE WHEN ds.duration IS NOT NULL THEN ds.duration END) as min_duration,
