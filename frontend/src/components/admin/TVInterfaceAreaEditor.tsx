@@ -654,7 +654,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
       { x: 840, y: 300, text: "Приложения", icon: "📱", color: "#f59e0b" },
       { x: 1160, y: 300, text: "Поиск", icon: "🔍", color: "#06b6d4" },
       { x: 200, y: 600, text: "Фильмы", icon: "🎬", color: "#ef4444" },
-      { x: 520, y: 600, text: "Музыка", icon: "���", color: "#8b5cf6" },
+      { x: 520, y: 600, text: "Музыка", icon: "🎵", color: "#8b5cf6" },
       { x: 840, y: 600, text: "Игры", icon: "🎮", color: "#f97316" },
       { x: 1160, y: 600, text: "Записи", icon: "📹", color: "#84cc16" },
     ];
@@ -895,6 +895,20 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
                   <EyeOff className="h-4 w-4" />
                 )}
               </Button>
+              {tempScreenshot && (
+                <Button
+                  variant="secondary"
+                  size="sm"
+                  onClick={() => {
+                    if (tempScreenshot) {
+                      handleSaveScreenshot(tempScreenshot);
+                    }
+                  }}
+                >
+                  <Save className="h-4 w-4 mr-1" />
+                  Сохранить скриншот
+                </Button>
+              )}
               <Button variant="default" size="sm" onClick={handleSave}>
                 <Save className="h-4 w-4 mr-1" />
                 Сохранить области
