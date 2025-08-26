@@ -57,12 +57,9 @@ class DiagnosticSession extends BaseModel {
         throw new Error('Сессия не найдена');
       }
 
-      const startTime = new Date(currentSession.created_at);
-      const duration = Math.round((new Date(endTime) - startTime) / 1000); // в секундах
-
       const updateData = {
-        duration,
         feedback: completionData.feedback || null,
+        completed_steps: completionData.completed_steps || currentSession.completed_steps,
         ...completionData
       };
 
