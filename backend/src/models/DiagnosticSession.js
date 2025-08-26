@@ -440,7 +440,7 @@ class DiagnosticSession extends BaseModel {
           COUNT(*) as total_sessions,
           COUNT(CASE WHEN success = true THEN 1 END) as successful_sessions,
           AVG(CASE WHEN duration IS NOT NULL THEN duration END) as avg_duration,
-          AVG(completed_steps::float / NULLIF(total_steps, 0) * 100) as avg_completion_rate
+          0 as avg_completion_rate
         FROM diagnostic_sessions
         WHERE created_at >= NOW() - INTERVAL '${limit} ${period}s'
         GROUP BY ${groupBy}
