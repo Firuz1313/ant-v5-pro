@@ -110,7 +110,7 @@ export const stepValidation = {
     id: commonSchemas.id.optional(),
     problem_id: commonSchemas.id.required(),
     device_id: commonSchemas.id.required(),
-    step_number: commonSchemas.positiveInteger.required(),
+    step_number: commonSchemas.positiveInteger.optional(), // Optional for auto-numbering
     title: Joi.string().min(1).max(500).required(),
     description: commonSchemas.longText.optional(),
     instruction: commonSchemas.longText.required(),
