@@ -30,7 +30,7 @@ if (process.env.DATABASE_URL) {
     max: 20, // максимал����ное количество соединений в pool
     min: 2, // минимальное количество соединений
     idleTimeoutMillis: 30000, // время простоя перед закрытием ���оединения
-    connectionTimeoutMillis: 10000, // таймаут подкл��чения
+    connectionTimeoutMillis: 10000, // таймаут подключения
     maxUses: 7500, // максимальное количество использований соединения
   };
 } else {
@@ -52,7 +52,7 @@ if (process.env.DATABASE_URL) {
   };
 }
 
-// Создание pool соединений
+// Создани�� pool соединений
 const pool = new Pool(dbConfig);
 
 // Обработка событий pool
@@ -194,7 +194,7 @@ export async function createDatabase() {
     );
 
     if (checkResult.rows.length === 0) {
-      console.log(`📊 Создание базы данных: ${dbConfig.database}`);
+      console.log(`�� Создание базы данных: ${dbConfig.database}`);
       await client.query(`CREATE DATABASE "${dbConfig.database}"`);
       console.log("��� База данных создана ��спешно");
     } else {
@@ -348,6 +348,20 @@ export async function fixDiagnosticStepsSchema() {
       console.log("✅ Добавлена колонка instruction");
     } else {
       console.log("✅ Колонка instruction уже существует");
+    }
+
+    // Add missing tv_interface column
+    if (!hasTvInterface) {
+      console.log("⚠️  tv_interface column missing, adding it...");
+
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN tv_interface VARCHAR(255)
+      `);
+
+      console.log("✅ Добавлена колонка tv_interface");
+    } else {
+      console.log("✅ Колонка tv_interface уже существует");
     }
 
     console.log("🎉 Схема diagnostic_steps исправлена");
