@@ -180,10 +180,8 @@ export const remotesApi = {
       );
       return response.data;
     } catch (error) {
-      throw handleApiError(
-        error,
-        `Failed to fetch default remote for device ${deviceId}`,
-      );
+      console.error(`Failed to fetch default remote for device ${deviceId}:`, error);
+      throw error; // Re-throw the original error to maintain error type
     }
   },
 
