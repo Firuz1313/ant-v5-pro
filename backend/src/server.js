@@ -94,7 +94,7 @@ const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000, // 15 минут
   max:
     NODE_ENV === "development" || process.env.FLY_APP_NAME
-      ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 10000 // 10000 запросов для разработки и облачных сред
+      ? parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 10000 // 10000 запр��сов для разработки и облачных сред
       : parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 1000, // 1000 для продакшена
   message: {
     error: "Слишком много запросов с этого IP, попробуйте позже.",
@@ -140,8 +140,9 @@ if (NODE_ENV === "development") {
 
 // Парсинг JSON и URL-encoded данных с увеличенным таймаутом
 app.use(express.json({
-  limit: "50mb",
+  limit: "100mb", // Увеличиваем лимит до 100MB
   parameterLimit: 100000,
+  type: ['application/json', 'application/*+json'],
   // Добавляем обработчик для отслеживания больших запросов
   verify: (req, res, buf, encoding) => {
     if (buf.length > 1024 * 1024) { // Больше 1MB
@@ -149,7 +150,7 @@ app.use(express.json({
     }
   }
 }));
-app.use(express.urlencoded({ extended: true, limit: "50mb", parameterLimit: 100000 }));
+app.use(express.urlencoded({ extended: true, limit: "100mb", parameterLimit: 100000 }));
 
 // Увеличиваем таймауты для сервера
 app.use((req, res, next) => {
@@ -160,7 +161,7 @@ app.use((req, res, next) => {
       if (!res.headersSent) {
         res.status(408).json({
           success: false,
-          error: 'Request timeout - операци�� заняла слишком много времени',
+          error: 'Request timeout - операци�� заняла ��лишком много времени',
           timestamp: new Date().toISOString()
         });
       }

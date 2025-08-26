@@ -154,7 +154,7 @@ export class ApiClient {
     let specialTimeout = this.timeout;
     if (endpoint.includes('/tv-interfaces') &&
         (options.method === 'PUT' || options.method === 'POST')) {
-      specialTimeout = 120000; // 2 minutes for TV interface operations
+      specialTimeout = 180000; // 3 minutes for TV interface operations
       console.log(`⏱️ Using extended timeout (${specialTimeout}ms) for TV interface operation`);
     }
 
@@ -557,7 +557,7 @@ console.log("========================");
 
 export const apiClient = new ApiClient({
   baseUrl: API_BASE_URL,
-  timeout: 60000, // Increased timeout to 60s for database reconnection scenarios
+  timeout: 90000, // Increased timeout to 90s for large requests
 });
 
 // Helper functions for common API patterns
