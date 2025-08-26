@@ -9,6 +9,9 @@ import {
   diagnoseTVInterfaceMarksTable,
   createMinimalTVInterfaceMarksTable
 } from '../controllers/tvInterfaceMarkDiagnosticController.js';
+import {
+  fixTVInterfaceIdFormat
+} from '../controllers/tvInterfaceMarkFixController.js';
 import requestLogger from '../middleware/requestLogger.js';
 
 const router = express.Router();
@@ -58,6 +61,13 @@ router.get('/tv-interface-marks/diagnose', diagnoseTVInterfaceMarksTable);
  * @access Admin
  */
 router.post('/tv-interface-marks/create-minimal', createMinimalTVInterfaceMarksTable);
+
+/**
+ * @route POST /api/v1/optimization/tv-interface-marks/fix-id-format
+ * @desc Fix TV interface ID format from UUID to VARCHAR
+ * @access Admin
+ */
+router.post('/tv-interface-marks/fix-id-format', fixTVInterfaceIdFormat);
 
 // Middleware для обработки ошибок маршрутов
 router.use((error, req, res, next) => {
