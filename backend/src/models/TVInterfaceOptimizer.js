@@ -48,11 +48,11 @@ class TVInterfaceOptimizer {
       results.indexesCreated.push('idx_tv_interfaces_id_active');
       console.log('✅ Update operations index created');
 
-      // 4. Add monitoring index for large screenshot data
+      // 4. Add monitoring index for large screenshot data (>10MB)
       console.log('📇 Creating monitoring index for large screenshots...');
       await query(`
-        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_tv_interfaces_screenshot_size 
-        ON tv_interfaces(device_id) WHERE length(screenshot_data) > 1048576
+        CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_tv_interfaces_screenshot_size
+        ON tv_interfaces(device_id) WHERE length(screenshot_data) > 10485760
       `);
       results.indexesCreated.push('idx_tv_interfaces_screenshot_size');
       console.log('✅ Screenshot monitoring index created');
@@ -100,7 +100,7 @@ class TVInterfaceOptimizer {
         SELECT 
           count(*) AS total_rows,
           count(*) FILTER (WHERE is_active = true) AS active_rows,
-          count(*) FILTER (WHERE length(screenshot_data) > 1048576) AS large_screenshots,
+          count(*) FILTER (WHERE length(screenshot_data) > 10485760) AS large_screenshots,
           avg(length(screenshot_data))::int AS avg_screenshot_size
         FROM tv_interfaces
       `);
@@ -194,7 +194,7 @@ class TVInterfaceOptimizer {
   /**
    * Clean up large screenshot data (move to external storage simulation)
    */
-  async cleanupLargeScreenshots(maxSizeMB = 5) {
+  async cleanupLargeScreenshots(maxSizeMB = 10) {
     try {
       const maxSizeBytes = maxSizeMB * 1024 * 1024;
       
