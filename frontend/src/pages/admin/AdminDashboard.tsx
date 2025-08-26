@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useDevices } from "@/hooks/useDevices";
 import { useProblems } from "@/hooks/useProblems";
-import { useSteps, useStepStats } from "@/hooks/useSteps";
+import { useSteps } from "@/hooks/useSteps";
 import { useActiveSessions, useSessionStats } from "@/hooks/useSessions";
 import {
   BarChart3,
@@ -264,7 +264,7 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stepStatsData.active}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-blue-600">{stepStatsData.total}</span> в��его
+              <span className="text-blue-600">{stepStatsData.total}</span> всего
             </p>
             <Progress
               value={stepStatsData.total > 0 ? (stepStatsData.active / stepStatsData.total) * 100 : 0}
