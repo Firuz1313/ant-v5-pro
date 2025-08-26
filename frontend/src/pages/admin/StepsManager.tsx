@@ -664,7 +664,7 @@ const StepsManager = () => {
       // Показываем пользователю информацию об ошибке
       if (error instanceof Error && error.message.includes("Сетевая ошибка")) {
         // Можно добавить toast уведомление
-        console.error("П��облемы с подключением к с��рверу");
+        console.error("П��облемы с подклю��ением к с��рверу");
       }
     } finally {
       setLoadingTVInterfaces(false);
@@ -777,7 +777,7 @@ const StepsManager = () => {
         error,
       );
       toast({
-        title: "Предупреждение",
+        title: "Предупрежд��ние",
         description: `Не удалось загрузить по��ные данные интерфейса ${tvInterface.name}. Используются кэшированные данные.`,
         variant: "destructive",
       });
@@ -830,16 +830,45 @@ const StepsManager = () => {
     return getRemotesForDevice(filterDevice);
   };
 
-  const handleCreate = async () => {
-    const deviceSteps = steps.filter(
-      (s) =>
-        s.deviceId === formData.deviceId && s.problemId === formData.problemId,
-    );
-    const maxStepNumber =
-      deviceSteps.length > 0
-        ? Math.max(...deviceSteps.map((s) => s.stepNumber))
+  const calculateNextStepNumber = async (deviceId: string, problemId: string): Promise<number> => {
+    try {
+      // Refresh steps data from server to get latest state
+      console.log("🔄 Refreshing steps data to calculate next step number...");
+      const freshStepsResponse = await stepsApi.getSteps(1, 1000);
+      const freshStepsData = freshStepsResponse?.data || freshStepsResponse || [];
+      const freshSteps = Array.isArray(freshStepsData) ? freshStepsData : [];
+
+      // Filter steps for the specific device and problem
+      const problemSteps = freshSteps.filter(
+        (s) => s.device_id === deviceId && s.problem_id === problemId && s.is_active
+      );
+
+      const maxStepNumber = problemSteps.length > 0
+        ? Math.max(...problemSteps.map((s) => s.step_number || s.stepNumber || 0))
         : 0;
 
+      console.log("📊 Step number calculation:", {
+        deviceId,
+        problemId,
+        problemStepsCount: problemSteps.length,
+        maxStepNumber,
+        nextStepNumber: maxStepNumber + 1
+      });
+
+      return maxStepNumber + 1;
+    } catch (error) {
+      console.error("Error fetching fresh steps data:", error);
+      // Fallback to local data
+      const localSteps = steps.filter(
+        (s) => s.deviceId === deviceId && s.problemId === problemId
+      );
+      return localSteps.length > 0
+        ? Math.max(...localSteps.map((s) => s.stepNumber)) + 1
+        : 1;
+    }
+  };
+
+  const handleCreate = async (retryCount = 0) => {
     // Validate required fields before creating step
     if (
       !formData.deviceId ||
@@ -856,35 +885,74 @@ const StepsManager = () => {
       return;
     }
 
-    const newStep: DiagnosticStep = {
-      id: `step-${formData.deviceId}-${formData.problemId}-${Date.now()}`,
-      ...formData,
-      highlightRemoteButton:
-        formData.highlightRemoteButton === "none"
-          ? undefined
-          : formData.highlightRemoteButton,
-      highlightTVArea:
-        formData.highlightTVArea === "none"
-          ? undefined
-          : formData.highlightTVArea,
-      remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
-      tvInterfaceId:
-        formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
-      buttonPosition:
-        formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
-          ? undefined
-          : formData.buttonPosition,
-      stepNumber: maxStepNumber + 1,
-      isActive: true,
-      // Don't set timestamps - let backend handle them
-    };
-
     try {
+      // Calculate the next step number using fresh data
+      const nextStepNumber = await calculateNextStepNumber(formData.deviceId, formData.problemId);
+
+      const newStep: DiagnosticStep = {
+        id: `step-${formData.deviceId}-${formData.problemId}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+        ...formData,
+        highlightRemoteButton:
+          formData.highlightRemoteButton === "none"
+            ? undefined
+            : formData.highlightRemoteButton,
+        highlightTVArea:
+          formData.highlightTVArea === "none"
+            ? undefined
+            : formData.highlightTVArea,
+        remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
+        tvInterfaceId:
+          formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
+        buttonPosition:
+          formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
+            ? undefined
+            : formData.buttonPosition,
+        stepNumber: nextStepNumber,
+        isActive: true,
+        // Don't set timestamps - let backend handle them
+      };
+
+      console.log("📝 Creating step with data:", {
+        id: newStep.id,
+        stepNumber: newStep.stepNumber,
+        deviceId: newStep.deviceId,
+        problemId: newStep.problemId,
+        title: newStep.title
+      });
+
       await createStep(newStep);
       setIsCreateDialogOpen(false);
       resetForm();
+
+      toast({
+        title: "Шаг создан",
+        description: `Шаг "${newStep.title}" усп��шно создан с номером ${newStep.stepNumber}.`,
+      });
+
     } catch (error) {
       console.error("Error creating step:", error);
+
+      // Handle specific 409 conflict error
+      if (error instanceof Error && error.message.includes("409")) {
+        if (retryCount < 2) {
+          console.log(`🔄 Step number conflict detected, retrying... (attempt ${retryCount + 1}/2)`);
+          // Wait a bit and retry with fresh data
+          await new Promise(resolve => setTimeout(resolve, 1000));
+          return handleCreate(retryCount + 1);
+        } else {
+          toast({
+            title: "Конфликт номеров шагов",
+            description: "Не удалось создать шаг из-за конфликта номеров. Попробуйте обновить страницу и создать шаг заново.",
+            variant: "destructive",
+          });
+        }
+      } else {
+        toast({
+          title: "Ошибка создания шага",
+          description: error instanceof Error ? error.message : "Не удалось создать шаг.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -1051,7 +1119,7 @@ const StepsManager = () => {
       } else {
         toast({
           title: "Пульт не найден",
-          description: `Не удалось загрузить данные пульта ${formData.remoteId}.`,
+          description: `Не удалось загрузить данны�� пульта ${formData.remoteId}.`,
           variant: "destructive",
         });
       }
