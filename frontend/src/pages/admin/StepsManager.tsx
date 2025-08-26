@@ -485,7 +485,7 @@ const StepsManager = () => {
       toast({
         title: "Ошибка обновления шага",
         description:
-          error instanceof Error ? error.message : "Не удалось обн��вить шаг.",
+          error instanceof Error ? error.message : "Не удалось обновить шаг.",
         variant: "destructive",
       });
       throw error;
@@ -713,7 +713,7 @@ const StepsManager = () => {
         await loadTVInterfacesForDevice(formData.deviceId);
       }
       toast({
-        title: "Интерфейс не найден",
+        title: "Интерфейс ��е найден",
         description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список обн��влён.`,
         variant: "destructive",
       });
@@ -1016,11 +1016,52 @@ const StepsManager = () => {
     setIsEditDialogOpen(true);
   };
 
-  const openRemoteEditor = () => {
-    const remote = getRemoteById(formData.remoteId);
-    if (remote) {
-      setSelectedRemote(remote);
-      setIsRemoteEditorOpen(true);
+  const openRemoteEditor = async () => {
+    if (!formData.remoteId || formData.remoteId === "none") {
+      toast({
+        title: "Пульт не выбран",
+        description: "Выберите пульт из списка перед редактированием позиции.",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      // Try to get remote from local data first
+      let remote = remotes.find((r) => r.id === formData.remoteId);
+
+      if (!remote) {
+        // If not found in local data, try to fetch from API
+        console.log(`🔄 Fetching remote ${formData.remoteId} from API...`);
+        const response = await remotesApi.getById(formData.remoteId);
+        remote = response?.data || response;
+      }
+
+      if (remote) {
+        console.log("🎮 Opening remote editor with remote:", {
+          id: remote.id,
+          name: remote.name,
+          hasImageData: !!(remote.imageData || remote.image_data),
+          dimensions: remote.dimensions,
+          buttons: remote.buttons?.length || 0
+        });
+
+        setSelectedRemote(remote);
+        setIsRemoteEditorOpen(true);
+      } else {
+        toast({
+          title: "Пульт не найден",
+          description: `Не удалось загрузить данные пульта ${formData.remoteId}.`,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error("Error loading remote:", error);
+      toast({
+        title: "Ошибка загрузки",
+        description: "Не удалось загрузить данные о пульте.",
+        variant: "destructive",
+      });
     }
   };
 
@@ -1526,7 +1567,7 @@ const StepsManager = () => {
                               )}
                               {step.isActive
                                 ? "Деактивировать"
-                                : "Активировать"}
+                                : "Акти��ировать"}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleDelete(step.id)}
