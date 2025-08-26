@@ -195,7 +195,7 @@ class DiagnosticSession extends BaseModel {
   }
 
   /**
-   * Получение сессии с де��альным прогрессом
+   * Получение сессии с детальным прогрессом
    */
   async findByIdWithProgress(sessionId) {
     try {
@@ -335,7 +335,7 @@ class DiagnosticSession extends BaseModel {
           COUNT(ds.id) as session_count,
           COUNT(CASE WHEN ds.success = true THEN 1 END) as successful_count,
           AVG(CASE WHEN ds.duration IS NOT NULL THEN ds.duration END) as avg_duration,
-          AVG(ds.completed_steps::float / NULLIF(ds.total_steps, 0) * 100) as avg_completion_rate
+          0 as avg_completion_rate
         FROM diagnostic_sessions ds
         JOIN problems p ON ds.problem_id = p.id
         JOIN devices d ON ds.device_id = d.id
