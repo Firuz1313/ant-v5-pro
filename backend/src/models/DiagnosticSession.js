@@ -396,13 +396,11 @@ class DiagnosticSession extends BaseModel {
         abandonedCutoff.setHours(abandonedCutoff.getHours() - 24); // старше 24 часов
 
         const abandonedResult = await client.query(`
-          UPDATE diagnostic_sessions 
-          SET is_active = false, 
-              end_time = NOW(),
+          UPDATE diagnostic_sessions
+          SET duration = EXTRACT(EPOCH FROM (NOW() - created_at))::integer,
               updated_at = NOW()
-          WHERE start_time < $1 
-            AND end_time IS NULL 
-            AND is_active = true
+          WHERE created_at < $1
+            AND duration IS NULL
           RETURNING id
         `, [abandonedCutoff]);
 
