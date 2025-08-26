@@ -385,10 +385,9 @@ class DiagnosticSession extends BaseModel {
       return await transaction(async (client) => {
         // Удаляем старые завершенные сессии
         const sessionsResult = await client.query(`
-          DELETE FROM diagnostic_sessions 
-          WHERE start_time < $1 
-            AND end_time IS NOT NULL 
-            AND is_active = true
+          DELETE FROM diagnostic_sessions
+          WHERE created_at < $1
+            AND duration IS NOT NULL
           RETURNING id
         `, [cutoffDate]);
 
