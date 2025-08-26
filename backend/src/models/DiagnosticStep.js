@@ -368,12 +368,12 @@ class DiagnosticStep extends BaseModel {
   async canDelete(id) {
     try {
       const sql = `
-        SELECT 
+        SELECT
           COUNT(ss.id) as session_steps_count,
           COUNT(CASE WHEN sess.end_time IS NULL THEN 1 END) as active_sessions_count
         FROM diagnostic_steps ds
-        LEFT JOIN session_steps ss ON ds.id = ss.step_id
-        LEFT JOIN diagnostic_sessions sess ON ss.session_id = sess.id AND sess.is_active = true
+        LEFT JOIN session_steps ss ON ds.id::text = ss.step_id::text
+        LEFT JOIN diagnostic_sessions sess ON ss.session_id::text = sess.id::text AND sess.is_active = true
         WHERE ds.id = $1
         GROUP BY ds.id
       `;
