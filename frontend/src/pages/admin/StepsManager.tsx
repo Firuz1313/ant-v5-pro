@@ -422,12 +422,13 @@ const StepsManager = () => {
   };
 
   const getActiveRemotes = () => {
+    const activeRemotes = remotes.filter((r: any) => r.isActive !== false);
     console.log("🔍 getActiveRemotes called:", {
       totalRemotes: remotes.length,
       remotesArray: remotes,
-      activeRemotes: remotes.filter((r: any) => r.is_active),
+      activeRemotes: activeRemotes,
     });
-    return remotes.filter((r: any) => r.is_active);
+    return activeRemotes;
   };
 
   const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
