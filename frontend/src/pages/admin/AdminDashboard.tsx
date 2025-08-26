@@ -5,6 +5,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { useDevices } from "@/hooks/useDevices";
 import { useProblems } from "@/hooks/useProblems";
+import { useSteps, useStepStats } from "@/hooks/useSteps";
+import { useActiveSessions, useSessionStats } from "@/hooks/useSessions";
 import {
   BarChart3,
   TrendingUp,
@@ -195,7 +197,7 @@ const AdminDashboard = () => {
             <div className="text-2xl font-bold">{problemStats.total}</div>
             <p className="text-xs text-muted-foreground">
               <span className="text-green-600">{publishedProblems}</span>{" "}
-              опубликованы
+              опу��ликованы
             </p>
             <Progress value={completionRate} className="mt-3" />
           </CardContent>
@@ -440,7 +442,7 @@ const AdminDashboard = () => {
                   size="sm"
                 >
                   <Users className="h-4 w-4 mr-2" />
-                  Управление пользователями
+                  Управление поль��ователями
                 </Button>
                 <Button
                   className="w-full justify-start"
