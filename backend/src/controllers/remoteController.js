@@ -1,5 +1,6 @@
 import Remote from "../models/Remote.js";
 import { v4 as uuidv4 } from "uuid";
+import { seedDefaultRemotes as seedRemotesUtil } from "../utils/seedDefaultRemotes.js";
 
 const remoteModel = new Remote();
 
