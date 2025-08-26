@@ -29,11 +29,11 @@ export const useDevices = (
   return useQuery({
     queryKey: deviceKeys.list({ page, limit, ...filters }),
     queryFn: () => devicesApi.getDevices(page, limit, filters),
-    staleTime: 10 * 60 * 1000, // 🔧 FIX: 10 minutes to prevent aggressive refetching
-    cacheTime: 15 * 60 * 1000, // 🔧 FIX: 15 minutes cache
-    refetchOnWindowFocus: false, // 🔧 FIX: Prevent refetch on focus
-    refetchOnMount: false, // 🔧 FIX: Prevent refetch on mount if data exists
-    keepPreviousData: true, // 🔧 FIX: Keep previous data during transitions
+    staleTime: 2 * 60 * 1000, // 2 minutes
+    cacheTime: 5 * 60 * 1000, // 5 minutes cache
+    refetchOnWindowFocus: false,
+    keepPreviousData: true,
+    retry: 3,
   });
 };
 
