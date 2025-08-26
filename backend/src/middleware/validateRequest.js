@@ -2,7 +2,7 @@ import Joi from "joi";
 
 // Общие схемы валидации
 const commonSchemas = {
-  id: Joi.string().min(1).max(255).required(),
+  id: Joi.string().min(1).max(255),
   uuid: Joi.string().uuid().required(),
   email: Joi.string().email().max(320).required(),
   password: Joi.string().min(6).max(255).required(),
@@ -107,18 +107,18 @@ export const problemValidation = {
 // Схемы валидации для диагностических шагов
 export const stepValidation = {
   create: Joi.object({
-    id: commonSchemas.id,
+    id: commonSchemas.id.optional(),
     problem_id: commonSchemas.id.required(),
     device_id: commonSchemas.id.required(),
     step_number: commonSchemas.positiveInteger.required(),
     title: Joi.string().min(1).max(500).required(),
-    description: commonSchemas.longText,
+    description: commonSchemas.longText.optional(),
     instruction: commonSchemas.longText.required(),
     estimated_time: commonSchemas.positiveInteger.default(30),
-    highlight_remote_button: Joi.string().max(255),
-    highlight_tv_area: Joi.string().max(255),
-    tv_interface_id: commonSchemas.id,
-    remote_id: commonSchemas.id,
+    highlight_remote_button: Joi.string().max(255).optional(),
+    highlight_tv_area: Joi.string().max(255).optional(),
+    tv_interface_id: commonSchemas.id.optional(),
+    remote_id: commonSchemas.id.optional(),
     action_type: Joi.string().valid(
       "button_press",
       "navigation",
@@ -145,17 +145,17 @@ export const stepValidation = {
   }),
 
   update: Joi.object({
-    problem_id: commonSchemas.id,
-    device_id: commonSchemas.id,
-    step_number: commonSchemas.positiveInteger,
-    title: Joi.string().min(1).max(500),
-    description: commonSchemas.longText,
-    instruction: commonSchemas.longText,
-    estimated_time: commonSchemas.positiveInteger,
-    highlight_remote_button: Joi.string().max(255),
-    highlight_tv_area: Joi.string().max(255),
-    tv_interface_id: commonSchemas.id,
-    remote_id: commonSchemas.id,
+    problem_id: commonSchemas.id.optional(),
+    device_id: commonSchemas.id.optional(),
+    step_number: commonSchemas.positiveInteger.optional(),
+    title: Joi.string().min(1).max(500).optional(),
+    description: commonSchemas.longText.optional(),
+    instruction: commonSchemas.longText.optional(),
+    estimated_time: commonSchemas.positiveInteger.optional(),
+    highlight_remote_button: Joi.string().max(255).optional(),
+    highlight_tv_area: Joi.string().max(255).optional(),
+    tv_interface_id: commonSchemas.id.optional(),
+    remote_id: commonSchemas.id.optional(),
     action_type: Joi.string().valid(
       "button_press",
       "navigation",
@@ -322,7 +322,7 @@ export const validateRequest = (schema, source = "body") => {
       });
     }
 
-    // Заменяем исходные данные на валидированные и очищенные
+    // Заменяем исходные данные на валидированные и очище��ные
     switch (source) {
       case "body":
         req.body = value;
