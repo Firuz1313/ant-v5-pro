@@ -1,7 +1,7 @@
-import TVInterfaceMark from "../models/TVInterfaceMark.js";
+import TVInterfaceMarkSimplified from "../models/TVInterfaceMarkSimplified.js";
 import { v4 as uuidv4 } from "uuid";
 
-const tvInterfaceMarkModel = new TVInterfaceMark();
+const tvInterfaceMarkModel = new TVInterfaceMarkSimplified();
 
 // Получить все отметки для TV интерфейса
 export const getMarksByTVInterfaceId = async (req, res) => {
