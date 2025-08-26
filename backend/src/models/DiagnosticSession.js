@@ -55,7 +55,6 @@ class DiagnosticSession extends BaseModel {
 
       const updateData = {
         feedback: completionData.feedback || null,
-        completed_steps: completionData.completed_steps || currentSession.completed_steps,
         ...completionData
       };
 
@@ -407,7 +406,7 @@ class DiagnosticSession extends BaseModel {
   }
 
   /**
-   * Получение аналитики по временным инте��валам
+   * Получение аналитики по временным интервалам
    */
   async getTimeAnalytics(period = 'day', limit = 30) {
     try {
