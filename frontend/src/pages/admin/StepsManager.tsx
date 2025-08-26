@@ -485,7 +485,7 @@ const StepsManager = () => {
       toast({
         title: "Ошибка обновления шага",
         description:
-          error instanceof Error ? error.message : "Не удалось обновить шаг.",
+          error instanceof Error ? error.message : "Не удалось обн��вить шаг.",
         variant: "destructive",
       });
       throw error;
@@ -1105,32 +1105,70 @@ const StepsManager = () => {
   };
 
   const renderRemoteEditor = () => {
-    const remoteImage = customRemoteImage || selectedRemote?.imageData;
+    const remoteImage = customRemoteImage || selectedRemote?.imageData || selectedRemote?.image_data;
+
+    console.log("🎮 Remote Editor Debug:", {
+      selectedRemote: selectedRemote ? {
+        id: selectedRemote.id,
+        name: selectedRemote.name,
+        hasImageData: !!selectedRemote.imageData,
+        hasImage_data: !!selectedRemote.image_data,
+        imageDataLength: selectedRemote.imageData?.length || selectedRemote.image_data?.length || 0
+      } : null,
+      customRemoteImage: !!customRemoteImage,
+      finalRemoteImage: !!remoteImage
+    });
 
     return (
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Canvas Area */}
         <div className="flex-1">
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 relative">
-            <canvas
-              ref={canvasRef}
-              width={400}
-              height={600}
-              className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair mx-auto"
-              style={{
-                backgroundImage: remoteImage ? `url(${remoteImage})` : "none",
-                backgroundSize: "contain",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-                backgroundColor: remoteImage ? "transparent" : "#f3f4f6",
-              }}
-              onClick={handleCanvasClick}
-            />
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 relative min-h-[600px]">
+            {remoteImage ? (
+              <canvas
+                ref={canvasRef}
+                width={400}
+                height={600}
+                className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair mx-auto"
+                style={{
+                  backgroundImage: `url(${remoteImage})`,
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                  backgroundColor: "transparent",
+                }}
+                onClick={handleCanvasClick}
+              />
+            ) : (
+              <div className="w-full h-full flex flex-col items-center justify-center text-center space-y-4">
+                <div className="w-[400px] h-[600px] border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg flex flex-col items-center justify-center bg-gray-50 dark:bg-gray-900">
+                  <div className="text-gray-500 dark:text-gray-400 space-y-2">
+                    <div className="text-4xl">📱</div>
+                    <p className="text-lg font-medium">Изображение пульта не найдено</p>
+                    <p className="text-sm">Загрузите изображение пульта, чтобы выбрать позицию кнопки</p>
+                    {selectedRemote && (
+                      <div className="mt-4 p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg text-xs">
+                        <p><strong>Отладка:</strong> Пульт "{selectedRemote.name}" (ID: {selectedRemote.id})</p>
+                        <p>imageData: {selectedRemote.imageData ? "✓" : "✗"}</p>
+                        <p>image_data: {selectedRemote.image_data ? "✓" : "✗"}</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+                <canvas
+                  ref={canvasRef}
+                  width={400}
+                  height={600}
+                  className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair mx-auto opacity-0 absolute"
+                  onClick={handleCanvasClick}
+                />
+              </div>
+            )}
 
             {/* Show selected position */}
             {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
               <div
-                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none z-10"
                 style={{
                   left: `${(formData.buttonPosition.x / 400) * 100}%`,
                   top: `${(formData.buttonPosition.y / 600) * 100}%`,
