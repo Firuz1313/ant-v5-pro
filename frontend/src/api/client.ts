@@ -157,8 +157,14 @@ export class ApiClient {
     let specialTimeout = this.timeout;
     if (endpoint.includes('/tv-interfaces') &&
         (options.method === 'PUT' || options.method === 'POST')) {
-      specialTimeout = 180000; // 3 minutes for TV interface operations
+      specialTimeout = 300000; // 5 minutes for TV interface operations (increased from 3 minutes)
       console.log(`⏱️ Using extended timeout (${specialTimeout}ms) for TV interface operation`);
+
+      // Log warning for potentially large operations
+      if (options.body && options.body.length > 10 * 1024 * 1024) { // 10MB
+        const sizeInMB = (options.body.length / 1024 / 1024).toFixed(2);
+        console.warn(`📷 Large request body detected (${sizeInMB}MB) - using extended timeout`);
+      }
     }
 
     const { params, timeout = specialTimeout, ...fetchOptions } = options;
