@@ -586,7 +586,7 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
       };
       reader.readAsDataURL(file);
     } catch (error) {
-      console.error("Ошибка загрузки скриншота:", error);
+      console.error("Ошибка загрузки скриншот��:", error);
       alert(
         error instanceof Error ? error.message : "Ошибка загрузки скриншота",
       );
@@ -799,12 +799,13 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
               onClick={() => {
                 const testScreenshot = createTestScreenshot();
                 if (testScreenshot) {
+                  setTempScreenshot(testScreenshot);
                   handleSaveScreenshot(testScreenshot);
                 }
               }}
             >
               <ImageIcon className="h-4 w-4 mr-2" />
-              Создать тестовый скри��шот
+              Создать тестовый скриншот
             </Button>
             <Button
               variant="secondary"
