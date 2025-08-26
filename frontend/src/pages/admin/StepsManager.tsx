@@ -148,13 +148,13 @@ const StepFormFieldsComponent = React.memo(
           id={isEdit ? "edit-description" : "description"}
           value={formData.description}
           onChange={(e) => handleFieldChange("description", e.target.value)}
-          placeholder="��раткое описание шага"
+          placeholder="Краткое описание шага"
         />
       </div>
 
       <div>
         <Label htmlFor={isEdit ? "edit-instruction" : "instruction"}>
-          Инструкция
+          Инст��укция
         </Label>
         <Textarea
           id={isEdit ? "edit-instruction" : "instruction"}
@@ -550,6 +550,7 @@ const StepsManager = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isRemoteEditorOpen, setIsRemoteEditorOpen] = useState(false);
   const [isTVInterfaceEditorOpen, setIsTVInterfaceEditorOpen] = useState(false);
+  const [isCreatingStep, setIsCreatingStep] = useState(false);
 
   // TV Interfaces state
   const [tvInterfaces, setTVInterfaces] = useState<TVInterface[]>([]);
@@ -937,7 +938,7 @@ const StepsManager = () => {
           return handleCreate(retryCount + 1);
         } else {
           toast({
-            title: "Конфликт номеров шагов",
+            title: "Конфликт номеров шаг��в",
             description: "Не удалось создать шаг из-за конфликта номеров. Попробуйте обновить страницу и создать шаг заново.",
             variant: "destructive",
           });
@@ -1306,7 +1307,7 @@ const StepsManager = () => {
 
   const getProblemTitle = (problemId: string) => {
     const problem = problems.find((p) => p.id === problemId);
-    return problem?.title || "Неизвестная проблема";
+    return problem?.title || "Неизвестная проб��ема";
   };
 
   const getGroupedSteps = () => {
