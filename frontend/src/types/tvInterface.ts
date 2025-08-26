@@ -1,15 +1,23 @@
 // TV Interface Types для работы с бэкендом
 
 // Тип интерфейса
-export type TVInterfaceType = 'home' | 'settings' | 'channels' | 'apps' | 'guide' | 'no-signal' | 'error' | 'custom';
+export type TVInterfaceType =
+  | "home"
+  | "settings"
+  | "channels"
+  | "apps"
+  | "guide"
+  | "no-signal"
+  | "error"
+  | "custom";
 
-// Кликабельная область
+// Кликабельная област��
 export interface ClickableArea {
   id: string;
   name: string;
   position: { x: number; y: number };
   size: { width: number; height: number };
-  shape: 'rectangle' | 'circle' | 'polygon';
+  shape: "rectangle" | "circle" | "polygon";
   action: string;
   coordinates?: number[]; // для polygon shapes
 }
@@ -22,7 +30,7 @@ export interface HighlightArea {
   size: { width: number; height: number };
   color: string;
   opacity: number;
-  animation?: 'pulse' | 'glow' | 'blink' | 'none';
+  animation?: "pulse" | "glow" | "blink" | "none";
   duration?: number;
 }
 
@@ -135,45 +143,45 @@ export interface TVInterfaceTypeOption {
 // Константы для типов интерфейсов
 export const TV_INTERFACE_TYPES: TVInterfaceTypeOption[] = [
   {
-    value: 'home',
-    label: 'Домашний экран',
-    description: 'Главный экран приставки с приложениями'
+    value: "home",
+    label: "Домашний экран",
+    description: "Главный экран приставки с приложениями",
   },
   {
-    value: 'settings',
-    label: 'Настройки',
-    description: 'Экран настроек системы'
+    value: "settings",
+    label: "Настройки",
+    description: "Экран настроек системы",
   },
   {
-    value: 'channels',
-    label: 'Каналы',
-    description: 'Список телевизионных каналов'
+    value: "channels",
+    label: "Каналы",
+    description: "Список телевизионных каналов",
   },
   {
-    value: 'apps',
-    label: 'Приложения',
-    description: 'Магазин или список приложений'
+    value: "apps",
+    label: "Приложения",
+    description: "Магазин или список приложений",
   },
   {
-    value: 'guide',
-    label: 'Телегид',
-    description: 'Программа телепередач'
+    value: "guide",
+    label: "Телегид",
+    description: "Программа телепередач",
   },
   {
-    value: 'no-signal',
-    label: 'Нет сигнала',
-    description: 'Экран отсутствия сигнала'
+    value: "no-signal",
+    label: "Нет сигнала",
+    description: "Экран отсутствия сигнала",
   },
   {
-    value: 'error',
-    label: 'Ошибка',
-    description: 'Экран ошибки системы'
+    value: "error",
+    label: "Ошибка",
+    description: "Экран ошибки системы",
   },
   {
-    value: 'custom',
-    label: 'Пользовательский',
-    description: 'Кастомный интерфейс'
-  }
+    value: "custom",
+    label: "Пользовательский",
+    description: "Кастомный интерфейс",
+  },
 ];
 
 // Утилиты для работы с TV Interface
@@ -183,57 +191,82 @@ export const tvInterfaceUtils = {
     return {
       id: backendData.id,
       name: backendData.name,
-      description: backendData.description || '',
+      description: backendData.description || "",
       type: backendData.type,
-      deviceId: backendData.device_id,
-      device_id: backendData.device_id,
-      deviceName: backendData.device_name,
-      device_name: backendData.device_name,
+      deviceId: backendData.deviceId || backendData.device_id, // Поддержка обоих форматов
+      device_id: backendData.device_id || backendData.deviceId, // Поддержка обоих форматов
+      deviceName: backendData.deviceName || backendData.device_name,
+      device_name: backendData.device_name || backendData.deviceName,
       device_brand: backendData.device_brand,
       device_model: backendData.device_model,
-      screenshotUrl: backendData.screenshot_url,
-      screenshot_url: backendData.screenshot_url,
-      screenshotData: backendData.screenshot_data,
-      screenshot_data: backendData.screenshot_data,
-      clickableAreas: Array.isArray(backendData.clickable_areas) ? backendData.clickable_areas : [],
-      clickable_areas: Array.isArray(backendData.clickable_areas) ? backendData.clickable_areas : [],
-      highlightAreas: Array.isArray(backendData.highlight_areas) ? backendData.highlight_areas : [],
-      highlight_areas: Array.isArray(backendData.highlight_areas) ? backendData.highlight_areas : [],
-      isActive: backendData.is_active !== false,
-      is_active: backendData.is_active,
-      createdAt: backendData.created_at,
-      created_at: backendData.created_at,
-      updatedAt: backendData.updated_at,
-      updated_at: backendData.updated_at
+      screenshotUrl: backendData.screenshotUrl || backendData.screenshot_url,
+      screenshot_url: backendData.screenshot_url || backendData.screenshotUrl,
+      screenshotData: backendData.screenshotData || backendData.screenshot_data,
+      screenshot_data:
+        backendData.screenshot_data || backendData.screenshotData,
+      clickableAreas: Array.isArray(backendData.clickable_areas)
+        ? backendData.clickable_areas
+        : [],
+      clickable_areas: Array.isArray(backendData.clickable_areas)
+        ? backendData.clickable_areas
+        : [],
+      highlightAreas: Array.isArray(backendData.highlight_areas)
+        ? backendData.highlight_areas
+        : [],
+      highlight_areas: Array.isArray(backendData.highlight_areas)
+        ? backendData.highlight_areas
+        : [],
+      isActive:
+        backendData.isActive !== false && backendData.is_active !== false,
+      is_active:
+        backendData.is_active !== false && backendData.isActive !== false,
+      createdAt: backendData.createdAt || backendData.created_at,
+      created_at: backendData.created_at || backendData.createdAt,
+      updatedAt: backendData.updatedAt || backendData.updated_at,
+      updated_at: backendData.updated_at || backendData.updatedAt,
     };
   },
 
   // Получение названия типа интерфейса
   getTypeLabel: (type: TVInterfaceType): string => {
-    const typeOption = TV_INTERFACE_TYPES.find(t => t.value === type);
+    const typeOption = TV_INTERFACE_TYPES.find((t) => t.value === type);
     return typeOption?.label || type;
   },
 
   // Получение описания типа интерфейса
   getTypeDescription: (type: TVInterfaceType): string => {
-    const typeOption = TV_INTERFACE_TYPES.find(t => t.value === type);
-    return typeOption?.description || '';
+    const typeOption = TV_INTERFACE_TYPES.find((t) => t.value === type);
+    return typeOption?.description || "";
   },
 
   // Проверка наличия скриншота
   hasScreenshot: (tvInterface: TVInterface): boolean => {
-    return !!(tvInterface.screenshotData || tvInterface.screenshot_data || 
-              tvInterface.screenshotUrl || tvInterface.screenshot_url);
+    // Для списочного представления проверяем has_screenshot_data (оптимизация)
+    if ((tvInterface as any).has_screenshot_data !== undefined) {
+      return !!(tvInterface as any).has_screenshot_data;
+    }
+    // Для детального представления проверяем actual data
+    return !!(
+      tvInterface.screenshotData ||
+      tvInterface.screenshot_data ||
+      tvInterface.screenshotUrl ||
+      tvInterface.screenshot_url
+    );
   },
 
   // Получение URL скриншота
   getScreenshotUrl: (tvInterface: TVInterface): string | null => {
-    return tvInterface.screenshotData || tvInterface.screenshot_data || 
-           tvInterface.screenshotUrl || tvInterface.screenshot_url || null;
+    return (
+      tvInterface.screenshotData ||
+      tvInterface.screenshot_data ||
+      tvInterface.screenshotUrl ||
+      tvInterface.screenshot_url ||
+      null
+    );
   },
 
   // Проверка активности интерфейса
   isActive: (tvInterface: TVInterface): boolean => {
     return tvInterface.isActive !== false && tvInterface.is_active !== false;
-  }
+  },
 };

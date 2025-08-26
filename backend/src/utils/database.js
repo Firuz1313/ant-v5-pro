@@ -26,11 +26,11 @@ if (process.env.DATABASE_URL) {
       ? { rejectUnauthorized: false }
       : false,
 
-    // Настройки pool соединен��й
-    max: 20, // максимал����ное количество соединений в pool
-    min: 2, // минимальное количество соединений
-    idleTimeoutMillis: 30000, // время простоя перед закрытием ���оединения
-    connectionTimeoutMillis: 10000, // таймаут подключения
+    // Настройки pool соединений (увеличены для TV interface операций)
+    max: 50, // максимальное количество соединений в pool (увеличено с 20)
+    min: 5, // минимальное количество соединений (увеличено с 2)
+    idleTimeoutMillis: 60000, // время простоя перед закрытием соединения (увеличено)
+    connectionTimeoutMillis: 15000, // таймаут подключения (увеличено)
     maxUses: 7500, // максимальное количество использований соединения
   };
 } else {
@@ -43,12 +43,12 @@ if (process.env.DATABASE_URL) {
     password: process.env.DB_PASSWORD || "password",
     ssl: process.env.DB_SSL === "true" ? { rejectUnauthorized: false } : false,
 
-    // Настройки pool соединений
-    max: 20, // максимальное количество соединений в pool
-    min: 5, // минимальное количество соединений
-    idleTimeoutMillis: 30000, // время простоя перед закрытием соединения
-    connectionTimeoutMillis: 5000, // таймаут подключения
-    maxUses: 7500, // максимальное количес��в�� использований соединения
+    // Настройки pool соединений (увеличены для TV interface операций)
+    max: 50, // максимальное количество соединений в pool (увеличено с 20)
+    min: 10, // минимальное количество соединений (увеличено с 5)
+    idleTimeoutMillis: 60000, // время простоя перед закрытием соединения (увеличено)
+    connectionTimeoutMillis: 15000, // таймаут подключения (увеличено)
+    maxUses: 7500, // максимальное количество использований соединения
   };
 }
 
@@ -395,7 +395,10 @@ export async function createTVInterfaceMarksTable() {
 
     return true;
   } catch (error) {
-    console.error("❌ Ошибка создания таблицы tv_interface_marks:", error.message);
+    console.error(
+      "❌ Ошибка создания таблицы tv_interface_marks:",
+      error.message,
+    );
     throw error;
   }
 }

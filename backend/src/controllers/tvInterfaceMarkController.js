@@ -1,7 +1,7 @@
-import TVInterfaceMark from "../models/TVInterfaceMark.js";
+import TVInterfaceMarkSimplified from "../models/TVInterfaceMarkSimplified.js";
 import { v4 as uuidv4 } from "uuid";
 
-const tvInterfaceMarkModel = new TVInterfaceMark();
+const tvInterfaceMarkModel = new TVInterfaceMarkSimplified();
 
 // Получить все отметки для TV интерфейса
 export const getMarksByTVInterfaceId = async (req, res) => {
@@ -17,16 +17,27 @@ export const getMarksByTVInterfaceId = async (req, res) => {
     }
 
     const options = {
-      is_active: req.query.is_active !== undefined ? req.query.is_active === "true" : undefined,
-      is_visible: req.query.is_visible !== undefined ? req.query.is_visible === "true" : undefined,
+      is_active:
+        req.query.is_active !== undefined
+          ? req.query.is_active === "true"
+          : undefined,
+      is_visible:
+        req.query.is_visible !== undefined
+          ? req.query.is_visible === "true"
+          : undefined,
       mark_type: req.query.mark_type,
       step_id: req.query.step_id,
     };
 
     // Убираем undefined значения
-    Object.keys(options).forEach((key) => options[key] === undefined && delete options[key]);
+    Object.keys(options).forEach(
+      (key) => options[key] === undefined && delete options[key],
+    );
 
-    const marks = await tvInterfaceMarkModel.getByTVInterfaceId(tvInterfaceId, options);
+    const marks = await tvInterfaceMarkModel.getByTVInterfaceId(
+      tvInterfaceId,
+      options,
+    );
 
     res.json({
       success: true,
@@ -225,7 +236,10 @@ export const createMark = async (req, res) => {
   } catch (error) {
     console.error("Error in createMark:", error);
 
-    if (error.message.includes("не найден") || error.message.includes("обязательно")) {
+    if (
+      error.message.includes("не найден") ||
+      error.message.includes("обязательно")
+    ) {
       return res.status(400).json({
         success: false,
         error: error.message,
@@ -338,7 +352,8 @@ export const deleteMarksByTVInterfaceId = async (req, res) => {
       });
     }
 
-    const deletedCount = await tvInterfaceMarkModel.deleteByTVInterfaceId(tvInterfaceId);
+    const deletedCount =
+      await tvInterfaceMarkModel.deleteByTVInterfaceId(tvInterfaceId);
 
     res.json({
       success: true,

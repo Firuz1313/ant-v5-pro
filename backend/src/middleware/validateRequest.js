@@ -235,19 +235,13 @@ export const sessionValidation = {
     problem_id: commonSchemas.id.required(),
     user_id: commonSchemas.id,
     session_id: commonSchemas.id.required(),
-    total_steps: commonSchemas.integer.min(0).default(0),
     user_agent: Joi.string().max(1000),
     ip_address: Joi.string().ip(),
     metadata: commonSchemas.jsonObject,
   }),
 
   update: Joi.object({
-    completed_steps: commonSchemas.integer.min(0),
-    success: commonSchemas.boolean,
-    duration: commonSchemas.integer.min(0),
-    error_steps: commonSchemas.jsonArray,
     feedback: commonSchemas.jsonObject,
-    end_time: commonSchemas.timestamp,
     metadata: commonSchemas.jsonObject,
   }).min(1),
 };

@@ -103,7 +103,15 @@ export class ApiClient {
       };
 
       xhr.ontimeout = () => {
-        reject(new Error("XHR request timeout"));
+        if (url.includes("/tv-interfaces")) {
+          reject(
+            new Error(
+              "XHR request timeout - TV interface operation exceeded time limit. This may be due to large image data or server load.",
+            ),
+          );
+        } else {
+          reject(new Error("XHR request timeout"));
+        }
       };
 
       // Send body if present
@@ -155,10 +163,23 @@ export class ApiClient {
   ): Promise<T> {
     // Special timeout handling for TV interface operations (large image data)
     let specialTimeout = this.timeout;
-    if (endpoint.includes('/tv-interfaces') &&
-        (options.method === 'PUT' || options.method === 'POST')) {
-      specialTimeout = 180000; // 3 minutes for TV interface operations
-      console.log(`⏱️ Using extended timeout (${specialTimeout}ms) for TV interface operation`);
+    if (
+      endpoint.includes("/tv-interfaces") &&
+      (options.method === "PUT" || options.method === "POST")
+    ) {
+      specialTimeout = 600000; // 10 minutes for TV interface operations (increased for large images)
+      console.log(
+        `⏱️ Using extended timeout (${specialTimeout}ms) for TV interface operation`,
+      );
+
+      // Log warning for potentially large operations
+      if (options.body && options.body.length > 10 * 1024 * 1024) {
+        // 10MB
+        const sizeInMB = (options.body.length / 1024 / 1024).toFixed(2);
+        console.warn(
+          `📷 Large request body detected (${sizeInMB}MB) - using extended timeout`,
+        );
+      }
     }
 
     const { params, timeout = specialTimeout, ...fetchOptions } = options;
@@ -237,10 +258,14 @@ export class ApiClient {
       if (this.useFallback) {
         // Use XMLHttpRequest fallback if fetch has failed before
         console.log(`📡 Using XHR fallback due to previous fetch failures`);
-        response = await this.xhrFallback(url, {
-          ...fetchOptions,
-          headers,
-        }, options.timeout);
+        response = await this.xhrFallback(
+          url,
+          {
+            ...fetchOptions,
+            headers,
+          },
+          options.timeout,
+        );
       } else {
         // Try fetch first
         response = await this.originalFetch(url, {
@@ -362,6 +387,22 @@ export class ApiClient {
         console.error(`📡 Request method:`, fetchOptions.method || "GET");
 
         if (error.name === "AbortError") {
+          // Special handling for TV interface timeouts (less aggressive retry)
+          if (
+            endpoint.includes("/tv-interfaces") &&
+            (options.method === "PUT" || options.method === "POST")
+          ) {
+            console.error(
+              `⏱️ TV interface operation timeout after ${timeout}ms`,
+            );
+            throw new ApiError(
+              "TV interface operation timeout after 10 minutes. This indicates very large image data or server issues. Try compressing the image to under 5MB or contact support.",
+              408,
+              undefined,
+              "TV_INTERFACE_TIMEOUT",
+            );
+          }
+
           // Check if this is a timeout during potential database reconnection
           if (retryCount < 2) {
             console.log(

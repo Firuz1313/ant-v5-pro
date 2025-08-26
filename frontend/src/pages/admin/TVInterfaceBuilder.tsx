@@ -105,13 +105,25 @@ const TVInterfaceBuilder = () => {
   const loadTVInterfaces = async () => {
     setIsLoading(true);
     try {
+      console.log("📡 Loading TV interfaces...");
       const response = await tvInterfacesAPI.getAll();
+      console.log("📡 TV interfaces response:", response);
+
       if (response.success && response.data) {
         // Нормализуем данные с бэкенда
-        const normalizedInterfaces = response.data.map((iface) =>
-          tvInterfaceUtils.normalizeFromBackend(iface),
-        );
+        const normalizedInterfaces = response.data.map((iface) => {
+          const normalized = tvInterfaceUtils.normalizeFromBackend(iface);
+          console.log("📡 Normalized interface:", normalized.id, {
+            hasScreenshot: tvInterfaceUtils.hasScreenshot(normalized),
+            screenshotUrl:
+              tvInterfaceUtils.getScreenshotUrl(normalized)?.substring(0, 50) +
+              "...",
+            createdAt: normalized.createdAt || normalized.created_at,
+          });
+          return normalized;
+        });
         setTVInterfaces(normalizedInterfaces);
+        console.log("📡 Total interfaces loaded:", normalizedInterfaces.length);
       } else {
         toast({
           title: "Ошибка",
@@ -146,11 +158,11 @@ const TVInterfaceBuilder = () => {
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
       toast({
-        title: "Ош��бка",
-        description: "Размер файла не должен превышать 5 МБ",
+        title: "Ошибка",
+        description: "Размер файла не должен превышать 10 МБ",
         variant: "destructive",
       });
       return;
@@ -241,15 +253,32 @@ const TVInterfaceBuilder = () => {
 
     setIsLoading(true);
     try {
+      console.log("📤 Creating TV interface with data:", {
+        name: formData.name,
+        type: formData.type,
+        deviceId: formData.deviceId,
+        hasScreenshot: !!formData.screenshotData,
+        screenshotSize: formData.screenshotData
+          ? Math.round(formData.screenshotData.length / 1024) + "KB"
+          : "None",
+      });
+
       const response = await tvInterfacesAPI.create(formData);
+      console.log("📤 Create response:", response);
+
       if (response.success) {
         toast({
-          title: "Успе��",
+          title: "Успех",
           description: response.message || "TV интерфейс создан",
         });
         setIsCreateDialogOpen(false);
         resetForm();
-        loadTVInterfaces();
+
+        // Форсированная перезагрузка через небольшую задержку
+        setTimeout(() => {
+          console.log("🔄 Force reloading interfaces after create...");
+          loadTVInterfaces();
+        }, 500);
       } else {
         toast({
           title: "Ошибка",
@@ -283,7 +312,7 @@ const TVInterfaceBuilder = () => {
         deviceId: formData.deviceId,
       };
 
-      // Добавляем screenshot_data только если был загружен новы�� скриншот
+      // Добавляем screenshot_data только если был загружен новый скриншот
       if (
         formData.screenshotData &&
         formData.screenshotData.startsWith("data:")
@@ -291,10 +320,19 @@ const TVInterfaceBuilder = () => {
         updateData.screenshotData = formData.screenshotData;
       }
 
+      console.log("📤 Updating TV interface:", selectedInterface.id, {
+        hasNewScreenshot: !!updateData.screenshotData,
+        screenshotSize: updateData.screenshotData
+          ? Math.round(updateData.screenshotData.length / 1024) + "KB"
+          : "None",
+      });
+
       const response = await tvInterfacesAPI.update(
         selectedInterface.id,
         updateData,
       );
+      console.log("📤 Update response:", response);
+
       if (response.success) {
         toast({
           title: "Успех",
@@ -302,7 +340,12 @@ const TVInterfaceBuilder = () => {
         });
         setIsEditDialogOpen(false);
         resetForm();
-        loadTVInterfaces();
+
+        // Форсированная перезагрузка через небольшую задержку
+        setTimeout(() => {
+          console.log("🔄 Force reloading interfaces after update...");
+          loadTVInterfaces();
+        }, 500);
       } else {
         toast({
           title: "Ошибка",
@@ -776,7 +819,7 @@ const TVInterfaceBuilder = () => {
               selectedDeviceFilter !== "all" ||
               selectedTypeFilter !== "all"
                 ? "Попробуйте изменить фильтры поиска"
-                : "Создайте первый TV интерфейс для начала работы"}
+                : "Соз��айте первый TV интерфейс для начала ��аботы"}
             </p>
             {!searchTerm &&
               selectedDeviceFilter === "all" &&
@@ -793,12 +836,21 @@ const TVInterfaceBuilder = () => {
               <CardContent className="p-0">
                 {/* Interface Preview */}
                 <div className="aspect-video bg-gray-100 dark:bg-gray-800 flex items-center justify-center relative">
-                  {tvInterfaceUtils.hasScreenshot(tvInterface) ? (
+                  {tvInterfaceUtils.hasScreenshot(tvInterface) &&
+                  tvInterfaceUtils.getScreenshotUrl(tvInterface) ? (
                     <img
                       src={tvInterfaceUtils.getScreenshotUrl(tvInterface)!}
                       alt={tvInterface.name}
                       className="w-full h-full object-cover"
                     />
+                  ) : tvInterfaceUtils.hasScreenshot(tvInterface) ? (
+                    <div className="text-center">
+                      <ImageIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
+                      <p className="text-sm text-gray-500">Скриншот есть</p>
+                      <p className="text-xs text-gray-400">
+                        Открыть для просмотра
+                      </p>
+                    </div>
                   ) : (
                     <div className="text-center">
                       <ImageIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
@@ -848,9 +900,19 @@ const TVInterfaceBuilder = () => {
 
                   <div className="text-xs text-gray-500">
                     Создан:{" "}
-                    {new Date(
-                      tvInterface.createdAt || tvInterface.created_at!,
-                    ).toLocaleDateString("ru")}
+                    {(() => {
+                      const dateStr =
+                        tvInterface.createdAt || tvInterface.created_at;
+                      if (!dateStr) return "Неизвестно";
+                      try {
+                        const date = new Date(dateStr);
+                        return isNaN(date.getTime())
+                          ? "Неизвестно"
+                          : date.toLocaleDateString("ru");
+                      } catch {
+                        return "Неизвестно";
+                      }
+                    })()}
                   </div>
 
                   {/* Actions */}
@@ -948,7 +1010,7 @@ const TVInterfaceBuilder = () => {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Выберите тип интерфейса" />
+                    <SelectValue placeholder="Выберите тип инте��фейса" />
                   </SelectTrigger>
                   <SelectContent>
                     {TV_INTERFACE_TYPES.map((type) => (
