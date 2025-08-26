@@ -27,8 +27,12 @@ const DiagnosticPage = () => {
   }>();
 
   // API hooks
-  const { devices, loading: devicesLoading } = useDevices();
-  const { problems, loading: problemsLoading } = useProblems({ deviceId });
+  const { data: devicesResponse, isLoading: devicesLoading } = useDevices();
+  const { data: problemsResponse, isLoading: problemsLoading } = useProblems(1, 20, { deviceId });
+
+  // Extract data arrays from API responses
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   // Local state
   const [currentStepNumber, setCurrentStepNumber] = useState(1);
