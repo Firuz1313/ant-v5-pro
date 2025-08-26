@@ -113,9 +113,19 @@ const RemoteControl = ({
           <div
             className="relative w-full max-w-[260px] h-full min-h-[600px] lg:min-h-[700px] bg-cover bg-center bg-no-repeat rounded-3xl shadow-2xl border-4 border-gray-700"
             style={{
-              backgroundImage: `url(${remote.imageData})`,
+              backgroundImage: remote.imageData ? `url(${remote.imageData})` : "none",
+              backgroundColor: remote.imageData ? "transparent" : "#374151",
             }}
           >
+            {/* Fallback content when no image */}
+            {!remote.imageData && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-4">
+                <div className="text-6xl mb-4">📱</div>
+                <p className="text-white text-lg font-semibold mb-2">{remote.name}</p>
+                <p className="text-gray-300 text-sm">Изображение пульта не найдено</p>
+              </div>
+            )}
+
             {/* Custom buttons */}
             {remote.buttons.map((button) => (
               <button
@@ -128,13 +138,13 @@ const RemoteControl = ({
                     glowButton === button.action,
                 })}
                 style={{
-                  left: `${(button.position.x / remote.dimensions.width) * 100}%`,
-                  top: `${(button.position.y / remote.dimensions.height) * 100}%`,
-                  width: `${(button.size.width / remote.dimensions.width) * 100}%`,
-                  height: `${(button.size.height / remote.dimensions.height) * 100}%`,
-                  backgroundColor: button.color,
-                  color: button.textColor,
-                  fontSize: `${button.fontSize}px`,
+                  left: `${(button.position?.x || 0 / (remote.dimensions?.width || 400)) * 100}%`,
+                  top: `${(button.position?.y || 0 / (remote.dimensions?.height || 600)) * 100}%`,
+                  width: `${(button.size?.width || 40 / (remote.dimensions?.width || 400)) * 100}%`,
+                  height: `${(button.size?.height || 40 / (remote.dimensions?.height || 600)) * 100}%`,
+                  backgroundColor: button.color || "#4a5568",
+                  color: button.textColor || "#ffffff",
+                  fontSize: `${button.fontSize || 12}px`,
                   borderRadius:
                     button.shape === "circle"
                       ? "50%"
@@ -154,8 +164,8 @@ const RemoteControl = ({
               <div
                 className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
                 style={{
-                  left: `${(showButtonPosition.x / remote.dimensions.width) * 100}%`,
-                  top: `${(showButtonPosition.y / remote.dimensions.height) * 100}%`,
+                  left: `${(showButtonPosition.x / (remote.dimensions?.width || 400)) * 100}%`,
+                  top: `${(showButtonPosition.y / (remote.dimensions?.height || 600)) * 100}%`,
                 }}
               />
             )}
