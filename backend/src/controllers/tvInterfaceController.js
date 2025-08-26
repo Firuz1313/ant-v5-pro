@@ -104,7 +104,7 @@ export const getTVInterfacesByDeviceId = async (req, res) => {
     console.error('Error in getTVInterfacesByDeviceId:', error);
     res.status(500).json({
       success: false,
-      error: 'Ошибка при получении TV интерфейсов д��я устройства',
+      error: 'Ошибка при получении TV интерфейсов для устройства',
       details: error.message,
       timestamp: new Date().toISOString()
     });
@@ -188,7 +188,7 @@ export const updateTVInterface = async (req, res) => {
   const updateData = req.body;
 
   // Устанавливаем расширенный таймаут для ответа
-  req.setTimeout(300000); // 5 ми��ут для обработки запроса
+  req.setTimeout(300000); // 5 минут для обработки запроса
   res.setTimeout(300000); // 5 минут для отправки ответа
 
   try {
@@ -204,6 +204,16 @@ export const updateTVInterface = async (req, res) => {
       // Предупреждение для очень больших файлов
       if (screenshotSize > 50 * 1024 * 1024) { // 50MB
         console.warn(`⚠️ Large screenshot data detected (${sizeInMB}MB) - this may take longer to process`);
+      }
+
+      // Проверка лимита размера файла (10MB)
+      if (screenshotSize > 10 * 1024 * 1024) { // 10MB
+        return res.status(413).json({
+          success: false,
+          error: 'Размер скриншота превышает лимит 10МБ',
+          details: `Размер загружаемого скриншота: ${sizeInMB}МБ. Максимальный размер: 10МБ`,
+          timestamp: new Date().toISOString()
+        });
       }
     }
 
@@ -262,7 +272,7 @@ export const updateTVInterface = async (req, res) => {
       return res.status(408).json({
         success: false,
         error: 'Операция превысила лимит времени',
-        details: 'Обновление интерфейса заняло слишком много времени. Возможные причины: большой размер изображения, проблемы с сетью или высокая нагрузка на сервер.',
+        details: 'Обно��ление интерфейса заняло слишком много времени. Возможные причины: большой размер изображения, проблемы с сетью или высокая нагрузка на сервер.',
         suggestions: [
           'Попробуйте уменьшить размер изображения',
           'Попробуйте позже, когда нагрузка на сервер будет меньше',
@@ -420,7 +430,7 @@ export const duplicateTVInterface = async (req, res) => {
     res.status(201).json({
       success: true,
       data: tvInterface,
-      message: 'TV интерфейс успешно дублирован',
+      message: 'TV интерфейс успешно дуб��ирован',
       timestamp: new Date().toISOString()
     });
   } catch (error) {
@@ -465,7 +475,7 @@ export const getTVInterfaceStats = async (req, res) => {
   }
 };
 
-// Экспортировать TV интерфейс в JSON
+// Экспор��ировать TV интерфейс в JSON
 export const exportTVInterface = async (req, res) => {
   try {
     const { id } = req.params;
