@@ -22,6 +22,7 @@ import apiRoutes from "./routes/index.js";
 import errorHandler from "./middleware/errorHandler.js";
 import requestLogger from "./middleware/requestLogger.js";
 import validateRequest from "./middleware/validateRequest.js";
+import decamelizeBody from "./middleware/decamelizeBody.js";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -139,6 +140,9 @@ if (NODE_ENV === "development") {
 // Парсинг JSON и URL-encoded данных
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true, limit: "10mb" }));
+
+// Преобразование camelCase ключей в snake_case для совместимости с базой данных
+app.use(decamelizeBody);
 
 // Статические файлы
 app.use("/media", express.static(path.join(__dirname, "../uploads")));
