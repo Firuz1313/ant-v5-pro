@@ -183,9 +183,19 @@ export const createTVInterface = async (req, res) => {
 
 // Обновить TV интерфейс
 export const updateTVInterface = async (req, res) => {
+  const startTime = Date.now();
   try {
     const { id } = req.params;
     const updateData = req.body;
+
+    console.log(`🔄 Starting TV interface update: ${id}`);
+    console.log(`📊 Update data size: ${JSON.stringify(updateData).length} characters`);
+
+    // Логируем размер screenshot_data если он есть
+    if (updateData.screenshot_data) {
+      const screenshotSize = updateData.screenshot_data.length;
+      console.log(`📷 Screenshot data size: ${(screenshotSize / 1024 / 1024).toFixed(2)}MB`);
+    }
 
     if (!id) {
       return res.status(400).json({
@@ -195,7 +205,12 @@ export const updateTVInterface = async (req, res) => {
       });
     }
 
+    console.log(`🔍 Calling model update for TV interface: ${id}`);
     const tvInterface = await tvInterfaceModel.update(id, updateData);
+
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    console.log(`✅ TV interface update completed in ${duration}ms`);
 
     res.json({
       success: true,
@@ -204,8 +219,15 @@ export const updateTVInterface = async (req, res) => {
       timestamp: new Date().toISOString()
     });
   } catch (error) {
-    console.error('Error in updateTVInterface:', error);
-    
+    const endTime = Date.now();
+    const duration = endTime - startTime;
+    console.error(`❌ TV interface update failed after ${duration}ms:`, error);
+    console.error('Error details:', {
+      name: error.name,
+      message: error.message,
+      stack: error.stack?.split('\n').slice(0, 5).join('\n') // Первые 5 строк стека
+    });
+
     if (error.message.includes('не найден')) {
       return res.status(404).json({
         success: false,
@@ -218,6 +240,16 @@ export const updateTVInterface = async (req, res) => {
       return res.status(400).json({
         success: false,
         error: error.message,
+        timestamp: new Date().toISOString()
+      });
+    }
+
+    // Проверяем на специфические ошибки базы данных
+    if (error.message.includes('timeout') || error.message.includes('connection')) {
+      return res.status(503).json({
+        success: false,
+        error: 'Ошибка подключения к базе данных - попробуйте позже',
+        details: error.message,
         timestamp: new Date().toISOString()
       });
     }
@@ -400,7 +432,7 @@ export const exportTVInterface = async (req, res) => {
       });
     }
 
-    // Подготавливаем данные для экспорта
+    // Под��отавливаем данные для экспорта
     const exportData = {
       name: tvInterface.name,
       description: tvInterface.description,
