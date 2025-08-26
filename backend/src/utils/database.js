@@ -285,7 +285,7 @@ export async function fixDiagnosticStepsSchema() {
       AND column_name IN (
         'device_id', 'instruction', 'instruction_text', 'tv_interface',
         'validation_rules', 'success_condition', 'failure_actions',
-        'warning_text', 'success_text', 'media', 'next_step_conditions', 'hint'
+        'warning_text', 'success_text', 'media', 'next_step_conditions', 'hint', 'button_position'
       );
     `;
 
@@ -373,7 +373,7 @@ export async function fixDiagnosticStepsSchema() {
 
     // Add missing validation_rules column
     if (!hasValidationRules) {
-      console.log("⚠️  validation_rules column missing, adding it...");
+      console.log("⚠���  validation_rules column missing, adding it...");
 
       await query(`
         ALTER TABLE diagnostic_steps
@@ -582,7 +582,7 @@ export async function closePool() {
   }
 }
 
-// Функция очистки старых данных (maintenance)
+// Функция очистк�� старых данных (maintenance)
 export async function cleanupOldData(daysToKeep = 90) {
   try {
     console.log(`🧹 Очистка данных старше ${daysToKeep} дней...`);
