@@ -27,9 +27,7 @@ class DiagnosticSession extends BaseModel {
         const session = {
           ...sessionData,
           total_steps: totalSteps,
-          completed_steps: 0,
-          success: null,
-          duration: null
+          completed_steps: 0
         };
 
         const prepared = this.prepareForInsert(session);
@@ -82,7 +80,7 @@ class DiagnosticSession extends BaseModel {
   }
 
   /**
-   * Обновление пр��гресса сессии
+   * Обновление пр��гресса сесси��
    */
   async updateProgress(sessionId, stepId, stepResult) {
     try {
