@@ -167,7 +167,7 @@ export const TV_INTERFACE_TYPES: TVInterfaceTypeOption[] = [
   {
     value: 'error',
     label: 'Ошибка',
-    description: 'Экран ошибки системы'
+    description: 'Экран ошибки сист��мы'
   },
   {
     value: 'custom',
@@ -220,16 +220,37 @@ export const tvInterfaceUtils = {
     return typeOption?.description || '';
   },
 
-  // Проверка наличия скриншота
+  // Пров��рка наличия скриншота
   hasScreenshot: (tvInterface: TVInterface): boolean => {
-    return !!(tvInterface.screenshotData || tvInterface.screenshot_data || 
+    // Для списочного представления проверяем has_screenshot_data (оптимизация)
+    if ((tvInterface as any).has_screenshot_data !== undefined) {
+      return !!(tvInterface as any).has_screenshot_data;
+    }
+    // Для детального представления проверяем actual data
+    return !!(tvInterface.screenshotData || tvInterface.screenshot_data ||
               tvInterface.screenshotUrl || tvInterface.screenshot_url);
   },
 
   // Получение URL скриншота
   getScreenshotUrl: (tvInterface: TVInterface): string | null => {
-    return tvInterface.screenshotData || tvInterface.screenshot_data || 
-           tvInterface.screenshotUrl || tvInterface.screenshot_url || null;
+    // Проверяем есть ли actual data для отображения
+    const actualData = tvInterface.screenshotData || tvInterface.screenshot_data ||
+                       tvInterface.screenshotUrl || tvInterface.screenshot_url;
+
+    if (actualData) {
+      return actualData;
+    }
+
+    // Если нет actual data, но has_screenshot_data = true, значит данные есть в БД
+    // но не загружены для оптимизации. Возвращаем placeholder или null
+    if ((tvInterface as any).has_screenshot_data) {
+      // Можно вернуть placeholder изображение или null
+      // Для корректной работы UI лучше вернуть null, чтобы показать "Нет скриншота"
+      // и позволить пользователю открыть детальный просмотр где скриншот загрузится
+      return null;
+    }
+
+    return null;
   },
 
   // Проверка активности интерфейса
