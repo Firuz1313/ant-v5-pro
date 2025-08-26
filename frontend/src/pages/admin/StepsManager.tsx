@@ -432,19 +432,35 @@ const StepsManager = () => {
 
   const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
 
-  const getProblemsForDevice = (deviceId: string) =>
-    problems.filter((p: any) => p.device_id === deviceId);
+  const getProblemsForDevice = (deviceId: string) => {
+    const deviceProblems = problems.filter((p: any) => p.deviceId === deviceId);
+    console.log("🔍 getProblemsForDevice called:", {
+      deviceId,
+      totalProblems: problems.length,
+      deviceProblems: deviceProblems.length,
+      allProblems: problems.map(p => ({id: p.id, deviceId: p.deviceId, title: p.title}))
+    });
+    return deviceProblems;
+  };
 
   const getRemotesForDevice = (deviceId: string) => {
+    const deviceRemotes = remotes.filter((r: any) => r.deviceId === deviceId);
     console.log("🔍 getRemotesForDevice called:", {
       deviceId,
       totalRemotes: remotes.length,
-      remotesForDevice: remotes.filter((r: any) => r.device_id === deviceId),
+      deviceRemotes: deviceRemotes.length,
+      allRemotes: remotes.map(r => ({id: r.id, deviceId: r.deviceId, name: r.name}))
     });
-    return remotes.filter((r: any) => r.device_id === deviceId);
+    return deviceRemotes;
   };
-  const getDefaultRemoteForDevice = (deviceId: string) =>
-    remotes.find((r: any) => r.device_id === deviceId && r.is_default);
+  const getDefaultRemoteForDevice = (deviceId: string) => {
+    const defaultRemote = remotes.find((r: any) => r.deviceId === deviceId && r.isDefault);
+    console.log("🔍 getDefaultRemoteForDevice called:", {
+      deviceId,
+      defaultRemote: defaultRemote ? {id: defaultRemote.id, name: defaultRemote.name} : null
+    });
+    return defaultRemote;
+  };
 
   // ALL HOOKS MUST BE DECLARED BEFORE ANY CONDITIONAL RETURNS
   const { toast } = useToast();
@@ -621,7 +637,7 @@ const StepsManager = () => {
       }
       toast({
         title: "Интерфейс не найден",
-        description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список обн��влён.`,
+        description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список о��н��влён.`,
         variant: "destructive",
       });
       return;
@@ -1364,7 +1380,7 @@ const StepsManager = () => {
                               {step.tvInterface && (
                                 <span>Интерфейс: {step.tvInterface}</span>
                               )}
-                              <span>Обновлено: {step.updatedAt}</span>
+                              <span>Об��овлено: {step.updatedAt}</span>
                             </div>
                           </div>
                         </div>
