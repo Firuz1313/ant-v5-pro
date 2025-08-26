@@ -1103,7 +1103,7 @@ const StepsManager = () => {
 
     if (!ctx) return null;
 
-    // Залив��ем фон пульта
+    // Заливаем фон пульта
     const gradient = ctx.createLinearGradient(0, 0, 0, 800);
     gradient.addColorStop(0, "#2d3748");
     gradient.addColorStop(1, "#1a202c");
@@ -1390,7 +1390,30 @@ const StepsManager = () => {
                 className="hidden"
               />
 
-              {isPickingButton && (
+              {!remoteImage && (
+                <div className="p-3 bg-yellow-50 dark:bg-yellow-900/20 rounded-lg">
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300 mb-2">
+                    ⚠️ Изображение пульта отсутствует
+                  </p>
+                  <p className="text-xs text-yellow-600 dark:text-yellow-400 mb-3">
+                    Загрузите изображение или создайте тестовый пульт для выбора позиции кнопки.
+                  </p>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => {
+                      // Открываем редактор пультов в новой вкладке
+                      window.open(`/admin/remote-builder?edit=${selectedRemote?.id}`, '_blank');
+                    }}
+                    className="w-full text-xs"
+                  >
+                    <Settings className="h-3 w-3 mr-1" />
+                    Редактировать в Remote Builder
+                  </Button>
+                </div>
+              )}
+
+              {isPickingButton && remoteImage && (
                 <div className="p-3 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
                   <p className="text-sm text-blue-700 dark:text-blue-300">
                     Кликнит�� на изображение пульта, чтобы указать позици��
@@ -1424,7 +1447,7 @@ const StepsManager = () => {
             Управление шагами
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создан��е шагов диагностики с привязкой к приставкам и пробл��мам
+            Создан��е шагов диагностики с привязкой к приставкам и проблемам
           </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
@@ -1499,7 +1522,7 @@ const StepsManager = () => {
                   <SelectValue placeholder="Приставка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все приставки</SelectItem>
+                  <SelectItem value="all">Все пристав��и</SelectItem>
                   {getActiveDevices().map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       <div className="flex items-center">
@@ -1658,7 +1681,7 @@ const StepsManager = () => {
                             <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
                               {step.remoteId && (
                                 <span>
-                                  Пуль��:{" "}
+                                  Пульт:{" "}
                                   {getRemoteById(step.remoteId)?.name ||
                                     "Неизвестный"}
                                 </span>
@@ -1752,7 +1775,7 @@ const StepsManager = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Ред��ктироват�� шаг</DialogTitle>
+            <DialogTitle>Редактироват�� шаг</DialogTitle>
           </DialogHeader>
           <StepFormFieldsComponent
             isEdit={true}
