@@ -243,7 +243,7 @@ export const remotesApi = {
   },
 
   /**
-   * П��иск пультов
+   * Поиск пультов
    */
   async search(
     query: string,
@@ -253,6 +253,19 @@ export const remotesApi = {
       return await this.getAll({ ...filters, search: query });
     } catch (error) {
       console.error(`Failed to search remotes with query: ${query}:`, error);
+      throw error;
+    }
+  },
+
+  /**
+   * Создание пультов по умолчанию для устройств
+   */
+  async seedDefaultRemotes(): Promise<{ message: string }> {
+    try {
+      const response = await apiClient.post("/remotes/seed-defaults");
+      return response.data;
+    } catch (error) {
+      console.error("Failed to seed default remotes:", error);
       throw error;
     }
   },
