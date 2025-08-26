@@ -623,55 +623,97 @@ const TVInterfaceAreaEditor: React.FC<TVInterfaceAreaEditorProps> = ({
 
   const createTestScreenshot = () => {
     const canvas = document.createElement("canvas");
-    canvas.width = 800;
-    canvas.height = 600;
+    canvas.width = 1920;
+    canvas.height = 1080;
     const ctx = canvas.getContext("2d");
 
     if (!ctx) return null;
 
-    // Заливаем фон
-    ctx.fillStyle = "#1a1a1a";
-    ctx.fillRect(0, 0, 800, 600);
+    // Заливаем фон градиентом
+    const gradient = ctx.createLinearGradient(0, 0, 1920, 1080);
+    gradient.addColorStop(0, "#1e3a8a");
+    gradient.addColorStop(1, "#1e1b4b");
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 1920, 1080);
 
     // Рисуем заголовок
     ctx.fillStyle = "#ffffff";
-    ctx.font = "bold 32px Arial";
+    ctx.font = "bold 64px Arial";
     ctx.textAlign = "center";
-    ctx.fillText("Главно�� меню", 400, 80);
+    ctx.fillText(`${tvInterface.name || "TV Интерфейс"}`, 960, 120);
 
-    // Рисуем псевдо-эле��енты интерфейса
+    // Добавляем подзаголовок
+    ctx.font = "32px Arial";
+    ctx.fillStyle = "#d1d5db";
+    ctx.fillText("Главное меню", 960, 180);
+
+    // Рисуем элементы интерфейса
     const items = [
-      { x: 100, y: 150, text: "Каналы", color: "#3b82f6" },
-      { x: 300, y: 150, text: "Настройки", color: "#10b981" },
-      { x: 500, y: 150, text: "Приложения", color: "#f59e0b" },
-      { x: 100, y: 320, text: "Фильмы", color: "#ef4444" },
-      { x: 300, y: 320, text: "Музыка", color: "#8b5cf6" },
-      { x: 500, y: 320, text: "Игры", color: "#06b6d4" },
+      { x: 200, y: 300, text: "Каналы", icon: "📺", color: "#3b82f6" },
+      { x: 520, y: 300, text: "Настройки", icon: "⚙️", color: "#10b981" },
+      { x: 840, y: 300, text: "Приложения", icon: "📱", color: "#f59e0b" },
+      { x: 1160, y: 300, text: "Поиск", icon: "🔍", color: "#06b6d4" },
+      { x: 200, y: 600, text: "Фильмы", icon: "🎬", color: "#ef4444" },
+      { x: 520, y: 600, text: "Музыка", icon: "🎵", color: "#8b5cf6" },
+      { x: 840, y: 600, text: "Игры", icon: "🎮", color: "#f97316" },
+      { x: 1160, y: 600, text: "Записи", icon: "📹", color: "#84cc16" },
     ];
 
     items.forEach((item) => {
-      // Рису��м блок
+      // Рисуем блок с округленными углами
       ctx.fillStyle = item.color;
-      ctx.fillRect(item.x, item.y, 150, 120);
+      ctx.beginPath();
+      ctx.roundRect(item.x, item.y, 280, 200, 20);
+      ctx.fill();
+
+      // Рисуем тень
+      ctx.shadowColor = "rgba(0, 0, 0, 0.3)";
+      ctx.shadowBlur = 10;
+      ctx.shadowOffsetX = 5;
+      ctx.shadowOffsetY = 5;
 
       // Рамка
       ctx.strokeStyle = "#ffffff";
-      ctx.lineWidth = 2;
-      ctx.strokeRect(item.x, item.y, 150, 120);
+      ctx.lineWidth = 3;
+      ctx.beginPath();
+      ctx.roundRect(item.x, item.y, 280, 200, 20);
+      ctx.stroke();
+
+      // Сбрасываем тень
+      ctx.shadowColor = "transparent";
+      ctx.shadowBlur = 0;
+      ctx.shadowOffsetX = 0;
+      ctx.shadowOffsetY = 0;
+
+      // Иконка
+      ctx.font = "48px Arial";
+      ctx.textAlign = "center";
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(item.icon, item.x + 140, item.y + 80);
 
       // Текст
-      ctx.fillStyle = "#ffffff";
-      ctx.font = "bold 16px Arial";
-      ctx.textAlign = "center";
-      ctx.fillText(item.text, item.x + 75, item.y + 70);
+      ctx.font = "bold 24px Arial";
+      ctx.fillText(item.text, item.x + 140, item.y + 130);
     });
 
-    // Добавляем время в углу
+    // Добавляем статус бар
+    ctx.fillStyle = "rgba(0, 0, 0, 0.5)";
+    ctx.fillRect(0, 0, 1920, 60);
+
+    // Время
     ctx.fillStyle = "#ffffff";
-    ctx.font = "18px Arial";
+    ctx.font = "24px Arial";
     ctx.textAlign = "right";
     const now = new Date();
-    ctx.fillText(now.toLocaleTimeString(), 780, 30);
+    ctx.fillText(now.toLocaleTimeString(), 1880, 35);
+
+    // Сигнал
+    ctx.textAlign = "left";
+    ctx.fillText("WiFi: ●●●●", 40, 35);
+
+    // Центральный текст
+    ctx.textAlign = "center";
+    ctx.fillText("ANT TV System", 960, 35);
 
     return canvas.toDataURL("image/png");
   };
