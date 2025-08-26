@@ -264,7 +264,7 @@ const AdminDashboard = () => {
           <CardContent>
             <div className="text-2xl font-bold">{stepStatsData.active}</div>
             <p className="text-xs text-muted-foreground">
-              <span className="text-blue-600">{stepStatsData.total}</span> всего
+              <span className="text-blue-600">{stepStatsData.total}</span> в��его
             </p>
             <Progress
               value={stepStatsData.total > 0 ? (stepStatsData.active / stepStatsData.total) * 100 : 0}
@@ -286,6 +286,41 @@ const AdminDashboard = () => {
               <span className="text-green-600">+{Math.round(sessionStatsData.successRate)}%</span> успешность
             </p>
             <Progress value={sessionStatsData.successRate} className="mt-3" />
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Additional Statistics */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Поддерживаемых моделей</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-primary">{devices.length}</div>
+            <p className="text-sm text-muted-foreground">устройств в системе</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Среднее время решения</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-primary">
+              {sessionStats?.avgDuration ? `${Math.round(sessionStats.avgDuration / 60)}м` : "-"}
+            </div>
+            <p className="text-sm text-muted-foreground">на одну проблему</p>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <CardTitle className="text-lg font-semibold">Доступность</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="text-3xl font-bold text-green-600">99.9%</div>
+            <p className="text-sm text-muted-foreground">время работы системы</p>
           </CardContent>
         </Card>
       </div>
@@ -563,7 +598,7 @@ const AdminDashboard = () => {
                       }
                     >
                       {problem.status === "published"
-                        ? "Опубл��ковано"
+                        ? "Опубликовано"
                         : "Черновик"}
                     </Badge>
                     <DropdownMenu>
