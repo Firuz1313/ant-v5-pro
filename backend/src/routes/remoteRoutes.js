@@ -92,4 +92,11 @@ router.put("/:id", updateRemote);
  */
 router.delete("/:id", deleteRemote);
 
+/**
+ * @route POST /api/v1/remotes/seed-defaults
+ * @desc Создание пультов по умолчанию для устройств без них
+ * @access Public
+ */
+router.post("/seed-defaults", seedDefaultRemotes);
+
 export default router;
