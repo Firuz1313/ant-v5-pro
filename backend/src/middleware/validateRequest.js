@@ -2,7 +2,7 @@ import Joi from "joi";
 
 // Общие схемы валидации
 const commonSchemas = {
-  id: Joi.string().min(1).max(255).required(),
+  id: Joi.string().min(1).max(255),
   uuid: Joi.string().uuid().required(),
   email: Joi.string().email().max(320).required(),
   password: Joi.string().min(6).max(255).required(),
@@ -322,7 +322,7 @@ export const validateRequest = (schema, source = "body") => {
       });
     }
 
-    // Заменяем исходные данные на валидированные и очищенные
+    // Заменяем исходные данные на валидированные и очище��ные
     switch (source) {
       case "body":
         req.body = value;
