@@ -51,6 +51,17 @@ const RemoteControl = ({
       setIsLoading(true);
       try {
         const remoteData = await getRemoteById(remoteId);
+        console.log("🎮 RemoteControl loading remote:", {
+          remoteId,
+          remoteData: remoteData ? {
+            id: remoteData.id,
+            name: remoteData.name,
+            hasImageData: !!(remoteData.imageData || remoteData.image_data),
+            hasButtons: Array.isArray(remoteData.buttons) && remoteData.buttons.length > 0,
+            dimensions: remoteData.dimensions
+          } : null
+        });
+
         if (remoteData) {
           // Normalize data structure
           const normalizedRemote = {
@@ -62,6 +73,7 @@ const RemoteControl = ({
         }
       } catch (error) {
         console.error("Error loading remote:", error);
+        setRemote(null);
       } finally {
         setIsLoading(false);
       }
