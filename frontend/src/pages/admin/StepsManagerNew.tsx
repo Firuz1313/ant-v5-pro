@@ -229,7 +229,7 @@ const StepsManagerNew = () => {
     }
   };
 
-  // Загрузка отметок для TV ��нтерфейса
+  // Загрузка отметок для TV ��нтерфе��са
 
   // Сох��анение отметок TV интерфейса
   const saveTVInterfaceMarks = async (marks: TVInterfaceMark[]) => {
@@ -503,7 +503,9 @@ const StepsManagerNew = () => {
     };
 
     try {
-      await stepsApi.updateStep(selectedStep.id, updatedData);
+      // Convert to snake_case for API
+      const updatePayload = convertToSnakeCase(updatedData);
+      await stepsApi.updateStep(selectedStep.id, updatePayload);
 
       // If step has TV interface markings, update them
       if (
@@ -605,7 +607,7 @@ const StepsManagerNew = () => {
       tvAreaPosition: step.tvAreaPosition || { x: 0, y: 0 },
     });
 
-    // Загрузить интер��ейс�� ��ля текущего устро��ства
+    // Загрузить интер��ейсы ��ля текущего устро��ства
     if (step.deviceId) {
       loadTVInterfacesForDevice(step.deviceId);
     }
@@ -866,7 +868,7 @@ const StepsManagerNew = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingRemoteButton ? "Отменить выбор" : "Выбрать позицию"}
+                  {isPickingRemoteButton ? "Отменить выбо��" : "Выбрать позицию"}
                 </Button>
                 <Button
                   variant="outline"
@@ -1279,7 +1281,7 @@ const StepsManagerNew = () => {
       </div>
 
       <div>
-        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>По��сказка</Label>
+        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
         <Textarea
           id={isEdit ? "edit-hint" : "hint"}
           value={formData.hint}
