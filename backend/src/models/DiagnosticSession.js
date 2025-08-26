@@ -218,9 +218,9 @@ class DiagnosticSession extends BaseModel {
           p.title as problem_title,
           p.category as problem_category,
           p.estimated_time as problem_estimated_time,
-          CASE 
-            WHEN ds.end_time IS NOT NULL THEN ds.duration
-            ELSE EXTRACT(EPOCH FROM (NOW() - ds.start_time))::integer
+          CASE
+            WHEN ds.duration IS NOT NULL THEN ds.duration
+            ELSE EXTRACT(EPOCH FROM (NOW() - ds.created_at))::integer
           END as current_duration
         FROM diagnostic_sessions ds
         LEFT JOIN devices d ON ds.device_id = d.id
@@ -393,7 +393,7 @@ class DiagnosticSession extends BaseModel {
 
         // Архивируем очень старые активные сессии (возможно, брошенные)
         const abandonedCutoff = new Date();
-        abandonedCutoff.setHours(abandonedCutoff.getHours() - 24); // старше 24 часов
+        abandonedCutoff.setHours(abandonedCutoff.getHours() - 24); // ста��ше 24 часов
 
         const abandonedResult = await client.query(`
           UPDATE diagnostic_sessions
