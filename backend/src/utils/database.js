@@ -272,6 +272,60 @@ export async function runMigrations() {
   }
 }
 
+// Функция исправления схемы diagnostic_steps
+export async function fixDiagnosticStepsSchema() {
+  try {
+    console.log("🔧 Пр��верка и исправление схемы diagnostic_steps...");
+
+    // Проверяем какие колонки существуют
+    const columnsQuery = `
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = 'diagnostic_steps' AND column_name = 'device_id';
+    `;
+
+    const existingColumns = await query(columnsQuery);
+    const hasDeviceId = existingColumns.rows.some(
+      (row) => row.column_name === "device_id",
+    );
+
+    // Добавляем недостающую колонку device_id
+    if (!hasDeviceId) {
+      console.log("⚠️  device_id column missing, adding it...");
+
+      // First, add the column as nullable
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN device_id VARCHAR(255) REFERENCES devices(id) ON DELETE CASCADE
+      `);
+
+      // Update existing records to set device_id from their associated problem
+      await query(`
+        UPDATE diagnostic_steps
+        SET device_id = p.device_id
+        FROM problems p
+        WHERE diagnostic_steps.problem_id = p.id AND diagnostic_steps.device_id IS NULL
+      `);
+
+      // Now make it NOT NULL
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ALTER COLUMN device_id SET NOT NULL
+      `);
+
+      console.log("✅ Добавлена колонка device_id");
+    } else {
+      console.log("✅ Колонка device_id уже существует");
+    }
+
+    console.log("🎉 Схема diagnostic_steps ��справлена");
+    return true;
+  } catch (error) {
+    console.error("❌ Ошибка исправления схемы diagnostic_steps:", error.message);
+    throw error;
+  }
+}
+
 // Функция исправления схемы tv_interfaces
 export async function fixTVInterfacesSchema() {
   try {
