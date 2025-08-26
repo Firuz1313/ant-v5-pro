@@ -150,7 +150,15 @@ export class ApiClient {
     options: RequestOptions = {},
     retryCount = 0,
   ): Promise<T> {
-    const { params, timeout = this.timeout, ...fetchOptions } = options;
+    // Special timeout handling for TV interface operations (large image data)
+    let specialTimeout = this.timeout;
+    if (endpoint.includes('/tv-interfaces') &&
+        (options.method === 'PUT' || options.method === 'POST')) {
+      specialTimeout = 120000; // 2 minutes for TV interface operations
+      console.log(`⏱️ Using extended timeout (${specialTimeout}ms) for TV interface operation`);
+    }
+
+    const { params, timeout = specialTimeout, ...fetchOptions } = options;
 
     const url = this.buildUrl(endpoint, params);
     const method = fetchOptions.method || "GET";
