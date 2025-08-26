@@ -3,6 +3,7 @@ import { v4 as uuidv4 } from "uuid";
 
 /**
  * Seed default remotes for devices that don't have any default remotes
+ * Fixed import issue
  */
 export const seedDefaultRemotes = async () => {
   try {
