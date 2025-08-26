@@ -105,13 +105,23 @@ const TVInterfaceBuilder = () => {
   const loadTVInterfaces = async () => {
     setIsLoading(true);
     try {
+      console.log('📡 Loading TV interfaces...');
       const response = await tvInterfacesAPI.getAll();
+      console.log('📡 TV interfaces response:', response);
+
       if (response.success && response.data) {
         // Нормализуем данные с бэкенда
-        const normalizedInterfaces = response.data.map((iface) =>
-          tvInterfaceUtils.normalizeFromBackend(iface),
-        );
+        const normalizedInterfaces = response.data.map((iface) => {
+          const normalized = tvInterfaceUtils.normalizeFromBackend(iface);
+          console.log('📡 Normalized interface:', normalized.id, {
+            hasScreenshot: tvInterfaceUtils.hasScreenshot(normalized),
+            screenshotUrl: tvInterfaceUtils.getScreenshotUrl(normalized)?.substring(0, 50) + '...',
+            createdAt: normalized.createdAt || normalized.created_at
+          });
+          return normalized;
+        });
         setTVInterfaces(normalizedInterfaces);
+        console.log('📡 Total interfaces loaded:', normalizedInterfaces.length);
       } else {
         toast({
           title: "Ошибка",
@@ -241,15 +251,30 @@ const TVInterfaceBuilder = () => {
 
     setIsLoading(true);
     try {
+      console.log('📤 Creating TV interface with data:', {
+        name: formData.name,
+        type: formData.type,
+        deviceId: formData.deviceId,
+        hasScreenshot: !!formData.screenshotData,
+        screenshotSize: formData.screenshotData ? Math.round(formData.screenshotData.length / 1024) + 'KB' : 'None'
+      });
+
       const response = await tvInterfacesAPI.create(formData);
+      console.log('📤 Create response:', response);
+
       if (response.success) {
         toast({
-          title: "Успе��",
+          title: "Успех",
           description: response.message || "TV интерфейс создан",
         });
         setIsCreateDialogOpen(false);
         resetForm();
-        loadTVInterfaces();
+
+        // Форсированная перезагрузка через небольшую задержку
+        setTimeout(() => {
+          console.log('🔄 Force reloading interfaces after create...');
+          loadTVInterfaces();
+        }, 500);
       } else {
         toast({
           title: "Ошибка",
@@ -261,7 +286,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error creating TV interface:", error);
       toast({
         title: "Ошибка",
-        description: "П��оизошла ошибка при создании TV интерфейса",
+        description: "Произошла ошибка при создании TV интерфейса",
         variant: "destructive",
       });
     } finally {
@@ -283,7 +308,7 @@ const TVInterfaceBuilder = () => {
         deviceId: formData.deviceId,
       };
 
-      // Добавляем screenshot_data только если был загружен новы�� скриншот
+      // Добавляем screenshot_data только если был загружен новый скриншот
       if (
         formData.screenshotData &&
         formData.screenshotData.startsWith("data:")
@@ -291,10 +316,17 @@ const TVInterfaceBuilder = () => {
         updateData.screenshotData = formData.screenshotData;
       }
 
+      console.log('📤 Updating TV interface:', selectedInterface.id, {
+        hasNewScreenshot: !!updateData.screenshotData,
+        screenshotSize: updateData.screenshotData ? Math.round(updateData.screenshotData.length / 1024) + 'KB' : 'None'
+      });
+
       const response = await tvInterfacesAPI.update(
         selectedInterface.id,
         updateData,
       );
+      console.log('📤 Update response:', response);
+
       if (response.success) {
         toast({
           title: "Успех",
@@ -302,7 +334,12 @@ const TVInterfaceBuilder = () => {
         });
         setIsEditDialogOpen(false);
         resetForm();
-        loadTVInterfaces();
+
+        // Форсированная перезагрузка через небольшую задержку
+        setTimeout(() => {
+          console.log('🔄 Force reloading interfaces after update...');
+          loadTVInterfaces();
+        }, 500);
       } else {
         toast({
           title: "Ошибка",
@@ -776,7 +813,7 @@ const TVInterfaceBuilder = () => {
               selectedDeviceFilter !== "all" ||
               selectedTypeFilter !== "all"
                 ? "Попробуйте изменить фильтры поиска"
-                : "Создайте первый TV интерфейс для начала работы"}
+                : "Соз��айте первый TV интерфейс для начала работы"}
             </p>
             {!searchTerm &&
               selectedDeviceFilter === "all" &&
@@ -955,7 +992,7 @@ const TVInterfaceBuilder = () => {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Выберите тип интерфейса" />
+                    <SelectValue placeholder="Выберите тип инте��фейса" />
                   </SelectTrigger>
                   <SelectContent>
                     {TV_INTERFACE_TYPES.map((type) => (
