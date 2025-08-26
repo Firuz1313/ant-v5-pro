@@ -247,3 +247,18 @@ export function useIncrementRemoteUsage() {
     },
   });
 }
+
+/**
+ * Hook for seeding default remotes
+ */
+export function useSeedDefaultRemotes() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: () => remotesApi.seedDefaultRemotes(),
+    onSuccess: () => {
+      // Invalidate all remote queries to refresh data after seeding
+      queryClient.invalidateQueries({ queryKey: remotesKeys.all });
+    },
+  });
+}
