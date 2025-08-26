@@ -282,7 +282,7 @@ interface DiagnosticStep {
   id: string;
   problemId: string;
   deviceId: string;
-  stepNumber: number;
+  stepNumber?: number; // Optional - backend will auto-assign
   title: string;
   description: string;
   instruction: string;
@@ -295,8 +295,8 @@ interface DiagnosticStep {
   remoteId?: string;
   buttonPosition?: { x: number; y: number };
   isActive: boolean;
-  createdAt: string;
-  updatedAt: string;
+  createdAt?: string; // Optional - backend will auto-assign
+  updatedAt?: string; // Optional - backend will auto-assign
 }
 
 const StepsManager = () => {
@@ -762,7 +762,7 @@ const StepsManager = () => {
           }
           toast({
             title: "Интерфейс не найден",
-            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Спис��к интерфейсов обновлён.`,
+            description: `TV интерфе��с "${tvInterface.name}" больше не существует. Спис��к инт��рфейсов обновлён.`,
             variant: "destructive",
           });
           return; // Don't open editor for non-existent interface
@@ -1175,7 +1175,7 @@ const StepsManager = () => {
     // Навигационные кнопки (D-pad)
     const dpadCenter = { x: 200, y: 450 };
 
-    // Центральная кнопка OK
+    // Центральная ��нопка OK
     ctx.fillStyle = "#3182ce";
     ctx.beginPath();
     ctx.arc(dpadCenter.x, dpadCenter.y, 30, 0, 2 * Math.PI);
@@ -1257,7 +1257,7 @@ const StepsManager = () => {
 
   const getDeviceName = (deviceId: string) => {
     const device = devices.find((d) => d.id === deviceId);
-    return device?.name || "Неизв��стная приставка";
+    return device?.name || "Неизв����тная приставка";
   };
 
   const getProblemTitle = (problemId: string) => {
@@ -1383,7 +1383,7 @@ const StepsManager = () => {
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  За��руз��ть изображение
+                  З����руз��ть изображение
                 </Button>
                 {!remoteImage && (
                   <Button
@@ -1542,7 +1542,7 @@ const StepsManager = () => {
                   <SelectValue placeholder="Приставка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все пристав���и</SelectItem>
+                  <SelectItem value="all">Все приста�����и</SelectItem>
                   {getActiveDevices().map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       <div className="flex items-center">
