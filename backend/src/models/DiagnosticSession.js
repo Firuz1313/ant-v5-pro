@@ -178,18 +178,18 @@ class DiagnosticSession extends BaseModel {
   async getActiveSessions(options = {}) {
     try {
       const sql = `
-        SELECT 
+        SELECT
           ds.*,
           d.name as device_name,
           d.brand as device_brand,
           p.title as problem_title,
           p.category as problem_category,
-          EXTRACT(EPOCH FROM (NOW() - ds.start_time))::integer as elapsed_seconds
+          EXTRACT(EPOCH FROM (NOW() - ds.created_at))::integer as elapsed_seconds
         FROM diagnostic_sessions ds
         LEFT JOIN devices d ON ds.device_id = d.id
         LEFT JOIN problems p ON ds.problem_id = p.id
         WHERE ds.is_active = true AND ds.end_time IS NULL
-        ORDER BY ds.start_time DESC
+        ORDER BY ds.created_at DESC
         LIMIT $1 OFFSET $2
       `;
 
@@ -328,7 +328,7 @@ class DiagnosticSession extends BaseModel {
         avg_completion_rate: stats.avg_completion_rate ? Math.round(parseFloat(stats.avg_completion_rate)) : 0
       };
     } catch (error) {
-      console.error('Ошибка получения статистики сессий:', error.message);
+      console.error('Ошибка получения стати��тики сессий:', error.message);
       throw error;
     }
   }
