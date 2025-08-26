@@ -380,6 +380,25 @@ const StepsManagerNew = () => {
     }
   };
 
+  // Helper function to convert camelCase to snake_case for API
+  const convertToSnakeCase = (obj: any): any => {
+    if (obj === null || obj === undefined || typeof obj !== 'object') {
+      return obj;
+    }
+
+    if (Array.isArray(obj)) {
+      return obj.map(convertToSnakeCase);
+    }
+
+    const result: any = {};
+    for (const [key, value] of Object.entries(obj)) {
+      // Convert camelCase to snake_case
+      const snakeKey = key.replace(/([A-Z])/g, "_$1").toLowerCase();
+      result[snakeKey] = typeof value === 'object' ? convertToSnakeCase(value) : value;
+    }
+    return result;
+  };
+
   const handleCreate = async () => {
     try {
       const deviceSteps = steps.filter(
@@ -423,8 +442,14 @@ const StepsManagerNew = () => {
         isActive: true,
       };
 
+      // Convert to snake_case for API
+      const stepPayload = convertToSnakeCase(stepData);
+      // Remove step_number to let backend auto-assign
+      delete stepPayload.step_number;
+
       // Create step via API
-      const createdStep = await stepsApi.createStep(stepData);
+      const response = await stepsApi.createStep(stepPayload);
+      const createdStep = response?.data;
 
       // If step has TV interface markings, save them
       if (
@@ -580,7 +605,7 @@ const StepsManagerNew = () => {
       tvAreaPosition: step.tvAreaPosition || { x: 0, y: 0 },
     });
 
-    // Загрузить интер��ейсы ��ля текущего устро��ства
+    // Загрузить интер��ейс�� ��ля текущего устро��ства
     if (step.deviceId) {
       loadTVInterfacesForDevice(step.deviceId);
     }
@@ -1254,7 +1279,7 @@ const StepsManagerNew = () => {
       </div>
 
       <div>
-        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
+        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>По��сказка</Label>
         <Textarea
           id={isEdit ? "edit-hint" : "hint"}
           value={formData.hint}
