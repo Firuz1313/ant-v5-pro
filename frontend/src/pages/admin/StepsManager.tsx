@@ -289,7 +289,7 @@ interface DiagnosticStep {
   highlightRemoteButton?: string;
   highlightTVArea?: string;
   tvInterface?: "home" | "settings" | "channels" | "no-signal";
-  tvInterfaceId?: string; // ID созданного TV интерфейса
+  tvInterfaceId?: string; // ID созда��ного TV интерфейса
   requiredAction?: string;
   hint?: string;
   remoteId?: string;
@@ -713,7 +713,7 @@ const StepsManager = () => {
         await loadTVInterfacesForDevice(formData.deviceId);
       }
       toast({
-        title: "Интерфейс ��е найден",
+        title: "Интерфейс не найден",
         description: `TV интерфейс "${tvInterface.name}" больше не доступен. Список обн��влён.`,
         variant: "destructive",
       });
@@ -1093,6 +1093,127 @@ const StepsManager = () => {
       };
       reader.readAsDataURL(file);
     }
+  };
+
+  const createTestRemoteImage = () => {
+    const canvas = document.createElement("canvas");
+    canvas.width = 400;
+    canvas.height = 800;
+    const ctx = canvas.getContext("2d");
+
+    if (!ctx) return null;
+
+    // Заливаем фон пульта
+    const gradient = ctx.createLinearGradient(0, 0, 0, 800);
+    gradient.addColorStop(0, "#2d3748");
+    gradient.addColorStop(1, "#1a202c");
+    ctx.fillStyle = gradient;
+    ctx.beginPath();
+    ctx.roundRect(20, 20, 360, 760, 30);
+    ctx.fill();
+
+    // Рамка пульта
+    ctx.strokeStyle = "#4a5568";
+    ctx.lineWidth = 4;
+    ctx.stroke();
+
+    // Кнопка питания (красная, сверху)
+    ctx.fillStyle = "#e53e3e";
+    ctx.beginPath();
+    ctx.arc(200, 80, 25, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.strokeStyle = "#c53030";
+    ctx.lineWidth = 2;
+    ctx.stroke();
+
+    // Цифровые кнопки 1-9
+    const numberButtons = [
+      { x: 120, y: 150, num: "1" },
+      { x: 200, y: 150, num: "2" },
+      { x: 280, y: 150, num: "3" },
+      { x: 120, y: 210, num: "4" },
+      { x: 200, y: 210, num: "5" },
+      { x: 280, y: 210, num: "6" },
+      { x: 120, y: 270, num: "7" },
+      { x: 200, y: 270, num: "8" },
+      { x: 280, y: 270, num: "9" },
+      { x: 200, y: 330, num: "0" }
+    ];
+
+    numberButtons.forEach((btn) => {
+      ctx.fillStyle = "#4a5568";
+      ctx.beginPath();
+      ctx.roundRect(btn.x - 25, btn.y - 20, 50, 40, 8);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 20px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(btn.num, btn.x, btn.y + 7);
+    });
+
+    // Навигационные кнопки (D-pad)
+    const dpadCenter = { x: 200, y: 450 };
+
+    // Центральная кнопка OK
+    ctx.fillStyle = "#3182ce";
+    ctx.beginPath();
+    ctx.arc(dpadCenter.x, dpadCenter.y, 30, 0, 2 * Math.PI);
+    ctx.fill();
+    ctx.fillStyle = "#ffffff";
+    ctx.font = "bold 14px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText("OK", dpadCenter.x, dpadCenter.y + 5);
+
+    // Стрелки навигации
+    const navButtons = [
+      { x: dpadCenter.x, y: dpadCenter.y - 60, text: "▲" },
+      { x: dpadCenter.x, y: dpadCenter.y + 60, text: "▼" },
+      { x: dpadCenter.x - 60, y: dpadCenter.y, text: "◀" },
+      { x: dpadCenter.x + 60, y: dpadCenter.y, text: "▶" }
+    ];
+
+    navButtons.forEach((btn) => {
+      ctx.fillStyle = "#4a5568";
+      ctx.beginPath();
+      ctx.roundRect(btn.x - 20, btn.y - 15, 40, 30, 6);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "20px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(btn.text, btn.x, btn.y + 7);
+    });
+
+    // Функциональные кнопки внизу
+    const funcButtons = [
+      { x: 120, y: 580, text: "HOME", color: "#38a169" },
+      { x: 200, y: 580, text: "MENU", color: "#d69e2e" },
+      { x: 280, y: 580, text: "BACK", color: "#718096" },
+      { x: 120, y: 640, text: "V-", color: "#4a5568" },
+      { x: 200, y: 640, text: "MUTE", color: "#e53e3e" },
+      { x: 280, y: 640, text: "V+", color: "#4a5568" },
+    ];
+
+    funcButtons.forEach((btn) => {
+      ctx.fillStyle = btn.color;
+      ctx.beginPath();
+      ctx.roundRect(btn.x - 30, btn.y - 15, 60, 30, 6);
+      ctx.fill();
+
+      ctx.fillStyle = "#ffffff";
+      ctx.font = "bold 10px Arial";
+      ctx.textAlign = "center";
+      ctx.fillText(btn.text, btn.x, btn.y + 3);
+    });
+
+    // Брендинг внизу
+    ctx.fillStyle = "#a0aec0";
+    ctx.font = "14px Arial";
+    ctx.textAlign = "center";
+    ctx.fillText(selectedRemote?.name || "Universal Remote", 200, 750);
+
+    return canvas.toDataURL("image/png");
   };
 
   const resetForm = () => {
@@ -1567,7 +1688,7 @@ const StepsManager = () => {
                               )}
                               {step.isActive
                                 ? "Деактивировать"
-                                : "Акти��ировать"}
+                                : "Активировать"}
                             </DropdownMenuItem>
                             <DropdownMenuItem
                               onClick={() => handleDelete(step.id)}
