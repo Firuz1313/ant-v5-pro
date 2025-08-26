@@ -80,7 +80,7 @@ class DiagnosticSession extends BaseModel {
   }
 
   /**
-   * Обновление пр��гресса сесси��
+   * Обновление пр��гресса сессии
    */
   async updateProgress(sessionId, stepId, stepResult) {
     try {
@@ -98,7 +98,7 @@ class DiagnosticSession extends BaseModel {
           metadata: stepResult.metadata || null
         };
 
-        // Проверяем, существует ли уже запись о выполнении этого шага
+        // Проверяем, существует ли уже запись о вып��лнении этого шага
         const existingResult = await client.query(
           'SELECT id FROM session_steps WHERE session_id = $1 AND step_id = $2',
           [sessionId, stepId]
@@ -181,7 +181,7 @@ class DiagnosticSession extends BaseModel {
         FROM diagnostic_sessions ds
         LEFT JOIN devices d ON ds.device_id = d.id
         LEFT JOIN problems p ON ds.problem_id = p.id
-        WHERE ds.completed_steps < ds.total_steps OR ds.total_steps = 0
+        WHERE 1=1
         ORDER BY ds.created_at DESC
         LIMIT $1 OFFSET $2
       `;
