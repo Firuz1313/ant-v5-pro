@@ -164,7 +164,7 @@ const RemoteBuilder = () => {
   // Изв��екаем массивы данны�� из ответа API
   const devices = devicesResponse?.data || [];
   const remotes: RemoteTemplate[] = remotesResponse?.data || [];
-  const getActiveDevices = () => devices.filter((d: any) => d.is_active);
+  const getActiveDevices = () => devices.filter((d: any) => d.isActive === true);
   const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
   const getRemotesForDevice = (deviceId: string) =>
     remotes.filter((r: any) => r.device_id === deviceId);
@@ -1289,7 +1289,7 @@ const RemoteBuilder = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Производитель:
+                        Прои��водитель:
                       </span>
                       <span className="font-medium">{remote.manufacturer}</span>
                     </div>
