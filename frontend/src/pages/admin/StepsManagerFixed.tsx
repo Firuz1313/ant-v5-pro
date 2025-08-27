@@ -76,6 +76,217 @@ interface DiagnosticStep {
   updatedAt: string;
 }
 
+// Move StepFormFields outside to prevent recreation on every render
+const StepFormFields = React.memo(({
+  isEdit = false,
+  formData,
+  handleFieldChange,
+  handleDeviceChange,
+  devices,
+  problems,
+  remotes,
+  tvInterfaces,
+  loadingTVInterfaces,
+  getActiveDevices,
+  getAvailableProblems,
+  getAvailableRemotes,
+  openTVInterfaceEditor,
+  openRemoteEditor
+}: {
+  isEdit?: boolean;
+  formData: any;
+  handleFieldChange: (field: string, value: any) => void;
+  handleDeviceChange: (value: string) => void;
+  devices: any[];
+  problems: any[];
+  remotes: any[];
+  tvInterfaces: any[];
+  loadingTVInterfaces: boolean;
+  getActiveDevices: () => any[];
+  getAvailableProblems: () => any[];
+  getAvailableRemotes: () => any[];
+  openTVInterfaceEditor: (tvInterface: any) => void;
+  openRemoteEditor: () => void;
+}) => {
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  return (
+    <div ref={scrollRef} className="space-y-4 max-h-96 overflow-y-auto">
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <Label htmlFor={isEdit ? "edit-deviceId" : "deviceId"}>Приставка *</Label>
+          <Select value={formData.deviceId} onValueChange={handleDeviceChange}>
+            <SelectTrigger>
+              <SelectValue placeholder="Выберите приставку" />
+            </SelectTrigger>
+            <SelectContent>
+              {getActiveDevices().map((device) => (
+                <SelectItem key={device.id} value={device.id}>
+                  <div className="flex items-center">
+                    <div className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`} />
+                    {device.name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+        <div>
+          <Label htmlFor={isEdit ? "edit-problemId" : "problemId"}>Проблема *</Label>
+          <Select
+            value={formData.problemId}
+            onValueChange={(value) => handleFieldChange("problemId", value)}
+          >
+            <SelectTrigger>
+              <SelectValue placeholder="Выберите проблему" />
+            </SelectTrigger>
+            <SelectContent>
+              {getAvailableProblems().map((problem) => (
+                <SelectItem key={problem.id} value={problem.id}>
+                  {problem.title}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor={isEdit ? "edit-title" : "title"}>Название шага *</Label>
+        <Input
+          id={isEdit ? "edit-title" : "title"}
+          value={formData.title}
+          onChange={(e) => handleFieldChange("title", e.target.value)}
+          placeholder="Введите название шага"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor={isEdit ? "edit-description" : "description"}>Описание</Label>
+        <Textarea
+          id={isEdit ? "edit-description" : "description"}
+          value={formData.description}
+          onChange={(e) => handleFieldChange("description", e.target.value)}
+          placeholder="Краткое описание шага"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor={isEdit ? "edit-instruction" : "instruction"}>Инструкция *</Label>
+        <Textarea
+          id={isEdit ? "edit-instruction" : "instruction"}
+          value={formData.instruction}
+          onChange={(e) => handleFieldChange("instruction", e.target.value)}
+          placeholder="Подробная инструкция для пользователя"
+        />
+      </div>
+
+      <div>
+        <Label htmlFor={isEdit ? "edit-tvInterfaceId" : "tvInterfaceId"}>Интерфейс ТВ</Label>
+        <div className="flex space-x-2">
+          <Select
+            value={formData.tvInterfaceId}
+            onValueChange={(value) => handleFieldChange("tvInterfaceId", value)}
+          >
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Выберите интерфейс" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Без интерфейса</SelectItem>
+              {loadingTVInterfaces ? (
+                <SelectItem value="loading" disabled>
+                  Загрузка...
+                </SelectItem>
+              ) : (
+                tvInterfaces.map((tvInterface) => (
+                  <SelectItem key={tvInterface.id} value={tvInterface.id}>
+                    <div className="flex items-center">
+                      <Monitor className="w-3 h-3 mr-2" />
+                      {tvInterface.name}
+                      <span className="ml-2 text-xs text-gray-500">({tvInterface.type})</span>
+                    </div>
+                  </SelectItem>
+                ))
+              )}
+            </SelectContent>
+          </Select>
+          {formData.tvInterfaceId !== "none" && (
+            <Button
+              variant="outline"
+              onClick={() => {
+                const tvInterface = tvInterfaces.find((ti) => ti.id === formData.tvInterfaceId);
+                if (tvInterface) openTVInterfaceEditor(tvInterface);
+              }}
+              size="sm"
+            >
+              <Target className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor={isEdit ? "edit-remoteId" : "remoteId"}>Пульт</Label>
+        <div className="flex space-x-2">
+          <Select
+            value={formData.remoteId}
+            onValueChange={(value) => handleFieldChange("remoteId", value)}
+          >
+            <SelectTrigger className="flex-1">
+              <SelectValue placeholder="Выберите пульт" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="none">Без пульта</SelectItem>
+              {getAvailableRemotes().map((remote) => {
+                const device = devices.find((d) => d.id === remote.deviceId);
+                return (
+                  <SelectItem key={remote.id} value={remote.id}>
+                    <div className="flex items-center">
+                      {device && (
+                        <div className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`} />
+                      )}
+                      {remote.name}
+                      {remote.isDefault && (
+                        <span className="ml-2 text-xs text-blue-600">(по умолчанию)</span>
+                      )}
+                    </div>
+                  </SelectItem>
+                );
+              })}
+            </SelectContent>
+          </Select>
+          {formData.remoteId !== "none" && (
+            <Button variant="outline" onClick={openRemoteEditor} size="sm">
+              <MousePointer className="h-4 w-4" />
+            </Button>
+          )}
+        </div>
+      </div>
+
+      <div>
+        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
+        <Textarea
+          id={isEdit ? "edit-hint" : "hint"}
+          value={formData.hint}
+          onChange={(e) => handleFieldChange("hint", e.target.value)}
+          placeholder="Дополнительная подсказка для пользователя"
+        />
+      </div>
+
+      {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
+        <Alert className="border-green-200 bg-green-50 dark:bg-green-900/20">
+          <Target className="h-4 w-4" />
+          <AlertDescription>
+            <p className="text-sm text-green-700 dark:text-green-300">
+              Позиция кнопки: ({Math.round(formData.buttonPosition.x)}, {Math.round(formData.buttonPosition.y)})
+            </p>
+          </AlertDescription>
+        </Alert>
+      )}
+    </div>
+  );
+});
+
 const StepsManagerFixed = () => {
   const { data: devicesResponse, isLoading: devicesLoading, error: devicesError } = useDevices();
   const { data: problemsResponse, isLoading: problemsLoading, error: problemsError } = useProblems();
@@ -1062,7 +1273,7 @@ const StepsManagerFixed = () => {
                             <div className="flex items-center space-x-2 mb-1">
                               <h4 className="font-semibold text-gray-900 dark:text-white">{step.title}</h4>
                               <Badge variant={step.isActive ? "default" : "secondary"}>
-                                {step.isActive ? "Активный" : "Неактивный"}
+                                {step.isActive ? "Активный" : "Неакти��ный"}
                               </Badge>
                               {step.requiredAction && (
                                 <Badge variant="outline">
