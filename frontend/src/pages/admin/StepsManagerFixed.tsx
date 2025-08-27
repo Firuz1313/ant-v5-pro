@@ -117,7 +117,7 @@ const StepFormFields = React.memo(({
           <Label htmlFor={isEdit ? "edit-deviceId" : "deviceId"}>Приставка *</Label>
           <Select value={formData.deviceId} onValueChange={handleDeviceChange}>
             <SelectTrigger>
-              <SelectValue placeholder="Выберите приставку" />
+              <SelectValue placeholder="Выберите пр��ставку" />
             </SelectTrigger>
             <SelectContent>
               {getActiveDevices().map((device) => (
@@ -393,7 +393,7 @@ const StepsManagerFixed = () => {
 
   const handleDeviceChange = useCallback(
     (value: string) => {
-      const defaultRemote = getDefaultRemoteForDevice(value);
+      const defaultRemote = remotes.find((r: any) => r.deviceId === value && r.isDefault);
       setFormData((prev) => ({
         ...prev,
         deviceId: value,
