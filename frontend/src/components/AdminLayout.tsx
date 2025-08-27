@@ -41,7 +41,7 @@ const adminMenuItems = [
   },
   {
     title: "Управление шагами",
-    path: "/admin/steps",
+    path: "/admin/steps-fixed",
     icon: Layers,
     description: "Создание и редактирование шагов диагностики",
   },
