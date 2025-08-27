@@ -131,7 +131,7 @@ const RemoteBuilder = () => {
       .getAll()
       .then((result) => {
         console.log(
-          "✅✅✅ RemoteBuilder: remotesApi.getAll SUCCESS ✅✅✅",
+          "✅✅✅ RemoteBuilder: remotesApi.getAll SUCCESS ���✅✅",
           result,
         );
       })
@@ -307,15 +307,15 @@ const RemoteBuilder = () => {
         manufacturer: formData.manufacturer,
         model: formData.model,
         description: formData.description,
-        deviceId: formData.deviceId === "universal" ? null : formData.deviceId,
+        device_id: formData.deviceId === "universal" ? null : formData.deviceId,
         layout: formData.layout,
         color_scheme: formData.colorScheme,
         dimensions: { width: 400, height: 600 },
         buttons: [],
         zones: [],
         image_data: previewImageUrl || undefined,
-        isDefault: false,
-        isActive: true,
+        is_default: false,
+        is_active: true,
       });
 
       toast.success("Пульт создан успешно");
@@ -338,7 +338,7 @@ const RemoteBuilder = () => {
           manufacturer: formData.manufacturer,
           model: formData.model,
           description: formData.description,
-          deviceId:
+          device_id:
             formData.deviceId === "universal" ? null : formData.deviceId,
           layout: formData.layout,
           color_scheme: formData.colorScheme,
@@ -384,7 +384,7 @@ const RemoteBuilder = () => {
       await updateRemoteMutation.mutateAsync({
         id: remoteId,
         data: {
-          isActive: !remote.isActive,
+          is_active: !remote.isActive,
         },
       });
       toast.success(
