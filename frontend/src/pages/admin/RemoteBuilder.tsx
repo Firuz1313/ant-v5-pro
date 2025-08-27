@@ -431,7 +431,7 @@ const RemoteBuilder = () => {
         remoteId,
         deviceId: remote.deviceId,
       });
-      toast.success("Пульт устано��лен по умолчанию");
+      toast.success("Пульт устано����ен по умолчанию");
     } catch (error: any) {
       console.error("Error setting default remote:", error);
       toast.error(error?.message || "Ошибка при установке пульта по умолчанию");
@@ -1402,7 +1402,7 @@ const RemoteBuilder = () => {
                           Экспортировать
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDelete(remote.id)}
+                          onClick={() => openDeleteModal(remote)}
                           className="text-red-600"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
@@ -1547,7 +1547,7 @@ const RemoteBuilder = () => {
                 <div className="mt-2">
                   <img
                     src={previewImageUrl}
-                    alt="Предварительный просм��тр"
+                    alt="Предварительный просмотр"
                     className="w-full h-32 object-contain bg-gray-100 dark:bg-gray-800 rounded"
                   />
                 </div>
