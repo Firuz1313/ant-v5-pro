@@ -1047,11 +1047,17 @@ const RemoteBuilder = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="universal">Универсальный</SelectItem>
-                        {activeDevices.map((device) => (
-                          <SelectItem key={device.id} value={device.id}>
-                            {device.name}
-                          </SelectItem>
-                        ))}
+                        {activeDevices.length > 0 ? (
+                          activeDevices.map((device) => (
+                            <SelectItem key={device.id} value={device.id}>
+                              {device.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="px-2 py-1 text-sm text-gray-500">
+                            Нет доступных устройств. Создайте устройство сначала.
+                          </div>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
