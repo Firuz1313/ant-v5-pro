@@ -77,58 +77,9 @@ interface DiagnosticStep {
 }
 
 // Move StepFormFields outside to prevent recreation on every render
-const StepFormFields = React.memo(({
-  isEdit = false,
-  formData,
-  handleFieldChange,
-  handleDeviceChange,
-  devices,
-  problems,
-  remotes,
-  tvInterfaces,
-  loadingTVInterfaces,
-  getActiveDevices,
-  getAvailableProblems,
-  getAvailableRemotes,
-  openTVInterfaceEditor,
-  openRemoteEditor
-}: {
-  isEdit?: boolean;
-  formData: any;
-  handleFieldChange: (field: string, value: any) => void;
-  handleDeviceChange: (value: string) => void;
-  devices: any[];
-  problems: any[];
-  remotes: any[];
-  tvInterfaces: any[];
-  loadingTVInterfaces: boolean;
-  getActiveDevices: () => any[];
-  getAvailableProblems: () => any[];
-  getAvailableRemotes: () => any[];
-  openTVInterfaceEditor: (tvInterface: any) => void;
-  openRemoteEditor: () => void;
-}) => {
-  const scrollRef = useRef<HTMLDivElement>(null);
-
-  // Preserve scroll position during re-renders
-  useEffect(() => {
-    const scrollContainer = scrollRef.current;
-    if (scrollContainer) {
-      const scrollTop = scrollContainer.scrollTop;
-
-      // Restore scroll position after any potential DOM changes
-      const timeout = setTimeout(() => {
-        if (scrollContainer.scrollTop === 0 && scrollTop > 0) {
-          scrollContainer.scrollTop = scrollTop;
-        }
-      }, 0);
-
-      return () => clearTimeout(timeout);
-    }
-  });
-
+const StepFormFields = ({ isEdit = false }: { isEdit?: boolean }) => {
   return (
-    <div ref={scrollRef} className="space-y-4 max-h-96 overflow-y-auto">
+    <div className="space-y-4 max-h-96 overflow-y-auto">
       <div className="grid grid-cols-2 gap-4">
         <div>
           <Label htmlFor={isEdit ? "edit-deviceId" : "deviceId"}>Приставка *</Label>
@@ -306,7 +257,7 @@ const StepFormFields = React.memo(({
       )}
     </div>
   );
-});
+};
 
 StepFormFields.displayName = 'StepFormFields';
 
@@ -552,7 +503,7 @@ const StepsManagerFixed = () => {
     if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
       toast({
         title: "Ошибка валидации",
-        description: "Заполните все обязательные поля: устройство, проблема, название и инструкция",
+        description: "Заполните все обязательные п��ля: устройство, проблема, название и инструкция",
         variant: "destructive",
       });
       return;
@@ -623,7 +574,7 @@ const StepsManagerFixed = () => {
     // Validate required fields
     if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
       toast({
-        title: "Ошибка валидации",
+        title: "Ошибка ��алидации",
         description: "Заполните все обязательные поля: устройство, проблема, название и инструкция",
         variant: "destructive",
       });
