@@ -1217,6 +1217,25 @@ const ProblemsManager = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Success Modal */}
+      <AlertDialog open={isSuccessModalOpen} onOpenChange={setIsSuccessModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Проблема успешно создана!
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Проблема "{createdProblemTitle}" была успешно добавлена в систему и готова к использованию.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setIsSuccessModalOpen(false)}>
+              Понятно
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
