@@ -408,7 +408,7 @@ const StepFormFields = React.memo<{
             <Target className="h-4 w-4" />
             <AlertDescription>
               <p className="text-sm text-green-700 dark:text-green-300">
-                По��иция кнопки: ({Math.round(formData.buttonPosition.x)},{" "}
+                Позиция кнопки: ({Math.round(formData.buttonPosition.x)},{" "}
                 {Math.round(formData.buttonPosition.y)})
               </p>
             </AlertDescription>
@@ -1338,7 +1338,7 @@ const StepsManagerFixed = () => {
                               {step.tvInterfaceId && (
                                 <Badge variant="outline">
                                   <Monitor className="h-3 w-3 mr-1" />
-                                  ТВ интерф��йс
+                                  ТВ интерфейс
                                 </Badge>
                               )}
                               {step.buttonPosition && (
@@ -1399,7 +1399,7 @@ const StepsManagerFixed = () => {
                                 : "Активировать"}
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleDelete(step.id)}
+                              onClick={() => openDeleteModal(step)}
                               className="text-red-600"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
