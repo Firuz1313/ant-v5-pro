@@ -119,7 +119,7 @@ const RemoteBuilder = () => {
   // Simple test of remotesApi
   React.useEffect(() => {
     console.log(
-      "🚀🚀🚀 RemoteBuilder: useEffect STARTED! Testing remotesApi directly 🚀���🚀",
+      "🚀🚀🚀 RemoteBuilder: useEffect STARTED! Testing remotesApi directly 🚀🚀🚀",
     );
     console.log("🚀🚀🚀 RemoteBuilder: remotesApi object:", remotesApi);
     console.log(
@@ -435,7 +435,7 @@ const RemoteBuilder = () => {
       model: remote.model || "",
       description: remote.description || "",
       layout: remote.layout || "standard",
-      colorScheme: remote.color_scheme || "dark",
+      colorScheme: remote.colorScheme || "dark",
       deviceId: remote.deviceId || "universal",
     });
     setPreviewImageUrl(remote.image_data || null);
@@ -780,7 +780,7 @@ const RemoteBuilder = () => {
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  Изображение
+                  Изобр��жение
                 </Button>
               </div>
 
@@ -811,7 +811,7 @@ const RemoteBuilder = () => {
                               label: e.target.value,
                             })
                           }
-                          placeholder="Напри��ер: POWER"
+                          placeholder="Напр����ер: POWER"
                         />
                       </div>
                       <div>
