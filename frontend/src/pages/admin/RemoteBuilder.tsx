@@ -85,7 +85,7 @@ interface RemoteTemplate {
   model: string;
   description: string;
   layout: "standard" | "compact" | "smart" | "custom";
-  color_scheme: string;
+  colorScheme: string;
   image_url?: string;
   image_data?: string;
   svg_data?: string;
@@ -780,7 +780,7 @@ const RemoteBuilder = () => {
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  Изобр��жение
+                  Изображение
                 </Button>
               </div>
 
@@ -811,7 +811,7 @@ const RemoteBuilder = () => {
                               label: e.target.value,
                             })
                           }
-                          placeholder="Напр����ер: POWER"
+                          placeholder="Напри��ер: POWER"
                         />
                       </div>
                       <div>
