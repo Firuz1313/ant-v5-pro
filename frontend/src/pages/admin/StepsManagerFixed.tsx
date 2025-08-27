@@ -310,7 +310,7 @@ const StepFormFields = React.memo<{
 
         <div>
           <Label htmlFor={isEdit ? "edit-instruction" : "instruction"}>
-            Инструкция *
+            Инс��рукция *
           </Label>
           <Textarea
             id={isEdit ? "edit-instruction" : "instruction"}
@@ -441,7 +441,155 @@ const StepFormFields = React.memo<{
 
 StepFormFields.displayName = "StepFormFields";
 
+// Sortable Step Item Component
+const SortableStepItem = React.memo<{
+  step: DiagnosticStep;
+  getRemoteById: (id: string) => any;
+  onEdit: (step: DiagnosticStep) => void;
+  onToggleStatus: (stepId: string) => void;
+  onDelete: (step: DiagnosticStep) => void;
+}>(({ step, getRemoteById, onEdit, onToggleStatus, onDelete }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: step.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4 flex-1">
+          {/* Drag Handle (Hamburger Icon) */}
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            title="Перетащите для изменения порядка"
+          >
+            <GripVertical className="h-5 w-5" />
+          </div>
+
+          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+            <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+              {step.stepNumber}
+            </span>
+          </div>
+
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 mb-1">
+              <h4 className="font-semibold text-gray-900 dark:text-white">
+                {step.title}
+              </h4>
+              <Badge
+                variant={step.isActive ? "default" : "secondary"}
+              >
+                {step.isActive ? "Активный" : "Неактивный"}
+              </Badge>
+              {step.requiredAction && (
+                <Badge variant="outline">
+                  <PlayCircle className="h-3 w-3 mr-1" />
+                  Автопереход
+                </Badge>
+              )}
+              {step.remoteId && (
+                <Badge variant="outline">
+                  <MousePointer className="h-3 w-3 mr-1" />
+                  Пульт
+                </Badge>
+              )}
+              {step.tvInterfaceId && (
+                <Badge variant="outline">
+                  <Monitor className="h-3 w-3 mr-1" />
+                  ТВ интерфейс
+                </Badge>
+              )}
+              {step.buttonPosition && (
+                <Badge variant="outline">
+                  <Target className="h-3 w-3 mr-1" />
+                  Позиция
+                </Badge>
+              )}
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+              {step.description}
+            </p>
+            <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+              {step.remoteId && (
+                <span>
+                  Пульт:{" "}
+                  {getRemoteById(step.remoteId)?.name || "Неизвестный"}
+                </span>
+              )}
+              {step.buttonPosition && (
+                <span>
+                  Позиция: ({Math.round(step.buttonPosition.x)},{" "}
+                  {Math.round(step.buttonPosition.y)})
+                </span>
+              )}
+              {step.tvInterfaceId && (
+                <span>ТВ интерфейс: {step.tvInterfaceId}</span>
+              )}
+              <span>Обновлено: {step.updatedAt}</span>
+            </div>
+          </div>
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEdit(step)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Редактировать
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onToggleStatus(step.id)}>
+              {step.isActive ? (
+                <EyeOff className="h-4 w-4 mr-2" />
+              ) : (
+                <Eye className="h-4 w-4 mr-2" />
+              )}
+              {step.isActive ? "Деактивировать" : "Активировать"}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDelete(step)}
+              className="text-red-600"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Удалить
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
+});
+
+SortableStepItem.displayName = "SortableStepItem";
+
 const StepsManagerFixed = () => {
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
   const {
     data: devicesResponse,
     isLoading: devicesLoading,
@@ -935,7 +1083,7 @@ const StepsManagerFixed = () => {
 
       toast({
         title: "Ошибка удалени��",
-        description: `Не удалось удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
+        description: `Не удалось удалит�� шаг: ${error?.message || "Неизвестн��я ошибка"}`,
         variant: "destructive",
       });
     }
@@ -975,7 +1123,7 @@ const StepsManagerFixed = () => {
   };
 
   const openEditDialog = (step: DiagnosticStep) => {
-    console.log("�� Opening edit dialog for step:", step);
+    console.log("🔄 Opening edit dialog for step:", step);
 
     setSelectedStep(step);
     setFormData({
@@ -1121,7 +1269,7 @@ const StepsManagerFixed = () => {
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
                       Кликните на изображение пульта, ��тобы указать позицию
-                      кнопк��
+                      кнопки
                     </p>
                   </AlertDescription>
                 </Alert>
