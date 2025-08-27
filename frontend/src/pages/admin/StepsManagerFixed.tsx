@@ -198,7 +198,7 @@ const StepFormFields = React.memo<{
           </Select>
         </div>
         <div>
-          <Label htmlFor={isEdit ? "edit-problemId" : "problemId"}>Проблема *</Label>
+          <Label htmlFor={isEdit ? "edit-problemId" : "problemId"}>Проблем�� *</Label>
           <Select value={formData.problemId} onValueChange={handleProblemChange}>
             <SelectTrigger>
               <SelectValue placeholder="Выберите проблему" />
@@ -884,20 +884,6 @@ const StepsManagerFixed = () => {
     setIsEditDialogOpen(true);
   };
 
-  const openRemoteEditor = useCallback(() => {
-    const remote = getRemoteById(formData.remoteId);
-    if (remote) {
-      setSelectedRemote(remote);
-      setIsRemoteEditorOpen(true);
-    }
-  }, [formData.remoteId, remotes]);
-
-  const openTVInterfaceEditor = useCallback((tvInterface: TVInterface) => {
-    console.log("Opening TV Interface Editor with:", tvInterface);
-    setSelectedTVInterface(tvInterface);
-    setIsTVInterfaceEditorOpen(true);
-  }, []);
-
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isPickingButton || !canvasRef.current) return;
 
@@ -1240,7 +1226,7 @@ const StepsManagerFixed = () => {
                             <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">{step.description}</p>
                             <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
                               {step.remoteId && (
-                                <span>Пульт: {getRemoteById(step.remoteId)?.name || "Неизвестный"}</span>
+                                <span>Пульт: {getRemoteById(step.remoteId)?.name || "Неизвес��ный"}</span>
                               )}
                               {step.buttonPosition && (
                                 <span>
