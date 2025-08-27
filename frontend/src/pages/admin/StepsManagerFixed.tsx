@@ -408,7 +408,7 @@ const StepFormFields = React.memo<{
             <Target className="h-4 w-4" />
             <AlertDescription>
               <p className="text-sm text-green-700 dark:text-green-300">
-                Позиция кнопки: ({Math.round(formData.buttonPosition.x)},{" "}
+                По��иция кнопки: ({Math.round(formData.buttonPosition.x)},{" "}
                 {Math.round(formData.buttonPosition.y)})
               </p>
             </AlertDescription>
@@ -880,12 +880,23 @@ const StepsManagerFixed = () => {
     }
   };
 
-  const handleDelete = async (stepId: string) => {
+  const openDeleteModal = (step: DiagnosticStep) => {
+    setStepToDelete(step);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!stepToDelete) return;
+
     try {
-      await stepsApi.deleteStep(stepId);
+      await stepsApi.deleteStep(stepToDelete.id);
 
       // Update local state
-      setSteps((prev) => prev.filter((step) => step.id !== stepId));
+      setSteps((prev) => prev.filter((step) => step.id !== stepToDelete.id));
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setStepToDelete(null);
 
       // Reload data to ensure consistency
       await loadInitialData();
@@ -897,6 +908,11 @@ const StepsManagerFixed = () => {
       });
     } catch (error) {
       console.error("❌ Error deleting step:", error);
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setStepToDelete(null);
+
       toast({
         title: "Ошибка удалени��",
         description: `Не удалось удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
@@ -1322,7 +1338,7 @@ const StepsManagerFixed = () => {
                               {step.tvInterfaceId && (
                                 <Badge variant="outline">
                                   <Monitor className="h-3 w-3 mr-1" />
-                                  ТВ интерфейс
+                                  ТВ интерф��йс
                                 </Badge>
                               )}
                               {step.buttonPosition && (
