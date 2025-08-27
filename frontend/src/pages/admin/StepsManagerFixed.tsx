@@ -1481,6 +1481,34 @@ const StepsManagerFixed = () => {
         </DialogContent>
       </Dialog>
 
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Удалить шаг?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из базы данных? Это действие нельзя отменить! Шаг "{stepToDelete?.title}" будет удален навсегда.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setIsDeleteModalOpen(false);
+              setStepToDelete(null);
+            }}>
+              Отмена
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Удалить навсегда
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
       {Object.keys(groupedSteps).length === 0 && (
         <Card>
           <CardContent className="p-12 text-center">
