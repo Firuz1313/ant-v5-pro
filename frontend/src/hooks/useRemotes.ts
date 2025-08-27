@@ -67,14 +67,38 @@ export function useRemotesByDevice(deviceId: string) {
 }
 
 /**
- * Hook for fetching default remote for device
+ * Hook for fetching default remote for device with graceful fallback
  */
 export function useDefaultRemoteForDevice(deviceId: string) {
   return useQuery({
     queryKey: remotesKeys.defaultForDevice(deviceId),
-    queryFn: () => remotesApi.getDefaultForDevice(deviceId),
+    queryFn: async () => {
+      try {
+        return await remotesApi.getDefaultForDevice(deviceId);
+      } catch (error: any) {
+        // If no default remote found, try to get the first available remote
+        if (error?.status === 404) {
+          try {
+            const deviceRemotes = await remotesApi.getByDevice(deviceId);
+            if (deviceRemotes && deviceRemotes.length > 0) {
+              return deviceRemotes[0];
+            }
+          } catch (fallbackError) {
+            console.log("No remotes found for device:", deviceId);
+          }
+        }
+        throw error;
+      }
+    },
     enabled: !!deviceId,
     staleTime: 2 * 60 * 1000,
+    retry: (failureCount, error: any) => {
+      // Don't retry 404 errors (no remotes exist)
+      if (error?.status === 404) {
+        return false;
+      }
+      return failureCount < 3;
+    },
   });
 }
 
