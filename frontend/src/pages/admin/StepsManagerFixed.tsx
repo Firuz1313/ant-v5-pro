@@ -18,6 +18,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -451,6 +461,8 @@ const StepsManagerFixed = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isRemoteEditorOpen, setIsRemoteEditorOpen] = useState(false);
   const [isTVInterfaceEditorOpen, setIsTVInterfaceEditorOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [stepToDelete, setStepToDelete] = useState<DiagnosticStep | null>(null);
 
   // Remote editor state
   const [selectedRemote, setSelectedRemote] = useState<any>(null);
@@ -795,7 +807,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обяза��ельные поля: устройство, проблема, название и инструкция",
+          "Заполните все обяза��ельные поля: устройство, проблема, название и инструк��ия",
         variant: "destructive",
       });
       return;
@@ -835,7 +847,7 @@ const StepsManagerFixed = () => {
         selectedStep.id,
         updatedFormData,
       );
-      console.log("✅ Step updated successfully:", response);
+      console.log("�� Step updated successfully:", response);
 
       // Update local state
       if (response.data) {
