@@ -286,6 +286,7 @@ const StepFormFields = React.memo(({
       <div>
         <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
         <Textarea
+          key={isEdit ? "edit-hint" : "hint"}
           id={isEdit ? "edit-hint" : "hint"}
           value={formData.hint}
           onChange={(e) => handleFieldChange("hint", e.target.value)}
@@ -551,7 +552,7 @@ const StepsManagerFixed = () => {
     if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
       toast({
         title: "Ошибка валидации",
-        description: "Заполните все обязательные поля: устройство, проблема, назван��е и инструкция",
+        description: "Заполните все обязательные поля: устройство, проблема, название и инструкция",
         variant: "destructive",
       });
       return;
@@ -607,7 +608,7 @@ const StepsManagerFixed = () => {
     } catch (error) {
       console.error("❌ Error creating step:", error);
       toast({
-        title: "Ошибка создания",
+        title: "Ошибка созда��ия",
         description: `Не удалось создать шаг: ${error?.message || 'Неизвестная ошибка'}`,
         variant: "destructive",
       });
@@ -1235,7 +1236,7 @@ const StepsManagerFixed = () => {
       <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>Редактировать шаг</DialogTitle>
+            <DialogTitle>Редактировать ш��г</DialogTitle>
           </DialogHeader>
           <StepFormFields
             isEdit={true}
