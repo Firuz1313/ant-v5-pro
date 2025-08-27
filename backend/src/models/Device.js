@@ -194,6 +194,7 @@ class Device extends BaseModel {
         LEFT JOIN problems p ON d.id = p.device_id AND p.is_active = true
         LEFT JOIN remotes r ON d.id = r.device_id AND r.is_active = true
         LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id
+          AND ds.is_active = true
           AND ds.end_time IS NULL
         WHERE d.id = $1
         GROUP BY d.id
@@ -236,7 +237,7 @@ class Device extends BaseModel {
         return {
           canDelete: false,
           reason: `Устройство содержит ${remotesCount} пультов. Сначала удалите или переместите их.`,
-          suggestion: 'Можно архивироват�� устройство вместо удаления'
+          suggestion: 'Можно архивировать устройство вместо удаления'
         };
       }
 
@@ -273,7 +274,7 @@ class Device extends BaseModel {
         inactive: parseInt(stats.inactive_devices || 0)
       };
     } catch (error) {
-      console.error('Ошибка получения статисти��и устройств:', error.message);
+      console.error('Ошибка получения статистики устройств:', error.message);
       throw error;
     }
   }
