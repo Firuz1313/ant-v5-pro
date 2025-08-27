@@ -239,7 +239,7 @@ export async function runMigrations() {
       .filter((file) => file.endsWith(".sql"))
       .sort();
 
-    console.log(`📁 Найдено ${migrationFiles.length} файлов миграций`);
+    console.log(`📁 Найден�� ${migrationFiles.length} файлов миграций`);
 
     for (const filename of migrationFiles) {
       if (executedMigrations.has(filename)) {
@@ -408,15 +408,18 @@ export async function fixDiagnosticSessionsSchema() {
   try {
     console.log("🔧 Проверка и исправление схемы diagnostic_sessions...");
 
-    // Проверяем есть ли колонка is_active в diagnostic_sessions
+    // Проверяем какие колонки существуют в diagnostic_sessions
     const sessionsColumnsQuery = `
       SELECT column_name
       FROM information_schema.columns
-      WHERE table_name = 'diagnostic_sessions' AND column_name = 'is_active';
+      WHERE table_name = 'diagnostic_sessions' AND column_name IN ('is_active', 'end_time');
     `;
 
     const sessionsColumns = await query(sessionsColumnsQuery);
-    const hasSessionsIsActive = sessionsColumns.rows.length > 0;
+    const existingSessionsColumns = sessionsColumns.rows.map(row => row.column_name);
+
+    const hasSessionsIsActive = existingSessionsColumns.includes('is_active');
+    const hasSessionsEndTime = existingSessionsColumns.includes('end_time');
 
     if (!hasSessionsIsActive) {
       await query(`
@@ -424,6 +427,14 @@ export async function fixDiagnosticSessionsSchema() {
         ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT true
       `);
       console.log("✅ Добавлена колонка is_active в diagnostic_sessions");
+    }
+
+    if (!hasSessionsEndTime) {
+      await query(`
+        ALTER TABLE diagnostic_sessions
+        ADD COLUMN end_time TIMESTAMP WITH TIME ZONE
+      `);
+      console.log("✅ Добавлена колонка end_time в diagnostic_sessions");
     }
 
     // Проверяем есть ли колонка is_active в diagnostic_steps
@@ -444,8 +455,8 @@ export async function fixDiagnosticSessionsSchema() {
       console.log("✅ Добавлена колонка is_active в diagnostic_steps");
     }
 
-    if (hasSessionsIsActive && hasStepsIsActive) {
-      console.log("✅ Все необходимые колонки is_active уже существуют");
+    if (hasSessionsIsActive && hasSessionsEndTime && hasStepsIsActive) {
+      console.log("✅ Все необходимые колонки уже существуют");
     }
 
     console.log("🎉 Схема diagnostic_sessions исправлена");
