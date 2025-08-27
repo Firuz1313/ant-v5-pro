@@ -626,7 +626,7 @@ const StepsManagerFixed = () => {
         hint: formData.hint || undefined,
       };
 
-      console.log("🔄 Sending update data to API:", updatedFormData);
+      console.log("���� Sending update data to API:", updatedFormData);
 
       const response = await stepsApi.updateStep(selectedStep.id, updatedFormData);
       console.log("✅ Step updated successfully:", response);
@@ -744,19 +744,19 @@ const StepsManagerFixed = () => {
     setIsEditDialogOpen(true);
   };
 
-  const openRemoteEditor = () => {
+  const openRemoteEditor = useCallback(() => {
     const remote = getRemoteById(formData.remoteId);
     if (remote) {
       setSelectedRemote(remote);
       setIsRemoteEditorOpen(true);
     }
-  };
+  }, [formData.remoteId, getRemoteById]);
 
-  const openTVInterfaceEditor = async (tvInterface: TVInterface) => {
+  const openTVInterfaceEditor = useCallback(async (tvInterface: TVInterface) => {
     console.log("Opening TV Interface Editor with:", tvInterface);
     setSelectedTVInterface(tvInterface);
     setIsTVInterfaceEditorOpen(true);
-  };
+  }, []);
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isPickingButton || !canvasRef.current) return;
@@ -958,7 +958,7 @@ const StepsManagerFixed = () => {
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Plus className="h-4 w-4 mr-2" />
-              Создать но��ый шаг
+              Создать новый шаг
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
