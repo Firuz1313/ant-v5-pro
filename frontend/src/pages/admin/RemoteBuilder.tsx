@@ -359,7 +359,7 @@ const RemoteBuilder = () => {
         },
       });
 
-      toast.success("Пульт обновлен успешно");
+      toast.success("Пульт обновлен успеш��о");
       setIsEditDialogOpen(false);
       setSelectedRemote(null);
       resetForm();
@@ -1394,7 +1394,7 @@ const RemoteBuilder = () => {
                           <DropdownMenuItem
                             onClick={() => handleSetDefault(remote.id)}
                           >
-                            Сделать по умолчанию
+                            Сделать по умолча��ию
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem>
@@ -1627,6 +1627,34 @@ const RemoteBuilder = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Удалить пульт?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Вы уверены, что хотите удалить этот пульт? Это действие нельзя отменить! Пульт "{remoteToDelete?.name}" будет удален навсегда.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setIsDeleteModalOpen(false);
+              setRemoteToDelete(null);
+            }}>
+              Отмена
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Удалить навсегда
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {filteredRemotes.length === 0 && (
         <Card>
