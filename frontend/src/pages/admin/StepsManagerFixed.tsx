@@ -86,9 +86,7 @@ import {
   sortableKeyboardCoordinates,
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
-import {
-  useSortable,
-} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 
 interface DiagnosticStep {
@@ -493,9 +491,7 @@ const SortableStepItem = React.memo<{
               <h4 className="font-semibold text-gray-900 dark:text-white">
                 {step.title}
               </h4>
-              <Badge
-                variant={step.isActive ? "default" : "secondary"}
-              >
+              <Badge variant={step.isActive ? "default" : "secondary"}>
                 {step.isActive ? "Активный" : "Неактив��ый"}
               </Badge>
               {step.requiredAction && (
@@ -529,8 +525,7 @@ const SortableStepItem = React.memo<{
             <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
               {step.remoteId && (
                 <span>
-                  Пульт:{" "}
-                  {getRemoteById(step.remoteId)?.name || "Неизвестный"}
+                  Пульт: {getRemoteById(step.remoteId)?.name || "Неизвестный"}
                 </span>
               )}
               {step.buttonPosition && (
@@ -588,7 +583,7 @@ const StepsManagerFixed = () => {
     useSensor(PointerSensor),
     useSensor(KeyboardSensor, {
       coordinateGetter: sortableKeyboardCoordinates,
-    })
+    }),
   );
   const {
     data: devicesResponse,
@@ -803,102 +798,114 @@ const StepsManagerFixed = () => {
   }, [filterDevice, activeRemotes, remotes]);
 
   // Handle drag end - defined after groupedSteps to avoid circular dependency
-  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
-    const { active, over } = event;
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event;
 
-    if (!over || active.id === over.id) {
-      return;
-    }
-
-    // Find the group and steps being reordered
-    let targetGroup: { deviceId: string; problemId: string; steps: DiagnosticStep[] } | null = null;
-    let activeStep: DiagnosticStep | null = null;
-    let overStep: DiagnosticStep | null = null;
-
-    // Find the group containing the dragged step
-    Object.values(groupedSteps).forEach(group => {
-      const activeStepInGroup = group.steps.find(step => step.id === active.id);
-      const overStepInGroup = group.steps.find(step => step.id === over.id);
-
-      if (activeStepInGroup && overStepInGroup) {
-        targetGroup = group;
-        activeStep = activeStepInGroup;
-        overStep = overStepInGroup;
-      }
-    });
-
-    if (!targetGroup || !activeStep || !overStep) {
-      console.error('Could not find steps for reordering');
-      return;
-    }
-
-    try {
-      // Get the current order of steps in this group
-      const currentSteps = [...targetGroup.steps].sort((a, b) => a.stepNumber - b.stepNumber);
-      const activeIndex = currentSteps.findIndex(step => step.id === active.id);
-      const overIndex = currentSteps.findIndex(step => step.id === over.id);
-
-      if (activeIndex === -1 || overIndex === -1) {
-        console.error('Could not find step indexes');
+      if (!over || active.id === over.id) {
         return;
       }
 
-      // Reorder the steps array
-      const reorderedSteps = arrayMove(currentSteps, activeIndex, overIndex);
+      // Find the group and steps being reordered
+      let targetGroup: {
+        deviceId: string;
+        problemId: string;
+        steps: DiagnosticStep[];
+      } | null = null;
+      let activeStep: DiagnosticStep | null = null;
+      let overStep: DiagnosticStep | null = null;
 
-      // Create the new step IDs array in the correct order
-      const stepIds = reorderedSteps.map(step => step.id);
+      // Find the group containing the dragged step
+      Object.values(groupedSteps).forEach((group) => {
+        const activeStepInGroup = group.steps.find(
+          (step) => step.id === active.id,
+        );
+        const overStepInGroup = group.steps.find((step) => step.id === over.id);
 
-      console.log('Reordering steps:', {
-        problemId: targetGroup.problemId,
-        stepIds,
-        from: activeIndex + 1,
-        to: overIndex + 1
+        if (activeStepInGroup && overStepInGroup) {
+          targetGroup = group;
+          activeStep = activeStepInGroup;
+          overStep = overStepInGroup;
+        }
       });
 
-      // Update local state immediately for smooth UX
-      setSteps(prevSteps => {
-        const newSteps = [...prevSteps];
+      if (!targetGroup || !activeStep || !overStep) {
+        console.error("Could not find steps for reordering");
+        return;
+      }
 
-        // Update step numbers for the reordered steps
-        reorderedSteps.forEach((step, index) => {
-          const stepIndex = newSteps.findIndex(s => s.id === step.id);
-          if (stepIndex !== -1) {
-            newSteps[stepIndex] = {
-              ...newSteps[stepIndex],
-              stepNumber: index + 1
-            };
-          }
+      try {
+        // Get the current order of steps in this group
+        const currentSteps = [...targetGroup.steps].sort(
+          (a, b) => a.stepNumber - b.stepNumber,
+        );
+        const activeIndex = currentSteps.findIndex(
+          (step) => step.id === active.id,
+        );
+        const overIndex = currentSteps.findIndex((step) => step.id === over.id);
+
+        if (activeIndex === -1 || overIndex === -1) {
+          console.error("Could not find step indexes");
+          return;
+        }
+
+        // Reorder the steps array
+        const reorderedSteps = arrayMove(currentSteps, activeIndex, overIndex);
+
+        // Create the new step IDs array in the correct order
+        const stepIds = reorderedSteps.map((step) => step.id);
+
+        console.log("Reordering steps:", {
+          problemId: targetGroup.problemId,
+          stepIds,
+          from: activeIndex + 1,
+          to: overIndex + 1,
         });
 
-        return newSteps;
-      });
+        // Update local state immediately for smooth UX
+        setSteps((prevSteps) => {
+          const newSteps = [...prevSteps];
 
-      // Send reorder request to backend
-      await stepsApi.reorderSteps(targetGroup.problemId, stepIds);
+          // Update step numbers for the reordered steps
+          reorderedSteps.forEach((step, index) => {
+            const stepIndex = newSteps.findIndex((s) => s.id === step.id);
+            if (stepIndex !== -1) {
+              newSteps[stepIndex] = {
+                ...newSteps[stepIndex],
+                stepNumber: index + 1,
+              };
+            }
+          });
 
-      toast({
-        title: "Успех",
-        description: `Порядок шагов обновлен: шаг "${activeStep.title}" перемещен с позиции ${activeIndex + 1} на позицию ${overIndex + 1}`,
-        variant: "default",
-      });
+          return newSteps;
+        });
 
-      // Reload data to ensure consistency
-      await loadInitialData();
+        // Send reorder request to backend
+        await stepsApi.reorderSteps(targetGroup.problemId, stepIds);
 
-    } catch (error) {
-      console.error('Error reordering steps:', error);
+        toast({
+          title: "Успех",
+          description: `Порядок шагов обновлен: шаг "${activeStep.title}" перемещен с позиции ${activeIndex + 1} на позицию ${overIndex + 1}`,
+          variant: "default",
+        });
 
-      // Revert local changes on error
-      await loadInitialData();
+        // Reload data to ensure consistency
+        await loadInitialData();
+      } catch (error) {
+        console.error("Error reordering steps:", error);
 
-      toast({
-        title: "Ошибка",
-        description: `Не удалось изменить порядок шагов: ${error?.message || 'Неизвестная ошибка'}`,
-        variant: "destructive",
-      });
-    }
-  }, [groupedSteps, toast, loadInitialData]);
+        // Revert local changes on error
+        await loadInitialData();
+
+        toast({
+          title: "Ошибка",
+          description: `Не удалось изменить порядок шагов: ${error?.message || "Неизвестная ошибка"}`,
+          variant: "destructive",
+        });
+      }
+    },
+    [groupedSteps, toast, loadInitialData],
+  );
 
   const openRemoteEditor = useCallback(() => {
     const remote = getRemoteById(formData.remoteId);
@@ -1553,7 +1560,9 @@ const StepsManagerFixed = () => {
       >
         <div className="space-y-6">
           {Object.entries(groupedSteps).map(([key, group]) => {
-            const sortedSteps = group.steps.sort((a, b) => a.stepNumber - b.stepNumber);
+            const sortedSteps = group.steps.sort(
+              (a, b) => a.stepNumber - b.stepNumber,
+            );
 
             return (
               <Card key={key}>
@@ -1568,12 +1577,13 @@ const StepsManagerFixed = () => {
                     </Badge>
                   </CardTitle>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    💡 Используйте иконку ☰ для изменения порядка шагов методом перетаскивания
+                    💡 Используйте иконку ☰ для изменения порядка шагов методом
+                    перетаскивания
                   </p>
                 </CardHeader>
                 <CardContent>
                   <SortableContext
-                    items={sortedSteps.map(step => step.id)}
+                    items={sortedSteps.map((step) => step.id)}
                     strategy={verticalListSortingStrategy}
                   >
                     <div className="space-y-3">
