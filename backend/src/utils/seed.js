@@ -3,7 +3,7 @@ import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
 import { v4 as uuidv4 } from "uuid";
 
-// Заг��узка переменных окружения
+// Загрузка переменных окружения
 dotenv.config();
 
 async function seedDatabase() {
@@ -112,7 +112,7 @@ async function seedDatabase() {
         id: "problem-poor-quality",
         device_id: "device-ant-basic",
         title: "Плохое качество изображения",
-        description: "Изображение нечеткое, есть помехи или ар��ефакты",
+        description: "Изображение нечеткое, есть помехи или артефакты",
         category: "moderate",
         icon: "Monitor",
         color: "from-orange-500 to-orange-600",
@@ -440,7 +440,7 @@ async function seedDatabase() {
       );
 
       remotesCreated++;
-      console.log("✅ У��иверсальный пульт создан успешно");
+      console.log("✅ Универсальный пульт создан успешно");
     } else {
       console.log("⏭️  Универсальный пульт уже существует, пропускаем");
       remotesSkipped++;
@@ -459,11 +459,15 @@ async function seedDatabase() {
     const problemsCount = await database.query(
       "SELECT COUNT(*) as count FROM problems",
     );
+    const remotesCount = await database.query(
+      "SELECT COUNT(*) as count FROM remotes WHERE is_active = true",
+    );
 
     console.log("🎉 База данных успешно заполнена!");
     console.log("===================================");
     console.log(`📺 Устройств: ${devicesCount.rows[0].count}`);
     console.log(`⚠️  Проблем: ${problemsCount.rows[0].count}`);
+    console.log(`🎮 Пультов: ${remotesCount.rows[0].count}`);
 
     console.log("\n✅ Заполнение базы данных завершено!");
   } catch (error) {
