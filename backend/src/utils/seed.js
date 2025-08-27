@@ -1,8 +1,9 @@
 import database from "./database.js";
 import dotenv from "dotenv";
 import bcrypt from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
 
-// Загрузка переменных окружения
+// Заг��узка переменных окружения
 dotenv.config();
 
 async function seedDatabase() {
@@ -111,7 +112,7 @@ async function seedDatabase() {
         id: "problem-poor-quality",
         device_id: "device-ant-basic",
         title: "Плохое качество изображения",
-        description: "Изображение нечеткое, есть помехи или артефакты",
+        description: "Изображение нечеткое, есть помехи или ар��ефакты",
         category: "moderate",
         icon: "Monitor",
         color: "from-orange-500 to-orange-600",
@@ -439,7 +440,7 @@ async function seedDatabase() {
       );
 
       remotesCreated++;
-      console.log("✅ Универсальный пульт создан успешно");
+      console.log("✅ У��иверсальный пульт создан успешно");
     } else {
       console.log("⏭️  Универсальный пульт уже существует, пропускаем");
       remotesSkipped++;
