@@ -1,4 +1,10 @@
-import React, { useState, useRef, useEffect, useCallback } from "react";
+import React, {
+  useState,
+  useRef,
+  useEffect,
+  useCallback,
+  useMemo,
+} from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -76,12 +82,349 @@ interface DiagnosticStep {
   updatedAt: string;
 }
 
+// Memoized form component to prevent recreation and maintain input focus
+const StepFormFields = React.memo<{
+  isEdit: boolean;
+  formData: any;
+  onFieldChange: (field: string, value: any) => void;
+  onDeviceChange: (value: string) => void;
+  devices: any[];
+  problems: any[];
+  remotes: any[];
+  tvInterfaces: any[];
+  loadingTVInterfaces: boolean;
+  onTVInterfaceEditor: (tvInterface: any) => void;
+  onRemoteEditor: () => void;
+}>(
+  ({
+    isEdit,
+    formData,
+    onFieldChange,
+    onDeviceChange,
+    devices,
+    problems,
+    remotes,
+    tvInterfaces,
+    loadingTVInterfaces,
+    onTVInterfaceEditor,
+    onRemoteEditor,
+  }) => {
+    const scrollContainerRef = useRef<HTMLDivElement>(null);
+    const [scrollPosition, setScrollPosition] = useState(0);
+
+    // Preserve scroll position during re-renders
+    useEffect(() => {
+      const container = scrollContainerRef.current;
+      if (container && scrollPosition > 0) {
+        container.scrollTop = scrollPosition;
+      }
+    });
+
+    // Save scroll position before any potential re-render
+    const handleScroll = useCallback((e: React.UIEvent<HTMLDivElement>) => {
+      setScrollPosition(e.currentTarget.scrollTop);
+    }, []);
+
+    // Memoized computed values to prevent recalculation
+    const activeDevices = useMemo(
+      () => devices.filter((d: any) => d.isActive !== false),
+      [devices],
+    );
+
+    const availableProblems = useMemo(() => {
+      if (formData.deviceId) {
+        return problems.filter((p: any) => p.deviceId === formData.deviceId);
+      }
+      return problems.filter((p) => p.status === "published");
+    }, [problems, formData.deviceId]);
+
+    const availableRemotes = useMemo(() => {
+      if (formData.deviceId) {
+        return remotes.filter((r: any) => r.deviceId === formData.deviceId);
+      }
+      return remotes.filter((r: any) => r.isActive !== false);
+    }, [remotes, formData.deviceId]);
+
+    // Stable input change handlers to prevent re-creation
+    const handleTitleChange = useCallback(
+      (e: React.ChangeEvent<HTMLInputElement>) => {
+        onFieldChange("title", e.target.value);
+      },
+      [onFieldChange],
+    );
+
+    const handleDescriptionChange = useCallback(
+      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        onFieldChange("description", e.target.value);
+      },
+      [onFieldChange],
+    );
+
+    const handleInstructionChange = useCallback(
+      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        onFieldChange("instruction", e.target.value);
+      },
+      [onFieldChange],
+    );
+
+    const handleHintChange = useCallback(
+      (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        onFieldChange("hint", e.target.value);
+      },
+      [onFieldChange],
+    );
+
+    const handleTVInterfaceChange = useCallback(
+      (value: string) => {
+        onFieldChange("tvInterfaceId", value);
+      },
+      [onFieldChange],
+    );
+
+    const handleRemoteChange = useCallback(
+      (value: string) => {
+        onFieldChange("remoteId", value);
+      },
+      [onFieldChange],
+    );
+
+    const handleProblemChange = useCallback(
+      (value: string) => {
+        onFieldChange("problemId", value);
+      },
+      [onFieldChange],
+    );
+
+    const handleTVInterfaceEditClick = useCallback(() => {
+      const tvInterface = tvInterfaces.find(
+        (ti) => ti.id === formData.tvInterfaceId,
+      );
+      if (tvInterface) onTVInterfaceEditor(tvInterface);
+    }, [tvInterfaces, formData.tvInterfaceId, onTVInterfaceEditor]);
+
+    return (
+      <div
+        ref={scrollContainerRef}
+        className="space-y-4 max-h-96 overflow-y-auto"
+        onScroll={handleScroll}
+      >
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <Label htmlFor={isEdit ? "edit-deviceId" : "deviceId"}>
+              Приставка *
+            </Label>
+            <Select value={formData.deviceId} onValueChange={onDeviceChange}>
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите приставку" />
+              </SelectTrigger>
+              <SelectContent>
+                {activeDevices.map((device) => (
+                  <SelectItem key={device.id} value={device.id}>
+                    <div className="flex items-center">
+                      <div
+                        className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`}
+                      />
+                      {device.name}
+                    </div>
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label htmlFor={isEdit ? "edit-problemId" : "problemId"}>
+              Проблем�� *
+            </Label>
+            <Select
+              value={formData.problemId}
+              onValueChange={handleProblemChange}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Выберите проблему" />
+              </SelectTrigger>
+              <SelectContent>
+                {availableProblems.map((problem) => (
+                  <SelectItem key={problem.id} value={problem.id}>
+                    {problem.title}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor={isEdit ? "edit-title" : "title"}>
+            Название шага *
+          </Label>
+          <Input
+            id={isEdit ? "edit-title" : "title"}
+            value={formData.title}
+            onChange={handleTitleChange}
+            placeholder="Введите название шага"
+            autoComplete="off"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor={isEdit ? "edit-description" : "description"}>
+            Описание
+          </Label>
+          <Textarea
+            id={isEdit ? "edit-description" : "description"}
+            value={formData.description}
+            onChange={handleDescriptionChange}
+            placeholder="Краткое описание шага"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor={isEdit ? "edit-instruction" : "instruction"}>
+            Инструкция *
+          </Label>
+          <Textarea
+            id={isEdit ? "edit-instruction" : "instruction"}
+            value={formData.instruction}
+            onChange={handleInstructionChange}
+            placeholder="Подробная инструкция для пользователя"
+          />
+        </div>
+
+        <div>
+          <Label htmlFor={isEdit ? "edit-tvInterfaceId" : "tvInterfaceId"}>
+            Интерфейс ТВ
+          </Label>
+          <div className="flex space-x-2">
+            <Select
+              value={formData.tvInterfaceId}
+              onValueChange={handleTVInterfaceChange}
+            >
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Выберите интерфейс" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Без интерфейса</SelectItem>
+                {loadingTVInterfaces ? (
+                  <SelectItem value="loading" disabled>
+                    Загрузка...
+                  </SelectItem>
+                ) : (
+                  tvInterfaces.map((tvInterface) => (
+                    <SelectItem key={tvInterface.id} value={tvInterface.id}>
+                      <div className="flex items-center">
+                        <Monitor className="w-3 h-3 mr-2" />
+                        {tvInterface.name}
+                        <span className="ml-2 text-xs text-gray-500">
+                          ({tvInterface.type})
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))
+                )}
+              </SelectContent>
+            </Select>
+            {formData.tvInterfaceId !== "none" && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={handleTVInterfaceEditClick}
+                size="sm"
+              >
+                <Target className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor={isEdit ? "edit-remoteId" : "remoteId"}>Пульт</Label>
+          <div className="flex space-x-2">
+            <Select
+              value={formData.remoteId}
+              onValueChange={handleRemoteChange}
+            >
+              <SelectTrigger className="flex-1">
+                <SelectValue placeholder="Выберите пульт" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="none">Без пульта</SelectItem>
+                {availableRemotes.map((remote) => {
+                  const device = devices.find((d) => d.id === remote.deviceId);
+                  return (
+                    <SelectItem key={remote.id} value={remote.id}>
+                      <div className="flex items-center">
+                        {device && (
+                          <div
+                            className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`}
+                          />
+                        )}
+                        {remote.name}
+                        {remote.isDefault && (
+                          <span className="ml-2 text-xs text-blue-600">
+                            (по умолчан��ю)
+                          </span>
+                        )}
+                      </div>
+                    </SelectItem>
+                  );
+                })}
+              </SelectContent>
+            </Select>
+            {formData.remoteId !== "none" && (
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onRemoteEditor}
+                size="sm"
+              >
+                <MousePointer className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
+        </div>
+
+        <div>
+          <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
+          <Textarea
+            id={isEdit ? "edit-hint" : "hint"}
+            value={formData.hint}
+            onChange={handleHintChange}
+            placeholder="Дополнительная подсказка для пользователя"
+          />
+        </div>
+
+        {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
+          <Alert className="border-green-200 bg-green-50 dark:bg-green-900/20">
+            <Target className="h-4 w-4" />
+            <AlertDescription>
+              <p className="text-sm text-green-700 dark:text-green-300">
+                Позиция кнопки: ({Math.round(formData.buttonPosition.x)},{" "}
+                {Math.round(formData.buttonPosition.y)})
+              </p>
+            </AlertDescription>
+          </Alert>
+        )}
+      </div>
+    );
+  },
+);
+
+StepFormFields.displayName = "StepFormFields";
+
 const StepsManagerFixed = () => {
-  const { data: devicesResponse, isLoading: devicesLoading, error: devicesError } = useDevices();
-  const { data: problemsResponse, isLoading: problemsLoading, error: problemsError } = useProblems();
+  const {
+    data: devicesResponse,
+    isLoading: devicesLoading,
+    error: devicesError,
+  } = useDevices();
+  const {
+    data: problemsResponse,
+    isLoading: problemsLoading,
+    error: problemsError,
+  } = useProblems();
   const { toast } = useToast();
 
-  // Extract data arrays from API responses
+  // Extract data arrays from API responses - MUST be before other hooks that depend on them
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
 
@@ -90,11 +433,50 @@ const StepsManagerFixed = () => {
   const [remotes, setRemotes] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  // Load initial data
-  useEffect(() => {
-    loadInitialData();
-  }, []);
+  // TV Interfaces state
+  const [tvInterfaces, setTVInterfaces] = useState<TVInterface[]>([]);
+  const [selectedTVInterface, setSelectedTVInterface] =
+    useState<TVInterface | null>(null);
+  const [loadingTVInterfaces, setLoadingTVInterfaces] = useState(false);
 
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const [searchTerm, setSearchTerm] = useState("");
+  const [filterDevice, setFilterDevice] = useState<string>("all");
+  const [filterProblem, setFilterProblem] = useState<string>("all");
+  const [filterRemote, setFilterRemote] = useState<string>("all");
+  const [selectedStep, setSelectedStep] = useState<DiagnosticStep | null>(null);
+  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isRemoteEditorOpen, setIsRemoteEditorOpen] = useState(false);
+  const [isTVInterfaceEditorOpen, setIsTVInterfaceEditorOpen] = useState(false);
+
+  // Remote editor state
+  const [selectedRemote, setSelectedRemote] = useState<any>(null);
+  const [isPickingButton, setIsPickingButton] = useState(false);
+  const [customRemoteImage, setCustomRemoteImage] = useState<string | null>(
+    null,
+  );
+
+  // Form data state with proper initialization
+  const [formData, setFormData] = useState({
+    deviceId: "",
+    problemId: "",
+    title: "",
+    description: "",
+    instruction: "",
+    highlightRemoteButton: "none",
+    highlightTVArea: "none",
+    tvInterface: "home" as DiagnosticStep["tvInterface"],
+    tvInterfaceId: "none",
+    requiredAction: "",
+    hint: "",
+    remoteId: "none",
+    buttonPosition: { x: 0, y: 0 },
+  });
+
+  // Define loadInitialData function before useEffect
   const loadInitialData = async () => {
     try {
       setLoading(true);
@@ -129,71 +511,132 @@ const StepsManagerFixed = () => {
     }
   };
 
-  // TV Interfaces state
-  const [tvInterfaces, setTVInterfaces] = useState<TVInterface[]>([]);
-  const [selectedTVInterface, setSelectedTVInterface] = useState<TVInterface | null>(null);
-  const [loadingTVInterfaces, setLoadingTVInterfaces] = useState(false);
-
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
-
-  const [searchTerm, setSearchTerm] = useState("");
-  const [filterDevice, setFilterDevice] = useState<string>("all");
-  const [filterProblem, setFilterProblem] = useState<string>("all");
-  const [filterRemote, setFilterRemote] = useState<string>("all");
-  const [selectedStep, setSelectedStep] = useState<DiagnosticStep | null>(null);
-  const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
-  const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
-  const [isRemoteEditorOpen, setIsRemoteEditorOpen] = useState(false);
-  const [isTVInterfaceEditorOpen, setIsTVInterfaceEditorOpen] = useState(false);
-
-  // Remote editor state
-  const [selectedRemote, setSelectedRemote] = useState<any>(null);
-  const [isPickingButton, setIsPickingButton] = useState(false);
-  const [customRemoteImage, setCustomRemoteImage] = useState<string | null>(null);
-
-  // Form data state
-  const [formData, setFormData] = useState({
-    deviceId: "",
-    problemId: "",
-    title: "",
-    description: "",
-    instruction: "",
-    highlightRemoteButton: "none",
-    highlightTVArea: "none",
-    tvInterface: "home" as DiagnosticStep["tvInterface"],
-    tvInterfaceId: "none",
-    requiredAction: "",
-    hint: "",
-    remoteId: "none",
-    buttonPosition: { x: 0, y: 0 },
-  });
-
-  // Load TV interfaces when device changes
+  // Load initial data
   useEffect(() => {
-    if (formData.deviceId && formData.deviceId !== "all") {
-      loadTVInterfacesForDevice(formData.deviceId);
-    }
-  }, [formData.deviceId]);
+    loadInitialData();
+  }, []);
 
+  // Optimized device change effect that doesn't interfere with input focus
+  useEffect(() => {
+    if (
+      formData.deviceId &&
+      formData.deviceId !== "all" &&
+      !loadingTVInterfaces
+    ) {
+      // Use setTimeout to defer the loading and prevent focus interference
+      const timeoutId = setTimeout(() => {
+        loadTVInterfacesForDevice(formData.deviceId);
+      }, 0);
+
+      return () => clearTimeout(timeoutId);
+    }
+  }, [formData.deviceId]); // Removed loadingTVInterfaces dependency to prevent loops
+
+  // Helper functions that are used in useCallback hooks - MUST be defined before hooks that use them
+  const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
+
+  const getDeviceName = (deviceId: string) => {
+    const device = devices.find((d) => d.id === deviceId);
+    return device?.name || "Неизвестная приставка";
+  };
+
+  const getProblemTitle = (problemId: string) => {
+    const problem = problems.find((p) => p.id === problemId);
+    return problem?.title || "Неизвестная проблема";
+  };
+
+  // Memoized stable field change handler
   const handleFieldChange = useCallback((field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
   }, []);
 
+  // Memoized stable device change handler
   const handleDeviceChange = useCallback(
     (value: string) => {
-      const defaultRemote = getDefaultRemoteForDevice(value);
+      const defaultRemote = remotes.find(
+        (r: any) => r.deviceId === value && r.isDefault,
+      );
       setFormData((prev) => ({
         ...prev,
         deviceId: value,
-        problemId: "",
+        problemId: "", // Reset problem when device changes
         remoteId: defaultRemote?.id || "none",
       }));
     },
     [remotes],
   );
 
-  // Show loading state while data is being fetched
+  // Memoized computed values for optimal performance
+  const filteredSteps = useMemo(() => {
+    return steps.filter((step) => {
+      const matchesSearch =
+        step.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        step.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesDevice =
+        filterDevice === "all" || step.deviceId === filterDevice;
+      const matchesProblem =
+        filterProblem === "all" || step.problemId === filterProblem;
+      const matchesRemote =
+        filterRemote === "all" ||
+        step.remoteId === filterRemote ||
+        (!step.remoteId && filterRemote === "none");
+      return matchesSearch && matchesDevice && matchesProblem && matchesRemote;
+    });
+  }, [steps, searchTerm, filterDevice, filterProblem, filterRemote]);
+
+  const groupedSteps = useMemo(() => {
+    return filteredSteps.reduce(
+      (acc, step) => {
+        const key = `${step.deviceId}-${step.problemId}`;
+        if (!acc[key]) {
+          acc[key] = {
+            deviceId: step.deviceId,
+            problemId: step.problemId,
+            steps: [],
+          };
+        }
+        acc[key].steps.push(step);
+        return acc;
+      },
+      {} as Record<
+        string,
+        { deviceId: string; problemId: string; steps: DiagnosticStep[] }
+      >,
+    );
+  }, [filteredSteps]);
+
+  const activeDevices = useMemo(
+    () => devices.filter((d: any) => d.isActive !== false),
+    [devices],
+  );
+
+  const activeRemotes = useMemo(
+    () => remotes.filter((r: any) => r.isActive !== false),
+    [remotes],
+  );
+
+  const filteredRemotes = useMemo(() => {
+    if (filterDevice === "all") {
+      return activeRemotes;
+    }
+    return remotes.filter((r: any) => r.deviceId === filterDevice);
+  }, [filterDevice, activeRemotes, remotes]);
+
+  const openRemoteEditor = useCallback(() => {
+    const remote = getRemoteById(formData.remoteId);
+    if (remote) {
+      setSelectedRemote(remote);
+      setIsRemoteEditorOpen(true);
+    }
+  }, [formData.remoteId, remotes]);
+
+  const openTVInterfaceEditor = useCallback((tvInterface: TVInterface) => {
+    console.log("Opening TV Interface Editor with:", tvInterface);
+    setSelectedTVInterface(tvInterface);
+    setIsTVInterfaceEditorOpen(true);
+  }, []);
+
+  // Show loading state while data is being fetched - AFTER all hooks
   if (loading || devicesLoading || problemsLoading) {
     return (
       <div className="flex items-center justify-center py-12">
@@ -212,113 +655,66 @@ const StepsManagerFixed = () => {
       if (response.success && response.data) {
         const normalizedInterfaces = response.data.map((tvInterface) => ({
           ...tvInterface,
-          screenshotData: tvInterface.screenshotData || tvInterface.screenshot_data,
-          clickableAreas: tvInterface.clickableAreas || tvInterface.clickable_areas || [],
-          highlightAreas: tvInterface.highlightAreas || tvInterface.highlight_areas || [],
+          screenshotData:
+            tvInterface.screenshotData || tvInterface.screenshot_data,
+          clickableAreas:
+            tvInterface.clickableAreas || tvInterface.clickable_areas || [],
+          highlightAreas:
+            tvInterface.highlightAreas || tvInterface.highlight_areas || [],
           deviceId: tvInterface.deviceId || tvInterface.device_id,
-          isActive: tvInterface.isActive !== undefined ? tvInterface.isActive : tvInterface.is_active,
+          isActive:
+            tvInterface.isActive !== undefined
+              ? tvInterface.isActive
+              : tvInterface.is_active,
         }));
 
         setTVInterfaces(normalizedInterfaces);
-        console.log(`✅ Loaded ${normalizedInterfaces.length} TV interfaces:`, normalizedInterfaces);
+        console.log(
+          `✅ Loaded ${normalizedInterfaces.length} TV interfaces:`,
+          normalizedInterfaces,
+        );
       } else {
-        console.warn(`⚠️ No TV interfaces found for device ${deviceId}:`, response.error);
+        console.warn(
+          `⚠️ No TV interfaces found for device ${deviceId}:`,
+          response.error,
+        );
         setTVInterfaces([]);
       }
     } catch (error) {
-      console.error(`❌ Error loading TV interfaces for device ${deviceId}:`, error);
+      console.error(
+        `❌ Error loading TV interfaces for device ${deviceId}:`,
+        error,
+      );
       setTVInterfaces([]);
     } finally {
       setLoadingTVInterfaces(false);
     }
   };
 
-  const getActiveDevices = () => {
-    const activeDevices = devices.filter((d: any) => d.isActive !== false);
-    console.log("🔍 getActiveDevices called:", { totalDevices: devices.length, activeDevices: activeDevices.length });
-    return activeDevices;
-  };
-
-  const getActiveRemotes = () => {
-    const activeRemotes = remotes.filter((r: any) => r.isActive !== false);
-    console.log("🔍 getActiveRemotes called:", { totalRemotes: remotes.length, activeRemotes: activeRemotes.length });
-    return activeRemotes;
-  };
-
-  const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
-
-  const getProblemsForDevice = (deviceId: string) => {
-    const deviceProblems = problems.filter((p: any) => p.deviceId === deviceId);
-    console.log("🔍 getProblemsForDevice called:", {
-      deviceId,
-      totalProblems: problems.length,
-      deviceProblems: deviceProblems.length,
-    });
-    return deviceProblems;
-  };
-
-  const getRemotesForDevice = (deviceId: string) => {
-    const deviceRemotes = remotes.filter((r: any) => r.deviceId === deviceId);
-    console.log("🔍 getRemotesForDevice called:", {
-      deviceId,
-      totalRemotes: remotes.length,
-      deviceRemotes: deviceRemotes.length,
-    });
-    return deviceRemotes;
-  };
-
-  const getDefaultRemoteForDevice = (deviceId: string) => {
-    const defaultRemote = remotes.find((r: any) => r.deviceId === deviceId && r.isDefault);
-    console.log("🔍 getDefaultRemoteForDevice called:", {
-      deviceId,
-      defaultRemote: defaultRemote ? { id: defaultRemote.id, name: defaultRemote.name } : null,
-    });
-    return defaultRemote;
-  };
-
-  const getAvailableProblems = () => {
-    let availableProblems;
-    if (formData.deviceId) {
-      availableProblems = getProblemsForDevice(formData.deviceId);
-    } else {
-      availableProblems = problems.filter((p) => p.status === "published");
-    }
-
-    console.log("🔍 getAvailableProblems called:", {
-      selectedDeviceId: formData.deviceId,
-      totalProblems: problems.length,
-      availableProblems: availableProblems.length,
-    });
-
-    return availableProblems;
-  };
-
-  const getAvailableRemotes = () => {
-    const result = formData.deviceId ? getRemotesForDevice(formData.deviceId) : getActiveRemotes();
-
-    console.log("🔍 getAvailableRemotes called:", {
-      selectedDeviceId: formData.deviceId,
-      returnedRemotes: result.length,
-    });
-
-    return result;
-  };
-
-  const getFilteredRemotes = () => {
-    if (filterDevice === "all") {
-      return getActiveRemotes();
-    }
-    return getRemotesForDevice(filterDevice);
-  };
+  // Show loading state while data is being fetched
+  if (loading || devicesLoading || problemsLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+        <span className="text-lg">Загрузка данных...</span>
+      </div>
+    );
+  }
 
   const handleCreate = async () => {
     console.log("🔄 Creating step with form data:", formData);
 
     // Validate required fields
-    if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
+    if (
+      !formData.deviceId ||
+      !formData.problemId ||
+      !formData.title ||
+      !formData.instruction
+    ) {
       toast({
         title: "Ошибка валидации",
-        description: "Заполните все обязательные поля: устройство, проблема, название и инструкция",
+        description:
+          "Заполните все обязательные поля: устройство, проблема, название и инстр��кция",
         variant: "destructive",
       });
       return;
@@ -327,9 +723,14 @@ const StepsManagerFixed = () => {
     try {
       // Calculate next step number
       const deviceSteps = steps.filter(
-        (s) => s.deviceId === formData.deviceId && s.problemId === formData.problemId
+        (s) =>
+          s.deviceId === formData.deviceId &&
+          s.problemId === formData.problemId,
       );
-      const maxStepNumber = deviceSteps.length > 0 ? Math.max(...deviceSteps.map((s) => s.stepNumber)) : 0;
+      const maxStepNumber =
+        deviceSteps.length > 0
+          ? Math.max(...deviceSteps.map((s) => s.stepNumber))
+          : 0;
 
       const stepData = {
         problemId: formData.problemId,
@@ -338,13 +739,22 @@ const StepsManagerFixed = () => {
         title: formData.title,
         description: formData.description || "",
         instruction: formData.instruction,
-        highlightRemoteButton: formData.highlightRemoteButton === "none" ? undefined : formData.highlightRemoteButton,
-        highlightTVArea: formData.highlightTVArea === "none" ? undefined : formData.highlightTVArea,
+        highlightRemoteButton:
+          formData.highlightRemoteButton === "none"
+            ? undefined
+            : formData.highlightRemoteButton,
+        highlightTVArea:
+          formData.highlightTVArea === "none"
+            ? undefined
+            : formData.highlightTVArea,
         remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
-        tvInterfaceId: formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
-        buttonPosition: 
-          formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0 
-            ? undefined 
+        tvInterfaceId:
+          formData.tvInterfaceId === "none"
+            ? undefined
+            : formData.tvInterfaceId,
+        buttonPosition:
+          formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
+            ? undefined
             : formData.buttonPosition,
         requiredAction: formData.requiredAction || undefined,
         hint: formData.hint || undefined,
@@ -367,7 +777,7 @@ const StepsManagerFixed = () => {
       resetForm();
 
       toast({
-        title: "Успех",
+        title: "Ус��ех",
         description: "Шаг успешно создан",
         variant: "default",
       });
@@ -375,7 +785,7 @@ const StepsManagerFixed = () => {
       console.error("❌ Error creating step:", error);
       toast({
         title: "Ошибка создания",
-        description: `Не удалось создать шаг: ${error?.message || 'Неизвестная ошибка'}`,
+        description: `Не удалось создать шаг: ${error?.message || "Неизвестная ошибка"}`,
         variant: "destructive",
       });
     }
@@ -387,10 +797,16 @@ const StepsManagerFixed = () => {
     console.log("🔄 Updating step with form data:", formData);
 
     // Validate required fields
-    if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
+    if (
+      !formData.deviceId ||
+      !formData.problemId ||
+      !formData.title ||
+      !formData.instruction
+    ) {
       toast({
         title: "Ошибка валидации",
-        description: "Заполните все обязательные поля: устройство, проблема, название и инструкция",
+        description:
+          "Заполните все обяза��ельные поля: устройство, проблема, название и инструкция",
         variant: "destructive",
       });
       return;
@@ -403,10 +819,19 @@ const StepsManagerFixed = () => {
         title: formData.title,
         description: formData.description || "",
         instruction: formData.instruction,
-        highlightRemoteButton: formData.highlightRemoteButton === "none" ? undefined : formData.highlightRemoteButton,
-        highlightTVArea: formData.highlightTVArea === "none" ? undefined : formData.highlightTVArea,
+        highlightRemoteButton:
+          formData.highlightRemoteButton === "none"
+            ? undefined
+            : formData.highlightRemoteButton,
+        highlightTVArea:
+          formData.highlightTVArea === "none"
+            ? undefined
+            : formData.highlightTVArea,
         remoteId: formData.remoteId === "none" ? undefined : formData.remoteId,
-        tvInterfaceId: formData.tvInterfaceId === "none" ? undefined : formData.tvInterfaceId,
+        tvInterfaceId:
+          formData.tvInterfaceId === "none"
+            ? undefined
+            : formData.tvInterfaceId,
         buttonPosition:
           formData.buttonPosition.x === 0 && formData.buttonPosition.y === 0
             ? undefined
@@ -417,13 +842,18 @@ const StepsManagerFixed = () => {
 
       console.log("🔄 Sending update data to API:", updatedFormData);
 
-      const response = await stepsApi.updateStep(selectedStep.id, updatedFormData);
+      const response = await stepsApi.updateStep(
+        selectedStep.id,
+        updatedFormData,
+      );
       console.log("✅ Step updated successfully:", response);
 
       // Update local state
       if (response.data) {
         setSteps((prev) =>
-          prev.map((step) => (step.id === selectedStep.id ? { ...step, ...response.data } : step))
+          prev.map((step) =>
+            step.id === selectedStep.id ? { ...step, ...response.data } : step,
+          ),
         );
       }
 
@@ -436,14 +866,14 @@ const StepsManagerFixed = () => {
 
       toast({
         title: "Успех",
-        description: "Шаг успешно обновлен",
+        description: "Ш��г успешно обновлен",
         variant: "default",
       });
     } catch (error) {
       console.error("❌ Error updating step:", error);
       toast({
         title: "Ошибка обновления",
-        description: `Не удалось обновить шаг: ${error?.message || 'Неизвестная ошибка'}`,
+        description: `Не удалось обновить шаг: ${error?.message || "Неизвестная ошибка"}`,
         variant: "destructive",
       });
     }
@@ -452,7 +882,7 @@ const StepsManagerFixed = () => {
   const handleDelete = async (stepId: string) => {
     try {
       await stepsApi.deleteStep(stepId);
-      
+
       // Update local state
       setSteps((prev) => prev.filter((step) => step.id !== stepId));
 
@@ -467,8 +897,8 @@ const StepsManagerFixed = () => {
     } catch (error) {
       console.error("❌ Error deleting step:", error);
       toast({
-        title: "Ошибка удаления",
-        description: `Не удалось удалить шаг: ${error?.message || 'Неизвестная ошибка'}`,
+        title: "Ошибка удалени��",
+        description: `Не удалось удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
         variant: "destructive",
       });
     }
@@ -486,13 +916,15 @@ const StepsManagerFixed = () => {
       // Update local state
       if (response.data) {
         setSteps((prev) =>
-          prev.map((s) => (s.id === stepId ? { ...s, isActive: !step.isActive } : s))
+          prev.map((s) =>
+            s.id === stepId ? { ...s, isActive: !step.isActive } : s,
+          ),
         );
       }
 
       toast({
         title: "Успех",
-        description: `Шаг ${!step.isActive ? 'активирован' : 'деактивирован'}`,
+        description: `Шаг ${!step.isActive ? "активирован" : "деактивирован"}`,
         variant: "default",
       });
     } catch (error) {
@@ -507,7 +939,7 @@ const StepsManagerFixed = () => {
 
   const openEditDialog = (step: DiagnosticStep) => {
     console.log("🔄 Opening edit dialog for step:", step);
-    
+
     setSelectedStep(step);
     setFormData({
       deviceId: step.deviceId,
@@ -525,26 +957,7 @@ const StepsManagerFixed = () => {
       buttonPosition: step.buttonPosition || { x: 0, y: 0 },
     });
 
-    // Load TV interfaces for the device
-    if (step.deviceId) {
-      loadTVInterfacesForDevice(step.deviceId);
-    }
-
     setIsEditDialogOpen(true);
-  };
-
-  const openRemoteEditor = () => {
-    const remote = getRemoteById(formData.remoteId);
-    if (remote) {
-      setSelectedRemote(remote);
-      setIsRemoteEditorOpen(true);
-    }
-  };
-
-  const openTVInterfaceEditor = async (tvInterface: TVInterface) => {
-    console.log("Opening TV Interface Editor with:", tvInterface);
-    setSelectedTVInterface(tvInterface);
-    setIsTVInterfaceEditorOpen(true);
   };
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
@@ -596,223 +1009,6 @@ const StepsManagerFixed = () => {
     setCustomRemoteImage(null);
   };
 
-  const getDeviceName = (deviceId: string) => {
-    const device = devices.find((d) => d.id === deviceId);
-    return device?.name || "Неизвестная приставка";
-  };
-
-  const getProblemTitle = (problemId: string) => {
-    const problem = problems.find((p) => p.id === problemId);
-    return problem?.title || "Неизвестная проблема";
-  };
-
-  const filteredSteps = steps.filter((step) => {
-    const matchesSearch =
-      step.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      step.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesDevice = filterDevice === "all" || step.deviceId === filterDevice;
-    const matchesProblem = filterProblem === "all" || step.problemId === filterProblem;
-    const matchesRemote =
-      filterRemote === "all" ||
-      step.remoteId === filterRemote ||
-      (!step.remoteId && filterRemote === "none");
-    return matchesSearch && matchesDevice && matchesProblem && matchesRemote;
-  });
-
-  const getGroupedSteps = () => {
-    return filteredSteps.reduce(
-      (acc, step) => {
-        const key = `${step.deviceId}-${step.problemId}`;
-        if (!acc[key]) {
-          acc[key] = {
-            deviceId: step.deviceId,
-            problemId: step.problemId,
-            steps: [],
-          };
-        }
-        acc[key].steps.push(step);
-        return acc;
-      },
-      {} as Record<string, { deviceId: string; problemId: string; steps: DiagnosticStep[] }>
-    );
-  };
-
-  const StepFormFields = ({ isEdit = false }: { isEdit?: boolean }) => (
-    <div className="space-y-4 max-h-96 overflow-y-auto">
-      <div className="grid grid-cols-2 gap-4">
-        <div>
-          <Label htmlFor={isEdit ? "edit-deviceId" : "deviceId"}>Приставка *</Label>
-          <Select value={formData.deviceId} onValueChange={handleDeviceChange}>
-            <SelectTrigger>
-              <SelectValue placeholder="Выберите приставку" />
-            </SelectTrigger>
-            <SelectContent>
-              {getActiveDevices().map((device) => (
-                <SelectItem key={device.id} value={device.id}>
-                  <div className="flex items-center">
-                    <div className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`} />
-                    {device.name}
-                  </div>
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-        <div>
-          <Label htmlFor={isEdit ? "edit-problemId" : "problemId"}>Проблема *</Label>
-          <Select
-            value={formData.problemId}
-            onValueChange={(value) => handleFieldChange("problemId", value)}
-          >
-            <SelectTrigger>
-              <SelectValue placeholder="Выберите проблему" />
-            </SelectTrigger>
-            <SelectContent>
-              {getAvailableProblems().map((problem) => (
-                <SelectItem key={problem.id} value={problem.id}>
-                  {problem.title}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor={isEdit ? "edit-title" : "title"}>Название шага *</Label>
-        <Input
-          id={isEdit ? "edit-title" : "title"}
-          value={formData.title}
-          onChange={(e) => handleFieldChange("title", e.target.value)}
-          placeholder="Введите название шага"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor={isEdit ? "edit-description" : "description"}>Описание</Label>
-        <Textarea
-          id={isEdit ? "edit-description" : "description"}
-          value={formData.description}
-          onChange={(e) => handleFieldChange("description", e.target.value)}
-          placeholder="Краткое описание шага"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor={isEdit ? "edit-instruction" : "instruction"}>Инструкция *</Label>
-        <Textarea
-          id={isEdit ? "edit-instruction" : "instruction"}
-          value={formData.instruction}
-          onChange={(e) => handleFieldChange("instruction", e.target.value)}
-          placeholder="Подробная инструкция для пользователя"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor={isEdit ? "edit-tvInterfaceId" : "tvInterfaceId"}>Интерфейс ТВ</Label>
-        <div className="flex space-x-2">
-          <Select
-            value={formData.tvInterfaceId}
-            onValueChange={(value) => handleFieldChange("tvInterfaceId", value)}
-          >
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Выберите интерфейс" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Без интерфейса</SelectItem>
-              {loadingTVInterfaces ? (
-                <SelectItem value="loading" disabled>
-                  Загрузка...
-                </SelectItem>
-              ) : (
-                tvInterfaces.map((tvInterface) => (
-                  <SelectItem key={tvInterface.id} value={tvInterface.id}>
-                    <div className="flex items-center">
-                      <Monitor className="w-3 h-3 mr-2" />
-                      {tvInterface.name}
-                      <span className="ml-2 text-xs text-gray-500">({tvInterface.type})</span>
-                    </div>
-                  </SelectItem>
-                ))
-              )}
-            </SelectContent>
-          </Select>
-          {formData.tvInterfaceId !== "none" && (
-            <Button
-              variant="outline"
-              onClick={() => {
-                const tvInterface = tvInterfaces.find((ti) => ti.id === formData.tvInterfaceId);
-                if (tvInterface) openTVInterfaceEditor(tvInterface);
-              }}
-              size="sm"
-            >
-              <Target className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor={isEdit ? "edit-remoteId" : "remoteId"}>Пульт</Label>
-        <div className="flex space-x-2">
-          <Select
-            value={formData.remoteId}
-            onValueChange={(value) => handleFieldChange("remoteId", value)}
-          >
-            <SelectTrigger className="flex-1">
-              <SelectValue placeholder="Выберите пульт" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="none">Без пульта</SelectItem>
-              {getAvailableRemotes().map((remote) => {
-                const device = devices.find((d) => d.id === remote.deviceId);
-                return (
-                  <SelectItem key={remote.id} value={remote.id}>
-                    <div className="flex items-center">
-                      {device && (
-                        <div className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`} />
-                      )}
-                      {remote.name}
-                      {remote.isDefault && (
-                        <span className="ml-2 text-xs text-blue-600">(по умолчанию)</span>
-                      )}
-                    </div>
-                  </SelectItem>
-                );
-              })}
-            </SelectContent>
-          </Select>
-          {formData.remoteId !== "none" && (
-            <Button variant="outline" onClick={openRemoteEditor} size="sm">
-              <MousePointer className="h-4 w-4" />
-            </Button>
-          )}
-        </div>
-      </div>
-
-      <div>
-        <Label htmlFor={isEdit ? "edit-hint" : "hint"}>Подсказка</Label>
-        <Textarea
-          id={isEdit ? "edit-hint" : "hint"}
-          value={formData.hint}
-          onChange={(e) => handleFieldChange("hint", e.target.value)}
-          placeholder="Дополнительная подсказка для пользователя"
-        />
-      </div>
-
-      {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
-        <Alert className="border-green-200 bg-green-50 dark:bg-green-900/20">
-          <Target className="h-4 w-4" />
-          <AlertDescription>
-            <p className="text-sm text-green-700 dark:text-green-300">
-              Позиция ��нопки: ({Math.round(formData.buttonPosition.x)}, {Math.round(formData.buttonPosition.y)})
-            </p>
-          </AlertDescription>
-        </Alert>
-      )}
-    </div>
-  );
-
   const renderRemoteEditor = () => {
     const remoteImage = customRemoteImage || selectedRemote?.imageData;
 
@@ -855,6 +1051,7 @@ const StepsManagerFixed = () => {
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
                 <Button
+                  type="button"
                   variant={isPickingButton ? "default" : "outline"}
                   onClick={() => setIsPickingButton(!isPickingButton)}
                   className="w-full"
@@ -863,6 +1060,7 @@ const StepsManagerFixed = () => {
                   {isPickingButton ? "Отменить выбор" : "Выбрать позицию"}
                 </Button>
                 <Button
+                  type="button"
                   variant="outline"
                   onClick={() => fileInputRef.current?.click()}
                   className="w-full"
@@ -885,22 +1083,26 @@ const StepsManagerFixed = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Кликните на изображение пульта, чтобы указать позицию кнопки
+                      Кликните на изображение пульта, ��тобы указать позицию
+                      кнопки
                     </p>
                   </AlertDescription>
                 </Alert>
               )}
 
-              {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
-                <Alert className="border-green-200 bg-green-50 dark:bg-green-900/20">
-                  <Target className="h-4 w-4" />
-                  <AlertDescription>
-                    <p className="text-sm text-green-700 dark:text-green-300">
-                      Позиция выбрана: ({Math.round(formData.buttonPosition.x)}, {Math.round(formData.buttonPosition.y)})
-                    </p>
-                  </AlertDescription>
-                </Alert>
-              )}
+              {formData.buttonPosition.x > 0 &&
+                formData.buttonPosition.y > 0 && (
+                  <Alert className="border-green-200 bg-green-50 dark:bg-green-900/20">
+                    <Target className="h-4 w-4" />
+                    <AlertDescription>
+                      <p className="text-sm text-green-700 dark:text-green-300">
+                        Позиция выбрана: (
+                        {Math.round(formData.buttonPosition.x)},{" "}
+                        {Math.round(formData.buttonPosition.y)})
+                      </p>
+                    </AlertDescription>
+                  </Alert>
+                )}
             </CardContent>
           </Card>
         </div>
@@ -913,7 +1115,9 @@ const StepsManagerFixed = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Управление шагами (Исправлено)</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+            Управление шагами (Исправлено)
+          </h1>
           <p className="text-gray-600 dark:text-gray-400">
             Создание шагов диагностики с привязкой к приставкам и проблемам
           </p>
@@ -929,14 +1133,34 @@ const StepsManagerFixed = () => {
             <DialogHeader>
               <DialogTitle>Создать новый шаг</DialogTitle>
             </DialogHeader>
-            <StepFormFields />
+            <StepFormFields
+              isEdit={false}
+              formData={formData}
+              onFieldChange={handleFieldChange}
+              onDeviceChange={handleDeviceChange}
+              devices={devices}
+              problems={problems}
+              remotes={remotes}
+              tvInterfaces={tvInterfaces}
+              loadingTVInterfaces={loadingTVInterfaces}
+              onTVInterfaceEditor={openTVInterfaceEditor}
+              onRemoteEditor={openRemoteEditor}
+            />
             <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
+              <Button
+                variant="outline"
+                onClick={() => setIsCreateDialogOpen(false)}
+              >
                 Отмена
               </Button>
               <Button
                 onClick={handleCreate}
-                disabled={!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction}
+                disabled={
+                  !formData.deviceId ||
+                  !formData.problemId ||
+                  !formData.title ||
+                  !formData.instruction
+                }
               >
                 Создать
               </Button>
@@ -972,11 +1196,13 @@ const StepsManagerFixed = () => {
                   <SelectValue placeholder="Приставка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Вс�� приставки</SelectItem>
-                  {getActiveDevices().map((device) => (
+                  <SelectItem value="all">Все приставки</SelectItem>
+                  {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       <div className="flex items-center">
-                        <div className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`} />
+                        <div
+                          className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`}
+                        />
                         {device.name}
                       </div>
                     </SelectItem>
@@ -1007,17 +1233,23 @@ const StepsManagerFixed = () => {
                 <SelectContent>
                   <SelectItem value="all">Все пульты</SelectItem>
                   <SelectItem value="none">Без пульта</SelectItem>
-                  {getFilteredRemotes().map((remote) => {
-                    const device = devices.find((d) => d.id === remote.deviceId);
+                  {filteredRemotes.map((remote) => {
+                    const device = devices.find(
+                      (d) => d.id === remote.deviceId,
+                    );
                     return (
                       <SelectItem key={remote.id} value={remote.id}>
                         <div className="flex items-center">
                           {device && (
-                            <div className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`} />
+                            <div
+                              className={`w-3 h-3 rounded bg-gradient-to-br ${device.color} mr-2`}
+                            />
                           )}
                           {remote.name}
                           {remote.isDefault && (
-                            <span className="ml-2 text-xs text-blue-600">(по умолчанию)</span>
+                            <span className="ml-2 text-xs text-blue-600">
+                              (по умолчанию)
+                            </span>
                           )}
                         </div>
                       </SelectItem>
@@ -1032,13 +1264,14 @@ const StepsManagerFixed = () => {
 
       {/* Steps List - Grouped by Device and Problem */}
       <div className="space-y-6">
-        {Object.entries(getGroupedSteps()).map(([key, group]) => (
+        {Object.entries(groupedSteps).map(([key, group]) => (
           <Card key={key}>
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Layers className="h-5 w-5 mr-2" />
                 <Tv className="h-4 w-4 mr-2" />
-                {getDeviceName(group.deviceId)} - {getProblemTitle(group.problemId)}
+                {getDeviceName(group.deviceId)} -{" "}
+                {getProblemTitle(group.problemId)}
                 <Badge variant="secondary" className="ml-2">
                   {group.steps.length} шагов
                 </Badge>
@@ -1049,7 +1282,10 @@ const StepsManagerFixed = () => {
                 {group.steps
                   .sort((a, b) => a.stepNumber - b.stepNumber)
                   .map((step) => (
-                    <div key={step.id} className="border border-gray-200 dark:border-gray-700 rounded-lg p-4">
+                    <div
+                      key={step.id}
+                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+                    >
                       <div className="flex items-center justify-between">
                         <div className="flex items-center space-x-4 flex-1">
                           <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
@@ -1060,8 +1296,14 @@ const StepsManagerFixed = () => {
 
                           <div className="flex-1">
                             <div className="flex items-center space-x-2 mb-1">
-                              <h4 className="font-semibold text-gray-900 dark:text-white">{step.title}</h4>
-                              <Badge variant={step.isActive ? "default" : "secondary"}>
+                              <h4 className="font-semibold text-gray-900 dark:text-white">
+                                {step.title}
+                              </h4>
+                              <Badge
+                                variant={
+                                  step.isActive ? "default" : "secondary"
+                                }
+                              >
                                 {step.isActive ? "Активный" : "Неактивный"}
                               </Badge>
                               {step.requiredAction && (
@@ -1089,17 +1331,26 @@ const StepsManagerFixed = () => {
                                 </Badge>
                               )}
                             </div>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">{step.description}</p>
+                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+                              {step.description}
+                            </p>
                             <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
                               {step.remoteId && (
-                                <span>Пульт: {getRemoteById(step.remoteId)?.name || "Неизвестный"}</span>
+                                <span>
+                                  Пульт:{" "}
+                                  {getRemoteById(step.remoteId)?.name ||
+                                    "Неизвес��ный"}
+                                </span>
                               )}
                               {step.buttonPosition && (
                                 <span>
-                                  Позиция: ({Math.round(step.buttonPosition.x)}, {Math.round(step.buttonPosition.y)})
+                                  Позиция: ({Math.round(step.buttonPosition.x)},{" "}
+                                  {Math.round(step.buttonPosition.y)})
                                 </span>
                               )}
-                              {step.tvInterfaceId && <span>ТВ интерфейс: {step.tvInterfaceId}</span>}
+                              {step.tvInterfaceId && (
+                                <span>ТВ интерфейс: {step.tvInterfaceId}</span>
+                              )}
                               <span>Обновлено: {step.updatedAt}</span>
                             </div>
                           </div>
@@ -1112,19 +1363,28 @@ const StepsManagerFixed = () => {
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
-                            <DropdownMenuItem onClick={() => openEditDialog(step)}>
+                            <DropdownMenuItem
+                              onClick={() => openEditDialog(step)}
+                            >
                               <Edit className="h-4 w-4 mr-2" />
-                              Редактировать
+                              Р��дактировать
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleToggleStatus(step.id)}>
+                            <DropdownMenuItem
+                              onClick={() => handleToggleStatus(step.id)}
+                            >
                               {step.isActive ? (
                                 <EyeOff className="h-4 w-4 mr-2" />
                               ) : (
                                 <Eye className="h-4 w-4 mr-2" />
                               )}
-                              {step.isActive ? "Деактивировать" : "Активировать"}
+                              {step.isActive
+                                ? "Деактивировать"
+                                : "Активировать"}
                             </DropdownMenuItem>
-                            <DropdownMenuItem onClick={() => handleDelete(step.id)} className="text-red-600">
+                            <DropdownMenuItem
+                              onClick={() => handleDelete(step.id)}
+                              className="text-red-600"
+                            >
                               <Trash2 className="h-4 w-4 mr-2" />
                               Удалить
                             </DropdownMenuItem>
@@ -1143,16 +1403,21 @@ const StepsManagerFixed = () => {
       <Dialog open={isRemoteEditorOpen} onOpenChange={setIsRemoteEditorOpen}>
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
-            <DialogTitle>Выбор позиции на пульте: {selectedRemote?.name}</DialogTitle>
+            <DialogTitle>
+              Выбор позиции на пульте: {selectedRemote?.name}
+            </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">{renderRemoteEditor()}</div>
           <div className="flex justify-end space-x-2 pt-4">
-            <Button variant="outline" onClick={() => setIsRemoteEditorOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsRemoteEditorOpen(false)}
+            >
               Отмена
             </Button>
             <Button onClick={() => setIsRemoteEditorOpen(false)}>
               <Save className="h-4 w-4 mr-2" />
-              С��хранить позицию
+              Сохранить позицию
             </Button>
           </div>
         </DialogContent>
@@ -1164,14 +1429,34 @@ const StepsManagerFixed = () => {
           <DialogHeader>
             <DialogTitle>Редактировать шаг</DialogTitle>
           </DialogHeader>
-          <StepFormFields isEdit={true} />
+          <StepFormFields
+            isEdit={true}
+            formData={formData}
+            onFieldChange={handleFieldChange}
+            onDeviceChange={handleDeviceChange}
+            devices={devices}
+            problems={problems}
+            remotes={remotes}
+            tvInterfaces={tvInterfaces}
+            loadingTVInterfaces={loadingTVInterfaces}
+            onTVInterfaceEditor={openTVInterfaceEditor}
+            onRemoteEditor={openRemoteEditor}
+          />
           <div className="flex justify-end space-x-2">
-            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setIsEditDialogOpen(false)}
+            >
               Отмена
             </Button>
             <Button
               onClick={handleEdit}
-              disabled={!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction}
+              disabled={
+                !formData.deviceId ||
+                !formData.problemId ||
+                !formData.title ||
+                !formData.instruction
+              }
             >
               Сохранить
             </Button>
@@ -1179,13 +1464,15 @@ const StepsManagerFixed = () => {
         </DialogContent>
       </Dialog>
 
-      {Object.keys(getGroupedSteps()).length === 0 && (
+      {Object.keys(groupedSteps).length === 0 && (
         <Card>
           <CardContent className="p-12 text-center">
             <Layers className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Шаги не найдены</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
+              Шаги не найдены
+            </h3>
             <p className="text-gray-500 dark:text-gray-400">
-              Создайте первый шаг диагностики или измените параметры фильтрации
+              Создайте первый шаг диагностики или измените пар��метры фильтрации
             </p>
           </CardContent>
         </Card>

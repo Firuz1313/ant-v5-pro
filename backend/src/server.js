@@ -35,7 +35,7 @@ if (NODE_ENV === "production" || process.env.FLY_APP_NAME) {
   app.set("trust proxy", 1);
 }
 
-// Настройка CORS
+// Настрой��а CORS
 const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [
@@ -139,35 +139,55 @@ if (NODE_ENV === "development") {
 }
 
 // Парсинг JSON и URL-encoded данных с увеличенным таймаутом
-app.use(express.json({
-  limit: "100mb", // Увеличиваем лимит до 100MB
-  parameterLimit: 100000,
-  type: ['application/json', 'application/*+json'],
-  // Добавляем обработчик для отслеживания больших запросов
-  verify: (req, res, buf, encoding) => {
-    if (buf.length > 1024 * 1024) { // Больше 1MB
-      console.log(`📦 Large request detected: ${req.method} ${req.url} - ${(buf.length / 1024 / 1024).toFixed(2)}MB`);
-    }
-  }
-}));
-app.use(express.urlencoded({ extended: true, limit: "100mb", parameterLimit: 100000 }));
+app.use(
+  express.json({
+    limit: "100mb", // Увеличиваем лимит до 100MB
+    parameterLimit: 100000,
+    type: ["application/json", "application/*+json"],
+    // Добавляем обработчик для отслеживания больших запросов
+    verify: (req, res, buf, encoding) => {
+      if (buf.length > 1024 * 1024) {
+        // Больше 1MB
+        console.log(
+          `📦 Large request detected: ${req.method} ${req.url} - ${(buf.length / 1024 / 1024).toFixed(2)}MB`,
+        );
+      }
+    },
+  }),
+);
+app.use(
+  express.urlencoded({
+    extended: true,
+    limit: "100mb",
+    parameterLimit: 100000,
+  }),
+);
 
 // Увеличиваем таймауты для сервера
 app.use((req, res, next) => {
   // Увеличиваем таймаут для TV interface операций
-  if (req.url.includes('/tv-interfaces') && (req.method === 'PUT' || req.method === 'POST')) {
-    req.setTimeout(180000, () => { // 180 seconds (3 minutes)
-      console.log(`⏰ Request timeout for TV interface operation: ${req.method} ${req.url}`);
+  if (
+    req.url.includes("/tv-interfaces") &&
+    (req.method === "PUT" || req.method === "POST")
+  ) {
+    req.setTimeout(180000, () => {
+      // 180 seconds (3 minutes)
+      console.log(
+        `⏰ Request timeout for TV interface operation: ${req.method} ${req.url}`,
+      );
       if (!res.headersSent) {
         res.status(408).json({
           success: false,
-          error: 'Request timeout - операци�� заняла ��лишком много времени',
-          timestamp: new Date().toISOString()
+          error: "Request timeout - операци�� заняла ��лишком много времени",
+          timestamp: new Date().toISOString(),
         });
       }
     });
-    res.setTimeout(180000, () => { // 180 seconds (3 minutes)
-      console.log(`⏰ Response timeout for TV interface operation: ${req.method} ${req.url}`);
+    res.setTimeout(180000, () => {
+      // 180 seconds (3 minutes)
+      console.log(
+        `⏰ Response timeout for TV interface operation: ${req.method} ${req.url}`,
+      );
     });
   }
   next();
@@ -238,9 +258,14 @@ process.on("SIGINT", () => {
 async function startServer() {
   try {
     // Исправляем схему tv_interfaces при старте
-    const { fixTVInterfacesSchema, createTVInterfaceMarksTable } = await import("./utils/database.js");
+    const {
+      fixTVInterfacesSchema,
+      createTVInterfaceMarksTable,
+      fixDiagnosticSessionsSchema,
+    } = await import("./utils/database.js");
     await fixTVInterfacesSchema();
     await createTVInterfaceMarksTable();
+    await fixDiagnosticSessionsSchema();
   } catch (error) {
     console.error(
       "⚠️ Ошибка исправления схемы, продолжаем запуск:",

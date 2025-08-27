@@ -195,7 +195,7 @@ export const createRemote = async (req, res) => {
 
     res.status(500).json({
       success: false,
-      error: "Ошибка при создании пульта",
+      error: "Ошибка п��и создании пульта",
       details: error.message,
       timestamp: new Date().toISOString(),
     });
@@ -324,7 +324,10 @@ export const getDefaultRemoteForDevice = async (req, res) => {
     if (!remote) {
       return res.status(404).json({
         success: false,
-        error: "Пульт по умолчанию не найден для этого устройства",
+        error: "Пульт не найден для этого устройства",
+        message: "Создайте пульт для данного устройства в админ панели",
+        suggestion:
+          "Перейдите в раздел 'Конструктор пультов' для создания п��льта",
         timestamp: new Date().toISOString(),
       });
     }
@@ -332,6 +335,9 @@ export const getDefaultRemoteForDevice = async (req, res) => {
     res.json({
       success: true,
       data: remote,
+      message: remote.is_default
+        ? "Найден пульт по умолчанию"
+        : "Автоматически выбран доступный пульт",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
@@ -363,7 +369,7 @@ export const setRemoteAsDefault = async (req, res) => {
     console.error("Error in setRemoteAsDefault:", error);
     res.status(500).json({
       success: false,
-      error: "Ошибка при установке пульта по у��олчанию",
+      error: "Ошибка при установке пульта по у��олч��нию",
       details: error.message,
       timestamp: new Date().toISOString(),
     });

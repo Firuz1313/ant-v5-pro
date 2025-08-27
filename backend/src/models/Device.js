@@ -1,12 +1,12 @@
-import BaseModel from './BaseModel.js';
-import { query } from '../utils/database.js';
+import BaseModel from "./BaseModel.js";
+import { query } from "../utils/database.js";
 
 /**
  * Модель для работы с устройствами (ТВ-приставками)
  */
 class Device extends BaseModel {
   constructor() {
-    super('devices');
+    super("devices");
   }
 
   /**
@@ -14,8 +14,11 @@ class Device extends BaseModel {
    */
   async findAllWithStats(filters = {}, options = {}) {
     try {
-      const { sql: baseQuery, values } = this.buildSelectQuery(filters, options);
-      
+      const { sql: baseQuery, values } = this.buildSelectQuery(
+        filters,
+        options,
+      );
+
       // Расширяем запрос для получения статистики
       const sql = `
         SELECT 
@@ -32,14 +35,17 @@ class Device extends BaseModel {
       `;
 
       const result = await query(sql, values);
-      return result.rows.map(row => ({
+      return result.rows.map((row) => ({
         ...row,
         problems_count: parseInt(row.problems_count || 0),
         published_problems_count: parseInt(row.published_problems_count || 0),
-        active_problems_count: parseInt(row.active_problems_count || 0)
+        active_problems_count: parseInt(row.active_problems_count || 0),
       }));
     } catch (error) {
-      console.error('Ошибка получения устройств со статистикой:', error.message);
+      console.error(
+        "Ошибка получения устройств со статистикой:",
+        error.message,
+      );
       throw error;
     }
   }
@@ -73,13 +79,18 @@ class Device extends BaseModel {
       return {
         ...device,
         problems_count: parseInt(device.problems_count || 0),
-        published_problems_count: parseInt(device.published_problems_count || 0),
+        published_problems_count: parseInt(
+          device.published_problems_count || 0,
+        ),
         active_problems_count: parseInt(device.active_problems_count || 0),
         remotes_count: parseInt(device.remotes_count || 0),
-        default_remotes_count: parseInt(device.default_remotes_count || 0)
+        default_remotes_count: parseInt(device.default_remotes_count || 0),
       };
     } catch (error) {
-      console.error('Ошибка получения устройства со статистикой:', error.message);
+      console.error(
+        "Ошибка получения устройства со статистикой:",
+        error.message,
+      );
       throw error;
     }
   }
@@ -111,13 +122,13 @@ class Device extends BaseModel {
       const offset = options.offset || 0;
 
       const result = await query(sql, [searchTerm, limit, offset]);
-      return result.rows.map(row => ({
+      return result.rows.map((row) => ({
         ...row,
         problems_count: parseInt(row.problems_count || 0),
-        rank: parseFloat(row.rank || 0)
+        rank: parseFloat(row.rank || 0),
       }));
     } catch (error) {
-      console.error('Ошибка поиска устройств:', error.message);
+      console.error("Ошибка поиска устройств:", error.message);
       throw error;
     }
   }
@@ -144,14 +155,14 @@ class Device extends BaseModel {
       `;
 
       const result = await query(sql, [limit]);
-      return result.rows.map(row => ({
+      return result.rows.map((row) => ({
         ...row,
         problems_count: parseInt(row.problems_count || 0),
         total_completions: parseInt(row.total_completions || 0),
-        avg_success_rate: parseFloat(row.avg_success_rate || 0)
+        avg_success_rate: parseFloat(row.avg_success_rate || 0),
       }));
     } catch (error) {
-      console.error('Ошибка получения популярных устройств:', error.message);
+      console.error("Ошибка получения популярных устройств:", error.message);
       throw error;
     }
   }
@@ -172,9 +183,9 @@ class Device extends BaseModel {
       });
 
       const results = await Promise.all(updatePromises);
-      return results.map(result => result.rows[0]).filter(Boolean);
+      return results.map((result) => result.rows[0]).filter(Boolean);
     } catch (error) {
-      console.error('Ошибка обновления порядка устройств:', error.message);
+      console.error("Ошибка обновления порядка устройств:", error.message);
       throw error;
     }
   }
@@ -185,7 +196,7 @@ class Device extends BaseModel {
   async canDelete(id) {
     try {
       const sql = `
-        SELECT 
+        SELECT
           COUNT(p.id) as problems_count,
           COUNT(CASE WHEN p.status = 'published' THEN 1 END) as published_problems_count,
           COUNT(r.id) as remotes_count,
@@ -193,8 +204,8 @@ class Device extends BaseModel {
         FROM devices d
         LEFT JOIN problems p ON d.id = p.device_id AND p.is_active = true
         LEFT JOIN remotes r ON d.id = r.device_id AND r.is_active = true
-        LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id 
-          AND ds.is_active = true 
+        LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id
+          AND ds.is_active = true
           AND ds.end_time IS NULL
         WHERE d.id = $1
         GROUP BY d.id
@@ -202,26 +213,28 @@ class Device extends BaseModel {
 
       const result = await query(sql, [id]);
       if (result.rows.length === 0) {
-        return { canDelete: false, reason: 'Устройство не найдено' };
+        return { canDelete: false, reason: "Устройство не найдено" };
       }
 
       const stats = result.rows[0];
       const problemsCount = parseInt(stats.problems_count || 0);
-      const publishedProblemsCount = parseInt(stats.published_problems_count || 0);
+      const publishedProblemsCount = parseInt(
+        stats.published_problems_count || 0,
+      );
       const remotesCount = parseInt(stats.remotes_count || 0);
       const activeSessionsCount = parseInt(stats.active_sessions_count || 0);
 
       if (activeSessionsCount > 0) {
         return {
           canDelete: false,
-          reason: `Невозможно удалить устройство с ${activeSessionsCount} активными сессиями диагностики`
+          reason: `Невозможно удалить устройство с ${activeSessionsCount} активными сессиями диагностики`,
         };
       }
 
       if (publishedProblemsCount > 0) {
         return {
           canDelete: false,
-          reason: `Невозможно удалить устройство с ${publishedProblemsCount} опубликованными проблемами`
+          reason: `Невозможно удалить устройство с ${publishedProblemsCount} опубликованными проблемами`,
         };
       }
 
@@ -229,7 +242,7 @@ class Device extends BaseModel {
         return {
           canDelete: false,
           reason: `Устройство содержит ${problemsCount} проблем. Сначала удалите или переместите их.`,
-          suggestion: 'Можно архивировать устройство вместо удаления'
+          suggestion: "Можно архивировать устройство вместо удаления",
         };
       }
 
@@ -237,13 +250,16 @@ class Device extends BaseModel {
         return {
           canDelete: false,
           reason: `Устройство содержит ${remotesCount} пультов. Сначала удалите или переместите их.`,
-          suggestion: 'Можно архивировать устройство вместо удаления'
+          suggestion: "Можно архивировать устройство вместо удаления",
         };
       }
 
       return { canDelete: true };
     } catch (error) {
-      console.error('Ошибка проверки возможности удаления устройства:', error.message);
+      console.error(
+        "Ошибка проверки возможности удаления устройства:",
+        error.message,
+      );
       throw error;
     }
   }
@@ -265,16 +281,16 @@ class Device extends BaseModel {
 
       const result = await query(sql);
       const stats = result.rows[0];
-      
+
       return {
         total: parseInt(stats.total_devices || 0),
         active: parseInt(stats.active_devices || 0),
         working: parseInt(stats.working_devices || 0),
         maintenance: parseInt(stats.maintenance_devices || 0),
-        inactive: parseInt(stats.inactive_devices || 0)
+        inactive: parseInt(stats.inactive_devices || 0),
       };
     } catch (error) {
-      console.error('Ошибка получения статистики устройств:', error.message);
+      console.error("Ошибка получения статистики устройств:", error.message);
       throw error;
     }
   }
@@ -285,7 +301,7 @@ class Device extends BaseModel {
   async getForAdmin(filters = {}, options = {}) {
     try {
       // Строим базовый запрос с учетом фильтров
-      let whereConditions = ['d.id IS NOT NULL'];
+      let whereConditions = ["d.id IS NOT NULL"];
       const values = [];
       let paramIndex = 1;
 
@@ -324,7 +340,7 @@ class Device extends BaseModel {
         LEFT JOIN remotes r ON d.id = r.device_id AND r.is_active = true
         LEFT JOIN tv_interfaces tv ON d.id = tv.device_id AND tv.is_active = true
         LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id AND ds.is_active = true
-        WHERE ${whereConditions.join(' AND ')}
+        WHERE ${whereConditions.join(" AND ")}
         GROUP BY d.id
         ORDER BY d.order_index ASC, d.created_at DESC
         LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
@@ -335,15 +351,18 @@ class Device extends BaseModel {
       values.push(limit, offset);
 
       const result = await query(sql, values);
-      return result.rows.map(row => ({
+      return result.rows.map((row) => ({
         ...row,
         problems_count: parseInt(row.problems_count || 0),
         published_problems_count: parseInt(row.published_problems_count || 0),
         remotes_count: parseInt(row.remotes_count || 0),
-        tv_interfaces_count: parseInt(row.tv_interfaces_count || 0)
+        tv_interfaces_count: parseInt(row.tv_interfaces_count || 0),
       }));
     } catch (error) {
-      console.error('Ошибка получения устройств для админ панели:', error.message);
+      console.error(
+        "Ошибка получения устройств для админ панели:",
+        error.message,
+      );
       throw error;
     }
   }

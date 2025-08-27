@@ -12,6 +12,33 @@ class Remote extends BaseModel {
   }
 
   /**
+   * Переопределяем create для автоматической установки default
+   */
+  async create(data) {
+    try {
+      // Если пульт привязан к устройству, проверяем есть ли уже пульты для этого устройства
+      if (data.device_id && data.device_id !== "universal") {
+        const existingRemotes = await this.query(
+          `SELECT COUNT(*) as count FROM ${this.tableName}
+           WHERE device_id = $1 AND is_active = true`,
+          [data.device_id],
+        );
+
+        const count = parseInt(existingRemotes.rows[0]?.count || 0);
+
+        // Если это первый пульт для устройства, автоматически делаем его default
+        if (count === 0) {
+          data.is_default = true;
+        }
+      }
+
+      return await super.create(data);
+    } catch (error) {
+      throw this.handleError(error, "create");
+    }
+  }
+
+  /**
    * Валидация данных пульта
    */
   validateData(data, isUpdate = false) {
@@ -77,14 +104,41 @@ class Remote extends BaseModel {
    */
   async getDefaultForDevice(deviceId) {
     try {
-      const result = await this.query(
-        `SELECT * FROM ${this.tableName} 
-         WHERE device_id = $1 AND is_default = true AND is_active = true 
+      // Сначала пытаемся найти пульт, явно помеченный как default
+      let result = await this.query(
+        `SELECT * FROM ${this.tableName}
+         WHERE device_id = $1 AND is_default = true AND is_active = true
          LIMIT 1`,
         [deviceId],
       );
 
-      return result.rows[0] ? this.formatResponse(result.rows[0]) : null;
+      if (result.rows[0]) {
+        return this.formatResponse(result.rows[0]);
+      }
+
+      // Если нет явно назначенного default, возвращаем наиболее используемый пульт
+      result = await this.query(
+        `SELECT * FROM ${this.tableName}
+         WHERE device_id = $1 AND is_active = true
+         ORDER BY usage_count DESC, created_at ASC
+         LIMIT 1`,
+        [deviceId],
+      );
+
+      if (result.rows[0]) {
+        // Автоматически устанавливаем найденный пульт как default
+        const remote = result.rows[0];
+        await this.query(
+          `UPDATE ${this.tableName}
+           SET is_default = true, updated_at = NOW()
+           WHERE id = $1`,
+          [remote.id],
+        );
+
+        return this.formatResponse({ ...remote, is_default: true });
+      }
+
+      return null;
     } catch (error) {
       throw this.handleError(error, "getDefaultForDevice");
     }
@@ -147,7 +201,7 @@ class Remote extends BaseModel {
     try {
       const original = await this.findById(remoteId);
       if (!original) {
-        throw new Error("Пульт для дублирования не найден");
+        throw new Error("Пульт для ду��лирования не найден");
       }
 
       const duplicateData = {

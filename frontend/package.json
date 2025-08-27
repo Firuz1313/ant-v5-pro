@@ -6,6 +6,12 @@
     "dev": "vite",
     "build": "vite build",
     "test": "vitest --run",
+    "test:watch": "vitest",
+    "test:focus": "vitest --run src/__tests__/StepFormFocus.test.tsx",
+    "test:regression": "vitest --run src/__tests__/regression/",
+    "test:all-focus": "npm run test:focus && npm run test:regression",
+    "e2e": "playwright test",
+    "e2e:focus": "playwright test e2e/step-form-focus.spec.ts",
     "format.fix": "prettier --write .",
     "typecheck": "tsc"
   },

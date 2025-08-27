@@ -85,10 +85,10 @@ interface RemoteTemplate {
   model: string;
   description: string;
   layout: "standard" | "compact" | "smart" | "custom";
-  color_scheme: string;
-  image_url?: string;
-  image_data?: string;
-  svg_data?: string;
+  colorScheme: string;
+  imageUrl?: string;
+  imageData?: string;
+  svgData?: string;
   dimensions: { width: number; height: number };
   buttons: RemoteButton[];
   zones?: Array<{
@@ -101,10 +101,10 @@ interface RemoteTemplate {
     color?: string;
     description?: string;
   }>;
-  device_id?: string | null;
-  is_default: boolean;
-  is_active: boolean;
-  usage_count: number;
+  deviceId?: string | null;
+  isDefault: boolean;
+  isActive: boolean;
+  usageCount: number;
   last_used?: string;
   metadata?: Record<string, any>;
   created_at: string;
@@ -164,14 +164,15 @@ const RemoteBuilder = () => {
   // Изв��екаем массивы данны�� из ответа API
   const devices = devicesResponse?.data || [];
   const remotes: RemoteTemplate[] = remotesResponse?.data || [];
-  const getActiveDevices = () => devices.filter((d: any) => d.is_active);
+  const getActiveDevices = () =>
+    devices.filter((d: any) => d.isActive === true);
   const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
   const getRemotesForDevice = (deviceId: string) =>
-    remotes.filter((r: any) => r.device_id === deviceId);
+    remotes.filter((r: any) => r.deviceId === deviceId);
   const canDeleteRemote = (id: string) => ({ canDelete: true, reason: "" });
   const getRemoteUsageCount = (id: string) => {
     const remote = remotes.find((r) => r.id === id);
-    return remote?.usage_count || 0;
+    return remote?.usageCount || 0;
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -282,9 +283,9 @@ const RemoteBuilder = () => {
       filterLayout === "all" || remote.layout === filterLayout;
     const matchesDevice =
       filterDevice === "all" ||
-      remote.device_id === filterDevice ||
+      remote.deviceId === filterDevice ||
       (filterDevice === "universal" &&
-        (!remote.device_id || remote.device_id === ""));
+        (!remote.deviceId || remote.deviceId === ""));
     return matchesSearch && matchesLayout && matchesDevice;
   });
 
@@ -342,7 +343,7 @@ const RemoteBuilder = () => {
             formData.deviceId === "universal" ? null : formData.deviceId,
           layout: formData.layout,
           color_scheme: formData.colorScheme,
-          image_data: previewImageUrl || selectedRemote.image_data,
+          image_data: previewImageUrl || selectedRemote.imageData,
         },
       });
 
@@ -384,11 +385,11 @@ const RemoteBuilder = () => {
       await updateRemoteMutation.mutateAsync({
         id: remoteId,
         data: {
-          is_active: !remote.is_active,
+          is_active: !remote.isActive,
         },
       });
       toast.success(
-        `Пульт ${remote.is_active ? "деактивирован" : "активирован"}`,
+        `Пульт ${remote.isActive ? "деакти��ирован" : "активирован"}`,
       );
     } catch (error: any) {
       console.error("Error toggling remote status:", error);
@@ -398,12 +399,12 @@ const RemoteBuilder = () => {
 
   const handleSetDefault = async (remoteId: string) => {
     const remote = remotes.find((r) => r.id === remoteId);
-    if (!remote?.device_id) return;
+    if (!remote?.deviceId) return;
 
     try {
       await setDefaultMutation.mutateAsync({
         remoteId,
-        deviceId: remote.device_id,
+        deviceId: remote.deviceId,
       });
       toast.success("Пульт устано��лен по умолчанию");
     } catch (error: any) {
@@ -423,7 +424,7 @@ const RemoteBuilder = () => {
       toast.success("Пульт дублирован успешно");
     } catch (error: any) {
       console.error("Error duplicating remote:", error);
-      toast.error(error?.message || "Ошибк�� при дублировании пульта");
+      toast.error(error?.message || "Ошибк�� при дублировани�� пульта");
     }
   };
 
@@ -435,16 +436,16 @@ const RemoteBuilder = () => {
       model: remote.model || "",
       description: remote.description || "",
       layout: remote.layout || "standard",
-      colorScheme: remote.color_scheme || "dark",
-      deviceId: remote.device_id || "universal",
+      colorScheme: remote.colorScheme || "dark",
+      deviceId: remote.deviceId || "universal",
     });
-    setPreviewImageUrl(remote.image_data || null);
+    setPreviewImageUrl(remote.imageData || null);
     setIsEditDialogOpen(true);
   };
 
   const openEditorDialog = (remote: RemoteTemplate) => {
     setSelectedRemote(remote);
-    setPreviewImageUrl(remote.image_data || null);
+    setPreviewImageUrl(remote.imageData || null);
     setIsEditorDialogOpen(true);
     setIsEditingMode(false);
     setSelectedButton(null);
@@ -1001,7 +1002,7 @@ const RemoteBuilder = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="manufacturer">Производитель</Label>
+                    <Label htmlFor="manufacturer">П��оизводитель</Label>
                     <Input
                       id="manufacturer"
                       value={formData.manufacturer || ""}
@@ -1025,7 +1026,7 @@ const RemoteBuilder = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, model: e.target.value })
                       }
-                      placeholder="Модель пульта"
+                      placeholder="М��дель пульта"
                     />
                   </div>
                   <div>
@@ -1041,11 +1042,18 @@ const RemoteBuilder = () => {
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="universal">Универсальный</SelectItem>
-                        {activeDevices.map((device) => (
-                          <SelectItem key={device.id} value={device.id}>
-                            {device.name}
-                          </SelectItem>
-                        ))}
+                        {activeDevices.length > 0 ? (
+                          activeDevices.map((device) => (
+                            <SelectItem key={device.id} value={device.id}>
+                              {device.name}
+                            </SelectItem>
+                          ))
+                        ) : (
+                          <div className="px-2 py-1 text-sm text-gray-500">
+                            Нет доступных устройств. Создайте устройство
+                            сначала.
+                          </div>
+                        )}
                       </SelectContent>
                     </Select>
                   </div>
@@ -1232,8 +1240,8 @@ const RemoteBuilder = () => {
       {/* Remotes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRemotes.map((remote) => {
-          const device = remote.device_id
-            ? getDeviceById(remote.device_id)
+          const device = remote.deviceId
+            ? getDeviceById(remote.deviceId)
             : null;
           const usageCount = getRemoteUsageCount(remote.id);
 
@@ -1246,8 +1254,8 @@ const RemoteBuilder = () => {
                     {remote.is_default && (
                       <Badge variant="default">По умолчанию</Badge>
                     )}
-                    <Badge variant={remote.is_active ? "default" : "secondary"}>
-                      {remote.is_active ? "Активный" : "Не��ктивный"}
+                    <Badge variant={remote.isActive ? "default" : "secondary"}>
+                      {remote.isActive ? "А��тивный" : "Неактивный"}
                     </Badge>
                   </div>
                 </div>
@@ -1269,9 +1277,9 @@ const RemoteBuilder = () => {
 
                   {/* Remote Preview */}
                   <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-48 flex items-center justify-center relative">
-                    {remote.image_data ? (
+                    {remote.imageData ? (
                       <img
-                        src={remote.image_data}
+                        src={remote.imageData}
                         alt={remote.name}
                         className="max-w-full max-h-full object-contain"
                       />
@@ -1355,9 +1363,9 @@ const RemoteBuilder = () => {
                         <DropdownMenuItem
                           onClick={() => handleToggleStatus(remote.id)}
                         >
-                          {remote.is_active ? "Деактивировать" : "Активировать"}
+                          {remote.isActive ? "Деактивировать" : "Активировать"}
                         </DropdownMenuItem>
-                        {!remote.is_default && remote.device_id && (
+                        {!remote.isDefault && remote.deviceId && (
                           <DropdownMenuItem
                             onClick={() => handleSetDefault(remote.id)}
                           >
@@ -1463,15 +1471,21 @@ const RemoteBuilder = () => {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Выберите приставку" />
+                    <SelectValue placeholder="Выберите прис��авку" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="universal">Универсальный</SelectItem>
-                    {activeDevices.map((device) => (
-                      <SelectItem key={device.id} value={device.id}>
-                        {device.name}
-                      </SelectItem>
-                    ))}
+                    {activeDevices.length > 0 ? (
+                      activeDevices.map((device) => (
+                        <SelectItem key={device.id} value={device.id}>
+                          {device.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="px-2 py-1 text-sm text-gray-500">
+                        Нет доступных устройств. Создайте устройство сначала.
+                      </div>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
