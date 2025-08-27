@@ -323,7 +323,7 @@ class Device extends BaseModel {
         LEFT JOIN problems p ON d.id = p.device_id
         LEFT JOIN remotes r ON d.id = r.device_id AND r.is_active = true
         LEFT JOIN tv_interfaces tv ON d.id = tv.device_id AND tv.is_active = true
-        LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id AND ds.end_time IS NULL
+        LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id AND ds.is_active = true
         WHERE ${whereConditions.join(' AND ')}
         GROUP BY d.id
         ORDER BY d.order_index ASC, d.created_at DESC
