@@ -273,6 +273,7 @@ const DiagnosticPage = () => {
                   <RemoteControl
                     remote={remote}
                     highlightButton={currentStepData?.highlightRemoteButton}
+                    showButtonPosition={currentStepData?.buttonPosition}
                     onButtonClick={handleManualProgress}
                   />
                 ) : (
