@@ -171,6 +171,7 @@ const StepFormFields = React.memo(({
       <div>
         <Label htmlFor={isEdit ? "edit-title" : "title"}>Название шага *</Label>
         <Input
+          key={isEdit ? "edit-title" : "title"}
           id={isEdit ? "edit-title" : "title"}
           value={formData.title}
           onChange={(e) => handleFieldChange("title", e.target.value)}
@@ -181,6 +182,7 @@ const StepFormFields = React.memo(({
       <div>
         <Label htmlFor={isEdit ? "edit-description" : "description"}>Описание</Label>
         <Textarea
+          key={isEdit ? "edit-description" : "description"}
           id={isEdit ? "edit-description" : "description"}
           value={formData.description}
           onChange={(e) => handleFieldChange("description", e.target.value)}
@@ -191,6 +193,7 @@ const StepFormFields = React.memo(({
       <div>
         <Label htmlFor={isEdit ? "edit-instruction" : "instruction"}>Инструкция *</Label>
         <Textarea
+          key={isEdit ? "edit-instruction" : "instruction"}
           id={isEdit ? "edit-instruction" : "instruction"}
           value={formData.instruction}
           onChange={(e) => handleFieldChange("instruction", e.target.value)}
@@ -350,7 +353,7 @@ const StepsManagerFixed = () => {
     } catch (error) {
       console.error("❌ Error loading initial data:", error);
       toast({
-        title: "Ошибка загрузк��",
+        title: "Ошибка загрузки",
         description: "Не удалось загрузить данные шагов",
         variant: "destructive",
       });
@@ -548,7 +551,7 @@ const StepsManagerFixed = () => {
     if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
       toast({
         title: "Ошибка валидации",
-        description: "Заполните все обязательные поля: устройство, проблема, название и инструкция",
+        description: "Заполните все обязательные поля: устройство, проблема, назван��е и инструкция",
         variant: "destructive",
       });
       return;
@@ -940,7 +943,7 @@ const StepsManagerFixed = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Кликните на из��бражение пульта, чтобы указать позицию кнопки
+                      Кликните на изображение пульта, чтобы указать позицию кнопки
                     </p>
                   </AlertDescription>
                 </Alert>
@@ -970,7 +973,7 @@ const StepsManagerFixed = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Управление шагами (Исправлено)</h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание шагов диагностики с привязкой к приставкам и пр��блемам
+            Создание шагов диагностики с привязкой к приставкам и проблемам
           </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
