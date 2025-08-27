@@ -62,7 +62,7 @@ import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
 import { remotesApi } from "@/api";
 
-console.log("���🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! ��🔥🔥");
+console.log("����🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! ��🔥🔥");
 
 interface RemoteButton {
   id: string;
@@ -131,7 +131,7 @@ const RemoteBuilder = () => {
       .getAll()
       .then((result) => {
         console.log(
-          "✅✅✅ RemoteBuilder: remotesApi.getAll SUCCESS ���✅✅",
+          "✅✅✅ RemoteBuilder: remotesApi.getAll SUCCESS ✅✅✅",
           result,
         );
       })
@@ -342,7 +342,7 @@ const RemoteBuilder = () => {
             formData.deviceId === "universal" ? null : formData.deviceId,
           layout: formData.layout,
           color_scheme: formData.colorScheme,
-          image_data: previewImageUrl || selectedRemote.image_data,
+          image_data: previewImageUrl || selectedRemote.imageData,
         },
       });
 
@@ -1289,7 +1289,7 @@ const RemoteBuilder = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Производитель:
+                        Прои��водитель:
                       </span>
                       <span className="font-medium">{remote.manufacturer}</span>
                     </div>
