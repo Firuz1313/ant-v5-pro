@@ -958,14 +958,29 @@ const StepsManagerFixed = () => {
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Plus className="h-4 w-4 mr-2" />
-              Создать нов��й шаг
+              Создать новый шаг
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
             <DialogHeader>
               <DialogTitle>Создать новый шаг</DialogTitle>
             </DialogHeader>
-            <StepFormFields />
+            <StepFormFields
+              isEdit={false}
+              formData={formData}
+              handleFieldChange={handleFieldChange}
+              handleDeviceChange={handleDeviceChange}
+              devices={devices}
+              problems={problems}
+              remotes={remotes}
+              tvInterfaces={tvInterfaces}
+              loadingTVInterfaces={loadingTVInterfaces}
+              getActiveDevices={getActiveDevices}
+              getAvailableProblems={getAvailableProblems}
+              getAvailableRemotes={getAvailableRemotes}
+              openTVInterfaceEditor={openTVInterfaceEditor}
+              openRemoteEditor={openRemoteEditor}
+            />
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                 Отмена
@@ -1158,7 +1173,7 @@ const StepsManagerFixed = () => {
                               ) : (
                                 <Eye className="h-4 w-4 mr-2" />
                               )}
-                              {step.isActive ? "Деактивировать" : "Активировать"}
+                              {step.isActive ? "Деактивировать" : "Активирова��ь"}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDelete(step.id)} className="text-red-600">
                               <Trash2 className="h-4 w-4 mr-2" />
