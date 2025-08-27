@@ -303,7 +303,7 @@ const StepFormFields = React.memo<{
                       )}
                       {remote.name}
                       {remote.isDefault && (
-                        <span className="ml-2 text-xs text-blue-600">(по умолчанию)</span>
+                        <span className="ml-2 text-xs text-blue-600">(по умолчан��ю)</span>
                       )}
                     </div>
                   </SelectItem>
@@ -398,6 +398,41 @@ const StepsManagerFixed = () => {
     remoteId: "none",
     buttonPosition: { x: 0, y: 0 },
   });
+
+  // Define loadInitialData function before useEffect
+  const loadInitialData = async () => {
+    try {
+      setLoading(true);
+
+      // Load steps
+      const stepsResponse = await stepsApi.getSteps(1, 1000);
+      console.log("🔍 Steps response:", stepsResponse);
+
+      const stepsData = stepsResponse?.data || [];
+      setSteps(Array.isArray(stepsData) ? stepsData : []);
+
+      // Load remotes
+      const remotesResponse = await remotesApi.getAll();
+      console.log("🔍 Remotes response:", remotesResponse);
+
+      const remotesData = remotesResponse?.data || remotesResponse || [];
+      setRemotes(Array.isArray(remotesData) ? remotesData : []);
+
+      console.log("✅ Loaded data:", {
+        steps: Array.isArray(stepsData) ? stepsData.length : 0,
+        remotes: Array.isArray(remotesData) ? remotesData.length : 0,
+      });
+    } catch (error) {
+      console.error("❌ Error loading initial data:", error);
+      toast({
+        title: "Ошибка загрузки",
+        description: "Не удалось загрузить данные шагов",
+        variant: "destructive",
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Load initial data
   useEffect(() => {
@@ -619,7 +654,7 @@ const StepsManagerFixed = () => {
       resetForm();
 
       toast({
-        title: "Успех",
+        title: "Ус��ех",
         description: "Шаг успешно создан",
         variant: "default",
       });
@@ -1144,7 +1179,7 @@ const StepsManagerFixed = () => {
                           <DropdownMenuContent align="end">
                             <DropdownMenuItem onClick={() => openEditDialog(step)}>
                               <Edit className="h-4 w-4 mr-2" />
-                              Редактировать
+                              Р��дактировать
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleToggleStatus(step.id)}>
                               {step.isActive ? (
