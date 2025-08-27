@@ -62,7 +62,7 @@ import { toast } from "sonner";
 import type { RemoteFilters } from "@/api/remotes";
 import { remotesApi } from "@/api";
 
-console.log("����🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! ��🔥🔥");
+console.log("���🔥🔥 RemoteBuilder: FILE LOADED! Imports completed! ��🔥🔥");
 
 interface RemoteButton {
   id: string;
@@ -86,9 +86,9 @@ interface RemoteTemplate {
   description: string;
   layout: "standard" | "compact" | "smart" | "custom";
   colorScheme: string;
-  image_url?: string;
-  image_data?: string;
-  svg_data?: string;
+  imageUrl?: string;
+  imageData?: string;
+  svgData?: string;
   dimensions: { width: number; height: number };
   buttons: RemoteButton[];
   zones?: Array<{
@@ -438,13 +438,13 @@ const RemoteBuilder = () => {
       colorScheme: remote.colorScheme || "dark",
       deviceId: remote.deviceId || "universal",
     });
-    setPreviewImageUrl(remote.image_data || null);
+    setPreviewImageUrl(remote.imageData || null);
     setIsEditDialogOpen(true);
   };
 
   const openEditorDialog = (remote: RemoteTemplate) => {
     setSelectedRemote(remote);
-    setPreviewImageUrl(remote.image_data || null);
+    setPreviewImageUrl(remote.imageData || null);
     setIsEditorDialogOpen(true);
     setIsEditingMode(false);
     setSelectedButton(null);
@@ -1269,9 +1269,9 @@ const RemoteBuilder = () => {
 
                   {/* Remote Preview */}
                   <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 h-48 flex items-center justify-center relative">
-                    {remote.image_data ? (
+                    {remote.imageData ? (
                       <img
-                        src={remote.image_data}
+                        src={remote.imageData}
                         alt={remote.name}
                         className="max-w-full max-h-full object-contain"
                       />
@@ -1289,7 +1289,7 @@ const RemoteBuilder = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Прои��водитель:
+                        Производитель:
                       </span>
                       <span className="font-medium">{remote.manufacturer}</span>
                     </div>
