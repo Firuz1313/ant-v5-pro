@@ -380,8 +380,12 @@ const ProblemsManager = () => {
   const handleDelete = async () => {
     if (!problemToDelete) return;
 
-    console.log(`🗑️ Hard delete requested for problem ID: ${problemToDelete.id}`);
-    console.log(`🚀 Starting hard delete mutation for problem ${problemToDelete.id}`);
+    console.log(
+      `🗑️ Hard delete requested for problem ID: ${problemToDelete.id}`,
+    );
+    console.log(
+      `🚀 Starting hard delete mutation for problem ${problemToDelete.id}`,
+    );
     try {
       // Явно указываем force: true для полного удаления из базы
       const result = await deleteProblemMutation.mutateAsync({
@@ -1229,14 +1233,16 @@ const ProblemsManager = () => {
       )}
 
       {/* Success Modal */}
-      <AlertDialog open={isSuccessModalOpen} onOpenChange={setIsSuccessModalOpen}>
+      <AlertDialog
+        open={isSuccessModalOpen}
+        onOpenChange={setIsSuccessModalOpen}
+      >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Проблема успешно создана!
-            </AlertDialogTitle>
+            <AlertDialogTitle>Проблема успешно создана!</AlertDialogTitle>
             <AlertDialogDescription>
-              Проблема "{createdProblemTitle}" была успешно добавлена в систему и готова к использованию.
+              Проблема "{createdProblemTitle}" была успешно добавлена в систему
+              и готова к использованию.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1251,18 +1257,20 @@ const ProblemsManager = () => {
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Удалить проблему?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Удалить проблему?</AlertDialogTitle>
             <AlertDialogDescription>
-              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы данных? Это действие нельзя отменить! Проблема "{problemToDelete?.title}" будет удалена навсегда.
+              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы
+              данных? Это действие нельзя отменить! Проблема "
+              {problemToDelete?.title}" будет удалена навсегда.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => {
-              setIsDeleteModalOpen(false);
-              setProblemToDelete(null);
-            }}>
+            <AlertDialogCancel
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setProblemToDelete(null);
+              }}
+            >
               Отмена
             </AlertDialogCancel>
             <AlertDialogAction

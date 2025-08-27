@@ -1485,18 +1485,20 @@ const StepsManagerFixed = () => {
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Удалить шаг?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Удалить шаг?</AlertDialogTitle>
             <AlertDialogDescription>
-              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из базы данных? Это действие нельзя отменить! Шаг "{stepToDelete?.title}" будет удален навсегда.
+              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из базы данных?
+              Это действие нельзя отменить! Шаг "{stepToDelete?.title}" будет
+              удален навсегда.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => {
-              setIsDeleteModalOpen(false);
-              setStepToDelete(null);
-            }}>
+            <AlertDialogCancel
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setStepToDelete(null);
+              }}
+            >
               Отмена
             </AlertDialogCancel>
             <AlertDialogAction

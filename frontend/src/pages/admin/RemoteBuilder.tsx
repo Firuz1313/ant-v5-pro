@@ -199,7 +199,9 @@ const RemoteBuilder = () => {
   const [isEditorDialogOpen, setIsEditorDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [remoteToDelete, setRemoteToDelete] = useState<RemoteTemplate | null>(null);
+  const [remoteToDelete, setRemoteToDelete] = useState<RemoteTemplate | null>(
+    null,
+  );
   const [filterLayout, setFilterLayout] = useState<string>("all");
   const [filterDevice, setFilterDevice] = useState<string>("all");
 
@@ -1632,18 +1634,19 @@ const RemoteBuilder = () => {
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>
-              Удалить пульт?
-            </AlertDialogTitle>
+            <AlertDialogTitle>Удалить пульт?</AlertDialogTitle>
             <AlertDialogDescription>
-              Вы уверены, что хотите удалить этот пульт? Это действие нельзя отменить! Пульт "{remoteToDelete?.name}" будет удален навсегда.
+              Вы уверены, что хотите удалить этот пульт? Это действие нельзя
+              отменить! Пульт "{remoteToDelete?.name}" будет удален навсегда.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => {
-              setIsDeleteModalOpen(false);
-              setRemoteToDelete(null);
-            }}>
+            <AlertDialogCancel
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setRemoteToDelete(null);
+              }}
+            >
               Отмена
             </AlertDialogCancel>
             <AlertDialogAction
