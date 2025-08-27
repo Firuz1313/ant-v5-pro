@@ -587,25 +587,6 @@ const StepsManagerFixed = () => {
     }
   };
 
-  // Memoized stable field change handler
-  const handleFieldChange = useCallback((field: string, value: any) => {
-    setFormData((prev) => ({ ...prev, [field]: value }));
-  }, []);
-
-  // Memoized stable device change handler
-  const handleDeviceChange = useCallback(
-    (value: string) => {
-      const defaultRemote = remotes.find((r: any) => r.deviceId === value && r.isDefault);
-      setFormData((prev) => ({
-        ...prev,
-        deviceId: value,
-        problemId: "", // Reset problem when device changes
-        remoteId: defaultRemote?.id || "none",
-      }));
-    },
-    [remotes],
-  );
-
   // Memoized computed values for optimal performance
   const filteredSteps = useMemo(() => {
     return steps.filter((step) => {
