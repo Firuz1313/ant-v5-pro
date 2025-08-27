@@ -369,23 +369,36 @@ const RemoteBuilder = () => {
     }
   };
 
-  const handleDelete = async (remoteId: string) => {
-    const deleteCheck = canDeleteRemote(remoteId);
+  const openDeleteModal = (remote: RemoteTemplate) => {
+    setRemoteToDelete(remote);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!remoteToDelete) return;
+
+    const deleteCheck = canDeleteRemote(remoteToDelete.id);
     if (!deleteCheck.canDelete) {
       toast.error(deleteCheck.reason);
-      return;
-    }
-
-    if (!confirm("��ы уверены, что хотите удалить этот пульт?")) {
+      setIsDeleteModalOpen(false);
+      setRemoteToDelete(null);
       return;
     }
 
     try {
-      await deleteRemoteMutation.mutateAsync(remoteId);
+      await deleteRemoteMutation.mutateAsync(remoteToDelete.id);
       toast.success("Пульт удален успешно");
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setRemoteToDelete(null);
     } catch (error: any) {
       console.error("Error deleting remote:", error);
       toast.error(error?.message || "Ошибка при удалении пульта");
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setRemoteToDelete(null);
     }
   };
 
@@ -1534,7 +1547,7 @@ const RemoteBuilder = () => {
                 <div className="mt-2">
                   <img
                     src={previewImageUrl}
-                    alt="Предварительный просмотр"
+                    alt="Предварительный просм��тр"
                     className="w-full h-32 object-contain bg-gray-100 dark:bg-gray-800 rounded"
                   />
                 </div>
