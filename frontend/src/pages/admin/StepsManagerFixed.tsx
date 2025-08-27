@@ -55,6 +55,7 @@ import {
   EyeOff,
   Monitor,
   Settings,
+  GripVertical,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -70,6 +71,23 @@ import { useProblems } from "@/hooks/useProblems";
 import { tvInterfacesAPI } from "@/api/tvInterfaces";
 import { TVInterface, tvInterfaceUtils } from "@/types/tvInterface";
 import { stepsApi, remotesApi } from "@/api";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface DiagnosticStep {
   id: string;
@@ -421,7 +439,152 @@ const StepFormFields = React.memo<{
 
 StepFormFields.displayName = "StepFormFields";
 
+// Sortable Step Item Component
+const SortableStepItem = React.memo<{
+  step: DiagnosticStep;
+  getRemoteById: (id: string) => any;
+  onEdit: (step: DiagnosticStep) => void;
+  onToggleStatus: (stepId: string) => void;
+  onDelete: (step: DiagnosticStep) => void;
+}>(({ step, getRemoteById, onEdit, onToggleStatus, onDelete }) => {
+  const {
+    attributes,
+    listeners,
+    setNodeRef,
+    transform,
+    transition,
+    isDragging,
+  } = useSortable({ id: step.id });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
+    >
+      <div className="flex items-center justify-between">
+        <div className="flex items-center space-x-4 flex-1">
+          {/* Drag Handle (Hamburger Icon) */}
+          <div
+            {...attributes}
+            {...listeners}
+            className="cursor-grab active:cursor-grabbing p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
+            title="Перетащите для изменения порядка"
+          >
+            <GripVertical className="h-5 w-5" />
+          </div>
+
+          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
+            <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
+              {step.stepNumber}
+            </span>
+          </div>
+
+          <div className="flex-1">
+            <div className="flex items-center space-x-2 mb-1">
+              <h4 className="font-semibold text-gray-900 dark:text-white">
+                {step.title}
+              </h4>
+              <Badge variant={step.isActive ? "default" : "secondary"}>
+                {step.isActive ? "Активный" : "Неактив��ый"}
+              </Badge>
+              {step.requiredAction && (
+                <Badge variant="outline">
+                  <PlayCircle className="h-3 w-3 mr-1" />
+                  Автопереход
+                </Badge>
+              )}
+              {step.remoteId && (
+                <Badge variant="outline">
+                  <MousePointer className="h-3 w-3 mr-1" />
+                  Пульт
+                </Badge>
+              )}
+              {step.tvInterfaceId && (
+                <Badge variant="outline">
+                  <Monitor className="h-3 w-3 mr-1" />
+                  ТВ интерфейс
+                </Badge>
+              )}
+              {step.buttonPosition && (
+                <Badge variant="outline">
+                  <Target className="h-3 w-3 mr-1" />
+                  Позиция
+                </Badge>
+              )}
+            </div>
+            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
+              {step.description}
+            </p>
+            <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
+              {step.remoteId && (
+                <span>
+                  Пульт: {getRemoteById(step.remoteId)?.name || "Неизвестный"}
+                </span>
+              )}
+              {step.buttonPosition && (
+                <span>
+                  Позиция: ({Math.round(step.buttonPosition.x)},{" "}
+                  {Math.round(step.buttonPosition.y)})
+                </span>
+              )}
+              {step.tvInterfaceId && (
+                <span>ТВ интерфейс: {step.tvInterfaceId}</span>
+              )}
+              <span>Обновлено: {step.updatedAt}</span>
+            </div>
+          </div>
+        </div>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon">
+              <MoreVertical className="h-4 w-4" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => onEdit(step)}>
+              <Edit className="h-4 w-4 mr-2" />
+              Редактировать
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => onToggleStatus(step.id)}>
+              {step.isActive ? (
+                <EyeOff className="h-4 w-4 mr-2" />
+              ) : (
+                <Eye className="h-4 w-4 mr-2" />
+              )}
+              {step.isActive ? "Деактивировать" : "Активировать"}
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={() => onDelete(step)}
+              className="text-red-600"
+            >
+              <Trash2 className="h-4 w-4 mr-2" />
+              Удалить
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+    </div>
+  );
+});
+
+SortableStepItem.displayName = "SortableStepItem";
+
 const StepsManagerFixed = () => {
+  // Drag and drop sensors
+  const sensors = useSensors(
+    useSensor(PointerSensor),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    }),
+  );
   const {
     data: devicesResponse,
     isLoading: devicesLoading,
@@ -634,13 +797,123 @@ const StepsManagerFixed = () => {
     return remotes.filter((r: any) => r.deviceId === filterDevice);
   }, [filterDevice, activeRemotes, remotes]);
 
+  // Handle drag end - defined after groupedSteps to avoid circular dependency
+  const handleDragEnd = useCallback(
+    async (event: DragEndEvent) => {
+      const { active, over } = event;
+
+      if (!over || active.id === over.id) {
+        return;
+      }
+
+      // Find the group and steps being reordered
+      let targetGroup: {
+        deviceId: string;
+        problemId: string;
+        steps: DiagnosticStep[];
+      } | null = null;
+      let activeStep: DiagnosticStep | null = null;
+      let overStep: DiagnosticStep | null = null;
+
+      // Find the group containing the dragged step
+      Object.values(groupedSteps).forEach((group) => {
+        const activeStepInGroup = group.steps.find(
+          (step) => step.id === active.id,
+        );
+        const overStepInGroup = group.steps.find((step) => step.id === over.id);
+
+        if (activeStepInGroup && overStepInGroup) {
+          targetGroup = group;
+          activeStep = activeStepInGroup;
+          overStep = overStepInGroup;
+        }
+      });
+
+      if (!targetGroup || !activeStep || !overStep) {
+        console.error("Could not find steps for reordering");
+        return;
+      }
+
+      try {
+        // Get the current order of steps in this group
+        const currentSteps = [...targetGroup.steps].sort(
+          (a, b) => a.stepNumber - b.stepNumber,
+        );
+        const activeIndex = currentSteps.findIndex(
+          (step) => step.id === active.id,
+        );
+        const overIndex = currentSteps.findIndex((step) => step.id === over.id);
+
+        if (activeIndex === -1 || overIndex === -1) {
+          console.error("Could not find step indexes");
+          return;
+        }
+
+        // Reorder the steps array
+        const reorderedSteps = arrayMove(currentSteps, activeIndex, overIndex);
+
+        // Create the new step IDs array in the correct order
+        const stepIds = reorderedSteps.map((step) => step.id);
+
+        console.log("Reordering steps:", {
+          problemId: targetGroup.problemId,
+          stepIds,
+          from: activeIndex + 1,
+          to: overIndex + 1,
+        });
+
+        // Update local state immediately for smooth UX
+        setSteps((prevSteps) => {
+          const newSteps = [...prevSteps];
+
+          // Update step numbers for the reordered steps
+          reorderedSteps.forEach((step, index) => {
+            const stepIndex = newSteps.findIndex((s) => s.id === step.id);
+            if (stepIndex !== -1) {
+              newSteps[stepIndex] = {
+                ...newSteps[stepIndex],
+                stepNumber: index + 1,
+              };
+            }
+          });
+
+          return newSteps;
+        });
+
+        // Send reorder request to backend
+        await stepsApi.reorderSteps(targetGroup.problemId, stepIds);
+
+        toast({
+          title: "Успех",
+          description: `Порядок шагов обновлен: шаг "${activeStep.title}" перемещен с позиции ${activeIndex + 1} на позицию ${overIndex + 1}`,
+          variant: "default",
+        });
+
+        // Reload data to ensure consistency
+        await loadInitialData();
+      } catch (error) {
+        console.error("Error reordering steps:", error);
+
+        // Revert local changes on error
+        await loadInitialData();
+
+        toast({
+          title: "Ошибка",
+          description: `Не удалось изменить порядок шагов: ${error?.message || "Неизвестная ошибка"}`,
+          variant: "destructive",
+        });
+      }
+    },
+    [groupedSteps, toast, loadInitialData],
+  );
+
   const openRemoteEditor = useCallback(() => {
     const remote = getRemoteById(formData.remoteId);
     if (remote) {
       setSelectedRemote(remote);
       setIsRemoteEditorOpen(true);
     }
-  }, [formData.remoteId, remotes]);
+  }, [formData.remoteId, getRemoteById]);
 
   const openTVInterfaceEditor = useCallback((tvInterface: TVInterface) => {
     console.log("Opening TV Interface Editor with:", tvInterface);
@@ -807,7 +1080,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обяза��ельные поля: устройство, проблема, название и инструк��ия",
+          "Заполните все обяза��ельные поля: устройство, проблема, название и инст��ук��ия",
         variant: "destructive",
       });
       return;
@@ -1113,7 +1386,7 @@ const StepsManagerFixed = () => {
                     <Target className="h-4 w-4" />
                     <AlertDescription>
                       <p className="text-sm text-green-700 dark:text-green-300">
-                        Позиция выбрана: (
+                        Пози��ия выбрана: (
                         {Math.round(formData.buttonPosition.x)},{" "}
                         {Math.round(formData.buttonPosition.y)})
                       </p>
@@ -1279,142 +1552,59 @@ const StepsManagerFixed = () => {
         </CardContent>
       </Card>
 
-      {/* Steps List - Grouped by Device and Problem */}
-      <div className="space-y-6">
-        {Object.entries(groupedSteps).map(([key, group]) => (
-          <Card key={key}>
-            <CardHeader>
-              <CardTitle className="flex items-center">
-                <Layers className="h-5 w-5 mr-2" />
-                <Tv className="h-4 w-4 mr-2" />
-                {getDeviceName(group.deviceId)} -{" "}
-                {getProblemTitle(group.problemId)}
-                <Badge variant="secondary" className="ml-2">
-                  {group.steps.length} шагов
-                </Badge>
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                {group.steps
-                  .sort((a, b) => a.stepNumber - b.stepNumber)
-                  .map((step) => (
-                    <div
-                      key={step.id}
-                      className="border border-gray-200 dark:border-gray-700 rounded-lg p-4"
-                    >
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center space-x-4 flex-1">
-                          <div className="w-8 h-8 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center">
-                            <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
-                              {step.stepNumber}
-                            </span>
-                          </div>
+      {/* Steps List - Grouped by Device and Problem with Drag-and-Drop */}
+      <DndContext
+        sensors={sensors}
+        collisionDetection={closestCenter}
+        onDragEnd={handleDragEnd}
+      >
+        <div className="space-y-6">
+          {Object.entries(groupedSteps).map(([key, group]) => {
+            const sortedSteps = group.steps.sort(
+              (a, b) => a.stepNumber - b.stepNumber,
+            );
 
-                          <div className="flex-1">
-                            <div className="flex items-center space-x-2 mb-1">
-                              <h4 className="font-semibold text-gray-900 dark:text-white">
-                                {step.title}
-                              </h4>
-                              <Badge
-                                variant={
-                                  step.isActive ? "default" : "secondary"
-                                }
-                              >
-                                {step.isActive ? "Активный" : "Неактивный"}
-                              </Badge>
-                              {step.requiredAction && (
-                                <Badge variant="outline">
-                                  <PlayCircle className="h-3 w-3 mr-1" />
-                                  Автопереход
-                                </Badge>
-                              )}
-                              {step.remoteId && (
-                                <Badge variant="outline">
-                                  <MousePointer className="h-3 w-3 mr-1" />
-                                  Пульт
-                                </Badge>
-                              )}
-                              {step.tvInterfaceId && (
-                                <Badge variant="outline">
-                                  <Monitor className="h-3 w-3 mr-1" />
-                                  ТВ интерфейс
-                                </Badge>
-                              )}
-                              {step.buttonPosition && (
-                                <Badge variant="outline">
-                                  <Target className="h-3 w-3 mr-1" />
-                                  Позиция
-                                </Badge>
-                              )}
-                            </div>
-                            <p className="text-gray-600 dark:text-gray-400 text-sm mb-2">
-                              {step.description}
-                            </p>
-                            <div className="flex items-center space-x-4 text-xs text-gray-500 dark:text-gray-400">
-                              {step.remoteId && (
-                                <span>
-                                  Пульт:{" "}
-                                  {getRemoteById(step.remoteId)?.name ||
-                                    "Неизвес��ный"}
-                                </span>
-                              )}
-                              {step.buttonPosition && (
-                                <span>
-                                  Позиция: ({Math.round(step.buttonPosition.x)},{" "}
-                                  {Math.round(step.buttonPosition.y)})
-                                </span>
-                              )}
-                              {step.tvInterfaceId && (
-                                <span>ТВ интерфейс: {step.tvInterfaceId}</span>
-                              )}
-                              <span>Обновлено: {step.updatedAt}</span>
-                            </div>
-                          </div>
-                        </div>
-
-                        <DropdownMenu>
-                          <DropdownMenuTrigger asChild>
-                            <Button variant="ghost" size="icon">
-                              <MoreVertical className="h-4 w-4" />
-                            </Button>
-                          </DropdownMenuTrigger>
-                          <DropdownMenuContent align="end">
-                            <DropdownMenuItem
-                              onClick={() => openEditDialog(step)}
-                            >
-                              <Edit className="h-4 w-4 mr-2" />
-                              Р��дактировать
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => handleToggleStatus(step.id)}
-                            >
-                              {step.isActive ? (
-                                <EyeOff className="h-4 w-4 mr-2" />
-                              ) : (
-                                <Eye className="h-4 w-4 mr-2" />
-                              )}
-                              {step.isActive
-                                ? "Деактивировать"
-                                : "Активировать"}
-                            </DropdownMenuItem>
-                            <DropdownMenuItem
-                              onClick={() => openDeleteModal(step)}
-                              className="text-red-600"
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Удалить
-                            </DropdownMenuItem>
-                          </DropdownMenuContent>
-                        </DropdownMenu>
-                      </div>
+            return (
+              <Card key={key}>
+                <CardHeader>
+                  <CardTitle className="flex items-center">
+                    <Layers className="h-5 w-5 mr-2" />
+                    <Tv className="h-4 w-4 mr-2" />
+                    {getDeviceName(group.deviceId)} -{" "}
+                    {getProblemTitle(group.problemId)}
+                    <Badge variant="secondary" className="ml-2">
+                      {group.steps.length} шагов
+                    </Badge>
+                  </CardTitle>
+                  <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
+                    💡 Используйте иконку ☰ для изменения порядка шагов методом
+                    перетаскивания
+                  </p>
+                </CardHeader>
+                <CardContent>
+                  <SortableContext
+                    items={sortedSteps.map((step) => step.id)}
+                    strategy={verticalListSortingStrategy}
+                  >
+                    <div className="space-y-3">
+                      {sortedSteps.map((step) => (
+                        <SortableStepItem
+                          key={step.id}
+                          step={step}
+                          getRemoteById={getRemoteById}
+                          onEdit={openEditDialog}
+                          onToggleStatus={handleToggleStatus}
+                          onDelete={openDeleteModal}
+                        />
+                      ))}
                     </div>
-                  ))}
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                  </SortableContext>
+                </CardContent>
+              </Card>
+            );
+          })}
+        </div>
+      </DndContext>
 
       {/* Remote Editor Dialog */}
       <Dialog open={isRemoteEditorOpen} onOpenChange={setIsRemoteEditorOpen}>
@@ -1485,7 +1675,7 @@ const StepsManagerFixed = () => {
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить шаг?</AlertDialogTitle>
+            <AlertDialogTitle>Удал��ть шаг?</AlertDialogTitle>
             <AlertDialogDescription>
               Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из базы данных?
               Это действие нельзя отменить! Шаг "{stepToDelete?.title}" будет
@@ -1516,7 +1706,7 @@ const StepsManagerFixed = () => {
           <CardContent className="p-12 text-center">
             <Layers className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Шаги не найдены
+              Шаги не найд��ны
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
               Создайте первый шаг диагностики или измените пар��метры фильтрации
