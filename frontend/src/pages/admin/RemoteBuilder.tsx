@@ -225,12 +225,6 @@ const RemoteBuilder = () => {
 
   const activeDevices = getActiveDevices();
 
-  // Debug information
-  console.log("🐞 DEBUG: devices =", devices);
-  console.log("🐞 DEBUG: activeDevices =", activeDevices);
-  console.log("🐞 DEBUG: total devices count =", devices.length);
-  console.log("🐞 DEBUG: active devices count =", activeDevices.length);
-
   const layouts = [
     { value: "standard", label: "Стандартный" },
     { value: "compact", label: "Компактный" },
@@ -394,7 +388,7 @@ const RemoteBuilder = () => {
         },
       });
       toast.success(
-        `Пульт ${remote.isActive ? "деактивирован" : "активирован"}`,
+        `Пульт ${remote.isActive ? "деакти��ирован" : "активирован"}`,
       );
     } catch (error: any) {
       console.error("Error toggling remote status:", error);
@@ -429,7 +423,7 @@ const RemoteBuilder = () => {
       toast.success("Пульт дублирован успешно");
     } catch (error: any) {
       console.error("Error duplicating remote:", error);
-      toast.error(error?.message || "Ошибк�� при дублировании пульта");
+      toast.error(error?.message || "Ошибк�� при дублировани�� пульта");
     }
   };
 
@@ -817,7 +811,7 @@ const RemoteBuilder = () => {
                               label: e.target.value,
                             })
                           }
-                          placeholder="Напри���ер: POWER"
+                          placeholder="Напри��ер: POWER"
                         />
                       </div>
                       <div>
@@ -1007,7 +1001,7 @@ const RemoteBuilder = () => {
                     />
                   </div>
                   <div>
-                    <Label htmlFor="manufacturer">Производитель</Label>
+                    <Label htmlFor="manufacturer">П��оизводитель</Label>
                     <Input
                       id="manufacturer"
                       value={formData.manufacturer || ""}
@@ -1046,7 +1040,7 @@ const RemoteBuilder = () => {
                         <SelectValue placeholder="Выберите приставку" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="universal">��ниверсальный</SelectItem>
+                        <SelectItem value="universal">Универсальный</SelectItem>
                         {activeDevices.length > 0 ? (
                           activeDevices.map((device) => (
                             <SelectItem key={device.id} value={device.id}>
@@ -1236,7 +1230,7 @@ const RemoteBuilder = () => {
       {remotesError && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-700">
-            Ошибка загрузки п��льтов: {(remotesError as any)?.message}
+            Ошибка загрузки пультов: {(remotesError as any)?.message}
           </p>
         </div>
       )}
@@ -1416,7 +1410,7 @@ const RemoteBuilder = () => {
             </Button>
             <Button onClick={saveRemoteChanges}>
               <Save className="h-4 w-4 mr-2" />
-              Сохрани��ь изменения
+              Сохранить изменения
             </Button>
           </div>
         </DialogContent>
@@ -1475,7 +1469,7 @@ const RemoteBuilder = () => {
                   }
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Выберите приставку" />
+                    <SelectValue placeholder="Выберите прис��авку" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="universal">Универсальный</SelectItem>
