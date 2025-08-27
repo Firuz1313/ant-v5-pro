@@ -73,18 +73,45 @@ class Remote extends BaseModel {
   }
 
   /**
-   * Получить пульт по умолчанию для устройства
+   * Получить пульт по у��олчанию для устройства
    */
   async getDefaultForDevice(deviceId) {
     try {
-      const result = await this.query(
-        `SELECT * FROM ${this.tableName} 
-         WHERE device_id = $1 AND is_default = true AND is_active = true 
+      // Сначала пытаемся найти пульт, явно помеченный как default
+      let result = await this.query(
+        `SELECT * FROM ${this.tableName}
+         WHERE device_id = $1 AND is_default = true AND is_active = true
          LIMIT 1`,
         [deviceId],
       );
 
-      return result.rows[0] ? this.formatResponse(result.rows[0]) : null;
+      if (result.rows[0]) {
+        return this.formatResponse(result.rows[0]);
+      }
+
+      // Если нет явно назначенного default, возвращаем наиболее используемый пульт
+      result = await this.query(
+        `SELECT * FROM ${this.tableName}
+         WHERE device_id = $1 AND is_active = true
+         ORDER BY usage_count DESC, created_at ASC
+         LIMIT 1`,
+        [deviceId],
+      );
+
+      if (result.rows[0]) {
+        // Автоматически устанавливаем найденный пульт как default
+        const remote = result.rows[0];
+        await this.query(
+          `UPDATE ${this.tableName}
+           SET is_default = true, updated_at = NOW()
+           WHERE id = $1`,
+          [remote.id],
+        );
+
+        return this.formatResponse({...remote, is_default: true});
+      }
+
+      return null;
     } catch (error) {
       throw this.handleError(error, "getDefaultForDevice");
     }
