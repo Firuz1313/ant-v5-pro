@@ -18,13 +18,13 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-// Removed useData import - no longer using DataContext
 
 interface RemoteControlProps {
   highlightButton?: string;
   onButtonClick?: (buttonId: string) => void;
   glowButton?: string;
   remoteId?: string;
+  remote?: any;
   className?: string;
   showButtonPosition?: { x: number; y: number };
 }
@@ -34,6 +34,7 @@ const RemoteControl = ({
   onButtonClick,
   glowButton,
   remoteId,
+  remote: providedRemote,
   className,
   showButtonPosition,
 }: RemoteControlProps) => {
@@ -41,10 +42,17 @@ const RemoteControl = ({
   const getRemoteById = (id: string) => null;
   const getDefaultRemote = () => null;
 
-  // Get the specific remote or fall back to default
-  const remote = remoteId ? getRemoteById(remoteId) : getDefaultRemote();
-  const useCustomRemote =
-    remote && remote.imageData && remote.buttons.length > 0;
+  // Resolve remote from props or fallbacks
+  const remote =
+    providedRemote ?? (remoteId ? getRemoteById(remoteId) : getDefaultRemote());
+  const imageData =
+    remote?.imageData ||
+    remote?.image_data ||
+    remote?.imageUrl ||
+    remote?.image_url;
+  const buttons = remote?.buttons || [];
+  const dimensions = remote?.dimensions || { width: 260, height: 700 };
+  const useCustomRemote = !!imageData;
 
   const handleButtonClick = (buttonId: string) => {
     if (onButtonClick) {
@@ -74,11 +82,11 @@ const RemoteControl = ({
           <div
             className="relative w-full max-w-[260px] h-full min-h-[600px] lg:min-h-[700px] bg-cover bg-center bg-no-repeat rounded-3xl shadow-2xl border-4 border-gray-700"
             style={{
-              backgroundImage: `url(${remote.imageData})`,
+              backgroundImage: `url(${imageData})`,
             }}
           >
             {/* Custom buttons */}
-            {remote.buttons.map((button) => (
+            {buttons.map((button: any) => (
               <button
                 key={button.id}
                 onClick={() => handleButtonClick(button.action)}
@@ -89,13 +97,13 @@ const RemoteControl = ({
                     glowButton === button.action,
                 })}
                 style={{
-                  left: `${(button.position.x / remote.dimensions.width) * 100}%`,
-                  top: `${(button.position.y / remote.dimensions.height) * 100}%`,
-                  width: `${(button.size.width / remote.dimensions.width) * 100}%`,
-                  height: `${(button.size.height / remote.dimensions.height) * 100}%`,
+                  left: `${((button.position?.x ?? button.x) / dimensions.width) * 100}%`,
+                  top: `${((button.position?.y ?? button.y) / dimensions.height) * 100}%`,
+                  width: `${((button.size?.width ?? button.width) / dimensions.width) * 100}%`,
+                  height: `${((button.size?.height ?? button.height) / dimensions.height) * 100}%`,
                   backgroundColor: button.color,
                   color: button.textColor,
-                  fontSize: `${button.fontSize}px`,
+                  fontSize: `${button.fontSize ?? 12}px`,
                   borderRadius:
                     button.shape === "circle"
                       ? "50%"
@@ -360,7 +368,7 @@ const RemoteControl = ({
         {/* Remote Brand */}
         <div className="text-center flex-shrink-0">
           <span className="text-gray-500 text-xs font-semibold">
-            {remote?.name || "UNIVERSAL REMOTE"}
+            {remote?.name || remote?.model || "UNIVERSAL REMOTE"}
           </span>
         </div>
       </div>

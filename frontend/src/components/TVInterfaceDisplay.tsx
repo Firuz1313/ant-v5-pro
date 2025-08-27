@@ -1,8 +1,8 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent } from '@/components/ui/card';
-import { tvInterfacesAPI, TVInterfaceAPI } from '@/api/tvInterfaces';
-import { tvInterfaceMarksAPI, TVInterfaceMark } from '@/api/tvInterfaceMarks';
+import React, { useState, useEffect, useRef } from "react";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { tvInterfacesAPI, TVInterfaceAPI } from "@/api/tvInterfaces";
+import { tvInterfaceMarksAPI, TVInterfaceMark } from "@/api/tvInterfaceMarks";
 import {
   Monitor,
   Target,
@@ -13,29 +13,29 @@ import {
   Info,
   AlertTriangle,
   Lightbulb,
-} from 'lucide-react';
+} from "lucide-react";
 
 interface TVInterfaceDisplayProps {
   // TV Interface data
   tvInterfaceId?: string;
   stepId?: string;
-  
+
   // Display options
   className?: string;
   width?: number;
   height?: number;
-  
+
   // Interactive options
   showAllMarks?: boolean;
   highlightActiveMarks?: boolean;
   showHints?: boolean;
   enableAnimations?: boolean;
-  
+
   // Step-specific highlighting
   currentStepNumber?: number;
   tvAreaPosition?: { x: number; y: number };
   tvAreaRect?: { x: number; y: number; width: number; height: number };
-  
+
   // Callbacks
   onMarkClick?: (mark: TVInterfaceMark) => void;
   onMarkHover?: (mark: TVInterfaceMark | null) => void;
@@ -63,60 +63,69 @@ const MarkDisplay: React.FC<MarkDisplayProps> = ({
   const baseSize = Math.min(containerWidth, containerHeight);
   const scaleX = containerWidth / 800; // Assuming 800px base width
   const scaleY = containerHeight / 450; // Assuming 450px base height
-  
+
   const scaledPosition = {
-    x: (mark.position.x * scaleX),
-    y: (mark.position.y * scaleY),
+    x: mark.position.x * scaleX,
+    y: mark.position.y * scaleY,
   };
-  
-  const scaledSize = mark.size ? {
-    width: mark.size.width * scaleX,
-    height: mark.size.height * scaleY,
-  } : {
-    width: 32 * (baseSize / 800),
-    height: 32 * (baseSize / 800),
-  };
+
+  const scaledSize = mark.size
+    ? {
+        width: mark.size.width * scaleX,
+        height: mark.size.height * scaleY,
+      }
+    : {
+        width: 32 * (baseSize / 800),
+        height: 32 * (baseSize / 800),
+      };
 
   const getMarkStyles = () => {
     const baseStyles: React.CSSProperties = {
-      position: 'absolute',
+      position: "absolute",
       left: `${scaledPosition.x}px`,
       top: `${scaledPosition.y}px`,
-      width: mark.shape === 'circle' ? `${scaledSize.height}px` : `${scaledSize.width}px`,
+      width:
+        mark.shape === "circle"
+          ? `${scaledSize.height}px`
+          : `${scaledSize.width}px`,
       height: `${scaledSize.height}px`,
-      borderRadius: mark.shape === 'circle' ? '50%' : '4px',
+      borderRadius: mark.shape === "circle" ? "50%" : "4px",
       border: `${mark.border_width}px solid ${mark.border_color || mark.color}`,
-      backgroundColor: mark.background_color || `${mark.color}${Math.round(mark.opacity * 255).toString(16).padStart(2, '0')}`,
-      cursor: mark.is_clickable ? 'pointer' : 'default',
+      backgroundColor:
+        mark.background_color ||
+        `${mark.color}${Math.round(mark.opacity * 255)
+          .toString(16)
+          .padStart(2, "0")}`,
+      cursor: mark.is_clickable ? "pointer" : "default",
       zIndex: isActive ? 50 : 30,
-      transition: 'all 0.3s ease',
-      transform: 'translate(-50%, -50%)',
+      transition: "all 0.3s ease",
+      transform: "translate(-50%, -50%)",
     };
 
     // Add hover effects
     if (isHovered) {
-      baseStyles.transform = 'translate(-50%, -50%) scale(1.1)';
+      baseStyles.transform = "translate(-50%, -50%) scale(1.1)";
       baseStyles.boxShadow = `0 0 20px ${mark.color}`;
     }
 
     // Add active highlighting
     if (isActive) {
       baseStyles.boxShadow = `0 0 30px ${mark.color}, 0 0 60px ${mark.color}40`;
-      baseStyles.borderWidth = '3px';
+      baseStyles.borderWidth = "3px";
     }
 
     // Add animation classes
-    let animationClass = '';
-    if (mark.animation && mark.animation !== 'none') {
+    let animationClass = "";
+    if (mark.animation && mark.animation !== "none") {
       switch (mark.animation) {
-        case 'pulse':
-          animationClass = 'animate-pulse';
+        case "pulse":
+          animationClass = "animate-pulse";
           break;
-        case 'blink':
-          animationClass = 'animate-ping';
+        case "blink":
+          animationClass = "animate-ping";
           break;
-        case 'bounce':
-          animationClass = 'animate-bounce';
+        case "bounce":
+          animationClass = "animate-bounce";
           break;
         default:
           break;
@@ -152,7 +161,7 @@ const MarkDisplay: React.FC<MarkDisplayProps> = ({
     <>
       {/* Main mark */}
       <div
-        className={`${animationClass} ${isActive ? 'z-50' : 'z-30'}`}
+        className={`${animationClass} ${isActive ? "z-50" : "z-30"}`}
         style={styles}
         onClick={handleClick}
         onMouseEnter={handleMouseEnter}
@@ -160,29 +169,32 @@ const MarkDisplay: React.FC<MarkDisplayProps> = ({
         title={mark.tooltip_text || mark.name}
       >
         {/* Inner content based on mark type */}
-        {mark.mark_type === 'point' && (
+        {mark.mark_type === "point" && (
           <div className="w-full h-full flex items-center justify-center">
-            <Target className="w-4 h-4 text-white" style={{ fontSize: `${scaledSize.width * 0.4}px` }} />
+            <Target
+              className="w-4 h-4 text-white"
+              style={{ fontSize: `${scaledSize.width * 0.4}px` }}
+            />
           </div>
         )}
-        
-        {mark.mark_type === 'zone' && mark.is_clickable && (
+
+        {mark.mark_type === "zone" && mark.is_clickable && (
           <div className="absolute top-1 right-1">
             <Hand className="w-3 h-3 text-white" />
           </div>
         )}
 
         {/* Priority indicator */}
-        {mark.priority === 'critical' && (
+        {mark.priority === "critical" && (
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border border-white" />
         )}
-        {mark.priority === 'high' && (
+        {mark.priority === "high" && (
           <div className="absolute -top-1 -right-1 w-3 h-3 bg-orange-500 rounded-full border border-white" />
         )}
       </div>
 
       {/* Glow effect for active marks */}
-      {isActive && mark.animation === 'glow' && (
+      {isActive && mark.animation === "glow" && (
         <div
           className="absolute animate-pulse pointer-events-none"
           style={{
@@ -190,10 +202,10 @@ const MarkDisplay: React.FC<MarkDisplayProps> = ({
             top: `${scaledPosition.y}px`,
             width: `${scaledSize.width * 1.5}px`,
             height: `${scaledSize.height * 1.5}px`,
-            borderRadius: mark.shape === 'circle' ? '50%' : '8px',
+            borderRadius: mark.shape === "circle" ? "50%" : "8px",
             backgroundColor: `${mark.color}20`,
             border: `2px solid ${mark.color}60`,
-            transform: 'translate(-50%, -50%)',
+            transform: "translate(-50%, -50%)",
             zIndex: 20,
           }}
         />
@@ -206,8 +218,8 @@ const MarkDisplay: React.FC<MarkDisplayProps> = ({
           style={{
             left: `${scaledPosition.x}px`,
             top: `${scaledPosition.y - scaledSize.height / 2 - 30}px`,
-            transform: 'translateX(-50%)',
-            whiteSpace: 'nowrap',
+            transform: "translateX(-50%)",
+            whiteSpace: "nowrap",
           }}
         >
           {mark.name}
@@ -220,7 +232,7 @@ const MarkDisplay: React.FC<MarkDisplayProps> = ({
 const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
   tvInterfaceId,
   stepId,
-  className = '',
+  className = "",
   width,
   height,
   showAllMarks = true,
@@ -240,8 +252,11 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hoveredMark, setHoveredMark] = useState<TVInterfaceMark | null>(null);
-  const [containerSize, setContainerSize] = useState({ width: 800, height: 450 });
-  
+  const [containerSize, setContainerSize] = useState({
+    width: 800,
+    height: 450,
+  });
+
   const containerRef = useRef<HTMLDivElement>(null);
 
   // Load TV interface data
@@ -260,11 +275,11 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
         if (response.success && response.data) {
           setTVInterface(response.data);
         } else {
-          setError(response.error || 'Не удалось загрузить TV интерфейс');
+          setError(response.error || "Не удалось загрузить TV интерфейс");
         }
       } catch (err) {
-        setError('Ошибка при загрузке TV интерфейса');
-        console.error('Error loading TV interface:', err);
+        setError("Ошибка при загрузке TV интерфейс��");
+        console.error("Error loading TV interface:", err);
       } finally {
         setLoading(false);
       }
@@ -282,16 +297,19 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
       }
 
       try {
-        const response = await tvInterfaceMarksAPI.getByTVInterfaceId(tvInterfaceId, {
-          is_active: true,
-          is_visible: true,
-        });
+        const response = await tvInterfaceMarksAPI.getByTVInterfaceId(
+          tvInterfaceId,
+          {
+            is_active: true,
+            is_visible: true,
+          },
+        );
 
         if (response.success && response.data) {
           setMarks(response.data);
         }
       } catch (err) {
-        console.error('Error loading TV interface marks:', err);
+        console.error("Error loading TV interface marks:", err);
       }
     };
 
@@ -312,7 +330,7 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
           setStepMarks(response.data);
         }
       } catch (err) {
-        console.error('Error loading step marks:', err);
+        console.error("Error loading step marks:", err);
       }
     };
 
@@ -332,8 +350,8 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
     };
 
     updateSize();
-    window.addEventListener('resize', updateSize);
-    return () => window.removeEventListener('resize', updateSize);
+    window.addEventListener("resize", updateSize);
+    return () => window.removeEventListener("resize", updateSize);
   }, [width, height]);
 
   const handleMarkHover = (mark: TVInterfaceMark | null) => {
@@ -345,14 +363,17 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
 
   const getActiveMarks = () => {
     if (!highlightActiveMarks) return [];
-    
+
     // Prioritize step-specific marks, then all marks
     const relevantMarks = stepMarks.length > 0 ? stepMarks : marks;
-    
-    return relevantMarks.filter(mark => 
-      mark.is_active && 
-      mark.is_visible &&
-      (mark.priority === 'critical' || mark.priority === 'high' || stepMarks.includes(mark))
+
+    return relevantMarks.filter(
+      (mark) =>
+        mark.is_active &&
+        mark.is_visible &&
+        (mark.priority === "critical" ||
+          mark.priority === "high" ||
+          stepMarks.includes(mark)),
     );
   };
 
@@ -362,22 +383,28 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
   // Show hints for active marks
   const getHintText = () => {
     if (!showHints) return null;
-    
-    const activeMarkWithHint = activeMarks.find(mark => mark.hint_text || mark.action_description);
+
+    const activeMarkWithHint = activeMarks.find(
+      (mark) => mark.hint_text || mark.action_description,
+    );
     if (activeMarkWithHint) {
-      return activeMarkWithHint.hint_text || activeMarkWithHint.action_description;
+      return (
+        activeMarkWithHint.hint_text || activeMarkWithHint.action_description
+      );
     }
-    
+
     if (hoveredMark?.hint_text) {
       return hoveredMark.hint_text;
     }
-    
+
     return null;
   };
 
   if (loading) {
     return (
-      <div className={`flex items-center justify-center bg-black rounded-lg ${className}`}>
+      <div
+        className={`flex items-center justify-center bg-black rounded-lg ${className}`}
+      >
         <div className="text-center text-white">
           <Loader2 className="h-8 w-8 mx-auto mb-2 animate-spin" />
           <p className="text-sm">Загрузка интерфейса...</p>
@@ -388,7 +415,9 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
 
   if (error) {
     return (
-      <div className={`flex items-center justify-center bg-black rounded-lg ${className}`}>
+      <div
+        className={`flex items-center justify-center bg-black rounded-lg ${className}`}
+      >
         <div className="text-center text-red-400">
           <AlertTriangle className="h-8 w-8 mx-auto mb-2" />
           <p className="text-sm">{error}</p>
@@ -399,7 +428,9 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
 
   if (!tvInterface) {
     return (
-      <div className={`flex items-center justify-center bg-black rounded-lg ${className}`}>
+      <div
+        className={`flex items-center justify-center bg-black rounded-lg ${className}`}
+      >
         <div className="text-center text-gray-400">
           <Monitor className="h-12 w-12 mx-auto mb-2 opacity-50" />
           <p>TV интерфейс не выбран</p>
@@ -409,36 +440,45 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
   }
 
   return (
-    <div className={`relative bg-black rounded-lg overflow-hidden ${className}`}>
+    <div
+      className={`relative bg-black rounded-lg overflow-hidden ${className}`}
+    >
       {/* Main interface container */}
       <div
         ref={containerRef}
         className="relative w-full h-full"
         style={{
-          aspectRatio: '16/9',
-          minHeight: '200px',
+          aspectRatio: "16/9",
+          minHeight: "200px",
         }}
       >
         {/* TV Interface image */}
-        {tvInterface.screenshot_data ? (
-          <img
-            src={tvInterface.screenshot_data}
-            alt={tvInterface.name}
-            className="w-full h-full object-contain"
-            style={{
-              maxWidth: '100%',
-              maxHeight: '100%',
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-white">
-            <div className="text-center">
-              <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <p className="text-lg">{tvInterface.name}</p>
-              <p className="text-sm opacity-75">{tvInterface.type}</p>
+        {(() => {
+          const screenshot =
+            (tvInterface as any).screenshot_data ||
+            (tvInterface as any).screenshotData ||
+            (tvInterface as any).screenshot_url ||
+            (tvInterface as any).screenshotUrl;
+          return screenshot ? (
+            <img
+              src={screenshot}
+              alt={tvInterface.name}
+              className="w-full h-full object-contain"
+              style={{
+                maxWidth: "100%",
+                maxHeight: "100%",
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white">
+              <div className="text-center">
+                <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                <p className="text-lg">{tvInterface.name}</p>
+                <p className="text-sm opacity-75">{tvInterface.type}</p>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Interface marks overlay */}
         {displayMarks.map((mark) => (
@@ -481,7 +521,10 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
 
         {/* Interface info badges */}
         <div className="absolute top-2 left-2">
-          <Badge variant="outline" className="bg-black/70 text-white border-gray-500">
+          <Badge
+            variant="outline"
+            className="bg-black/70 text-white border-gray-500"
+          >
             <Monitor className="h-3 w-3 mr-1" />
             {tvInterface.name}
           </Badge>
@@ -509,9 +552,7 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/90 to-transparent p-4">
           <div className="flex items-start gap-2 text-yellow-200">
             <Lightbulb className="h-5 w-5 text-yellow-400 flex-shrink-0 mt-0.5" />
-            <p className="text-sm leading-relaxed">
-              {getHintText()}
-            </p>
+            <p className="text-sm leading-relaxed">{getHintText()}</p>
           </div>
         </div>
       )}
@@ -526,16 +567,20 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
                 <div className="text-white text-sm">
                   <p className="font-medium">{hoveredMark.name}</p>
                   {hoveredMark.description && (
-                    <p className="text-gray-300 mt-1">{hoveredMark.description}</p>
+                    <p className="text-gray-300 mt-1">
+                      {hoveredMark.description}
+                    </p>
                   )}
                   {hoveredMark.action_description && (
                     <p className="text-blue-300 mt-1">
-                      <strong>Действие:</strong> {hoveredMark.action_description}
+                      <strong>Действие:</strong>{" "}
+                      {hoveredMark.action_description}
                     </p>
                   )}
                   {hoveredMark.expected_result && (
                     <p className="text-green-300 mt-1">
-                      <strong>Ожидаемый результат:</strong> {hoveredMark.expected_result}
+                      <strong>Ожидаемый результат:</strong>{" "}
+                      {hoveredMark.expected_result}
                     </p>
                   )}
                 </div>

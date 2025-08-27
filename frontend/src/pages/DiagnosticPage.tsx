@@ -28,7 +28,11 @@ const DiagnosticPage = () => {
 
   // API hooks
   const { data: devicesResponse, isLoading: devicesLoading } = useDevices();
-  const { data: problemsResponse, isLoading: problemsLoading } = useProblems(1, 20, { deviceId });
+  const { data: problemsResponse, isLoading: problemsLoading } = useProblems(
+    1,
+    20,
+    { deviceId },
+  );
 
   // Extract data arrays from API responses
   const devices = devicesResponse?.data || [];
@@ -50,7 +54,7 @@ const DiagnosticPage = () => {
   const progress =
     steps.length > 0 ? (currentStepNumber / steps.length) * 100 : 0;
 
-  // Load steps and remote when component mounts
+  // Load steps when component mounts
   useEffect(() => {
     const loadData = async () => {
       if (!problemId || !deviceId) return;
@@ -61,22 +65,6 @@ const DiagnosticPage = () => {
         // Load steps for the problem
         const stepsResponse = await stepsApi.getStepsByProblem(problemId);
         setSteps(stepsResponse?.data || []);
-
-        // Load default remote for device
-        try {
-          const defaultRemote = await remotesApi.getDefaultForDevice(deviceId);
-          setRemote(defaultRemote);
-        } catch (error) {
-          // If no default remote, try to get any remote for the device
-          try {
-            const deviceRemotes = await remotesApi.getByDevice(deviceId);
-            if (deviceRemotes && deviceRemotes.length > 0) {
-              setRemote(deviceRemotes[0]);
-            }
-          } catch (err) {
-            console.log("No remotes found for device");
-          }
-        }
       } catch (error) {
         console.error("Error loading diagnostic data:", error);
       } finally {
@@ -86,6 +74,40 @@ const DiagnosticPage = () => {
 
     loadData();
   }, [problemId, deviceId]);
+
+  // Load remote: prefer step-specific remote, fallback to device defaults
+  useEffect(() => {
+    const loadRemote = async () => {
+      if (!deviceId) return;
+
+      try {
+        if (currentStepData?.remoteId) {
+          const stepRemote = await remotesApi.getById(currentStepData.remoteId);
+          setRemote(stepRemote);
+          return;
+        }
+
+        // Fallback: device default
+        try {
+          const defaultRemote = await remotesApi.getDefaultForDevice(deviceId);
+          setRemote(defaultRemote);
+        } catch (error) {
+          // Fallback: any remote for device
+          const deviceRemotes = await remotesApi.getByDevice(deviceId);
+          if (deviceRemotes && deviceRemotes.length > 0) {
+            setRemote(deviceRemotes[0]);
+          } else {
+            setRemote(null);
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load remote:", e);
+        setRemote(null);
+      }
+    };
+
+    loadRemote();
+  }, [deviceId, currentStepData?.remoteId]);
 
   const handlePrevStep = () => {
     if (currentStepNumber > 1) {
@@ -192,11 +214,9 @@ const DiagnosticPage = () => {
                 {currentStepData?.tvInterfaceId ? (
                   <TVInterfaceDisplay
                     tvInterfaceId={currentStepData.tvInterfaceId}
-                    highlightAreas={
-                      currentStepData.highlightTVArea
-                        ? [currentStepData.highlightTVArea]
-                        : []
-                    }
+                    stepId={currentStepData.id}
+                    tvAreaPosition={currentStepData.tvAreaPosition}
+                    tvAreaRect={currentStepData.tvAreaRect}
                   />
                 ) : (
                   <TVDisplay />
@@ -257,6 +277,7 @@ const DiagnosticPage = () => {
                   <RemoteControl
                     remote={remote}
                     highlightButton={currentStepData?.highlightRemoteButton}
+                    showButtonPosition={currentStepData?.buttonPosition}
                     onButtonClick={handleManualProgress}
                   />
                 ) : (

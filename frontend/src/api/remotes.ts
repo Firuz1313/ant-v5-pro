@@ -112,8 +112,8 @@ export const remotesApi = {
    */
   async getById(id: string): Promise<Remote> {
     try {
-      const response = await apiClient.get(`/remotes/${id}`);
-      return response.data;
+      const response = await apiClient.get<any>(`/remotes/${id}`);
+      return response?.data ?? response;
     } catch (error) {
       throw handleApiError(error, `Failed to fetch remote ${id}`);
     }
@@ -160,8 +160,8 @@ export const remotesApi = {
    */
   async getByDevice(deviceId: string): Promise<Remote[]> {
     try {
-      const response = await apiClient.get(`/remotes/device/${deviceId}`);
-      return response.data;
+      const response = await apiClient.get<any>(`/remotes/device/${deviceId}`);
+      return response?.data ?? response;
     } catch (error) {
       throw handleApiError(
         error,
@@ -175,10 +175,10 @@ export const remotesApi = {
    */
   async getDefaultForDevice(deviceId: string): Promise<Remote> {
     try {
-      const response = await apiClient.get(
+      const response = await apiClient.get<any>(
         `/remotes/device/${deviceId}/default`,
       );
-      return response.data;
+      return response?.data ?? response;
     } catch (error) {
       throw handleApiError(
         error,
