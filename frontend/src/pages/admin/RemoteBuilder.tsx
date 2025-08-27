@@ -817,7 +817,7 @@ const RemoteBuilder = () => {
                               label: e.target.value,
                             })
                           }
-                          placeholder="Напри��ер: POWER"
+                          placeholder="Напри���ер: POWER"
                         />
                       </div>
                       <div>
@@ -1046,7 +1046,7 @@ const RemoteBuilder = () => {
                         <SelectValue placeholder="Выберите приставку" />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="universal">Универсальный</SelectItem>
+                        <SelectItem value="universal">��ниверсальный</SelectItem>
                         {activeDevices.length > 0 ? (
                           activeDevices.map((device) => (
                             <SelectItem key={device.id} value={device.id}>
@@ -1236,7 +1236,7 @@ const RemoteBuilder = () => {
       {remotesError && (
         <div className="bg-red-50 border border-red-200 rounded-lg p-4">
           <p className="text-red-700">
-            Ошибка загрузки пультов: {(remotesError as any)?.message}
+            Ошибка загрузки п��льтов: {(remotesError as any)?.message}
           </p>
         </div>
       )}
@@ -1416,7 +1416,7 @@ const RemoteBuilder = () => {
             </Button>
             <Button onClick={saveRemoteChanges}>
               <Save className="h-4 w-4 mr-2" />
-              Сохранить изменения
+              Сохрани��ь изменения
             </Button>
           </div>
         </DialogContent>
@@ -1479,11 +1479,17 @@ const RemoteBuilder = () => {
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="universal">Универсальный</SelectItem>
-                    {activeDevices.map((device) => (
-                      <SelectItem key={device.id} value={device.id}>
-                        {device.name}
-                      </SelectItem>
-                    ))}
+                    {activeDevices.length > 0 ? (
+                      activeDevices.map((device) => (
+                        <SelectItem key={device.id} value={device.id}>
+                          {device.name}
+                        </SelectItem>
+                      ))
+                    ) : (
+                      <div className="px-2 py-1 text-sm text-gray-500">
+                        Нет доступных устройств. Создайте устройство сначала.
+                      </div>
+                    )}
                   </SelectContent>
                 </Select>
               </div>
