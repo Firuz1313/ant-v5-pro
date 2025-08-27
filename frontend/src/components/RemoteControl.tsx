@@ -18,7 +18,6 @@ import {
   Minus,
   Plus,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 interface RemoteControlProps {
   highlightButton?: string;
