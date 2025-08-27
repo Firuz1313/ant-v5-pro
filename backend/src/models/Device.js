@@ -45,7 +45,7 @@ class Device extends BaseModel {
   }
 
   /**
-   * Пол��чение устройства со статистикой по ID
+   * Получение устройства со статистикой по ID
    */
   async findByIdWithStats(id) {
     try {
@@ -117,7 +117,7 @@ class Device extends BaseModel {
         rank: parseFloat(row.rank || 0)
       }));
     } catch (error) {
-      console.error('Ошибка поиска ус��ройств:', error.message);
+      console.error('Ошибка поиска устройств:', error.message);
       throw error;
     }
   }
@@ -236,7 +236,7 @@ class Device extends BaseModel {
         return {
           canDelete: false,
           reason: `Устройство содержит ${remotesCount} пультов. Сначала удалите или переместите их.`,
-          suggestion: 'Можно архивировать устройство вместо удаления'
+          suggestion: 'Можно архивироват�� устройство вместо удаления'
         };
       }
 
@@ -273,7 +273,7 @@ class Device extends BaseModel {
         inactive: parseInt(stats.inactive_devices || 0)
       };
     } catch (error) {
-      console.error('Ошибка получения статистики устройств:', error.message);
+      console.error('Ошибка получения статисти��и устройств:', error.message);
       throw error;
     }
   }
@@ -322,7 +322,7 @@ class Device extends BaseModel {
         LEFT JOIN problems p ON d.id = p.device_id
         LEFT JOIN remotes r ON d.id = r.device_id AND r.is_active = true
         LEFT JOIN tv_interfaces tv ON d.id = tv.device_id AND tv.is_active = true
-        LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id AND ds.is_active = true
+        LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id AND ds.end_time IS NULL
         WHERE ${whereConditions.join(' AND ')}
         GROUP BY d.id
         ORDER BY d.order_index ASC, d.created_at DESC
