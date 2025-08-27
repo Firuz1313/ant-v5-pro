@@ -304,6 +304,8 @@ const StepFormFields = React.memo(({
   );
 });
 
+StepFormFields.displayName = 'StepFormFields';
+
 const StepsManagerFixed = () => {
   const { data: devicesResponse, isLoading: devicesLoading, error: devicesError } = useDevices();
   const { data: problemsResponse, isLoading: problemsLoading, error: problemsError } = useProblems();
@@ -348,7 +350,7 @@ const StepsManagerFixed = () => {
     } catch (error) {
       console.error("❌ Error loading initial data:", error);
       toast({
-        title: "Ошибка загрузки",
+        title: "Ошибка загрузк��",
         description: "Не удалось загрузить данные шагов",
         variant: "destructive",
       });
@@ -938,7 +940,7 @@ const StepsManagerFixed = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Кликните на изображение пульта, чтобы указать позицию кн��пки
+                      Кликните на из��бражение пульта, чтобы указать позицию кнопки
                     </p>
                   </AlertDescription>
                 </Alert>
@@ -968,7 +970,7 @@ const StepsManagerFixed = () => {
         <div>
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Управление шагами (Исправлено)</h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Создание шагов диагностики с привязкой к приставкам и проблемам
+            Создание шагов диагностики с привязкой к приставкам и пр��блемам
           </p>
         </div>
         <Dialog open={isCreateDialogOpen} onOpenChange={setIsCreateDialogOpen}>
