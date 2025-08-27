@@ -12,6 +12,33 @@ class Remote extends BaseModel {
   }
 
   /**
+   * Переопределяем create для автоматической установки default
+   */
+  async create(data) {
+    try {
+      // Если пульт привязан к устройству, проверяем есть ли уже пульты для этого устройства
+      if (data.device_id && data.device_id !== 'universal') {
+        const existingRemotes = await this.query(
+          `SELECT COUNT(*) as count FROM ${this.tableName}
+           WHERE device_id = $1 AND is_active = true`,
+          [data.device_id]
+        );
+
+        const count = parseInt(existingRemotes.rows[0]?.count || 0);
+
+        // Если это первый пульт для устройства, автоматически делаем его default
+        if (count === 0) {
+          data.is_default = true;
+        }
+      }
+
+      return await super.create(data);
+    } catch (error) {
+      throw this.handleError(error, "create");
+    }
+  }
+
+  /**
    * Валидация данных пульта
    */
   validateData(data, isUpdate = false) {
@@ -73,7 +100,7 @@ class Remote extends BaseModel {
   }
 
   /**
-   * Получить пульт по у��олчанию для устройства
+   * Получить пульт по умолчанию для устройства
    */
   async getDefaultForDevice(deviceId) {
     try {
@@ -174,7 +201,7 @@ class Remote extends BaseModel {
     try {
       const original = await this.findById(remoteId);
       if (!original) {
-        throw new Error("Пульт для дублирования не найден");
+        throw new Error("Пульт для ду��лирования не найден");
       }
 
       const duplicateData = {
