@@ -35,7 +35,7 @@ if (NODE_ENV === "production" || process.env.FLY_APP_NAME) {
   app.set("trust proxy", 1);
 }
 
-// Настройка CORS
+// Настрой��а CORS
 const corsOptions = {
   origin: function (origin, callback) {
     const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [
@@ -238,9 +238,10 @@ process.on("SIGINT", () => {
 async function startServer() {
   try {
     // Исправляем схему tv_interfaces при старте
-    const { fixTVInterfacesSchema, createTVInterfaceMarksTable } = await import("./utils/database.js");
+    const { fixTVInterfacesSchema, createTVInterfaceMarksTable, fixDiagnosticSessionsSchema } = await import("./utils/database.js");
     await fixTVInterfacesSchema();
     await createTVInterfaceMarksTable();
+    await fixDiagnosticSessionsSchema();
   } catch (error) {
     console.error(
       "⚠️ Ошибка исправления схемы, продолжаем запуск:",
