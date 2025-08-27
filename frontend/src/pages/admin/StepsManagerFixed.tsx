@@ -175,7 +175,7 @@ const StepFormFields = React.memo(({
           id={isEdit ? "edit-title" : "title"}
           value={formData.title}
           onChange={(e) => handleFieldChange("title", e.target.value)}
-          placeholder="Введите назва��ие шага"
+          placeholder="Введите название шага"
         />
       </div>
 
@@ -767,19 +767,19 @@ const StepsManagerFixed = () => {
     setIsEditDialogOpen(true);
   };
 
-  const openRemoteEditor = useCallback(() => {
+  const openRemoteEditor = () => {
     const remote = getRemoteById(formData.remoteId);
     if (remote) {
       setSelectedRemote(remote);
       setIsRemoteEditorOpen(true);
     }
-  }, [formData.remoteId, getRemoteById]);
+  };
 
-  const openTVInterfaceEditor = useCallback(async (tvInterface: TVInterface) => {
+  const openTVInterfaceEditor = async (tvInterface: TVInterface) => {
     console.log("Opening TV Interface Editor with:", tvInterface);
     setSelectedTVInterface(tvInterface);
     setIsTVInterfaceEditorOpen(true);
-  }, []);
+  };
 
   const handleCanvasClick = (event: React.MouseEvent<HTMLCanvasElement>) => {
     if (!isPickingButton || !canvasRef.current) return;
@@ -909,7 +909,7 @@ const StepsManagerFixed = () => {
         <div className="w-full lg:w-80 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Выбо�� позиции</CardTitle>
+              <CardTitle className="text-lg">Выбор позиции</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
