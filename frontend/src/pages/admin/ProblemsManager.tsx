@@ -398,6 +398,11 @@ const ProblemsManager = () => {
       setProblemToDelete(null);
     } catch (error) {
       console.error("❌ Error deleting problem:", error);
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setProblemToDelete(null);
+
       alert("Ошибка при удалении проблемы: " + (error as any)?.message);
     }
   };
@@ -440,7 +445,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         alert(
-          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую п��облему вручную.`,
+          `Не удалось создать копию: проблема �� названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую п��облему вручную.`,
         );
       } else {
         alert(
@@ -518,7 +523,7 @@ const ProblemsManager = () => {
         await deleteProblemMutation.mutateAsync({ id: problem.id });
       }
 
-      alert("Все проблемы удалены!");
+      alert("Вс�� проблемы удалены!");
     } catch (error) {
       console.error("Error clearing problems:", error);
       alert("Ошибка при удалении проблем: " + (error as any)?.message);
@@ -657,7 +662,7 @@ const ProblemsManager = () => {
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Очистить всё
+            О��истить всё
           </Button>
           <Button variant="outline">
             <Upload className="h-4 w-4 mr-2" />
