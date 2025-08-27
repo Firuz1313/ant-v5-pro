@@ -110,6 +110,23 @@ const StepFormFields = React.memo(({
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null);
 
+  // Preserve scroll position during re-renders
+  useEffect(() => {
+    const scrollContainer = scrollRef.current;
+    if (scrollContainer) {
+      const scrollTop = scrollContainer.scrollTop;
+
+      // Restore scroll position after any potential DOM changes
+      const timeout = setTimeout(() => {
+        if (scrollContainer.scrollTop === 0 && scrollTop > 0) {
+          scrollContainer.scrollTop = scrollTop;
+        }
+      }, 0);
+
+      return () => clearTimeout(timeout);
+    }
+  });
+
   return (
     <div ref={scrollRef} className="space-y-4 max-h-96 overflow-y-auto">
       <div className="grid grid-cols-2 gap-4">
@@ -626,7 +643,7 @@ const StepsManagerFixed = () => {
         hint: formData.hint || undefined,
       };
 
-      console.log("���� Sending update data to API:", updatedFormData);
+      console.log("🔄 Sending update data to API:", updatedFormData);
 
       const response = await stepsApi.updateStep(selectedStep.id, updatedFormData);
       console.log("✅ Step updated successfully:", response);
@@ -921,7 +938,7 @@ const StepsManagerFixed = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Кликните на изображение пульта, чтобы указать позицию кнопки
+                      Кликните на изображение пульта, чтобы указать позицию кн��пки
                     </p>
                   </AlertDescription>
                 </Alert>
