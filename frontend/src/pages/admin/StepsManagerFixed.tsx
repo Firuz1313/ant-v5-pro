@@ -175,7 +175,7 @@ const StepFormFields = React.memo(({
           id={isEdit ? "edit-title" : "title"}
           value={formData.title}
           onChange={(e) => handleFieldChange("title", e.target.value)}
-          placeholder="Введите название шага"
+          placeholder="Введите назва��ие шага"
         />
       </div>
 
@@ -467,21 +467,21 @@ const StepsManagerFixed = () => {
     }
   };
 
-  const getActiveDevices = useCallback(() => {
+  const getActiveDevices = () => {
     const activeDevices = devices.filter((d: any) => d.isActive !== false);
     console.log("🔍 getActiveDevices called:", { totalDevices: devices.length, activeDevices: activeDevices.length });
     return activeDevices;
-  }, [devices]);
+  };
 
-  const getActiveRemotes = useCallback(() => {
+  const getActiveRemotes = () => {
     const activeRemotes = remotes.filter((r: any) => r.isActive !== false);
     console.log("🔍 getActiveRemotes called:", { totalRemotes: remotes.length, activeRemotes: activeRemotes.length });
     return activeRemotes;
-  }, [remotes]);
+  };
 
-  const getRemoteById = useCallback((id: string) => remotes.find((r: any) => r.id === id), [remotes]);
+  const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
 
-  const getProblemsForDevice = useCallback((deviceId: string) => {
+  const getProblemsForDevice = (deviceId: string) => {
     const deviceProblems = problems.filter((p: any) => p.deviceId === deviceId);
     console.log("🔍 getProblemsForDevice called:", {
       deviceId,
@@ -489,9 +489,9 @@ const StepsManagerFixed = () => {
       deviceProblems: deviceProblems.length,
     });
     return deviceProblems;
-  }, [problems]);
+  };
 
-  const getRemotesForDevice = useCallback((deviceId: string) => {
+  const getRemotesForDevice = (deviceId: string) => {
     const deviceRemotes = remotes.filter((r: any) => r.deviceId === deviceId);
     console.log("🔍 getRemotesForDevice called:", {
       deviceId,
@@ -499,18 +499,18 @@ const StepsManagerFixed = () => {
       deviceRemotes: deviceRemotes.length,
     });
     return deviceRemotes;
-  }, [remotes]);
+  };
 
-  const getDefaultRemoteForDevice = useCallback((deviceId: string) => {
+  const getDefaultRemoteForDevice = (deviceId: string) => {
     const defaultRemote = remotes.find((r: any) => r.deviceId === deviceId && r.isDefault);
     console.log("🔍 getDefaultRemoteForDevice called:", {
       deviceId,
       defaultRemote: defaultRemote ? { id: defaultRemote.id, name: defaultRemote.name } : null,
     });
     return defaultRemote;
-  }, [remotes]);
+  };
 
-  const getAvailableProblems = useCallback(() => {
+  const getAvailableProblems = () => {
     let availableProblems;
     if (formData.deviceId) {
       availableProblems = getProblemsForDevice(formData.deviceId);
@@ -525,9 +525,9 @@ const StepsManagerFixed = () => {
     });
 
     return availableProblems;
-  }, [formData.deviceId, problems, getProblemsForDevice]);
+  };
 
-  const getAvailableRemotes = useCallback(() => {
+  const getAvailableRemotes = () => {
     const result = formData.deviceId ? getRemotesForDevice(formData.deviceId) : getActiveRemotes();
 
     console.log("🔍 getAvailableRemotes called:", {
@@ -536,14 +536,14 @@ const StepsManagerFixed = () => {
     });
 
     return result;
-  }, [formData.deviceId, getRemotesForDevice, getActiveRemotes]);
+  };
 
-  const getFilteredRemotes = useCallback(() => {
+  const getFilteredRemotes = () => {
     if (filterDevice === "all") {
       return getActiveRemotes();
     }
     return getRemotesForDevice(filterDevice);
-  }, [filterDevice, getActiveRemotes, getRemotesForDevice]);
+  };
 
   const handleCreate = async () => {
     console.log("🔄 Creating step with form data:", formData);
@@ -909,7 +909,7 @@ const StepsManagerFixed = () => {
         <div className="w-full lg:w-80 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Выбор позиции</CardTitle>
+              <CardTitle className="text-lg">Выбо�� позиции</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
