@@ -587,57 +587,6 @@ const StepsManagerFixed = () => {
     }
   };
 
-  // Memoized computed values for optimal performance
-  const filteredSteps = useMemo(() => {
-    return steps.filter((step) => {
-      const matchesSearch =
-        step.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        step.description.toLowerCase().includes(searchTerm.toLowerCase());
-      const matchesDevice = filterDevice === "all" || step.deviceId === filterDevice;
-      const matchesProblem = filterProblem === "all" || step.problemId === filterProblem;
-      const matchesRemote =
-        filterRemote === "all" ||
-        step.remoteId === filterRemote ||
-        (!step.remoteId && filterRemote === "none");
-      return matchesSearch && matchesDevice && matchesProblem && matchesRemote;
-    });
-  }, [steps, searchTerm, filterDevice, filterProblem, filterRemote]);
-
-  const groupedSteps = useMemo(() => {
-    return filteredSteps.reduce(
-      (acc, step) => {
-        const key = `${step.deviceId}-${step.problemId}`;
-        if (!acc[key]) {
-          acc[key] = {
-            deviceId: step.deviceId,
-            problemId: step.problemId,
-            steps: [],
-          };
-        }
-        acc[key].steps.push(step);
-        return acc;
-      },
-      {} as Record<string, { deviceId: string; problemId: string; steps: DiagnosticStep[] }>
-    );
-  }, [filteredSteps]);
-
-  const activeDevices = useMemo(() => 
-    devices.filter((d: any) => d.isActive !== false), 
-    [devices]
-  );
-
-  const activeRemotes = useMemo(() => 
-    remotes.filter((r: any) => r.isActive !== false), 
-    [remotes]
-  );
-
-  const filteredRemotes = useMemo(() => {
-    if (filterDevice === "all") {
-      return activeRemotes;
-    }
-    return remotes.filter((r: any) => r.deviceId === filterDevice);
-  }, [filterDevice, activeRemotes, remotes]);
-
   // Show loading state while data is being fetched
   if (loading || devicesLoading || problemsLoading) {
     return (
@@ -655,7 +604,7 @@ const StepsManagerFixed = () => {
     if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
       toast({
         title: "Ошибка валидации",
-        description: "Заполните все обязательные поля: устройство, проблема, название и инструкция",
+        description: "Заполните все обязательные поля: устройство, проблема, название и инстр��кция",
         variant: "destructive",
       });
       return;
@@ -727,7 +676,7 @@ const StepsManagerFixed = () => {
     if (!formData.deviceId || !formData.problemId || !formData.title || !formData.instruction) {
       toast({
         title: "Ошибка валидации",
-        description: "Заполните все обязательные поля: устройство, проблема, название и инструкция",
+        description: "Заполните все обяза��ельные поля: устройство, проблема, название и инструкция",
         variant: "destructive",
       });
       return;
@@ -1312,7 +1261,7 @@ const StepsManagerFixed = () => {
             <Layers className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Шаги не найдены</h3>
             <p className="text-gray-500 dark:text-gray-400">
-              Создайте первый шаг диагностики или измените параметры фильтрации
+              Создайте первый шаг диагностики или измените пар��метры фильтрации
             </p>
           </CardContent>
         </Card>
