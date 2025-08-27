@@ -1,15 +1,14 @@
-import database from "./database.js";
-import dotenv from "dotenv";
-import bcrypt from "bcryptjs";
+import database from "../src/utils/database.js";
 import { v4 as uuidv4 } from "uuid";
+import dotenv from "dotenv";
 
 // Загрузка переменных окружения
 dotenv.config();
 
-async function seedDatabase() {
+async function createDefaultRemotes() {
   try {
-    console.log("🌱 Запуск заполнения базы данных ANT Support");
-    console.log("=============================================");
+    console.log("🎮 Создание пультов по умолчанию для устройств ANT Support");
+    console.log("========================================================");
 
     // Проверяем подключение
     const connectionTest = await database.testConnection();
@@ -20,200 +19,26 @@ async function seedDatabase() {
 
     console.log("✅ Подключение к базе данных успешно");
 
-    // 1. Пропускаем создание пользователей (таблица имеет другую структуру)
-    console.log("\n👤 Пропускаем создание пользователей (уже существуют)...");
-
-    // 2. Создаем устройства
-    console.log("📺 Создание устройств...");
-
-    const devices = [
-      {
-        id: "device-ant-basic",
-        name: "ANT Basic",
-        brand: "ANT",
-        model: "ANT-B100",
-        description:
-          "Базовая модель цифровой ТВ-приставки ANT с поддержкой HD качества",
-        color: "from-blue-500 to-blue-600",
-        order_index: 1,
-      },
-      {
-        id: "device-ant-premium",
-        name: "ANT Premium",
-        brand: "ANT",
-        model: "ANT-P200",
-        description: "Премиум модель с поддержкой 4K и Smart TV функций",
-        color: "from-purple-500 to-purple-600",
-        order_index: 2,
-      },
-      {
-        id: "device-ant-pro",
-        name: "ANT Professional",
-        brand: "ANT",
-        model: "ANT-PR300",
-        description: "Профессиональная модель для коммерческого использования",
-        color: "from-green-500 to-green-600",
-        order_index: 3,
-      },
-      {
-        id: "device-generic-dvb",
-        name: "Generic DVB-T2",
-        brand: "Generic",
-        model: "DVB-T2-STD",
-        description: "Стандартная DVB-T2 приставка",
-        color: "from-gray-500 to-gray-600",
-        order_index: 4,
-      },
-    ];
-
-    for (const device of devices) {
-      await database.query(
-        `
-        INSERT INTO devices (id, name, brand, model, description, color, order_index, status)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
-        ON CONFLICT (id) DO UPDATE SET
-          name = EXCLUDED.name,
-          brand = EXCLUDED.brand,
-          model = EXCLUDED.model,
-          description = EXCLUDED.description,
-          color = EXCLUDED.color,
-          order_index = EXCLUDED.order_index
-      `,
-        [
-          device.id,
-          device.name,
-          device.brand,
-          device.model,
-          device.description,
-          device.color,
-          device.order_index,
-          "active",
-        ],
-      );
-    }
-
-    // 3. Создаем типичные проблемы
-    console.log("⚠️  Создание проблем...");
-
-    const problems = [
-      {
-        id: "problem-no-signal",
-        device_id: "device-ant-basic",
-        title: "Нет сигнала",
-        description:
-          'На экране отображается сообщение "Нет сигнала" или черный экран',
-        category: "critical",
-        icon: "AlertTriangle",
-        color: "from-red-500 to-red-600",
-        priority: 5,
-        estimated_time: 10,
-      },
-      {
-        id: "problem-poor-quality",
-        device_id: "device-ant-basic",
-        title: "Плохое качество изображения",
-        description: "Изображение нечеткое, есть помехи или артефакты",
-        category: "moderate",
-        icon: "Monitor",
-        color: "from-orange-500 to-orange-600",
-        priority: 3,
-        estimated_time: 8,
-      },
-      {
-        id: "problem-no-sound",
-        device_id: "device-ant-basic",
-        title: "Нет з��ука",
-        description: "Изображение есть, но звук отсутствует",
-        category: "moderate",
-        icon: "VolumeX",
-        color: "from-yellow-500 to-yellow-600",
-        priority: 3,
-        estimated_time: 5,
-      },
-      {
-        id: "problem-channels-missing",
-        device_id: "device-ant-basic",
-        title: "Не найдены каналы",
-        description: "Автопоиск не находит телеканалы или найдено слишком мало",
-        category: "moderate",
-        icon: "Search",
-        color: "from-blue-500 to-blue-600",
-        priority: 4,
-        estimated_time: 15,
-      },
-      {
-        id: "problem-remote-not-working",
-        device_id: "device-ant-basic",
-        title: "Пульт не работает",
-        description:
-          "Приставка не реагирует на команды пульта дистанционного управления",
-        category: "minor",
-        icon: "Zap",
-        color: "from-indigo-500 to-indigo-600",
-        priority: 2,
-        estimated_time: 7,
-      },
-      {
-        id: "problem-freezing",
-        device_id: "device-ant-premium",
-        title: "Приставка зависает",
-        description: "Устройство периодически зависает или перезагружается",
-        category: "critical",
-        icon: "Pause",
-        color: "from-red-500 to-red-600",
-        priority: 5,
-        estimated_time: 12,
-      },
-      {
-        id: "problem-wifi-connection",
-        device_id: "device-ant-premium",
-        title: "Проблемы с Wi-Fi",
-        description:
-          "Не удается подключиться к беспроводной сети или соединение нестабильно",
-        category: "moderate",
-        icon: "Wifi",
-        color: "from-purple-500 to-purple-600",
-        priority: 3,
-        estimated_time: 10,
-      },
-    ];
-
-    for (const problem of problems) {
-      await database.query(
-        `
-        INSERT INTO problems (id, device_id, title, description, category, icon, color, priority, estimated_time, status)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
-        ON CONFLICT (id) DO UPDATE SET
-          title = EXCLUDED.title,
-          description = EXCLUDED.description,
-          category = EXCLUDED.category,
-          icon = EXCLUDED.icon,
-          color = EXCLUDED.color,
-          priority = EXCLUDED.priority,
-          estimated_time = EXCLUDED.estimated_time
-      `,
-        [
-          problem.id,
-          problem.device_id,
-          problem.title,
-          problem.description,
-          problem.category,
-          problem.icon,
-          problem.color,
-          problem.priority,
-          problem.estimated_time,
-          "published",
-        ],
-      );
-    }
-
-    // 4. Пропускаем диагностические шаги (схема таблицы отличается)
-    console.log(
-      "🔧 Пропускаем диагностические шаги (будут добавлены позже)...",
+    // Получаем все активные устройства
+    const devicesResult = await database.query(
+      "SELECT id, name, brand, model FROM devices WHERE is_active = true",
     );
 
-    // 5. Создаем пульты дистанционного управления
-    console.log("🎮 Создание пультов дистанционного управления...");
+    const devices = devicesResult.rows;
+    console.log(`📺 Найдено устройств: ${devices.length}`);
+
+    // Проверяем существующие пульты
+    const existingRemotesResult = await database.query(
+      "SELECT device_id, COUNT(*) as count FROM remotes WHERE is_active = true GROUP BY device_id",
+    );
+    const existingRemotes = new Map(
+      existingRemotesResult.rows.map((row) => [
+        row.device_id,
+        parseInt(row.count),
+      ]),
+    );
+
+    console.log("🔍 Проверка сущ��ствующих пультов...");
 
     const defaultRemotes = [
       {
@@ -356,6 +181,106 @@ async function seedDatabase() {
             height: 25,
             action: "channel_down",
           },
+          {
+            id: "num_1",
+            name: "1",
+            type: "number",
+            x: 60,
+            y: 280,
+            width: 25,
+            height: 25,
+            action: "number_1",
+          },
+          {
+            id: "num_2",
+            name: "2",
+            type: "number",
+            x: 100,
+            y: 280,
+            width: 25,
+            height: 25,
+            action: "number_2",
+          },
+          {
+            id: "num_3",
+            name: "3",
+            type: "number",
+            x: 140,
+            y: 280,
+            width: 25,
+            height: 25,
+            action: "number_3",
+          },
+          {
+            id: "num_4",
+            name: "4",
+            type: "number",
+            x: 60,
+            y: 310,
+            width: 25,
+            height: 25,
+            action: "number_4",
+          },
+          {
+            id: "num_5",
+            name: "5",
+            type: "number",
+            x: 100,
+            y: 310,
+            width: 25,
+            height: 25,
+            action: "number_5",
+          },
+          {
+            id: "num_6",
+            name: "6",
+            type: "number",
+            x: 140,
+            y: 310,
+            width: 25,
+            height: 25,
+            action: "number_6",
+          },
+          {
+            id: "num_7",
+            name: "7",
+            type: "number",
+            x: 60,
+            y: 340,
+            width: 25,
+            height: 25,
+            action: "number_7",
+          },
+          {
+            id: "num_8",
+            name: "8",
+            type: "number",
+            x: 100,
+            y: 340,
+            width: 25,
+            height: 25,
+            action: "number_8",
+          },
+          {
+            id: "num_9",
+            name: "9",
+            type: "number",
+            x: 140,
+            y: 340,
+            width: 25,
+            height: 25,
+            action: "number_9",
+          },
+          {
+            id: "num_0",
+            name: "0",
+            type: "number",
+            x: 100,
+            y: 370,
+            width: 25,
+            height: 25,
+            action: "number_0",
+          },
         ],
         zones: [
           {
@@ -375,6 +300,15 @@ async function seedDatabase() {
             width: 120,
             height: 100,
             description: "Navigation controls",
+          },
+          {
+            id: "number_zone",
+            name: "Number Pad",
+            x: 40,
+            y: 260,
+            width: 120,
+            height: 130,
+            description: "Number buttons",
           },
         ],
       },
@@ -519,6 +453,7 @@ async function seedDatabase() {
             height: 30,
             action: "channel_down",
           },
+          // Smart TV buttons
           {
             id: "netflix",
             name: "Netflix",
@@ -549,6 +484,117 @@ async function seedDatabase() {
             height: 30,
             action: "launch_prime",
           },
+          {
+            id: "apps",
+            name: "Apps",
+            type: "app",
+            x: 170,
+            y: 280,
+            width: 30,
+            height: 30,
+            action: "open_apps",
+          },
+          // Number pad
+          {
+            id: "num_1",
+            name: "1",
+            type: "number",
+            x: 60,
+            y: 330,
+            width: 30,
+            height: 30,
+            action: "number_1",
+          },
+          {
+            id: "num_2",
+            name: "2",
+            type: "number",
+            x: 105,
+            y: 330,
+            width: 30,
+            height: 30,
+            action: "number_2",
+          },
+          {
+            id: "num_3",
+            name: "3",
+            type: "number",
+            x: 150,
+            y: 330,
+            width: 30,
+            height: 30,
+            action: "number_3",
+          },
+          {
+            id: "num_4",
+            name: "4",
+            type: "number",
+            x: 60,
+            y: 365,
+            width: 30,
+            height: 30,
+            action: "number_4",
+          },
+          {
+            id: "num_5",
+            name: "5",
+            type: "number",
+            x: 105,
+            y: 365,
+            width: 30,
+            height: 30,
+            action: "number_5",
+          },
+          {
+            id: "num_6",
+            name: "6",
+            type: "number",
+            x: 150,
+            y: 365,
+            width: 30,
+            height: 30,
+            action: "number_6",
+          },
+          {
+            id: "num_7",
+            name: "7",
+            type: "number",
+            x: 60,
+            y: 400,
+            width: 30,
+            height: 30,
+            action: "number_7",
+          },
+          {
+            id: "num_8",
+            name: "8",
+            type: "number",
+            x: 105,
+            y: 400,
+            width: 30,
+            height: 30,
+            action: "number_8",
+          },
+          {
+            id: "num_9",
+            name: "9",
+            type: "number",
+            x: 150,
+            y: 400,
+            width: 30,
+            height: 30,
+            action: "number_9",
+          },
+          {
+            id: "num_0",
+            name: "0",
+            type: "number",
+            x: 105,
+            y: 435,
+            width: 30,
+            height: 30,
+            action: "number_0",
+          },
         ],
         zones: [
           {
@@ -577,6 +623,15 @@ async function seedDatabase() {
             width: 140,
             height: 50,
             description: "Smart TV app shortcuts",
+          },
+          {
+            id: "number_zone",
+            name: "Number Pad",
+            x: 40,
+            y: 310,
+            width: 130,
+            height: 150,
+            description: "Number buttons",
           },
         ],
       },
@@ -731,6 +786,148 @@ async function seedDatabase() {
             height: 30,
             action: "channel_down",
           },
+          // Professional controls
+          {
+            id: "record",
+            name: "Record",
+            type: "media",
+            x: 50,
+            y: 340,
+            width: 30,
+            height: 30,
+            action: "start_recording",
+          },
+          {
+            id: "play",
+            name: "Play",
+            type: "media",
+            x: 90,
+            y: 340,
+            width: 30,
+            height: 30,
+            action: "play_pause",
+          },
+          {
+            id: "stop",
+            name: "Stop",
+            type: "media",
+            x: 130,
+            y: 340,
+            width: 30,
+            height: 30,
+            action: "stop",
+          },
+          {
+            id: "rewind",
+            name: "Rewind",
+            type: "media",
+            x: 170,
+            y: 340,
+            width: 30,
+            height: 30,
+            action: "rewind",
+          },
+          // Number pad
+          {
+            id: "num_1",
+            name: "1",
+            type: "number",
+            x: 65,
+            y: 390,
+            width: 30,
+            height: 30,
+            action: "number_1",
+          },
+          {
+            id: "num_2",
+            name: "2",
+            type: "number",
+            x: 110,
+            y: 390,
+            width: 30,
+            height: 30,
+            action: "number_2",
+          },
+          {
+            id: "num_3",
+            name: "3",
+            type: "number",
+            x: 155,
+            y: 390,
+            width: 30,
+            height: 30,
+            action: "number_3",
+          },
+          {
+            id: "num_4",
+            name: "4",
+            type: "number",
+            x: 65,
+            y: 425,
+            width: 30,
+            height: 30,
+            action: "number_4",
+          },
+          {
+            id: "num_5",
+            name: "5",
+            type: "number",
+            x: 110,
+            y: 425,
+            width: 30,
+            height: 30,
+            action: "number_5",
+          },
+          {
+            id: "num_6",
+            name: "6",
+            type: "number",
+            x: 155,
+            y: 425,
+            width: 30,
+            height: 30,
+            action: "number_6",
+          },
+          {
+            id: "num_7",
+            name: "7",
+            type: "number",
+            x: 65,
+            y: 460,
+            width: 30,
+            height: 30,
+            action: "number_7",
+          },
+          {
+            id: "num_8",
+            name: "8",
+            type: "number",
+            x: 110,
+            y: 460,
+            width: 30,
+            height: 30,
+            action: "number_8",
+          },
+          {
+            id: "num_9",
+            name: "9",
+            type: "number",
+            x: 155,
+            y: 460,
+            width: 30,
+            height: 30,
+            action: "number_9",
+          },
+          {
+            id: "num_0",
+            name: "0",
+            type: "number",
+            x: 110,
+            y: 495,
+            width: 30,
+            height: 30,
+            action: "number_0",
+          },
         ],
         zones: [
           {
@@ -750,6 +947,24 @@ async function seedDatabase() {
             width: 160,
             height: 120,
             description: "Navigation controls",
+          },
+          {
+            id: "media_zone",
+            name: "Media Controls",
+            x: 40,
+            y: 320,
+            width: 140,
+            height: 50,
+            description: "Media playback controls",
+          },
+          {
+            id: "number_zone",
+            name: "Number Pad",
+            x: 45,
+            y: 370,
+            width: 130,
+            height: 160,
+            description: "Number buttons",
           },
         ],
       },
@@ -893,6 +1108,117 @@ async function seedDatabase() {
             height: 25,
             action: "channel_down",
           },
+          {
+            id: "exit",
+            name: "Exit",
+            type: "navigation",
+            x: 95,
+            y: 240,
+            width: 30,
+            height: 30,
+            action: "exit",
+          },
+          // Number pad
+          {
+            id: "num_1",
+            name: "1",
+            type: "number",
+            x: 55,
+            y: 290,
+            width: 25,
+            height: 25,
+            action: "number_1",
+          },
+          {
+            id: "num_2",
+            name: "2",
+            type: "number",
+            x: 95,
+            y: 290,
+            width: 25,
+            height: 25,
+            action: "number_2",
+          },
+          {
+            id: "num_3",
+            name: "3",
+            type: "number",
+            x: 135,
+            y: 290,
+            width: 25,
+            height: 25,
+            action: "number_3",
+          },
+          {
+            id: "num_4",
+            name: "4",
+            type: "number",
+            x: 55,
+            y: 320,
+            width: 25,
+            height: 25,
+            action: "number_4",
+          },
+          {
+            id: "num_5",
+            name: "5",
+            type: "number",
+            x: 95,
+            y: 320,
+            width: 25,
+            height: 25,
+            action: "number_5",
+          },
+          {
+            id: "num_6",
+            name: "6",
+            type: "number",
+            x: 135,
+            y: 320,
+            width: 25,
+            height: 25,
+            action: "number_6",
+          },
+          {
+            id: "num_7",
+            name: "7",
+            type: "number",
+            x: 55,
+            y: 350,
+            width: 25,
+            height: 25,
+            action: "number_7",
+          },
+          {
+            id: "num_8",
+            name: "8",
+            type: "number",
+            x: 95,
+            y: 350,
+            width: 25,
+            height: 25,
+            action: "number_8",
+          },
+          {
+            id: "num_9",
+            name: "9",
+            type: "number",
+            x: 135,
+            y: 350,
+            width: 25,
+            height: 25,
+            action: "number_9",
+          },
+          {
+            id: "num_0",
+            name: "0",
+            type: "number",
+            x: 95,
+            y: 380,
+            width: 25,
+            height: 25,
+            action: "number_0",
+          },
         ],
         zones: [
           {
@@ -913,48 +1239,54 @@ async function seedDatabase() {
             height: 90,
             description: "Navigation controls",
           },
+          {
+            id: "number_zone",
+            name: "Number Pad",
+            x: 35,
+            y: 270,
+            width: 120,
+            height: 140,
+            description: "Number buttons",
+          },
         ],
       },
     ];
 
-    // Проверяем существующие пульты
-    const existingRemotesResult = await database.query(
-      "SELECT device_id, COUNT(*) as count FROM remotes WHERE is_active = true GROUP BY device_id",
-    );
-    const existingRemotes = new Map(
-      existingRemotesResult.rows.map((row) => [
-        row.device_id,
-        parseInt(row.count),
-      ]),
-    );
-
-    let remotesCreated = 0;
-    let remotesSkipped = 0;
+    let createdCount = 0;
+    let skippedCount = 0;
 
     for (const remoteConfig of defaultRemotes) {
       const { deviceId, ...remoteData } = remoteConfig;
+
+      // Проверяем, существует ли устройство
+      const deviceExists = devices.find((d) => d.id === deviceId);
+      if (!deviceExists) {
+        console.log(`⚠️  Устройство ${deviceId} не найдено, пропускаем пульт`);
+        skippedCount++;
+        continue;
+      }
 
       // Проверяем, есть ли уже пульты для этого устройства
       const existingCount = existingRemotes.get(deviceId) || 0;
       if (existingCount > 0) {
         console.log(
-          `⏭️  У устройства ${deviceId} уже есть ${existingCount} пульт(ов), пропускаем`,
+          `⏭️  У устройства ${deviceExists.name} уже есть ${existingCount} пульт(ов), пропускаем`,
         );
-        remotesSkipped++;
+        skippedCount++;
         continue;
       }
 
-      console.log(`📱 Создаем пульт для ${deviceId}...`);
+      console.log(`��� Создаем пульт для ${deviceExists.name}...`);
 
+      const remoteId = uuidv4();
       await database.query(
         `INSERT INTO remotes (
-          id, device_id, name, manufacturer, model, description,
-          layout, color_scheme, dimensions, buttons, zones,
+          id, device_id, name, manufacturer, model, description, 
+          layout, color_scheme, dimensions, buttons, zones, 
           is_default, usage_count, is_active, created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-        ON CONFLICT (id) DO NOTHING`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
         [
-          `remote-${deviceId}`,
+          remoteId,
           deviceId,
           remoteData.name,
           remoteData.manufacturer,
@@ -973,27 +1305,27 @@ async function seedDatabase() {
         ],
       );
 
-      remotesCreated++;
+      createdCount++;
       console.log(`✅ Пульт "${remoteData.name}" создан успешно`);
     }
 
     // Создаем универсальный пульт
-    console.log("🌍 Создание универсального пульта...");
+    console.log("🌍 Со��дание универсального пульта...");
 
     const universalRemoteExists = await database.query(
       "SELECT COUNT(*) as count FROM remotes WHERE device_id IS NULL AND is_active = true",
     );
 
     if (parseInt(universalRemoteExists.rows[0].count) === 0) {
+      const universalRemoteId = uuidv4();
       await database.query(
         `INSERT INTO remotes (
-          id, device_id, name, manufacturer, model, description,
-          layout, color_scheme, dimensions, buttons, zones,
+          id, device_id, name, manufacturer, model, description, 
+          layout, color_scheme, dimensions, buttons, zones, 
           is_default, usage_count, is_active, created_at, updated_at
-        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)
-        ON CONFLICT (id) DO NOTHING`,
+        ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16)`,
         [
-          "remote-universal",
+          universalRemoteId,
           null, // device_id = NULL для универсального пульта
           "Universal Remote",
           "ANT",
@@ -1073,6 +1405,46 @@ async function seedDatabase() {
               height: 30,
               action: "confirm",
             },
+            {
+              id: "vol_up",
+              name: "Vol+",
+              type: "volume",
+              x: 40,
+              y: 160,
+              width: 25,
+              height: 25,
+              action: "volume_up",
+            },
+            {
+              id: "vol_down",
+              name: "Vol-",
+              type: "volume",
+              x: 40,
+              y: 190,
+              width: 25,
+              height: 25,
+              action: "volume_down",
+            },
+            {
+              id: "ch_up",
+              name: "Ch+",
+              type: "channel",
+              x: 160,
+              y: 160,
+              width: 25,
+              height: 25,
+              action: "channel_up",
+            },
+            {
+              id: "ch_down",
+              name: "Ch-",
+              type: "channel",
+              x: 160,
+              y: 190,
+              width: 25,
+              height: 25,
+              action: "channel_down",
+            },
           ]),
           JSON.stringify([
             {
@@ -1093,41 +1465,42 @@ async function seedDatabase() {
         ],
       );
 
-      remotesCreated++;
+      createdCount++;
       console.log("✅ Универсальный пульт создан успешно");
     } else {
       console.log("⏭️  Универсальный пульт уже существует, пропускаем");
-      remotesSkipped++;
+      skippedCount++;
     }
 
-    console.log(
-      `📱 Пультов создано: ${remotesCreated}, пропущено: ${remotesSkipped}`,
-    );
-
-    // 6. Пропускаем настройки сайта
-    console.log("⚙️  Пропускаем настройки сайта...");
-
-    // Проверяем количество записей
-    console.log("\n📊 Проверка данных...");
-    const devicesCount = await database.query(
-      "SELECT COUNT(*) as count FROM devices",
-    );
-    const problemsCount = await database.query(
-      "SELECT COUNT(*) as count FROM problems",
-    );
-    const remotesCount = await database.query(
+    // Проверяем итоговое количество пультов
+    const finalCount = await database.query(
       "SELECT COUNT(*) as count FROM remotes WHERE is_active = true",
     );
 
-    console.log("🎉 База данных успешно заполнена!");
-    console.log("===================================");
-    console.log(`📺 Устройств: ${devicesCount.rows[0].count}`);
-    console.log(`⚠️  Проблем: ${problemsCount.rows[0].count}`);
-    console.log(`🎮 Пультов: ${remotesCount.rows[0].count}`);
+    console.log("\n🎉 Создание пультов завершено!");
+    console.log("===============================");
+    console.log(`✅ Создано пультов: ${createdCount}`);
+    console.log(`⏭️  Пропущено: ${skippedCount}`);
+    console.log(`📱 Всего активных пультов: ${finalCount.rows[0].count}`);
 
-    console.log("\n✅ Заполнение базы данных завершено!");
+    // Проверяем, что у каждого устройства е��ть default пульт
+    console.log("\n🔍 Проверка default пультов для каждого устройства:");
+    for (const device of devices) {
+      const defaultRemote = await database.query(
+        "SELECT name FROM remotes WHERE device_id = $1 AND is_default = true AND is_active = true",
+        [device.id],
+      );
+
+      if (defaultRemote.rows.length > 0) {
+        console.log(`✅ ${device.name}: ${defaultRemote.rows[0].name}`);
+      } else {
+        console.log(`❌ ${device.name}: default пульт не найден`);
+      }
+    }
+
+    console.log("\n✅ Настройка пультов завершена успешно!");
   } catch (error) {
-    console.error("❌ Ошибка заполнения базы данных:", error.message);
+    console.error("❌ Ошибка создания пультов:", error.message);
     console.error("Stack trace:", error.stack);
     process.exit(1);
   } finally {
@@ -1136,5 +1509,5 @@ async function seedDatabase() {
   }
 }
 
-// Запуск заполнения
-seedDatabase();
+// Запуск создания пультов
+createDefaultRemotes();
