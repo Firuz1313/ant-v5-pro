@@ -310,7 +310,7 @@ const StepFormFields = React.memo<{
 
         <div>
           <Label htmlFor={isEdit ? "edit-instruction" : "instruction"}>
-            Инс��рукция *
+            Инструкция *
           </Label>
           <Textarea
             id={isEdit ? "edit-instruction" : "instruction"}
@@ -655,6 +655,104 @@ const StepsManagerFixed = () => {
     remoteId: "none",
     buttonPosition: { x: 0, y: 0 },
   });
+
+  // Handle drag end
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    // Find the group and steps being reordered
+    let targetGroup: { deviceId: string; problemId: string; steps: DiagnosticStep[] } | null = null;
+    let activeStep: DiagnosticStep | null = null;
+    let overStep: DiagnosticStep | null = null;
+
+    // Find the group containing the dragged step
+    Object.values(groupedSteps).forEach(group => {
+      const activeStepInGroup = group.steps.find(step => step.id === active.id);
+      const overStepInGroup = group.steps.find(step => step.id === over.id);
+
+      if (activeStepInGroup && overStepInGroup) {
+        targetGroup = group;
+        activeStep = activeStepInGroup;
+        overStep = overStepInGroup;
+      }
+    });
+
+    if (!targetGroup || !activeStep || !overStep) {
+      console.error('Could not find steps for reordering');
+      return;
+    }
+
+    try {
+      // Get the current order of steps in this group
+      const currentSteps = [...targetGroup.steps].sort((a, b) => a.stepNumber - b.stepNumber);
+      const activeIndex = currentSteps.findIndex(step => step.id === active.id);
+      const overIndex = currentSteps.findIndex(step => step.id === over.id);
+
+      if (activeIndex === -1 || overIndex === -1) {
+        console.error('Could not find step indexes');
+        return;
+      }
+
+      // Reorder the steps array
+      const reorderedSteps = arrayMove(currentSteps, activeIndex, overIndex);
+
+      // Create the new step IDs array in the correct order
+      const stepIds = reorderedSteps.map(step => step.id);
+
+      console.log('Reordering steps:', {
+        problemId: targetGroup.problemId,
+        stepIds,
+        from: activeIndex + 1,
+        to: overIndex + 1
+      });
+
+      // Update local state immediately for smooth UX
+      setSteps(prevSteps => {
+        const newSteps = [...prevSteps];
+
+        // Update step numbers for the reordered steps
+        reorderedSteps.forEach((step, index) => {
+          const stepIndex = newSteps.findIndex(s => s.id === step.id);
+          if (stepIndex !== -1) {
+            newSteps[stepIndex] = {
+              ...newSteps[stepIndex],
+              stepNumber: index + 1
+            };
+          }
+        });
+
+        return newSteps;
+      });
+
+      // Send reorder request to backend
+      await stepsApi.reorderSteps(targetGroup.problemId, stepIds);
+
+      toast({
+        title: "Успех",
+        description: `Порядок шагов обновлен: шаг "${activeStep.title}" перемещен с позиции ${activeIndex + 1} на позицию ${overIndex + 1}`,
+        variant: "default",
+      });
+
+      // Reload data to ensure consistency
+      await loadInitialData();
+
+    } catch (error) {
+      console.error('Error reordering steps:', error);
+
+      // Revert local changes on error
+      await loadInitialData();
+
+      toast({
+        title: "Ошибка",
+        description: `Не удалось изменить порядок шагов: ${error?.message || 'Неизвестная ошибка'}`,
+        variant: "destructive",
+      });
+    }
+  }, [groupedSteps, toast]);
 
   // Define loadInitialData function before useEffect
   const loadInitialData = async () => {
@@ -1083,7 +1181,7 @@ const StepsManagerFixed = () => {
 
       toast({
         title: "Ошибка удалени��",
-        description: `Не удалось удалит�� шаг: ${error?.message || "Неизвестн��я ошибка"}`,
+        description: `Не удалось удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
         variant: "destructive",
       });
     }
