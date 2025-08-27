@@ -55,6 +55,7 @@ import {
   EyeOff,
   Monitor,
   Settings,
+  GripVertical,
 } from "lucide-react";
 import {
   DropdownMenu,
@@ -70,6 +71,25 @@ import { useProblems } from "@/hooks/useProblems";
 import { tvInterfacesAPI } from "@/api/tvInterfaces";
 import { TVInterface, tvInterfaceUtils } from "@/types/tvInterface";
 import { stepsApi, remotesApi } from "@/api";
+import {
+  DndContext,
+  closestCenter,
+  KeyboardSensor,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  DragEndEvent,
+} from "@dnd-kit/core";
+import {
+  arrayMove,
+  SortableContext,
+  sortableKeyboardCoordinates,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import {
+  useSortable,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 
 interface DiagnosticStep {
   id: string;
@@ -955,7 +975,7 @@ const StepsManagerFixed = () => {
   };
 
   const openEditDialog = (step: DiagnosticStep) => {
-    console.log("🔄 Opening edit dialog for step:", step);
+    console.log("�� Opening edit dialog for step:", step);
 
     setSelectedStep(step);
     setFormData({
@@ -1101,7 +1121,7 @@ const StepsManagerFixed = () => {
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
                       Кликните на изображение пульта, ��тобы указать позицию
-                      кнопки
+                      кнопк��
                     </p>
                   </AlertDescription>
                 </Alert>
