@@ -121,7 +121,7 @@ const StepsManagerFixed = () => {
       console.error("❌ Error loading initial data:", error);
       toast({
         title: "Ошибка загрузки",
-        description: "Не удалось загрузить данные шагов",
+        description: "Не удалось загрузи��ь данные шагов",
         variant: "destructive",
       });
     } finally {
@@ -368,7 +368,7 @@ const StepsManagerFixed = () => {
 
       toast({
         title: "Успех",
-        description: "Шаг успешно создан",
+        description: "Шаг успешно соз��ан",
         variant: "default",
       });
     } catch (error) {
@@ -1127,7 +1127,7 @@ const StepsManagerFixed = () => {
                               ) : (
                                 <Eye className="h-4 w-4 mr-2" />
                               )}
-                              {step.isActive ? "Деактивиро��ать" : "Активировать"}
+                              {step.isActive ? "Деактивировать" : "Активировать"}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDelete(step.id)} className="text-red-600">
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -1169,22 +1169,7 @@ const StepsManagerFixed = () => {
           <DialogHeader>
             <DialogTitle>Редактировать ш��г</DialogTitle>
           </DialogHeader>
-          <StepFormFields
-            isEdit={true}
-            formData={formData}
-            handleFieldChange={handleFieldChange}
-            handleDeviceChange={handleDeviceChange}
-            devices={devices}
-            problems={problems}
-            remotes={remotes}
-            tvInterfaces={tvInterfaces}
-            loadingTVInterfaces={loadingTVInterfaces}
-            getActiveDevices={getActiveDevices}
-            getAvailableProblems={getAvailableProblems}
-            getAvailableRemotes={getAvailableRemotes}
-            openTVInterfaceEditor={openTVInterfaceEditor}
-            openRemoteEditor={openRemoteEditor}
-          />
+          <StepFormFields isEdit={true} />
           <div className="flex justify-end space-x-2">
             <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
               Отмена
