@@ -416,6 +416,19 @@ const StepsManagerFixed = () => {
     }
   }, [formData.deviceId]); // Removed loadingTVInterfaces dependency to prevent loops
 
+  // Helper functions that are used in useCallback hooks - MUST be defined before hooks that use them
+  const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
+
+  const getDeviceName = (deviceId: string) => {
+    const device = devices.find((d) => d.id === deviceId);
+    return device?.name || "Неизвестная приставка";
+  };
+
+  const getProblemTitle = (problemId: string) => {
+    const problem = problems.find((p) => p.id === problemId);
+    return problem?.title || "Неизвестная проблема";
+  };
+
   // Memoized stable field change handler
   const handleFieldChange = useCallback((field: string, value: any) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -791,7 +804,7 @@ const StepsManagerFixed = () => {
 
       toast({
         title: "Успех",
-        description: "Шаг успешно обновлен",
+        description: "Ш��г успешно обновлен",
         variant: "default",
       });
     } catch (error) {
