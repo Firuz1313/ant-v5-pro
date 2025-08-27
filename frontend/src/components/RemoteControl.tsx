@@ -48,7 +48,7 @@ const RemoteControl = ({
     remote?.imageData || remote?.image_data || remote?.imageUrl || remote?.image_url;
   const buttons = remote?.buttons || [];
   const dimensions = remote?.dimensions || { width: 260, height: 700 };
-  const useCustomRemote = remote && imageData && Array.isArray(buttons) && buttons.length > 0;
+  const useCustomRemote = !!imageData;
 
   const handleButtonClick = (buttonId: string) => {
     if (onButtonClick) {
