@@ -238,7 +238,7 @@ const ProblemsManager = () => {
 
   const getDeviceName = (deviceId: string) => {
     const device = devices.find((d) => d.id === deviceId);
-    return device?.name || "Неизвестна�� приставка";
+    return device?.name || "Не��звестна�� приставка";
   };
 
   const getCategoryInfo = (category: string) => {
@@ -274,7 +274,7 @@ const ProblemsManager = () => {
     // Client-side duplicate check for better UX
     if (checkForDuplicateTitle(formData.title, formData.deviceId)) {
       alert(
-        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\n��ожалуйста, выберите другое ��азвание.`,
+        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\n��ожалуйста, выберите другое ��азва��ие.`,
       );
       return;
     }
@@ -419,7 +419,7 @@ const ProblemsManager = () => {
     } catch (error) {
       console.error("Error toggling problem status:", error);
       alert(
-        "Ош��бка при изменении статуса проблемы: " + (error as any)?.message,
+        "Ош��бка при изменени�� статуса проблемы: " + (error as any)?.message,
       );
     }
   };
@@ -439,7 +439,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         alert(
-          `Не удалось создать копию: пробле��а с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или ��оздать новую проблему вручную.`,
+          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`,
         );
       } else {
         alert(
@@ -485,7 +485,7 @@ const ProblemsManager = () => {
     try {
       console.log("🔄 Массовая активация проблем...");
 
-      // Акти��ируем все проблемы по одной
+      // Активируем все проблемы по одной
       for (const problem of problems) {
         await updateProblemMutation.mutateAsync({
           id: problem.id,
@@ -582,7 +582,7 @@ const ProblemsManager = () => {
                 })
                 .catch((error) => {
                   console.error(
-                    "❌ Ошибка при создании тестовой проблемы:",
+                    "❌ ��шибка при создании тестовой проблемы:",
                     error,
                   );
 
@@ -598,7 +598,7 @@ const ProblemsManager = () => {
                     );
                   } else {
                     alert(
-                      "Оши��ка при создании тест��вой проблемы: " +
+                      "Ошибка при создании тест��вой проблемы: " +
                         (error?.message || "Неизвестная ошибка"),
                     );
                   }
@@ -1230,12 +1230,40 @@ const ProblemsManager = () => {
               Проблема успешно создана!
             </AlertDialogTitle>
             <AlertDialogDescription>
-              Проблема "{createdProblemTitle}" была успешно добавлена в систему и готова к использованию.
+              Проблема "{createdProblemTitle}" была успешно добавлена в систему и готова к использо��анию.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogAction onClick={() => setIsSuccessModalOpen(false)}>
               Понятно
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>
+              Удалить проблему?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы данных? Это действие нельзя отменить! Проблема "{problemToDelete?.title}" будет удалена навсегда.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => {
+              setIsDeleteModalOpen(false);
+              setProblemToDelete(null);
+            }}>
+              Отмена
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Удалить навсегда
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
