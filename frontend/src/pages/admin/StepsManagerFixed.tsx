@@ -117,7 +117,7 @@ const StepFormFields = React.memo(({
           <Label htmlFor={isEdit ? "edit-deviceId" : "deviceId"}>Приставка *</Label>
           <Select value={formData.deviceId} onValueChange={handleDeviceChange}>
             <SelectTrigger>
-              <SelectValue placeholder="Выберите пр��ставку" />
+              <SelectValue placeholder="Выберите приставку" />
             </SelectTrigger>
             <SelectContent>
               {getActiveDevices().map((device) => (
@@ -444,21 +444,21 @@ const StepsManagerFixed = () => {
     }
   };
 
-  const getActiveDevices = () => {
+  const getActiveDevices = useCallback(() => {
     const activeDevices = devices.filter((d: any) => d.isActive !== false);
     console.log("🔍 getActiveDevices called:", { totalDevices: devices.length, activeDevices: activeDevices.length });
     return activeDevices;
-  };
+  }, [devices]);
 
-  const getActiveRemotes = () => {
+  const getActiveRemotes = useCallback(() => {
     const activeRemotes = remotes.filter((r: any) => r.isActive !== false);
     console.log("🔍 getActiveRemotes called:", { totalRemotes: remotes.length, activeRemotes: activeRemotes.length });
     return activeRemotes;
-  };
+  }, [remotes]);
 
-  const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
+  const getRemoteById = useCallback((id: string) => remotes.find((r: any) => r.id === id), [remotes]);
 
-  const getProblemsForDevice = (deviceId: string) => {
+  const getProblemsForDevice = useCallback((deviceId: string) => {
     const deviceProblems = problems.filter((p: any) => p.deviceId === deviceId);
     console.log("🔍 getProblemsForDevice called:", {
       deviceId,
@@ -466,9 +466,9 @@ const StepsManagerFixed = () => {
       deviceProblems: deviceProblems.length,
     });
     return deviceProblems;
-  };
+  }, [problems]);
 
-  const getRemotesForDevice = (deviceId: string) => {
+  const getRemotesForDevice = useCallback((deviceId: string) => {
     const deviceRemotes = remotes.filter((r: any) => r.deviceId === deviceId);
     console.log("🔍 getRemotesForDevice called:", {
       deviceId,
@@ -476,18 +476,18 @@ const StepsManagerFixed = () => {
       deviceRemotes: deviceRemotes.length,
     });
     return deviceRemotes;
-  };
+  }, [remotes]);
 
-  const getDefaultRemoteForDevice = (deviceId: string) => {
+  const getDefaultRemoteForDevice = useCallback((deviceId: string) => {
     const defaultRemote = remotes.find((r: any) => r.deviceId === deviceId && r.isDefault);
     console.log("🔍 getDefaultRemoteForDevice called:", {
       deviceId,
       defaultRemote: defaultRemote ? { id: defaultRemote.id, name: defaultRemote.name } : null,
     });
     return defaultRemote;
-  };
+  }, [remotes]);
 
-  const getAvailableProblems = () => {
+  const getAvailableProblems = useCallback(() => {
     let availableProblems;
     if (formData.deviceId) {
       availableProblems = getProblemsForDevice(formData.deviceId);
@@ -502,9 +502,9 @@ const StepsManagerFixed = () => {
     });
 
     return availableProblems;
-  };
+  }, [formData.deviceId, problems, getProblemsForDevice]);
 
-  const getAvailableRemotes = () => {
+  const getAvailableRemotes = useCallback(() => {
     const result = formData.deviceId ? getRemotesForDevice(formData.deviceId) : getActiveRemotes();
 
     console.log("🔍 getAvailableRemotes called:", {
@@ -513,14 +513,14 @@ const StepsManagerFixed = () => {
     });
 
     return result;
-  };
+  }, [formData.deviceId, getRemotesForDevice, getActiveRemotes]);
 
-  const getFilteredRemotes = () => {
+  const getFilteredRemotes = useCallback(() => {
     if (filterDevice === "all") {
       return getActiveRemotes();
     }
     return getRemotesForDevice(filterDevice);
-  };
+  }, [filterDevice, getActiveRemotes, getRemotesForDevice]);
 
   const handleCreate = async () => {
     console.log("🔄 Creating step with form data:", formData);
@@ -958,7 +958,7 @@ const StepsManagerFixed = () => {
           <DialogTrigger asChild>
             <Button className="bg-blue-600 hover:bg-blue-700">
               <Plus className="h-4 w-4 mr-2" />
-              Создать новый шаг
+              Создать но��ый шаг
             </Button>
           </DialogTrigger>
           <DialogContent className="max-w-2xl">
