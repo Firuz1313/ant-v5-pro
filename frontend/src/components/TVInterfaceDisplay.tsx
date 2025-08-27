@@ -263,7 +263,7 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
           setError(response.error || 'Не удалось загрузить TV интерфейс');
         }
       } catch (err) {
-        setError('Ошибка при загрузке TV интерфейса');
+        setError('Ошибка при загрузке TV интерфейс��');
         console.error('Error loading TV interface:', err);
       } finally {
         setLoading(false);
@@ -420,25 +420,32 @@ const TVInterfaceDisplay: React.FC<TVInterfaceDisplayProps> = ({
         }}
       >
         {/* TV Interface image */}
-        {tvInterface.screenshot_data ? (
-          <img
-            src={tvInterface.screenshot_data}
-            alt={tvInterface.name}
-            className="w-full h-full object-contain"
-            style={{
-              maxWidth: '100%',
-              maxHeight: '100%',
-            }}
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center text-white">
-            <div className="text-center">
-              <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
-              <p className="text-lg">{tvInterface.name}</p>
-              <p className="text-sm opacity-75">{tvInterface.type}</p>
+        {(() => {
+          const screenshot =
+            (tvInterface as any).screenshot_data ||
+            (tvInterface as any).screenshotData ||
+            (tvInterface as any).screenshot_url ||
+            (tvInterface as any).screenshotUrl;
+          return screenshot ? (
+            <img
+              src={screenshot}
+              alt={tvInterface.name}
+              className="w-full h-full object-contain"
+              style={{
+                maxWidth: '100%',
+                maxHeight: '100%',
+              }}
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center text-white">
+              <div className="text-center">
+                <Monitor className="h-16 w-16 mx-auto mb-4 opacity-50" />
+                <p className="text-lg">{tvInterface.name}</p>
+                <p className="text-sm opacity-75">{tvInterface.type}</p>
+              </div>
             </div>
-          </div>
-        )}
+          );
+        })()}
 
         {/* Interface marks overlay */}
         {displayMarks.map((mark) => (
