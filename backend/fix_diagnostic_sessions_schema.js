@@ -12,7 +12,9 @@ async function fixDiagnosticSessionsSchema() {
     `;
 
     const sessionsResult = await database.query(checkDiagnosticSessionsQuery);
-    console.log(`Found ${sessionsResult.rows.length} is_active column in diagnostic_sessions`);
+    console.log(
+      `Found ${sessionsResult.rows.length} is_active column in diagnostic_sessions`,
+    );
 
     if (sessionsResult.rows.length === 0) {
       console.log("Adding missing is_active column to diagnostic_sessions...");
@@ -35,7 +37,9 @@ async function fixDiagnosticSessionsSchema() {
     `;
 
     const stepsResult = await database.query(checkDiagnosticStepsQuery);
-    console.log(`Found ${stepsResult.rows.length} is_active column in diagnostic_steps`);
+    console.log(
+      `Found ${stepsResult.rows.length} is_active column in diagnostic_steps`,
+    );
 
     if (stepsResult.rows.length === 0) {
       console.log("Adding missing is_active column to diagnostic_steps...");
@@ -82,7 +86,6 @@ async function fixDiagnosticSessionsSchema() {
     });
 
     console.log("\n🎉 Schema fix completed successfully!");
-
   } catch (error) {
     console.error("❌ Error fixing schema:", error.message);
     console.error("Stack trace:", error.stack);

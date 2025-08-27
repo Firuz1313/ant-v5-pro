@@ -17,11 +17,11 @@ class Remote extends BaseModel {
   async create(data) {
     try {
       // Если пульт привязан к устройству, проверяем есть ли уже пульты для этого устройства
-      if (data.device_id && data.device_id !== 'universal') {
+      if (data.device_id && data.device_id !== "universal") {
         const existingRemotes = await this.query(
           `SELECT COUNT(*) as count FROM ${this.tableName}
            WHERE device_id = $1 AND is_active = true`,
-          [data.device_id]
+          [data.device_id],
         );
 
         const count = parseInt(existingRemotes.rows[0]?.count || 0);
@@ -135,7 +135,7 @@ class Remote extends BaseModel {
           [remote.id],
         );
 
-        return this.formatResponse({...remote, is_default: true});
+        return this.formatResponse({ ...remote, is_default: true });
       }
 
       return null;

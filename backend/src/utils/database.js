@@ -416,10 +416,12 @@ export async function fixDiagnosticSessionsSchema() {
     `;
 
     const sessionsColumns = await query(sessionsColumnsQuery);
-    const existingSessionsColumns = sessionsColumns.rows.map(row => row.column_name);
+    const existingSessionsColumns = sessionsColumns.rows.map(
+      (row) => row.column_name,
+    );
 
-    const hasSessionsIsActive = existingSessionsColumns.includes('is_active');
-    const hasSessionsEndTime = existingSessionsColumns.includes('end_time');
+    const hasSessionsIsActive = existingSessionsColumns.includes("is_active");
+    const hasSessionsEndTime = existingSessionsColumns.includes("end_time");
 
     if (!hasSessionsIsActive) {
       await query(`
@@ -462,7 +464,10 @@ export async function fixDiagnosticSessionsSchema() {
     console.log("🎉 Схема diagnostic_sessions исправлена");
     return true;
   } catch (error) {
-    console.error("❌ Ошибка исправления схемы diagnostic_sessions:", error.message);
+    console.error(
+      "❌ Ошибка исправления схемы diagnostic_sessions:",
+      error.message,
+    );
     throw error;
   }
 }

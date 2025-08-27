@@ -164,7 +164,8 @@ const RemoteBuilder = () => {
   // Изв��екаем массивы данны�� из ответа API
   const devices = devicesResponse?.data || [];
   const remotes: RemoteTemplate[] = remotesResponse?.data || [];
-  const getActiveDevices = () => devices.filter((d: any) => d.isActive === true);
+  const getActiveDevices = () =>
+    devices.filter((d: any) => d.isActive === true);
   const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
   const getRemotesForDevice = (deviceId: string) =>
     remotes.filter((r: any) => r.deviceId === deviceId);
@@ -1049,7 +1050,8 @@ const RemoteBuilder = () => {
                           ))
                         ) : (
                           <div className="px-2 py-1 text-sm text-gray-500">
-                            Нет доступных устройств. Создайте устройство сначала.
+                            Нет доступных устройств. Создайте устройство
+                            сначала.
                           </div>
                         )}
                       </SelectContent>

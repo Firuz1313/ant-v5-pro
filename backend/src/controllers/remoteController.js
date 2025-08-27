@@ -326,7 +326,8 @@ export const getDefaultRemoteForDevice = async (req, res) => {
         success: false,
         error: "Пульт не найден для этого устройства",
         message: "Создайте пульт для данного устройства в админ панели",
-        suggestion: "Перейдите в раздел 'Конструктор пультов' для создания п��льта",
+        suggestion:
+          "Перейдите в раздел 'Конструктор пультов' для создания п��льта",
         timestamp: new Date().toISOString(),
       });
     }
@@ -334,7 +335,9 @@ export const getDefaultRemoteForDevice = async (req, res) => {
     res.json({
       success: true,
       data: remote,
-      message: remote.is_default ? "Найден пульт по умолчанию" : "Автоматически выбран доступный пульт",
+      message: remote.is_default
+        ? "Найден пульт по умолчанию"
+        : "Автоматически выбран доступный пульт",
       timestamp: new Date().toISOString(),
     });
   } catch (error) {
