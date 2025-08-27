@@ -129,6 +129,8 @@ const ProblemsManager = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
   const [createdProblemTitle, setCreatedProblemTitle] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [problemToDelete, setProblemToDelete] = useState<Problem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDevice, setFilterDevice] = useState<string>("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
@@ -369,19 +371,16 @@ const ProblemsManager = () => {
     }
   };
 
-  const handleDelete = async (problemId: string) => {
-    console.log(`🗑️ Hard delete requested for problem ID: ${problemId}`);
+  const openDeleteModal = (problem: Problem) => {
+    setProblemToDelete(problem);
+    setIsDeleteModalOpen(true);
+  };
 
-    if (
-      !confirm(
-        "Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы данных? Это действие нельзя отменить!",
-      )
-    ) {
-      console.log(`❌ User cancelled deletion`);
-      return;
-    }
+  const handleDelete = async () => {
+    if (!problemToDelete) return;
 
-    console.log(`🚀 Starting hard delete mutation for problem ${problemId}`);
+    console.log(`🗑️ Hard delete requested for problem ID: ${problemToDelete.id}`);
+    console.log(`🚀 Starting hard delete mutation for problem ${problemToDelete.id}`);
     try {
       // Явно указываем force: true для полного удаления из базы
       const result = await deleteProblemMutation.mutateAsync({
@@ -392,6 +391,10 @@ const ProblemsManager = () => {
       console.log(
         `🔄 React Query should automatically invalidate and refetch problems list`,
       );
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setProblemToDelete(null);
     } catch (error) {
       console.error("❌ Error deleting problem:", error);
       alert("Ошибка при удалении проблемы: " + (error as any)?.message);
@@ -1039,7 +1042,7 @@ const ProblemsManager = () => {
                         Экспортирова��ь
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => handleDelete(problem.id)}
+                        onClick={() => openDeleteModal(problem)}
                         className="text-red-600"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
