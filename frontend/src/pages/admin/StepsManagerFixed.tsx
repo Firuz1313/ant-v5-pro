@@ -18,6 +18,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -451,6 +461,8 @@ const StepsManagerFixed = () => {
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
   const [isRemoteEditorOpen, setIsRemoteEditorOpen] = useState(false);
   const [isTVInterfaceEditorOpen, setIsTVInterfaceEditorOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [stepToDelete, setStepToDelete] = useState<DiagnosticStep | null>(null);
 
   // Remote editor state
   const [selectedRemote, setSelectedRemote] = useState<any>(null);
@@ -795,7 +807,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обяза��ельные поля: устройство, проблема, название и инструкция",
+          "Заполните все обяза��ельные поля: устройство, проблема, название и инструк��ия",
         variant: "destructive",
       });
       return;
@@ -835,7 +847,7 @@ const StepsManagerFixed = () => {
         selectedStep.id,
         updatedFormData,
       );
-      console.log("✅ Step updated successfully:", response);
+      console.log("�� Step updated successfully:", response);
 
       // Update local state
       if (response.data) {
@@ -868,12 +880,23 @@ const StepsManagerFixed = () => {
     }
   };
 
-  const handleDelete = async (stepId: string) => {
+  const openDeleteModal = (step: DiagnosticStep) => {
+    setStepToDelete(step);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!stepToDelete) return;
+
     try {
-      await stepsApi.deleteStep(stepId);
+      await stepsApi.deleteStep(stepToDelete.id);
 
       // Update local state
-      setSteps((prev) => prev.filter((step) => step.id !== stepId));
+      setSteps((prev) => prev.filter((step) => step.id !== stepToDelete.id));
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setStepToDelete(null);
 
       // Reload data to ensure consistency
       await loadInitialData();
@@ -885,6 +908,11 @@ const StepsManagerFixed = () => {
       });
     } catch (error) {
       console.error("❌ Error deleting step:", error);
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setStepToDelete(null);
+
       toast({
         title: "Ошибка удалени��",
         description: `Не удалось удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
@@ -1371,7 +1399,7 @@ const StepsManagerFixed = () => {
                                 : "Активировать"}
                             </DropdownMenuItem>
                             <DropdownMenuItem
-                              onClick={() => handleDelete(step.id)}
+                              onClick={() => openDeleteModal(step)}
                               className="text-red-600"
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
@@ -1452,6 +1480,36 @@ const StepsManagerFixed = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить шаг?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из базы данных?
+              Это действие нельзя отменить! Шаг "{stepToDelete?.title}" будет
+              удален навсегда.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setStepToDelete(null);
+              }}
+            >
+              Отмена
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Удалить навсегда
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {Object.keys(groupedSteps).length === 0 && (
         <Card>

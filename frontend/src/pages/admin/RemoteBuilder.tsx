@@ -12,6 +12,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -188,6 +198,10 @@ const RemoteBuilder = () => {
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
   const [isEditorDialogOpen, setIsEditorDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [remoteToDelete, setRemoteToDelete] = useState<RemoteTemplate | null>(
+    null,
+  );
   const [filterLayout, setFilterLayout] = useState<string>("all");
   const [filterDevice, setFilterDevice] = useState<string>("all");
 
@@ -347,7 +361,7 @@ const RemoteBuilder = () => {
         },
       });
 
-      toast.success("Пульт обновлен успешно");
+      toast.success("Пульт обновлен успеш��о");
       setIsEditDialogOpen(false);
       setSelectedRemote(null);
       resetForm();
@@ -357,23 +371,36 @@ const RemoteBuilder = () => {
     }
   };
 
-  const handleDelete = async (remoteId: string) => {
-    const deleteCheck = canDeleteRemote(remoteId);
+  const openDeleteModal = (remote: RemoteTemplate) => {
+    setRemoteToDelete(remote);
+    setIsDeleteModalOpen(true);
+  };
+
+  const handleDelete = async () => {
+    if (!remoteToDelete) return;
+
+    const deleteCheck = canDeleteRemote(remoteToDelete.id);
     if (!deleteCheck.canDelete) {
       toast.error(deleteCheck.reason);
-      return;
-    }
-
-    if (!confirm("��ы уверены, что хотите удалить этот пульт?")) {
+      setIsDeleteModalOpen(false);
+      setRemoteToDelete(null);
       return;
     }
 
     try {
-      await deleteRemoteMutation.mutateAsync(remoteId);
+      await deleteRemoteMutation.mutateAsync(remoteToDelete.id);
       toast.success("Пульт удален успешно");
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setRemoteToDelete(null);
     } catch (error: any) {
       console.error("Error deleting remote:", error);
       toast.error(error?.message || "Ошибка при удалении пульта");
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setRemoteToDelete(null);
     }
   };
 
@@ -406,7 +433,7 @@ const RemoteBuilder = () => {
         remoteId,
         deviceId: remote.deviceId,
       });
-      toast.success("Пульт устано��лен по умолчанию");
+      toast.success("Пульт устано����ен по умолчанию");
     } catch (error: any) {
       console.error("Error setting default remote:", error);
       toast.error(error?.message || "Ошибка при установке пульта по умолчанию");
@@ -1130,7 +1157,7 @@ const RemoteBuilder = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="colorScheme">Цветовая схема</Label>
+                    <Label htmlFor="colorScheme">Ц��етовая схема</Label>
                     <Select
                       value={formData.colorScheme}
                       onValueChange={(value) =>
@@ -1225,7 +1252,7 @@ const RemoteBuilder = () => {
       {remotesLoading && (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-          <span className="text-lg">Загрузка пультов...</span>
+          <span className="text-lg">Загрузка ��ультов...</span>
         </div>
       )}
 
@@ -1369,7 +1396,7 @@ const RemoteBuilder = () => {
                           <DropdownMenuItem
                             onClick={() => handleSetDefault(remote.id)}
                           >
-                            Сделать по умолчанию
+                            Сделать по умолча��ию
                           </DropdownMenuItem>
                         )}
                         <DropdownMenuItem>
@@ -1377,7 +1404,7 @@ const RemoteBuilder = () => {
                           Экспортировать
                         </DropdownMenuItem>
                         <DropdownMenuItem
-                          onClick={() => handleDelete(remote.id)}
+                          onClick={() => openDeleteModal(remote)}
                           className="text-red-600"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
@@ -1602,6 +1629,35 @@ const RemoteBuilder = () => {
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить пульт?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Вы уверены, что хотите удалить этот пульт? Это действие нельзя
+              отменить! Пульт "{remoteToDelete?.name}" будет удален навсегда.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setRemoteToDelete(null);
+              }}
+            >
+              Отмена
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Удалить навсегда
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {filteredRemotes.length === 0 && (
         <Card>

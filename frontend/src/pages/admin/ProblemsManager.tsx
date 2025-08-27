@@ -12,6 +12,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -118,6 +128,10 @@ const ProblemsManager = () => {
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [createdProblemTitle, setCreatedProblemTitle] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [problemToDelete, setProblemToDelete] = useState<Problem | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDevice, setFilterDevice] = useState<string>("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
@@ -249,7 +263,7 @@ const ProblemsManager = () => {
     });
 
     if (!formData.title) {
-      alert("Пожалуйста, введите название проблемы");
+      alert("Пожалуйста, введите назв��ние проблемы");
       return;
     }
 
@@ -261,7 +275,7 @@ const ProblemsManager = () => {
     // Client-side duplicate check for better UX
     if (checkForDuplicateTitle(formData.title, formData.deviceId)) {
       alert(
-        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\nПожалуйста, выберите другое ��азвание.`,
+        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\n��ожалуйста, выберите другое ��азвание.`,
       );
       return;
     }
@@ -290,7 +304,9 @@ const ProblemsManager = () => {
       setIsCreateDialogOpen(false);
       resetForm();
 
-      alert("Проблема успешно создана!");
+      // Show success modal instead of alert
+      setCreatedProblemTitle(problemData.title);
+      setIsSuccessModalOpen(true);
     } catch (error) {
       console.error("❌ Ошибка при создании проблемы:", error);
       console.error("❌ Дет��ли ошибки:", {
@@ -312,7 +328,7 @@ const ProblemsManager = () => {
         const suggestions = errorResponse.details?.suggestions || [];
 
         let alertMessage = `Проблема с таким названием уже существует для этого устройства.\n\n`;
-        alertMessage += `Существующая проблема:\n`;
+        alertMessage += `��уществующая проблема:\n`;
         alertMessage += `• Название: "${existingProblem?.title}"\n`;
         alertMessage += `• Статус: ${existingProblem?.status}\n`;
         alertMessage += `• Создана: ${existingProblem?.created_at ? new Date(existingProblem.created_at).toLocaleDateString() : "н/д"}\n\n`;
@@ -356,31 +372,41 @@ const ProblemsManager = () => {
     }
   };
 
-  const handleDelete = async (problemId: string) => {
-    console.log(`🗑️ Hard delete requested for problem ID: ${problemId}`);
+  const openDeleteModal = (problem: Problem) => {
+    setProblemToDelete(problem);
+    setIsDeleteModalOpen(true);
+  };
 
-    if (
-      !confirm(
-        "Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы данных? Это действие нельзя отменить!",
-      )
-    ) {
-      console.log(`❌ User cancelled deletion`);
-      return;
-    }
+  const handleDelete = async () => {
+    if (!problemToDelete) return;
 
-    console.log(`🚀 Starting hard delete mutation for problem ${problemId}`);
+    console.log(
+      `🗑️ Hard delete requested for problem ID: ${problemToDelete.id}`,
+    );
+    console.log(
+      `🚀 Starting hard delete mutation for problem ${problemToDelete.id}`,
+    );
     try {
       // Явно указываем force: true для полного удаления из базы
       const result = await deleteProblemMutation.mutateAsync({
-        id: problemId,
+        id: problemToDelete.id,
         force: true,
       });
       console.log(`✅ Hard delete successful:`, result);
       console.log(
         `🔄 React Query should automatically invalidate and refetch problems list`,
       );
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setProblemToDelete(null);
     } catch (error) {
       console.error("❌ Error deleting problem:", error);
+
+      // Close the modal
+      setIsDeleteModalOpen(false);
+      setProblemToDelete(null);
+
       alert("Ошибка при удалении проблемы: " + (error as any)?.message);
     }
   };
@@ -423,7 +449,7 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         alert(
-          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую проблему вручную.`,
+          `Не удалось создать копию: проблема �� названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую п��облему вручную.`,
         );
       } else {
         alert(
@@ -469,7 +495,7 @@ const ProblemsManager = () => {
     try {
       console.log("🔄 Массовая активация проблем...");
 
-      // Активируем все проблемы по одной
+      // Активируем все проб��емы по одной
       for (const problem of problems) {
         await updateProblemMutation.mutateAsync({
           id: problem.id,
@@ -501,7 +527,7 @@ const ProblemsManager = () => {
         await deleteProblemMutation.mutateAsync({ id: problem.id });
       }
 
-      alert("Все проблемы удалены!");
+      alert("Вс�� проблемы удалены!");
     } catch (error) {
       console.error("Error clearing problems:", error);
       alert("Ошибка при удалении проблем: " + (error as any)?.message);
@@ -561,7 +587,8 @@ const ProblemsManager = () => {
                 .mutateAsync(testData)
                 .then(() => {
                   console.log("✅ Тестовая проблема создана успешно");
-                  alert("Тестовая проблема создана успешно!");
+                  setCreatedProblemTitle(testTitle);
+                  setIsSuccessModalOpen(true);
                 })
                 .catch((error) => {
                   console.error(
@@ -577,11 +604,11 @@ const ProblemsManager = () => {
                     );
                   } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
                     alert(
-                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
+                      `Не удалось с��здать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
                     );
                   } else {
                     alert(
-                      "Ошибка при создании тест��вой проблемы: " +
+                      "Ошибка при создани�� тест��вой проблемы: " +
                         (error?.message || "Неизвестная ошибка"),
                     );
                   }
@@ -639,7 +666,7 @@ const ProblemsManager = () => {
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            Очистить всё
+            О��истить всё
           </Button>
           <Button variant="outline">
             <Upload className="h-4 w-4 mr-2" />
@@ -1025,7 +1052,7 @@ const ProblemsManager = () => {
                         Экспортирова��ь
                       </DropdownMenuItem>
                       <DropdownMenuItem
-                        onClick={() => handleDelete(problem.id)}
+                        onClick={() => openDeleteModal(problem)}
                         className="text-red-600"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
@@ -1204,6 +1231,57 @@ const ProblemsManager = () => {
           </CardContent>
         </Card>
       )}
+
+      {/* Success Modal */}
+      <AlertDialog
+        open={isSuccessModalOpen}
+        onOpenChange={setIsSuccessModalOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Проблема успешно создана!</AlertDialogTitle>
+            <AlertDialogDescription>
+              Проблема "{createdProblemTitle}" была успешно добавлена в систему
+              и готова к использованию.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogAction onClick={() => setIsSuccessModalOpen(false)}>
+              Понятно
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Delete Confirmation Modal */}
+      <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Удалить проблему?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ эту проблему из базы
+              данных? Это действие нельзя отменить! Проблема "
+              {problemToDelete?.title}" будет удалена навсегда.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel
+              onClick={() => {
+                setIsDeleteModalOpen(false);
+                setProblemToDelete(null);
+              }}
+            >
+              Отмена
+            </AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              className="bg-red-600 hover:bg-red-700"
+            >
+              Удалить навсегда
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
