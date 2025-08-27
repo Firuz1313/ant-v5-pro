@@ -667,18 +667,6 @@ const StepsManagerFixed = () => {
     );
   }
 
-  const getRemoteById = (id: string) => remotes.find((r: any) => r.id === id);
-
-  const getDeviceName = (deviceId: string) => {
-    const device = devices.find((d) => d.id === deviceId);
-    return device?.name || "Неизвестная приставка";
-  };
-
-  const getProblemTitle = (problemId: string) => {
-    const problem = problems.find((p) => p.id === problemId);
-    return problem?.title || "Неизвестная проблема";
-  };
-
   const handleCreate = async () => {
     console.log("🔄 Creating step with form data:", formData);
 
