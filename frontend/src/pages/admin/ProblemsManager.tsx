@@ -12,6 +12,15 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -118,6 +127,8 @@ const ProblemsManager = () => {
   const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
   const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
   const [isEditDialogOpen, setIsEditDialogOpen] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+  const [createdProblemTitle, setCreatedProblemTitle] = useState("");
   const [searchTerm, setSearchTerm] = useState("");
   const [filterDevice, setFilterDevice] = useState<string>("all");
   const [filterCategory, setFilterCategory] = useState<string>("all");
@@ -249,7 +260,7 @@ const ProblemsManager = () => {
     });
 
     if (!formData.title) {
-      alert("Пожалуйста, введите название проблемы");
+      alert("Пожалуйста, введите назв��ние проблемы");
       return;
     }
 
@@ -290,7 +301,9 @@ const ProblemsManager = () => {
       setIsCreateDialogOpen(false);
       resetForm();
 
-      alert("Проблема успешно создана!");
+      // Show success modal instead of alert
+      setCreatedProblemTitle(problemData.title);
+      setIsSuccessModalOpen(true);
     } catch (error) {
       console.error("❌ Ошибка при создании проблемы:", error);
       console.error("❌ Дет��ли ошибки:", {
@@ -312,7 +325,7 @@ const ProblemsManager = () => {
         const suggestions = errorResponse.details?.suggestions || [];
 
         let alertMessage = `Проблема с таким названием уже существует для этого устройства.\n\n`;
-        alertMessage += `Существующая проблема:\n`;
+        alertMessage += `��уществующая проблема:\n`;
         alertMessage += `• Название: "${existingProblem?.title}"\n`;
         alertMessage += `• Статус: ${existingProblem?.status}\n`;
         alertMessage += `• Создана: ${existingProblem?.created_at ? new Date(existingProblem.created_at).toLocaleDateString() : "н/д"}\n\n`;
@@ -577,7 +590,7 @@ const ProblemsManager = () => {
                     );
                   } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
                     alert(
-                      `Не удалось создать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
+                      `Не удалось с��здать тестовую проблему: проблема с таким названием уже существует.\n\nПопробуйте сначала удалить старые тестовые проблемы.`,
                     );
                   } else {
                     alert(
