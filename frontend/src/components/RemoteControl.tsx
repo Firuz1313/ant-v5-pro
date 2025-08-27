@@ -44,7 +44,8 @@ const RemoteControl = ({
 
   // Resolve remote from props or fallbacks
   const remote = providedRemote ?? (remoteId ? getRemoteById(remoteId) : getDefaultRemote());
-  const imageData = remote?.imageData || remote?.image_data;
+  const imageData =
+    remote?.imageData || remote?.image_data || remote?.imageUrl || remote?.image_url;
   const buttons = remote?.buttons || [];
   const dimensions = remote?.dimensions || { width: 260, height: 700 };
   const useCustomRemote = remote && imageData && Array.isArray(buttons) && buttons.length > 0;
