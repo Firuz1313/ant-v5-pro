@@ -403,6 +403,59 @@ export async function createTVInterfaceMarksTable() {
   }
 }
 
+// Функция исправления схемы diagnostic_sessions и diagnostic_steps
+export async function fixDiagnosticSessionsSchema() {
+  try {
+    console.log("🔧 Проверка и исправление схемы diagnostic_sessions...");
+
+    // Проверяем есть ли колонка is_active в diagnostic_sessions
+    const sessionsColumnsQuery = `
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = 'diagnostic_sessions' AND column_name = 'is_active';
+    `;
+
+    const sessionsColumns = await query(sessionsColumnsQuery);
+    const hasSessionsIsActive = sessionsColumns.rows.length > 0;
+
+    if (!hasSessionsIsActive) {
+      await query(`
+        ALTER TABLE diagnostic_sessions
+        ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT true
+      `);
+      console.log("✅ Добавлена колонка is_active в diagnostic_sessions");
+    }
+
+    // Проверяем есть ли колонка is_active в diagnostic_steps
+    const stepsColumnsQuery = `
+      SELECT column_name
+      FROM information_schema.columns
+      WHERE table_name = 'diagnostic_steps' AND column_name = 'is_active';
+    `;
+
+    const stepsColumns = await query(stepsColumnsQuery);
+    const hasStepsIsActive = stepsColumns.rows.length > 0;
+
+    if (!hasStepsIsActive) {
+      await query(`
+        ALTER TABLE diagnostic_steps
+        ADD COLUMN is_active BOOLEAN NOT NULL DEFAULT true
+      `);
+      console.log("✅ Добавлена колонка is_active в diagnostic_steps");
+    }
+
+    if (hasSessionsIsActive && hasStepsIsActive) {
+      console.log("✅ Все необходимые колонки is_active уже существуют");
+    }
+
+    console.log("🎉 Схема diagnostic_sessions исправлена");
+    return true;
+  } catch (error) {
+    console.error("❌ Ошибка исправления схемы diagnostic_sessions:", error.message);
+    throw error;
+  }
+}
+
 // Функция получения статистики базы данных
 export async function getDatabaseStats() {
   try {
