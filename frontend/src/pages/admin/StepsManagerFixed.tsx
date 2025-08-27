@@ -231,7 +231,7 @@ const StepFormFields = React.memo<{
           id={isEdit ? "edit-description" : "description"}
           value={formData.description}
           onChange={handleDescriptionChange}
-          placeholder="Краткое описание шага"
+          placeholder="Краткое описание шаг��"
         />
       </div>
 
@@ -350,10 +350,6 @@ const StepsManagerFixed = () => {
   const { data: problemsResponse, isLoading: problemsLoading, error: problemsError } = useProblems();
   const { toast } = useToast();
 
-  // Extract data arrays from API responses
-  const devices = devicesResponse?.data || [];
-  const problems = problemsResponse?.data || [];
-
   // Local state for steps and remotes
   const [steps, setSteps] = useState<DiagnosticStep[]>([]);
   const [remotes, setRemotes] = useState<any[]>([]);
@@ -411,10 +407,108 @@ const StepsManagerFixed = () => {
       const timeoutId = setTimeout(() => {
         loadTVInterfacesForDevice(formData.deviceId);
       }, 0);
-      
+
       return () => clearTimeout(timeoutId);
     }
   }, [formData.deviceId]); // Removed loadingTVInterfaces dependency to prevent loops
+
+  // Memoized stable field change handler
+  const handleFieldChange = useCallback((field: string, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  }, []);
+
+  // Memoized stable device change handler
+  const handleDeviceChange = useCallback(
+    (value: string) => {
+      const defaultRemote = remotes.find((r: any) => r.deviceId === value && r.isDefault);
+      setFormData((prev) => ({
+        ...prev,
+        deviceId: value,
+        problemId: "", // Reset problem when device changes
+        remoteId: defaultRemote?.id || "none",
+      }));
+    },
+    [remotes],
+  );
+
+  // Memoized computed values for optimal performance
+  const filteredSteps = useMemo(() => {
+    return steps.filter((step) => {
+      const matchesSearch =
+        step.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        step.description.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesDevice = filterDevice === "all" || step.deviceId === filterDevice;
+      const matchesProblem = filterProblem === "all" || step.problemId === filterProblem;
+      const matchesRemote =
+        filterRemote === "all" ||
+        step.remoteId === filterRemote ||
+        (!step.remoteId && filterRemote === "none");
+      return matchesSearch && matchesDevice && matchesProblem && matchesRemote;
+    });
+  }, [steps, searchTerm, filterDevice, filterProblem, filterRemote]);
+
+  const groupedSteps = useMemo(() => {
+    return filteredSteps.reduce(
+      (acc, step) => {
+        const key = `${step.deviceId}-${step.problemId}`;
+        if (!acc[key]) {
+          acc[key] = {
+            deviceId: step.deviceId,
+            problemId: step.problemId,
+            steps: [],
+          };
+        }
+        acc[key].steps.push(step);
+        return acc;
+      },
+      {} as Record<string, { deviceId: string; problemId: string; steps: DiagnosticStep[] }>
+    );
+  }, [filteredSteps]);
+
+  const activeDevices = useMemo(() =>
+    devices.filter((d: any) => d.isActive !== false),
+    [devices]
+  );
+
+  const activeRemotes = useMemo(() =>
+    remotes.filter((r: any) => r.isActive !== false),
+    [remotes]
+  );
+
+  const filteredRemotes = useMemo(() => {
+    if (filterDevice === "all") {
+      return activeRemotes;
+    }
+    return remotes.filter((r: any) => r.deviceId === filterDevice);
+  }, [filterDevice, activeRemotes, remotes]);
+
+  const openRemoteEditor = useCallback(() => {
+    const remote = getRemoteById(formData.remoteId);
+    if (remote) {
+      setSelectedRemote(remote);
+      setIsRemoteEditorOpen(true);
+    }
+  }, [formData.remoteId, remotes]);
+
+  const openTVInterfaceEditor = useCallback((tvInterface: TVInterface) => {
+    console.log("Opening TV Interface Editor with:", tvInterface);
+    setSelectedTVInterface(tvInterface);
+    setIsTVInterfaceEditorOpen(true);
+  }, []);
+
+  // Extract data arrays from API responses AFTER all hooks are defined
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
+
+  // Show loading state while data is being fetched - AFTER all hooks
+  if (loading || devicesLoading || problemsLoading) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+        <span className="text-lg">Загрузка данных...</span>
+      </div>
+    );
+  }
 
   const loadInitialData = async () => {
     try {
@@ -1115,7 +1209,7 @@ const StepsManagerFixed = () => {
                             <div className="flex items-center space-x-2 mb-1">
                               <h4 className="font-semibold text-gray-900 dark:text-white">{step.title}</h4>
                               <Badge variant={step.isActive ? "default" : "secondary"}>
-                                {step.isActive ? "Активный" : "Неактивный"}
+                                {step.isActive ? "Активный" : "Неакти��ный"}
                               </Badge>
                               {step.requiredAction && (
                                 <Badge variant="outline">
