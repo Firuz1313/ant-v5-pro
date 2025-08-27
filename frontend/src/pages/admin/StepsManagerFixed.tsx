@@ -721,21 +721,10 @@ const StepsManagerFixed = () => {
     }
 
     try {
-      // Calculate next step number
-      const deviceSteps = steps.filter(
-        (s) =>
-          s.deviceId === formData.deviceId &&
-          s.problemId === formData.problemId,
-      );
-      const maxStepNumber =
-        deviceSteps.length > 0
-          ? Math.max(...deviceSteps.map((s) => s.stepNumber))
-          : 0;
-
+      // Do not send stepNumber; let backend auto-assign next available number
       const stepData = {
         problemId: formData.problemId,
         deviceId: formData.deviceId,
-        stepNumber: maxStepNumber + 1,
         title: formData.title,
         description: formData.description || "",
         instruction: formData.instruction,
