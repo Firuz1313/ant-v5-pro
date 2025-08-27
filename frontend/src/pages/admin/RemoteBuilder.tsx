@@ -12,6 +12,16 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -188,6 +198,8 @@ const RemoteBuilder = () => {
   const [isPreviewDialogOpen, setIsPreviewDialogOpen] = useState(false);
   const [isEditorDialogOpen, setIsEditorDialogOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [remoteToDelete, setRemoteToDelete] = useState<RemoteTemplate | null>(null);
   const [filterLayout, setFilterLayout] = useState<string>("all");
   const [filterDevice, setFilterDevice] = useState<string>("all");
 
@@ -1130,7 +1142,7 @@ const RemoteBuilder = () => {
                   </div>
 
                   <div>
-                    <Label htmlFor="colorScheme">Цветовая схема</Label>
+                    <Label htmlFor="colorScheme">Ц��етовая схема</Label>
                     <Select
                       value={formData.colorScheme}
                       onValueChange={(value) =>
@@ -1225,7 +1237,7 @@ const RemoteBuilder = () => {
       {remotesLoading && (
         <div className="flex items-center justify-center py-12">
           <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-          <span className="text-lg">Загрузка пультов...</span>
+          <span className="text-lg">Загрузка ��ультов...</span>
         </div>
       )}
 
