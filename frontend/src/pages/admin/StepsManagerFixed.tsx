@@ -523,40 +523,6 @@ const StepsManagerFixed = () => {
     );
   }
 
-  const loadInitialData = async () => {
-    try {
-      setLoading(true);
-
-      // Load steps
-      const stepsResponse = await stepsApi.getSteps(1, 1000);
-      console.log("🔍 Steps response:", stepsResponse);
-
-      const stepsData = stepsResponse?.data || [];
-      setSteps(Array.isArray(stepsData) ? stepsData : []);
-
-      // Load remotes
-      const remotesResponse = await remotesApi.getAll();
-      console.log("🔍 Remotes response:", remotesResponse);
-
-      const remotesData = remotesResponse?.data || remotesResponse || [];
-      setRemotes(Array.isArray(remotesData) ? remotesData : []);
-
-      console.log("✅ Loaded data:", {
-        steps: Array.isArray(stepsData) ? stepsData.length : 0,
-        remotes: Array.isArray(remotesData) ? remotesData.length : 0,
-      });
-    } catch (error) {
-      console.error("❌ Error loading initial data:", error);
-      toast({
-        title: "Ошибка загрузки",
-        description: "Не удалось загрузить данные шагов",
-        variant: "destructive",
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const loadTVInterfacesForDevice = async (deviceId: string) => {
     setLoadingTVInterfaces(true);
     try {
@@ -754,7 +720,7 @@ const StepsManagerFixed = () => {
       console.error("❌ Error deleting step:", error);
       toast({
         title: "Ошибка удалени��",
-        description: `Не удалось удалить шаг: ${error?.message || 'Неизвестная ошибка'}`,
+        description: `Не удалось удалить шаг: ${error?.message || 'Неизвестн��я ошибка'}`,
         variant: "destructive",
       });
     }
