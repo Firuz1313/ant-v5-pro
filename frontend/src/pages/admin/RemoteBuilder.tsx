@@ -225,6 +225,12 @@ const RemoteBuilder = () => {
 
   const activeDevices = getActiveDevices();
 
+  // Debug information
+  console.log("🐞 DEBUG: devices =", devices);
+  console.log("🐞 DEBUG: activeDevices =", activeDevices);
+  console.log("🐞 DEBUG: total devices count =", devices.length);
+  console.log("🐞 DEBUG: active devices count =", activeDevices.length);
+
   const layouts = [
     { value: "standard", label: "Стандартный" },
     { value: "compact", label: "Компактный" },
@@ -1025,7 +1031,7 @@ const RemoteBuilder = () => {
                       onChange={(e) =>
                         setFormData({ ...formData, model: e.target.value })
                       }
-                      placeholder="Модель пульта"
+                      placeholder="М��дель пульта"
                     />
                   </div>
                   <div>
@@ -1247,7 +1253,7 @@ const RemoteBuilder = () => {
                       <Badge variant="default">По умолчанию</Badge>
                     )}
                     <Badge variant={remote.isActive ? "default" : "secondary"}>
-                      {remote.isActive ? "Активный" : "Неактивный"}
+                      {remote.isActive ? "А��тивный" : "Неактивный"}
                     </Badge>
                   </div>
                 </div>
