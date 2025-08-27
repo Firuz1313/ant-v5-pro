@@ -231,7 +231,7 @@ const StepFormFields = React.memo<{
           id={isEdit ? "edit-description" : "description"}
           value={formData.description}
           onChange={handleDescriptionChange}
-          placeholder="Краткое описание шаг��"
+          placeholder="Краткое описание шага"
         />
       </div>
 
@@ -349,6 +349,10 @@ const StepsManagerFixed = () => {
   const { data: devicesResponse, isLoading: devicesLoading, error: devicesError } = useDevices();
   const { data: problemsResponse, isLoading: problemsLoading, error: problemsError } = useProblems();
   const { toast } = useToast();
+
+  // Extract data arrays from API responses - MUST be before other hooks that depend on them
+  const devices = devicesResponse?.data || [];
+  const problems = problemsResponse?.data || [];
 
   // Local state for steps and remotes
   const [steps, setSteps] = useState<DiagnosticStep[]>([]);
@@ -495,10 +499,6 @@ const StepsManagerFixed = () => {
     setSelectedTVInterface(tvInterface);
     setIsTVInterfaceEditorOpen(true);
   }, []);
-
-  // Extract data arrays from API responses AFTER all hooks are defined
-  const devices = devicesResponse?.data || [];
-  const problems = problemsResponse?.data || [];
 
   // Show loading state while data is being fetched - AFTER all hooks
   if (loading || devicesLoading || problemsLoading) {
@@ -822,7 +822,7 @@ const StepsManagerFixed = () => {
     } catch (error) {
       console.error("❌ Error deleting step:", error);
       toast({
-        title: "Ошибка удаления",
+        title: "Ошибка удалени��",
         description: `Не удалось удалить шаг: ${error?.message || 'Неизвестная ошибка'}`,
         variant: "destructive",
       });
@@ -1020,7 +1020,7 @@ const StepsManagerFixed = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Кликните на изображение пульта, чтобы указать позицию кнопки
+                      Кликните на изображение пульта, ��тобы указать позицию кнопки
                     </p>
                   </AlertDescription>
                 </Alert>
@@ -1209,7 +1209,7 @@ const StepsManagerFixed = () => {
                             <div className="flex items-center space-x-2 mb-1">
                               <h4 className="font-semibold text-gray-900 dark:text-white">{step.title}</h4>
                               <Badge variant={step.isActive ? "default" : "secondary"}>
-                                {step.isActive ? "Активный" : "Неакти��ный"}
+                                {step.isActive ? "Активный" : "Неактивный"}
                               </Badge>
                               {step.requiredAction && (
                                 <Badge variant="outline">
