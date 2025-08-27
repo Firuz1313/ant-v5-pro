@@ -45,7 +45,7 @@ class Device extends BaseModel {
   }
 
   /**
-   * Получение устройства со статистикой по ID
+   * Пол��чение устройства со статистикой по ID
    */
   async findByIdWithStats(id) {
     try {
@@ -117,7 +117,7 @@ class Device extends BaseModel {
         rank: parseFloat(row.rank || 0)
       }));
     } catch (error) {
-      console.error('Ошибка поиска устройств:', error.message);
+      console.error('Ошибка поиска ус��ройств:', error.message);
       throw error;
     }
   }
@@ -185,7 +185,7 @@ class Device extends BaseModel {
   async canDelete(id) {
     try {
       const sql = `
-        SELECT 
+        SELECT
           COUNT(p.id) as problems_count,
           COUNT(CASE WHEN p.status = 'published' THEN 1 END) as published_problems_count,
           COUNT(r.id) as remotes_count,
@@ -193,8 +193,7 @@ class Device extends BaseModel {
         FROM devices d
         LEFT JOIN problems p ON d.id = p.device_id AND p.is_active = true
         LEFT JOIN remotes r ON d.id = r.device_id AND r.is_active = true
-        LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id 
-          AND ds.is_active = true 
+        LEFT JOIN diagnostic_sessions ds ON d.id = ds.device_id
           AND ds.end_time IS NULL
         WHERE d.id = $1
         GROUP BY d.id
