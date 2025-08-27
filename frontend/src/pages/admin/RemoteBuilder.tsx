@@ -101,10 +101,10 @@ interface RemoteTemplate {
     color?: string;
     description?: string;
   }>;
-  device_id?: string | null;
-  is_default: boolean;
-  is_active: boolean;
-  usage_count: number;
+  deviceId?: string | null;
+  isDefault: boolean;
+  isActive: boolean;
+  usageCount: number;
   last_used?: string;
   metadata?: Record<string, any>;
   created_at: string;
@@ -119,7 +119,7 @@ const RemoteBuilder = () => {
   // Simple test of remotesApi
   React.useEffect(() => {
     console.log(
-      "🚀🚀🚀 RemoteBuilder: useEffect STARTED! Testing remotesApi directly 🚀🚀🚀",
+      "🚀🚀🚀 RemoteBuilder: useEffect STARTED! Testing remotesApi directly 🚀���🚀",
     );
     console.log("🚀🚀🚀 RemoteBuilder: remotesApi object:", remotesApi);
     console.log(
@@ -167,11 +167,11 @@ const RemoteBuilder = () => {
   const getActiveDevices = () => devices.filter((d: any) => d.isActive === true);
   const getDeviceById = (id: string) => devices.find((d: any) => d.id === id);
   const getRemotesForDevice = (deviceId: string) =>
-    remotes.filter((r: any) => r.device_id === deviceId);
+    remotes.filter((r: any) => r.deviceId === deviceId);
   const canDeleteRemote = (id: string) => ({ canDelete: true, reason: "" });
   const getRemoteUsageCount = (id: string) => {
     const remote = remotes.find((r) => r.id === id);
-    return remote?.usage_count || 0;
+    return remote?.usageCount || 0;
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -282,9 +282,9 @@ const RemoteBuilder = () => {
       filterLayout === "all" || remote.layout === filterLayout;
     const matchesDevice =
       filterDevice === "all" ||
-      remote.device_id === filterDevice ||
+      remote.deviceId === filterDevice ||
       (filterDevice === "universal" &&
-        (!remote.device_id || remote.device_id === ""));
+        (!remote.deviceId || remote.deviceId === ""));
     return matchesSearch && matchesLayout && matchesDevice;
   });
 
@@ -307,15 +307,15 @@ const RemoteBuilder = () => {
         manufacturer: formData.manufacturer,
         model: formData.model,
         description: formData.description,
-        device_id: formData.deviceId === "universal" ? null : formData.deviceId,
+        deviceId: formData.deviceId === "universal" ? null : formData.deviceId,
         layout: formData.layout,
         color_scheme: formData.colorScheme,
         dimensions: { width: 400, height: 600 },
         buttons: [],
         zones: [],
         image_data: previewImageUrl || undefined,
-        is_default: false,
-        is_active: true,
+        isDefault: false,
+        isActive: true,
       });
 
       toast.success("Пульт создан успешно");
@@ -338,7 +338,7 @@ const RemoteBuilder = () => {
           manufacturer: formData.manufacturer,
           model: formData.model,
           description: formData.description,
-          device_id:
+          deviceId:
             formData.deviceId === "universal" ? null : formData.deviceId,
           layout: formData.layout,
           color_scheme: formData.colorScheme,
@@ -384,11 +384,11 @@ const RemoteBuilder = () => {
       await updateRemoteMutation.mutateAsync({
         id: remoteId,
         data: {
-          is_active: !remote.is_active,
+          isActive: !remote.isActive,
         },
       });
       toast.success(
-        `Пульт ${remote.is_active ? "деактивирован" : "активирован"}`,
+        `Пульт ${remote.isActive ? "деактивирован" : "активирован"}`,
       );
     } catch (error: any) {
       console.error("Error toggling remote status:", error);
@@ -398,12 +398,12 @@ const RemoteBuilder = () => {
 
   const handleSetDefault = async (remoteId: string) => {
     const remote = remotes.find((r) => r.id === remoteId);
-    if (!remote?.device_id) return;
+    if (!remote?.deviceId) return;
 
     try {
       await setDefaultMutation.mutateAsync({
         remoteId,
-        deviceId: remote.device_id,
+        deviceId: remote.deviceId,
       });
       toast.success("Пульт устано��лен по умолчанию");
     } catch (error: any) {
@@ -436,7 +436,7 @@ const RemoteBuilder = () => {
       description: remote.description || "",
       layout: remote.layout || "standard",
       colorScheme: remote.color_scheme || "dark",
-      deviceId: remote.device_id || "universal",
+      deviceId: remote.deviceId || "universal",
     });
     setPreviewImageUrl(remote.image_data || null);
     setIsEditDialogOpen(true);
@@ -1232,8 +1232,8 @@ const RemoteBuilder = () => {
       {/* Remotes Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredRemotes.map((remote) => {
-          const device = remote.device_id
-            ? getDeviceById(remote.device_id)
+          const device = remote.deviceId
+            ? getDeviceById(remote.deviceId)
             : null;
           const usageCount = getRemoteUsageCount(remote.id);
 
@@ -1246,8 +1246,8 @@ const RemoteBuilder = () => {
                     {remote.is_default && (
                       <Badge variant="default">По умолчанию</Badge>
                     )}
-                    <Badge variant={remote.is_active ? "default" : "secondary"}>
-                      {remote.is_active ? "Активный" : "Не��ктивный"}
+                    <Badge variant={remote.isActive ? "default" : "secondary"}>
+                      {remote.isActive ? "Активный" : "Неактивный"}
                     </Badge>
                   </div>
                 </div>
@@ -1289,7 +1289,7 @@ const RemoteBuilder = () => {
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
                       <span className="text-gray-600 dark:text-gray-400">
-                        Прои��водитель:
+                        Производитель:
                       </span>
                       <span className="font-medium">{remote.manufacturer}</span>
                     </div>
@@ -1355,9 +1355,9 @@ const RemoteBuilder = () => {
                         <DropdownMenuItem
                           onClick={() => handleToggleStatus(remote.id)}
                         >
-                          {remote.is_active ? "Деактивировать" : "Активировать"}
+                          {remote.isActive ? "Деактивировать" : "Активировать"}
                         </DropdownMenuItem>
-                        {!remote.is_default && remote.device_id && (
+                        {!remote.isDefault && remote.deviceId && (
                           <DropdownMenuItem
                             onClick={() => handleSetDefault(remote.id)}
                           >
