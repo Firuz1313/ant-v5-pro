@@ -28,7 +28,11 @@ const DiagnosticPage = () => {
 
   // API hooks
   const { data: devicesResponse, isLoading: devicesLoading } = useDevices();
-  const { data: problemsResponse, isLoading: problemsLoading } = useProblems(1, 20, { deviceId });
+  const { data: problemsResponse, isLoading: problemsLoading } = useProblems(
+    1,
+    20,
+    { deviceId },
+  );
 
   // Extract data arrays from API responses
   const devices = devicesResponse?.data || [];
