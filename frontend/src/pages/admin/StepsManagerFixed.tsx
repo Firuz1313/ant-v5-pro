@@ -934,22 +934,7 @@ const StepsManagerFixed = () => {
             <DialogHeader>
               <DialogTitle>Создать новый шаг</DialogTitle>
             </DialogHeader>
-            <StepFormFields
-              isEdit={false}
-              formData={formData}
-              handleFieldChange={handleFieldChange}
-              handleDeviceChange={handleDeviceChange}
-              devices={devices}
-              problems={problems}
-              remotes={remotes}
-              tvInterfaces={tvInterfaces}
-              loadingTVInterfaces={loadingTVInterfaces}
-              getActiveDevices={getActiveDevices}
-              getAvailableProblems={getAvailableProblems}
-              getAvailableRemotes={getAvailableRemotes}
-              openTVInterfaceEditor={openTVInterfaceEditor}
-              openRemoteEditor={openRemoteEditor}
-            />
+            <StepFormFields />
             <div className="flex justify-end space-x-2">
               <Button variant="outline" onClick={() => setIsCreateDialogOpen(false)}>
                 Отмена
@@ -1142,7 +1127,7 @@ const StepsManagerFixed = () => {
                               ) : (
                                 <Eye className="h-4 w-4 mr-2" />
                               )}
-                              {step.isActive ? "Деактивировать" : "Активировать"}
+                              {step.isActive ? "Деактивиро��ать" : "Активировать"}
                             </DropdownMenuItem>
                             <DropdownMenuItem onClick={() => handleDelete(step.id)} className="text-red-600">
                               <Trash2 className="h-4 w-4 mr-2" />
