@@ -272,7 +272,7 @@ const ProblemsManager = () => {
     // Client-side duplicate check for better UX
     if (checkForDuplicateTitle(formData.title, formData.deviceId)) {
       alert(
-        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\nПожалуйста, выберите другое ��азвание.`,
+        `Проблема с названием "${formData.title}" уже существует для этого устройства.\n\n��ожалуйста, выберите другое ��азвание.`,
       );
       return;
     }
@@ -574,7 +574,8 @@ const ProblemsManager = () => {
                 .mutateAsync(testData)
                 .then(() => {
                   console.log("✅ Тестовая проблема создана успешно");
-                  alert("Тестовая проблема создана успешно!");
+                  setCreatedProblemTitle(testTitle);
+                  setIsSuccessModalOpen(true);
                 })
                 .catch((error) => {
                   console.error(
