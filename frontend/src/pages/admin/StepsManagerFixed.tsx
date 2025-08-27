@@ -316,7 +316,7 @@ const StepFormFields = React.memo<{
             id={isEdit ? "edit-instruction" : "instruction"}
             value={formData.instruction}
             onChange={handleInstructionChange}
-            placeholder="Подробная инструкция для пользоват��ля"
+            placeholder="Подробная инструкция для пользователя"
           />
         </div>
 
@@ -496,7 +496,7 @@ const SortableStepItem = React.memo<{
               <Badge
                 variant={step.isActive ? "default" : "secondary"}
               >
-                {step.isActive ? "Активный" : "Неактивный"}
+                {step.isActive ? "Активный" : "Неактив��ый"}
               </Badge>
               {step.requiredAction && (
                 <Badge variant="outline">
@@ -802,13 +802,111 @@ const StepsManagerFixed = () => {
     return remotes.filter((r: any) => r.deviceId === filterDevice);
   }, [filterDevice, activeRemotes, remotes]);
 
+  // Handle drag end - defined after groupedSteps to avoid circular dependency
+  const handleDragEnd = useCallback(async (event: DragEndEvent) => {
+    const { active, over } = event;
+
+    if (!over || active.id === over.id) {
+      return;
+    }
+
+    // Find the group and steps being reordered
+    let targetGroup: { deviceId: string; problemId: string; steps: DiagnosticStep[] } | null = null;
+    let activeStep: DiagnosticStep | null = null;
+    let overStep: DiagnosticStep | null = null;
+
+    // Find the group containing the dragged step
+    Object.values(groupedSteps).forEach(group => {
+      const activeStepInGroup = group.steps.find(step => step.id === active.id);
+      const overStepInGroup = group.steps.find(step => step.id === over.id);
+
+      if (activeStepInGroup && overStepInGroup) {
+        targetGroup = group;
+        activeStep = activeStepInGroup;
+        overStep = overStepInGroup;
+      }
+    });
+
+    if (!targetGroup || !activeStep || !overStep) {
+      console.error('Could not find steps for reordering');
+      return;
+    }
+
+    try {
+      // Get the current order of steps in this group
+      const currentSteps = [...targetGroup.steps].sort((a, b) => a.stepNumber - b.stepNumber);
+      const activeIndex = currentSteps.findIndex(step => step.id === active.id);
+      const overIndex = currentSteps.findIndex(step => step.id === over.id);
+
+      if (activeIndex === -1 || overIndex === -1) {
+        console.error('Could not find step indexes');
+        return;
+      }
+
+      // Reorder the steps array
+      const reorderedSteps = arrayMove(currentSteps, activeIndex, overIndex);
+
+      // Create the new step IDs array in the correct order
+      const stepIds = reorderedSteps.map(step => step.id);
+
+      console.log('Reordering steps:', {
+        problemId: targetGroup.problemId,
+        stepIds,
+        from: activeIndex + 1,
+        to: overIndex + 1
+      });
+
+      // Update local state immediately for smooth UX
+      setSteps(prevSteps => {
+        const newSteps = [...prevSteps];
+
+        // Update step numbers for the reordered steps
+        reorderedSteps.forEach((step, index) => {
+          const stepIndex = newSteps.findIndex(s => s.id === step.id);
+          if (stepIndex !== -1) {
+            newSteps[stepIndex] = {
+              ...newSteps[stepIndex],
+              stepNumber: index + 1
+            };
+          }
+        });
+
+        return newSteps;
+      });
+
+      // Send reorder request to backend
+      await stepsApi.reorderSteps(targetGroup.problemId, stepIds);
+
+      toast({
+        title: "Успех",
+        description: `Порядок шагов обновлен: шаг "${activeStep.title}" перемещен с позиции ${activeIndex + 1} на позицию ${overIndex + 1}`,
+        variant: "default",
+      });
+
+      // Reload data to ensure consistency
+      await loadInitialData();
+
+    } catch (error) {
+      console.error('Error reordering steps:', error);
+
+      // Revert local changes on error
+      await loadInitialData();
+
+      toast({
+        title: "Ошибка",
+        description: `Не удалось изменить порядок шагов: ${error?.message || 'Неизвестная ошибка'}`,
+        variant: "destructive",
+      });
+    }
+  }, [groupedSteps, toast, loadInitialData]);
+
   const openRemoteEditor = useCallback(() => {
     const remote = getRemoteById(formData.remoteId);
     if (remote) {
       setSelectedRemote(remote);
       setIsRemoteEditorOpen(true);
     }
-  }, [formData.remoteId, remotes]);
+  }, [formData.remoteId, getRemoteById]);
 
   const openTVInterfaceEditor = useCallback((tvInterface: TVInterface) => {
     console.log("Opening TV Interface Editor with:", tvInterface);
@@ -975,7 +1073,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обяза��ельные поля: устройство, проблема, название и инструк��ия",
+          "Заполните все обяза��ельные поля: устройство, проблема, название и инст��ук��ия",
         variant: "destructive",
       });
       return;
@@ -1567,7 +1665,7 @@ const StepsManagerFixed = () => {
       <AlertDialog open={isDeleteModalOpen} onOpenChange={setIsDeleteModalOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Удалить шаг?</AlertDialogTitle>
+            <AlertDialogTitle>Удал��ть шаг?</AlertDialogTitle>
             <AlertDialogDescription>
               Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из базы данных?
               Это действие нельзя отменить! Шаг "{stepToDelete?.title}" будет
@@ -1598,7 +1696,7 @@ const StepsManagerFixed = () => {
           <CardContent className="p-12 text-center">
             <Layers className="h-12 w-12 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              Шаги не найдены
+              Шаги не найд��ны
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
               Создайте первый шаг диагностики или измените пар��метры фильтрации
