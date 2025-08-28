@@ -15,8 +15,16 @@ import {
 
 const Index = () => {
   const navigate = useNavigate();
-  const { data: devicesResponse, isLoading: devicesLoading } = useDevices(1, 50, { status: "active" });
-  const { data: problemsResponse, isLoading: problemsLoading } = useProblems(1, 50, { status: "published" });
+  const { data: devicesResponse, isLoading: devicesLoading } = useDevices(
+    1,
+    50,
+    { status: "active" },
+  );
+  const { data: problemsResponse, isLoading: problemsLoading } = useProblems(
+    1,
+    50,
+    { status: "published" },
+  );
 
   const deviceCount = devicesResponse?.data?.length || 0;
   const problemCount = problemsResponse?.data?.length || 0;
@@ -63,9 +71,13 @@ const Index = () => {
                 {devicesLoading ? (
                   <Skeleton className="h-12 w-12 mx-auto mb-2 rounded" />
                 ) : (
-                  <div className="text-4xl font-bold text-gray-900 mb-2">{deviceCount}</div>
+                  <div className="text-4xl font-bold text-gray-900 mb-2">
+                    {deviceCount}
+                  </div>
                 )}
-                <div className="text-gray-600 font-medium">Поддерживаемых моделей</div>
+                <div className="text-gray-600 font-medium">
+                  Поддерживаемых моделей
+                </div>
               </CardContent>
             </Card>
 
@@ -73,15 +85,22 @@ const Index = () => {
               <CardContent className="p-8">
                 <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <div className="text-blue-600">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor">
-                      <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z"/>
+                    <svg
+                      width="32"
+                      height="32"
+                      viewBox="0 0 24 24"
+                      fill="currentColor"
+                    >
+                      <path d="M12 2L13.09 8.26L22 9L13.09 9.74L12 16L10.91 9.74L2 9L10.91 8.26L12 2Z" />
                     </svg>
                   </div>
                 </div>
                 {problemsLoading ? (
                   <Skeleton className="h-12 w-12 mx-auto mb-2 rounded" />
                 ) : (
-                  <div className="text-4xl font-bold text-gray-900 mb-2">{problemCount}</div>
+                  <div className="text-4xl font-bold text-gray-900 mb-2">
+                    {problemCount}
+                  </div>
                 )}
                 <div className="text-gray-600 font-medium">Готовых решений</div>
               </CardContent>
@@ -93,7 +112,9 @@ const Index = () => {
                   <CheckCircle className="h-8 w-8 text-blue-600" />
                 </div>
                 <div className="text-4xl font-bold text-gray-900 mb-2">95%</div>
-                <div className="text-gray-600 font-medium">Успешных решений</div>
+                <div className="text-gray-600 font-medium">
+                  Успешных решений
+                </div>
               </CardContent>
             </Card>
 
@@ -102,7 +123,9 @@ const Index = () => {
                 <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <Clock className="h-8 w-8 text-blue-600" />
                 </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">24/7</div>
+                <div className="text-4xl font-bold text-gray-900 mb-2">
+                  24/7
+                </div>
                 <div className="text-gray-600 font-medium">Доступность</div>
               </CardContent>
             </Card>
@@ -116,11 +139,14 @@ const Index = () => {
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
             Поддерживаемые устройства
           </h2>
-          
+
           {devicesLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
               {[...Array(4)].map((_, index) => (
-                <Card key={index} className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+                <Card
+                  key={index}
+                  className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm"
+                >
                   <CardContent className="p-8">
                     <Skeleton className="w-24 h-16 mx-auto mb-6 rounded-lg" />
                     <Skeleton className="h-6 w-24 mx-auto mb-2" />
@@ -135,13 +161,16 @@ const Index = () => {
               {devices.slice(0, 4).map((device) => {
                 const getDeviceIcon = (brand) => {
                   const brandLower = brand.toLowerCase();
-                  if (brandLower.includes('openbox') && brandLower.includes('gold')) {
+                  if (
+                    brandLower.includes("openbox") &&
+                    brandLower.includes("gold")
+                  ) {
                     return "bg-gradient-to-r from-orange-400 to-orange-600";
-                  } else if (brandLower.includes('openbox')) {
+                  } else if (brandLower.includes("openbox")) {
                     return "bg-black";
-                  } else if (brandLower.includes('uclan')) {
+                  } else if (brandLower.includes("uclan")) {
                     return "bg-gray-800";
-                  } else if (brandLower.includes('hdbox')) {
+                  } else if (brandLower.includes("hdbox")) {
                     return "bg-black";
                   } else {
                     return "bg-gray-700";
@@ -149,7 +178,10 @@ const Index = () => {
                 };
 
                 return (
-                  <Card key={device.id} className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                  <Card
+                    key={device.id}
+                    className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+                  >
                     <CardContent className="p-8">
                       <div className="w-24 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
                         {device.imageUrl ? (
@@ -159,35 +191,46 @@ const Index = () => {
                             className="w-16 h-10 object-contain rounded-sm"
                           />
                         ) : (
-                          <div className={`w-16 h-10 rounded-sm flex items-center justify-center ${getDeviceIcon(device.brand)}`}>
+                          <div
+                            className={`w-16 h-10 rounded-sm flex items-center justify-center ${getDeviceIcon(device.brand)}`}
+                          >
                             <span className="text-white text-xs font-bold">
                               {device.brand.toUpperCase().substring(0, 8)}
                             </span>
                           </div>
                         )}
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">{device.name}</h3>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                        {device.name}
+                      </h3>
                       <p className="text-gray-600 text-sm">
-                        {device.description || `${device.brand} ${device.model}`}
+                        {device.description ||
+                          `${device.brand} ${device.model}`}
                       </p>
                     </CardContent>
                   </Card>
                 );
               })}
               {/* Show placeholder cards if we have fewer than 4 devices */}
-              {devices.length < 4 && [...Array(4 - devices.length)].map((_, index) => (
-                <Card key={`placeholder-${index}`} className="text-center bg-gray-50 border border-gray-200 border-dashed rounded-2xl shadow-sm">
-                  <CardContent className="p-8">
-                    <div className="w-24 h-16 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-6">
-                      <div className="text-gray-400 text-xs">Скоро</div>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-400 mb-2">Новые устройства</h3>
-                    <p className="text-gray-400 text-sm">
-                      Добавим поддержку новых моделей при��тавок
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
+              {devices.length < 4 &&
+                [...Array(4 - devices.length)].map((_, index) => (
+                  <Card
+                    key={`placeholder-${index}`}
+                    className="text-center bg-gray-50 border border-gray-200 border-dashed rounded-2xl shadow-sm"
+                  >
+                    <CardContent className="p-8">
+                      <div className="w-24 h-16 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-6">
+                        <div className="text-gray-400 text-xs">Скоро</div>
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-400 mb-2">
+                        Новые устройства
+                      </h3>
+                      <p className="text-gray-400 text-sm">
+                        Добавим поддержку новых моделей при��тавок
+                      </p>
+                    </CardContent>
+                  </Card>
+                ))}
             </div>
           )}
         </div>
@@ -199,16 +242,19 @@ const Index = () => {
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
             Почему выбирают нас
           </h2>
-          
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Reliability */}
             <div className="text-center">
               <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Shield className="h-10 w-10 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Надежность</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Надежность
+              </h3>
               <p className="text-gray-600 leading-relaxed">
-                Проверенные решения от профессиональных техников с многолетним опытом
+                Проверенные решения от профессиональных техников с многолетним
+                опытом
               </p>
             </div>
 
@@ -217,7 +263,9 @@ const Index = () => {
               <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <Zap className="h-10 w-10 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Быстрота</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Быстрота
+              </h3>
               <p className="text-gray-600 leading-relaxed">
                 Среднее время решения проблемы составляет всего 5 - 10 минут
               </p>
@@ -228,7 +276,9 @@ const Index = () => {
               <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
                 <BarChart3 className="h-10 w-10 text-blue-600" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">Эффективность</h3>
+              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+                Эффективность
+              </h3>
               <p className="text-gray-600 leading-relaxed">
                 95% проблем решаются с первого раза без вызова техника
               </p>
@@ -236,7 +286,6 @@ const Index = () => {
           </div>
         </div>
       </section>
-
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8">
@@ -248,7 +297,9 @@ const Index = () => {
               </div>
               <div>
                 <div className="font-bold text-lg">ANT Support</div>
-                <div className="text-gray-400 text-sm">Служба поддержки ТВ-приставок</div>
+                <div className="text-gray-400 text-sm">
+                  Служба поддержки ТВ-приставок
+                </div>
               </div>
             </div>
             <div className="text-gray-400 text-sm">

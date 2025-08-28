@@ -77,7 +77,9 @@ const DiagnosticPage = () => {
         // Try step-specific remote first
         if (currentStepData?.remoteId) {
           try {
-            const stepRemote = await remotesApi.getById(currentStepData.remoteId);
+            const stepRemote = await remotesApi.getById(
+              currentStepData.remoteId,
+            );
             setRemote(stepRemote);
             return;
           } catch (stepError) {
@@ -113,7 +115,7 @@ const DiagnosticPage = () => {
           layout: "standard",
           is_default: false,
           buttons: [],
-          dimensions: { width: 140, height: 420 }
+          dimensions: { width: 140, height: 420 },
         };
         setRemote(fallbackRemote);
       } catch (error) {
@@ -201,8 +203,12 @@ const DiagnosticPage = () => {
               <ArrowLeft className="h-5 w-5" />
             </Button>
             <div>
-              <h1 className="text-xl font-semibold text-gray-900">{device.name || "OpenBox"}</h1>
-              <p className="text-gray-600 text-sm">{problem.title || "Диагностика"}</p>
+              <h1 className="text-xl font-semibold text-gray-900">
+                {device.name || "OpenBox"}
+              </h1>
+              <p className="text-gray-600 text-sm">
+                {problem.title || "Диагностика"}
+              </p>
             </div>
           </div>
         </div>
@@ -219,14 +225,16 @@ const DiagnosticPage = () => {
                     index + 1 <= currentStepNumber
                       ? "bg-gray-900 border-gray-900"
                       : index + 1 === currentStepNumber
-                      ? "bg-white border-gray-900"
-                      : "bg-white border-gray-300"
+                        ? "bg-white border-gray-900"
+                        : "bg-white border-gray-300"
                   }`}
                 />
                 {index < steps.length - 1 && (
                   <div
                     className={`w-16 h-0.5 ${
-                      index + 1 < currentStepNumber ? "bg-gray-900" : "bg-gray-300"
+                      index + 1 < currentStepNumber
+                        ? "bg-gray-900"
+                        : "bg-gray-300"
                     }`}
                   />
                 )}
@@ -248,10 +256,10 @@ const DiagnosticPage = () => {
                 <div
                   className="bg-gray-900 rounded-xl overflow-hidden w-full max-w-[560px] aspect-video lg:aspect-[560/320]"
                   style={{
-                    width: '90vw',
-                    maxWidth: '560px',
-                    height: 'calc(90vw * 320/560)',
-                    maxHeight: '320px'
+                    width: "90vw",
+                    maxWidth: "560px",
+                    height: "calc(90vw * 320/560)",
+                    maxHeight: "320px",
                   }}
                 >
                   {currentStepData?.tvInterfaceId ? (
@@ -269,40 +277,42 @@ const DiagnosticPage = () => {
                           <div className="flex items-center text-white">
                             <div className="w-6 h-6 mr-3">
                               <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z" />
                               </svg>
                             </div>
-                            <span className="text-lg font-medium">Главное меню</span>
+                            <span className="text-lg font-medium">
+                              Главное меню
+                            </span>
                           </div>
                           <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm">
                             Шаг 1
                           </div>
                         </div>
-                        
+
                         <div className="grid grid-cols-3 gap-6">
                           <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
                             <div className="w-10 h-10 mx-auto mb-3 text-red-500">
                               <svg viewBox="0 0 24 24" fill="currentColor">
-                                <circle cx="12" cy="12" r="3"/>
-                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                                <circle cx="12" cy="12" r="3" />
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1" />
                               </svg>
                             </div>
                             <div className="font-medium">Прямой эфир</div>
                           </div>
-                          
+
                           <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
                             <div className="w-10 h-10 mx-auto mb-3 text-blue-500">
                               <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+                                <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z" />
                               </svg>
                             </div>
                             <div className="font-medium">Настройки</div>
                           </div>
-                          
+
                           <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
                             <div className="w-10 h-10 mx-auto mb-3 text-green-500">
                               <svg viewBox="0 0 24 24" fill="currentColor">
-                                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+                                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z" />
                               </svg>
                             </div>
                             <div className="font-medium">Приложения</div>
@@ -316,7 +326,10 @@ const DiagnosticPage = () => {
             </Card>
 
             {/* Navigation Buttons - Directly Under TV */}
-            <div className="flex items-center justify-between mt-6 w-full max-w-[560px]" style={{ width: '90vw', maxWidth: '560px' }}>
+            <div
+              className="flex items-center justify-between mt-6 w-full max-w-[560px]"
+              style={{ width: "90vw", maxWidth: "560px" }}
+            >
               <Button
                 onClick={handlePrevStep}
                 disabled={currentStepNumber <= 1}
@@ -338,7 +351,10 @@ const DiagnosticPage = () => {
             </div>
 
             {/* Hint Text - Directly Under TV */}
-            <div className="mt-4 text-center w-full max-w-[560px]" style={{ width: '90vw', maxWidth: '560px' }}>
+            <div
+              className="mt-4 text-center w-full max-w-[560px]"
+              style={{ width: "90vw", maxWidth: "560px" }}
+            >
               <p className="text-gray-600 text-sm">
                 Красная точка на пульте показывает точное место для нажатия
               </p>
@@ -355,7 +371,9 @@ const DiagnosticPage = () => {
                 <div className="w-[120px] h-[380px] lg:w-[140px] lg:h-[420px]">
                   <RemoteControl
                     remote={remote}
-                    highlightButton={currentStepData?.highlightRemoteButton || "power"}
+                    highlightButton={
+                      currentStepData?.highlightRemoteButton || "power"
+                    }
                     showButtonPosition={currentStepData?.buttonPosition}
                     onButtonClick={handleManualProgress}
                     className="w-full h-full"

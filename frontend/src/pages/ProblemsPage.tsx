@@ -1,10 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  ArrowLeft,
-  AlertTriangle,
-} from "lucide-react";
+import { ArrowLeft, AlertTriangle } from "lucide-react";
 import { useProblems } from "@/hooks/useProblems";
 import { useDevices } from "@/hooks/useDevices";
 
@@ -13,43 +10,43 @@ const defaultOpenBoxProblems = [
   {
     id: "no-signal-tuner",
     title: "Нет сигнала от тюнера",
-    description: "Проблемы с приемом сигнала от тюнера"
+    description: "Проблемы с приемом сигнала от тюнера",
   },
   {
     id: "no-signal-tv",
-    title: "Нет сигнала от телевизора", 
-    description: "Отсутствует сигнал от телевизора"
+    title: "Нет сигнала от телевизора",
+    description: "Отсутствует сигнал от телевизора",
   },
   {
     id: "coded-channel",
     title: "Если пишет кодированный канал",
-    description: "Появляется сообщение о кодированном канале"
+    description: "Появляется сообщение о кодированном канале",
   },
   {
     id: "black-screen",
     title: "Телеканалы есть, но экран черный",
-    description: "Каналы доступны, но изображение отсутствует"
+    description: "Каналы доступны, но изображение отсутствует",
   },
   {
     id: "remote-not-working",
     title: "Пульт дистанционного управления не работает",
-    description: "Пульт не реагирует на нажатия"
+    description: "Пульт не реагирует на нажатия",
   },
   {
     id: "no-image-with-sound",
     title: "В нескольких каналах нет изображения, но есть звук",
-    description: "На некоторых каналах только звук без картинки"
+    description: "На некоторых каналах только звук без картинки",
   },
   {
     id: "image-no-sound",
     title: "Изображение есть, но нет звука",
-    description: "Видео отображается, но звук отсутствует"
+    description: "Видео отображается, но звук отсутствует",
   },
   {
     id: "image-cropped",
     title: "Изображение обрезается с обеих сторон экрана",
-    description: "Картинка не помещается на экране полностью"
-  }
+    description: "Картинка не помещается на экране полностью",
+  },
 ];
 
 const ProblemsPage = () => {
@@ -66,7 +63,12 @@ const ProblemsPage = () => {
   const device = devices.find((d: any) => d.id === deviceId);
 
   // Use API problems if available, otherwise use default OpenBox problems
-  const displayProblems = problems.length > 0 ? problems : (deviceId === "openbox" ? defaultOpenBoxProblems : []);
+  const displayProblems =
+    problems.length > 0
+      ? problems
+      : deviceId === "openbox"
+        ? defaultOpenBoxProblems
+        : [];
 
   const handleProblemSelect = (problemId: string) => {
     navigate(`/diagnostic/${deviceId}/${problemId}`);
@@ -81,7 +83,9 @@ const ProblemsPage = () => {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertTriangle className="h-16 w-16 mx-auto mb-4 text-yellow-500" />
-          <h2 className="text-2xl font-bold mb-4 text-gray-900">Приставка не найдена</h2>
+          <h2 className="text-2xl font-bold mb-4 text-gray-900">
+            Приставка не найдена
+          </h2>
           <Button onClick={() => navigate("/devices")}>
             Выбрать приставку
           </Button>
@@ -92,7 +96,8 @@ const ProblemsPage = () => {
 
   // Use device data or default for OpenBox
   const deviceName = device?.name || "OpenBox";
-  const deviceModel = device?.model || "Стандартные приставки OpenBox для цифрового телевидения";
+  const deviceModel =
+    device?.model || "Стандартные приставки OpenBox для цифрового телевидения";
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -138,12 +143,16 @@ const ProblemsPage = () => {
                   <div className="w-16 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
                     <div className="w-12 h-8 bg-black rounded-sm flex items-center justify-center">
                       <span className="text-white text-xs font-bold">
-                        {deviceId === "openbox" ? "OPENBOX" : deviceName.toUpperCase()}
+                        {deviceId === "openbox"
+                          ? "OPENBOX"
+                          : deviceName.toUpperCase()}
                       </span>
                     </div>
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-xl font-bold text-gray-900">{deviceName}</h3>
+                    <h3 className="text-xl font-bold text-gray-900">
+                      {deviceName}
+                    </h3>
                     <p className="text-gray-600 text-sm">{deviceModel}</p>
                   </div>
                   <div className="text-right">
@@ -166,7 +175,8 @@ const ProblemsPage = () => {
                   Нет доступных проблем
                 </h3>
                 <p className="text-gray-600 mb-6">
-                  Для данной модели приставки пока нет настроенных решений проблем
+                  Для данной модели приставки пока нет настроенных решений
+                  проблем
                 </p>
                 <Button
                   variant="outline"
@@ -194,7 +204,7 @@ const ProblemsPage = () => {
                         </p>
                       )}
                     </div>
-                    
+
                     <Button
                       onClick={() => handleProblemSelect(problem.id)}
                       className="w-full bg-gray-100 text-gray-900 hover:bg-gray-200 font-medium"

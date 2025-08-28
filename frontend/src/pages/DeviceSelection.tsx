@@ -3,16 +3,16 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Alert, AlertDescription } from "@/components/ui/alert";
-import {
-  ArrowLeft,
-  AlertCircle,
-  Tv,
-} from "lucide-react";
+import { ArrowLeft, AlertCircle, Tv } from "lucide-react";
 import { useDevices } from "@/hooks/useDevices";
 
 const DeviceSelection = () => {
   const navigate = useNavigate();
-  const { data: devicesResponse, isLoading, error } = useDevices(1, 50, { status: "active" });
+  const {
+    data: devicesResponse,
+    isLoading,
+    error,
+  } = useDevices(1, 50, { status: "active" });
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
@@ -29,13 +29,13 @@ const DeviceSelection = () => {
     // Простой способ создать визуальное представление для каждого бренда
     const brandLower = brand.toLowerCase();
 
-    if (brandLower.includes('openbox') && brandLower.includes('gold')) {
+    if (brandLower.includes("openbox") && brandLower.includes("gold")) {
       return "bg-gradient-to-r from-orange-400 to-orange-600";
-    } else if (brandLower.includes('openbox')) {
+    } else if (brandLower.includes("openbox")) {
       return "bg-black";
-    } else if (brandLower.includes('uclan')) {
+    } else if (brandLower.includes("uclan")) {
       return "bg-gray-800";
-    } else if (brandLower.includes('hdbox')) {
+    } else if (brandLower.includes("hdbox")) {
       return "bg-black";
     } else {
       return "bg-gray-700";
@@ -82,7 +82,8 @@ const DeviceSelection = () => {
               Выбор приставки
             </h1>
             <p className="text-xl text-gray-600">
-              Выберите модель вашей ТВ-приставки для получения персонализированной помощи
+              Выберите модель вашей ТВ-приставки для получения
+              персонализированной помощи
             </p>
             {devices.length > 0 && (
               <p className="text-sm text-gray-500 mt-2">
@@ -95,7 +96,10 @@ const DeviceSelection = () => {
           {isLoading && (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
               {[...Array(4)].map((_, index) => (
-                <Card key={index} className="bg-white border border-gray-200 rounded-2xl shadow-sm">
+                <Card
+                  key={index}
+                  className="bg-white border border-gray-200 rounded-2xl shadow-sm"
+                >
                   <CardContent className="p-8 text-center">
                     <Skeleton className="w-32 h-20 mx-auto mb-6 rounded-lg" />
                     <Skeleton className="h-8 w-32 mx-auto mb-3" />
@@ -112,7 +116,8 @@ const DeviceSelection = () => {
             <Alert className="max-w-2xl mx-auto">
               <AlertCircle className="h-4 w-4" />
               <AlertDescription>
-                Произошла ошибка при загрузке устройств. Пожалуйста, попробуйте позже.
+                Произошла ошибка при загрузке устройств. Пожалуйста, попробуйте
+                позже.
               </AlertDescription>
             </Alert>
           )}
@@ -148,7 +153,9 @@ const DeviceSelection = () => {
                           className="w-24 h-16 object-contain rounded-sm"
                         />
                       ) : (
-                        <div className={`w-24 h-16 rounded-sm flex items-center justify-center shadow-sm ${getDeviceIcon(device.brand)}`}>
+                        <div
+                          className={`w-24 h-16 rounded-sm flex items-center justify-center shadow-sm ${getDeviceIcon(device.brand)}`}
+                        >
                           <span className="text-white text-sm font-bold">
                             {device.brand.toUpperCase().substring(0, 8)}
                           </span>

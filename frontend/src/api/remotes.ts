@@ -187,7 +187,9 @@ export const remotesApi = {
     } catch (error: any) {
       // Handle 404 gracefully - no default remote found for device
       if (error?.response?.status === 404 || error?.status === 404) {
-        console.log(`No default remote found for device ${deviceId} (404 - expected)`);
+        console.log(
+          `No default remote found for device ${deviceId} (404 - expected)`,
+        );
         throw new Error(`NO_DEFAULT_REMOTE_FOR_DEVICE_${deviceId}`);
       }
       throw handleApiError(
