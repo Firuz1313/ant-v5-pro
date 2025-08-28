@@ -363,7 +363,7 @@ const DiagnosticPage = () => {
                   <CardContent className="p-6">
                     <RemoteControl
                       remote={remote}
-                      highlightButton={currentStepData?.highlightRemoteButton}
+                      highlightButton={currentStepData?.highlightRemoteButton || "power"}
                       showButtonPosition={currentStepData?.buttonPosition}
                       onButtonClick={handleManualProgress}
                     />
