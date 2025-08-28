@@ -31,7 +31,7 @@ export function Layout({
     <div className="min-h-screen bg-background">
       {/* Navigation Header */}
       <motion.header
-        className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10 backdrop-blur-md"
+        className="fixed top-0 left-0 right-0 z-50 glass border-b border-border backdrop-blur-md"
         initial={{ y: -100 }}
         animate={{ y: 0 }}
         transition={{ duration: 0.5 }}
@@ -44,7 +44,7 @@ export function Layout({
                   variant="ghost"
                   size="icon"
                   onClick={handleBack}
-                  className="text-white hover:bg-white/10"
+                  className="text-foreground hover:bg-accent"
                 >
                   <ArrowLeft className="h-5 w-5" />
                 </Button>
@@ -52,7 +52,7 @@ export function Layout({
               <Logo size="sm" />
               {title && (
                 <div className="hidden md:block">
-                  <h1 className="text-xl font-semibold text-white text-shadow">
+                  <h1 className="text-xl font-semibold text-foreground text-shadow">
                     {title}
                   </h1>
                 </div>
@@ -65,7 +65,7 @@ export function Layout({
                   variant="ghost"
                   size="icon"
                   onClick={handleHome}
-                  className="text-white hover:bg-white/10"
+                  className="text-foreground hover:bg-accent"
                 >
                   <Home className="h-5 w-5" />
                 </Button>
@@ -74,7 +74,7 @@ export function Layout({
                 variant="ghost"
                 size="icon"
                 onClick={() => navigate("/admin")}
-                className="text-white hover:bg-white/10"
+                className="text-foreground hover:bg-accent"
               >
                 <Settings className="h-5 w-5" />
               </Button>
