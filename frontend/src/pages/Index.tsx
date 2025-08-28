@@ -137,7 +137,7 @@ const Index = () => {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
-            Поддерживаемые устройства
+            Поддер��иваемые устройства
           </h2>
 
           {devicesLoading ? (
@@ -273,13 +273,13 @@ const Index = () => {
 
             {/* Efficiency */}
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="h-10 w-10 text-blue-600" />
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <BarChart3 className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 Эффективность
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 95% проблем решаются с первого раза без вызова техника
               </p>
             </div>
@@ -288,12 +288,12 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8">
+      <footer className="bg-background border-t border-border py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <div className="w-6 h-4 bg-white rounded-sm"></div>
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                <div className="w-6 h-4 bg-primary-foreground rounded-sm"></div>
               </div>
               <div>
                 <div className="font-bold text-lg">ANT Support</div>
