@@ -4,24 +4,30 @@ import path from "path";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  const isProduction = mode === 'production';
-  
+  const isProduction = mode === "production";
+
   return {
     build: {
       watch: null,
       reportCompressedSize: !isProduction,
       chunkSizeWarningLimit: 999999,
-      minify: isProduction ? 'esbuild' : false,
+      minify: isProduction ? "esbuild" : false,
       sourcemap: !isProduction,
       rollupOptions: {
         output: {
-          manualChunks: isProduction ? {
-            vendor: ['react', 'react-dom'],
-            router: ['react-router-dom'],
-            ui: ['@radix-ui/react-dialog', '@radix-ui/react-dropdown-menu', '@radix-ui/react-toast']
-          } : undefined
-        }
-      }
+          manualChunks: isProduction
+            ? {
+                vendor: ["react", "react-dom"],
+                router: ["react-router-dom"],
+                ui: [
+                  "@radix-ui/react-dialog",
+                  "@radix-ui/react-dropdown-menu",
+                  "@radix-ui/react-toast",
+                ],
+              }
+            : undefined,
+        },
+      },
     },
     optimizeDeps: {
       include: ["react", "react-dom", "react/jsx-runtime"],
