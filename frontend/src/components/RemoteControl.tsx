@@ -63,7 +63,7 @@ const RemoteControl = ({
       return position;
     }
 
-    // Иначе конвертируем старые пиксельные координаты
+    // Иначе кон��ертируем старые пиксельные координаты
     // Используем стандартные размеры canvas для пультов: 400x600
     const canvasWidth = 400;
     const canvasHeight = 600;
@@ -414,15 +414,20 @@ const RemoteControl = ({
       </div>
 
       {/* Show button position indicator if provided */}
-      {showButtonPosition && (
-        <div
-          className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
-          style={{
-            left: `${showButtonPosition.x}px`,
-            top: `${showButtonPosition.y}px`,
-          }}
-        />
-      )}
+      {(() => {
+        const normalizedPosition = normalizeButtonPosition(showButtonPosition);
+        return normalizedPosition && (
+          <div
+            className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
+            style={{
+              left: `${normalizedPosition.x * 100}%`,
+              top: `${normalizedPosition.y * 100}%`,
+            }}
+          >
+            <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+          </div>
+        );
+      })()}
 
       {/* Highlight Effect */}
       {highlightButton && (
