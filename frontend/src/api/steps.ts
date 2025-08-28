@@ -118,10 +118,36 @@ const transformToBackend = (data: any) => {
   return transformed;
 };
 
+// Helper function to normalize button coordinates (convert old pixel coordinates to 0-1 range)
+const normalizeButtonPosition = (position: { x: number; y: number } | null): { x: number; y: number } | null => {
+  if (!position || typeof position !== 'object') return null;
+
+  // If coordinates are already normalized (0-1), return as is
+  if (position.x <= 1 && position.y <= 1) {
+    return position;
+  }
+
+  // Convert old pixel coordinates to normalized (0-1) format
+  // Standard canvas size for remotes: 400x600
+  const canvasWidth = 400;
+  const canvasHeight = 600;
+
+  const normalizedX = Math.min(position.x / canvasWidth, 1);
+  const normalizedY = Math.min(position.y / canvasHeight, 1);
+
+  console.log('🔄 API: Converting old pixel coordinates to normalized:', {
+    original: position,
+    normalized: { x: normalizedX, y: normalizedY },
+    canvasSize: { width: canvasWidth, height: canvasHeight }
+  });
+
+  return { x: normalizedX, y: normalizedY };
+};
+
 // Transform snake_case to camelCase for frontend
 const transformFromBackend = (data: any): any => {
   if (!data) return data;
-  
+
   const fieldMappings: Record<string, string> = {
     problem_id: 'problemId',
     device_id: 'deviceId',
@@ -150,7 +176,14 @@ const transformFromBackend = (data: any): any => {
   const transformed: any = {};
   Object.keys(data).forEach(key => {
     const frontendKey = fieldMappings[key] || key;
-    transformed[frontendKey] = data[key];
+    let value = data[key];
+
+    // Special handling for button_position - normalize old pixel coordinates
+    if (key === 'button_position' && value) {
+      value = normalizeButtonPosition(value);
+    }
+
+    transformed[frontendKey] = value;
   });
 
   return transformed;
@@ -265,7 +298,7 @@ export class StepsApi {
   }
 
   /**
-   * Удаление шага
+   * Удалени�� шага
    */
   async deleteStep(
     id: string,
