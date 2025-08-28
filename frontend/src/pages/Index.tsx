@@ -45,7 +45,7 @@ const Index = () => {
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
             Пошаговое инструкции дл�� решения проблем с цифровыми ТВ-приставками.
             <br />
-            Простой интерфейс, профессиональные решения.
+            Простой интерфейс, проф��ссиональные решения.
           </p>
 
           <Button
@@ -260,13 +260,13 @@ const Index = () => {
 
             {/* Speed */}
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Zap className="h-10 w-10 text-blue-600" />
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Zap className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 Быстрота
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 Среднее время решения проблемы составляет всего 5 - 10 минут
               </p>
             </div>
