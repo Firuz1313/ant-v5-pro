@@ -80,7 +80,7 @@ const RemoteControl = ({
         <div className="relative w-full h-full flex items-center justify-center">
           {/* Remote background image */}
           <div
-            className="relative w-full max-w-[260px] h-full min-h-[600px] lg:min-h-[700px] bg-cover bg-center bg-no-repeat rounded-3xl shadow-2xl border-4 border-gray-700"
+            className="relative w-full max-w-[280px] h-full min-h-[480px] lg:min-h-[550px] bg-cover bg-center bg-no-repeat rounded-3xl shadow-2xl border-4 border-gray-700"
             style={{
               backgroundImage: `url(${imageData})`,
             }}
@@ -147,7 +147,7 @@ const RemoteControl = ({
       {/* Remote Frame */}
       <div
         className="bg-gray-900 p-3 rounded-2xl shadow-xl border-2 border-gray-700 w-full h-full flex flex-col justify-between"
-        style={{ maxWidth: "140px", minHeight: "420px" }}
+        style={{ maxWidth: "160px", minHeight: "330px" }}
       >
         {/* Top Section */}
         <div className="space-y-2 flex-shrink-0">

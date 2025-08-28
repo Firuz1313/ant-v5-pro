@@ -165,7 +165,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или проблема не найдены</p>
+          <p>Устройство или проблема не н��йдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -254,12 +254,12 @@ const DiagnosticPage = () => {
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-0">
                 <div
-                  className="bg-gray-900 rounded-xl overflow-hidden w-full max-w-[560px] aspect-video lg:aspect-[560/320]"
+                  className="bg-gray-900 rounded-xl overflow-hidden w-full max-w-[900px] aspect-video lg:aspect-[900/520]"
                   style={{
                     width: "90vw",
-                    maxWidth: "560px",
-                    height: "calc(90vw * 320/560)",
-                    maxHeight: "320px",
+                    maxWidth: "900px",
+                    height: "calc(90vw * 520/900)",
+                    maxHeight: "520px",
                   }}
                 >
                   {currentStepData?.tvInterfaceId ? (
@@ -327,8 +327,8 @@ const DiagnosticPage = () => {
 
             {/* Navigation Buttons - Directly Under TV */}
             <div
-              className="flex items-center justify-between mt-6 w-full max-w-[560px]"
-              style={{ width: "90vw", maxWidth: "560px" }}
+              className="flex items-center justify-between mt-6 w-full max-w-[900px]"
+              style={{ width: "90vw", maxWidth: "900px" }}
             >
               <Button
                 onClick={handlePrevStep}
@@ -352,8 +352,8 @@ const DiagnosticPage = () => {
 
             {/* Hint Text - Directly Under TV */}
             <div
-              className="mt-4 text-center w-full max-w-[560px]"
-              style={{ width: "90vw", maxWidth: "560px" }}
+              className="mt-4 text-center w-full max-w-[900px]"
+              style={{ width: "90vw", maxWidth: "900px" }}
             >
               <p className="text-gray-600 text-sm">
                 Красная точка на пульте показывает точное место для нажатия
@@ -364,11 +364,11 @@ const DiagnosticPage = () => {
             </div>
           </div>
 
-          {/* Remote Control - Bottom on Mobile, Right on Desktop */}
-          <div className="flex justify-center lg:justify-start">
+          {/* Remote Control - Bottom on Mobile, Right on Desktop - Positioned lower */}
+          <div className="flex justify-center lg:justify-start lg:items-end lg:mt-20">
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-4">
-                <div className="w-[120px] h-[380px] lg:w-[140px] lg:h-[420px]">
+                <div className="w-[140px] h-[300px] lg:w-[160px] lg:h-[330px]">
                   <RemoteControl
                     remote={remote}
                     highlightButton={
