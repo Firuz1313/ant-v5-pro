@@ -147,7 +147,7 @@ const RemoteControl = ({
       {/* Remote Frame */}
       <div
         className="bg-gray-900 p-3 rounded-2xl shadow-xl border-2 border-gray-700 w-full h-full flex flex-col justify-between"
-        style={{ maxWidth: "140px", minHeight: "420px" }}
+        style={{ maxWidth: "140px", minHeight: "360px" }}
       >
         {/* Top Section */}
         <div className="space-y-2 flex-shrink-0">
