@@ -35,23 +35,24 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="bg-white py-20">
+      <section className="bg-card py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl font-bold text-foreground mb-6">
             Быстрая диагностика проблем
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Пошаговое инструкции для решения проблем с цифровыми ТВ-приставками.
+          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
+            Пошаговое инструкции дл�� решения проблем с цифровыми
+            ТВ-приставками.
             <br />
-            Простой интерфейс, профессиональные решения.
+            Простой интерфейс, проф��ссиональные решения.
           </p>
 
           <Button
             size="lg"
             onClick={handleStartDiagnostic}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-medium rounded-xl"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-medium rounded-xl"
           >
             Начать диагностику
             <ArrowRight className="h-5 w-5 ml-2" />
@@ -60,31 +61,31 @@ const Index = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-card">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <Card className="text-center bg-card border border-border rounded-2xl shadow-sm">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <div className="w-8 h-6 bg-blue-600 rounded-sm"></div>
+                <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-8 h-6 bg-primary rounded-sm"></div>
                 </div>
                 {devicesLoading ? (
                   <Skeleton className="h-12 w-12 mx-auto mb-2 rounded" />
                 ) : (
-                  <div className="text-4xl font-bold text-gray-900 mb-2">
+                  <div className="text-4xl font-bold text-foreground mb-2">
                     {deviceCount}
                   </div>
                 )}
-                <div className="text-gray-600 font-medium">
+                <div className="text-muted-foreground font-medium">
                   Поддерживаемых моделей
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <Card className="text-center bg-card border border-border rounded-2xl shadow-sm">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <div className="text-blue-600">
+                <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="text-primary">
                     <svg
                       width="32"
                       height="32"
@@ -98,35 +99,41 @@ const Index = () => {
                 {problemsLoading ? (
                   <Skeleton className="h-12 w-12 mx-auto mb-2 rounded" />
                 ) : (
-                  <div className="text-4xl font-bold text-gray-900 mb-2">
+                  <div className="text-4xl font-bold text-foreground mb-2">
                     {problemCount}
                   </div>
                 )}
-                <div className="text-gray-600 font-medium">Готовых решений</div>
+                <div className="text-muted-foreground font-medium">
+                  Готовых решений
+                </div>
               </CardContent>
             </Card>
 
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <Card className="text-center bg-card border border-border rounded-2xl shadow-sm">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="h-8 w-8 text-primary" />
                 </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">95%</div>
-                <div className="text-gray-600 font-medium">
+                <div className="text-4xl font-bold text-foreground mb-2">
+                  95%
+                </div>
+                <div className="text-muted-foreground font-medium">
                   Успешных решений
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <Card className="text-center bg-card border border-border rounded-2xl shadow-sm">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Clock className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Clock className="h-8 w-8 text-primary" />
                 </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">
+                <div className="text-4xl font-bold text-foreground mb-2">
                   24/7
                 </div>
-                <div className="text-gray-600 font-medium">Доступность</div>
+                <div className="text-muted-foreground font-medium">
+                  Доступность
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -137,7 +144,7 @@ const Index = () => {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
-            Поддерживаемые устройства
+            Поддер��иваемые устройства
           </h2>
 
           {devicesLoading ? (
@@ -180,10 +187,10 @@ const Index = () => {
                 return (
                   <Card
                     key={device.id}
-                    className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+                    className="text-center bg-card border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow"
                   >
                     <CardContent className="p-8">
-                      <div className="w-24 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                      <div className="w-24 h-16 bg-muted rounded-lg flex items-center justify-center mx-auto mb-6">
                         {device.imageUrl ? (
                           <img
                             src={device.imageUrl}
@@ -200,10 +207,10 @@ const Index = () => {
                           </div>
                         )}
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      <h3 className="text-xl font-bold text-foreground mb-2">
                         {device.name}
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-muted-foreground text-sm">
                         {device.description ||
                           `${device.brand} ${device.model}`}
                       </p>
@@ -216,16 +223,18 @@ const Index = () => {
                 [...Array(4 - devices.length)].map((_, index) => (
                   <Card
                     key={`placeholder-${index}`}
-                    className="text-center bg-gray-50 border border-gray-200 border-dashed rounded-2xl shadow-sm"
+                    className="text-center bg-muted border border-border border-dashed rounded-2xl shadow-sm"
                   >
                     <CardContent className="p-8">
-                      <div className="w-24 h-16 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-6">
-                        <div className="text-gray-400 text-xs">Скоро</div>
+                      <div className="w-24 h-16 bg-border rounded-lg flex items-center justify-center mx-auto mb-6">
+                        <div className="text-muted-foreground text-xs">
+                          Скоро
+                        </div>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-400 mb-2">
+                      <h3 className="text-xl font-bold text-muted-foreground mb-2">
                         Новые устройства
                       </h3>
-                      <p className="text-gray-400 text-sm">
+                      <p className="text-muted-foreground text-sm">
                         Добавим поддержку новых моделей при��тавок
                       </p>
                     </CardContent>
@@ -237,50 +246,50 @@ const Index = () => {
       </section>
 
       {/* Why Choose Us Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-card">
         <div className="container mx-auto px-4">
-          <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
+          <h2 className="text-4xl font-bold text-center text-foreground mb-12">
             Почему выбирают нас
           </h2>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             {/* Reliability */}
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Shield className="h-10 w-10 text-blue-600" />
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Shield className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 Надежность
               </h3>
-              <p className="text-gray-600 leading-relaxed">
-                Проверенные решения от профессиональных техников с многолетним
+              <p className="text-muted-foreground leading-relaxed">
+                Про��еренные решения от профессиональных техников с многолетним
                 опытом
               </p>
             </div>
 
             {/* Speed */}
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <Zap className="h-10 w-10 text-blue-600" />
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <Zap className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 Быстрота
               </h3>
-              <p className="text-gray-600 leading-relaxed">
+              <p className="text-muted-foreground leading-relaxed">
                 Среднее время решения проблемы составляет всего 5 - 10 минут
               </p>
             </div>
 
             {/* Efficiency */}
             <div className="text-center">
-              <div className="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
-                <BarChart3 className="h-10 w-10 text-blue-600" />
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-6">
+                <BarChart3 className="h-10 w-10 text-primary" />
               </div>
-              <h3 className="text-2xl font-bold text-gray-900 mb-4">
+              <h3 className="text-2xl font-bold text-foreground mb-4">
                 Эффективность
               </h3>
-              <p className="text-gray-600 leading-relaxed">
-                95% проблем решаются с первого раза без вызова техника
+              <p className="text-muted-foreground leading-relaxed">
+                95% пр��блем решаются с первого раза без вызова техника
               </p>
             </div>
           </div>
@@ -288,21 +297,23 @@ const Index = () => {
       </section>
 
       {/* Footer */}
-      <footer className="bg-gray-900 text-white py-8">
+      <footer className="bg-background border-t border-border py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center space-x-3 mb-4 md:mb-0">
-              <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                <div className="w-6 h-4 bg-white rounded-sm"></div>
+              <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
+                <div className="w-6 h-4 bg-primary-foreground rounded-sm"></div>
               </div>
               <div>
-                <div className="font-bold text-lg">ANT Support</div>
-                <div className="text-gray-400 text-sm">
+                <div className="font-bold text-lg text-foreground">
+                  ANT Support
+                </div>
+                <div className="text-muted-foreground text-sm">
                   Служба поддержки ТВ-приставок
                 </div>
               </div>
             </div>
-            <div className="text-gray-400 text-sm">
+            <div className="text-muted-foreground text-sm">
               © 2025 ANT Support. Все права защищены.
             </div>
           </div>

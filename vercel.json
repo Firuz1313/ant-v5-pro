@@ -1,13 +1,17 @@
 {
   "version": 2,
-  "buildCommand": "npm run vercel-build",
+  "buildCommand": "cd frontend && npm run build",
   "outputDirectory": "frontend/dist",
   "installCommand": "npm run install:all",
-  "framework": "vite",
+  "framework": null,
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/not-supported"
+      "src": "/assets/(.*)",
+      "headers": { "Content-Type": "application/javascript" }
+    },
+    {
+      "src": "/(.*\\.(js|css|png|jpg|jpeg|gif|svg|ico|woff|woff2|ttf|eot))",
+      "headers": { "Cache-Control": "public, max-age=31536000, immutable" }
     },
     {
       "src": "/(.*)",
