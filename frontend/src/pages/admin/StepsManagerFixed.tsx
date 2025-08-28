@@ -417,7 +417,7 @@ const StepFormFields = React.memo<{
             id={isEdit ? "edit-hint" : "hint"}
             value={formData.hint}
             onChange={handleHintChange}
-            placeholder="Дополнительная подсказка для пользователя"
+            placeholder="Дополнит��льная подсказка для пользователя"
           />
         </div>
 
@@ -1141,7 +1141,7 @@ const StepsManagerFixed = () => {
 
       toast({
         title: "Успех",
-        description: "Ш����г успешно обновлен",
+        description: "Ш��г успешно обновлен",
         variant: "default",
       });
     } catch (error) {
@@ -1188,7 +1188,7 @@ const StepsManagerFixed = () => {
       setStepToDelete(null);
 
       toast({
-        title: "Ошибка у��алени��",
+        title: "Ошибка удалени��",
         description: `Не удалось удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
         variant: "destructive",
       });
@@ -1265,7 +1265,7 @@ const StepsManagerFixed = () => {
     const preciseX = event.clientX - rect.left;
     const preciseY = event.clientY - rect.top;
 
-    // Нормализуем координаты к ди��пазону 0-1 для максимальной точности
+    // Нормализуем координаты к диапазону 0-1 для максимальной точности
     const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
     const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
 
@@ -1348,7 +1348,11 @@ const StepsManagerFixed = () => {
               ref={canvasRef}
               width={400}
               height={600}
-              className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair mx-auto"
+              className={`border border-gray-300 dark:border-gray-600 rounded mx-auto transition-all duration-200 ${
+                isPickingButton
+                  ? "cursor-crosshair border-blue-500 shadow-lg ring-2 ring-blue-200"
+                  : "cursor-pointer hover:border-gray-400"
+              }`}
               style={{
                 backgroundImage: remoteImage ? `url(${remoteImage})` : "none",
                 backgroundSize: "contain",
@@ -1357,6 +1361,8 @@ const StepsManagerFixed = () => {
                 backgroundColor: remoteImage ? "transparent" : "#f3f4f6",
               }}
               onClick={handleCanvasClick}
+              onMouseMove={handleCanvasMouseMove}
+              onMouseLeave={handleCanvasMouseLeave}
             />
 
             {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
@@ -1752,7 +1758,7 @@ const StepsManagerFixed = () => {
               Шаги не найд��ны
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
-              Создайте первый шаг диагностики или измените пар��метры фильтрации
+              Создайте первый шаг ��иагностики или измените пар��метры фильтрации
             </p>
           </CardContent>
         </Card>
