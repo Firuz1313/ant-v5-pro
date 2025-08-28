@@ -210,7 +210,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Ус��ройство или проблема не найдены</p>
+          <p>Устройство или проблема не найдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -285,11 +285,80 @@ const DiagnosticPage = () => {
           </div>
         </div>
 
-        {/* Main Content */}
-        <div className="max-w-7xl mx-auto">
-          <div className="grid lg:grid-cols-2 gap-12 items-start">
-            {/* Left Navigation Arrow */}
-            <div className="lg:col-span-2 flex items-center justify-between mb-4">
+        {/* Main Content - TV left, Remote right, exact sizing */}
+        <div className="flex items-start justify-center gap-12">
+          {/* TV Section - Left Column */}
+          <div className="flex flex-col items-center">
+            {/* TV Display - Exact 400px × 300px */}
+            <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+              <CardContent className="p-0">
+                <div 
+                  className="bg-gray-900 rounded-xl overflow-hidden"
+                  style={{ width: '400px', height: '300px' }}
+                >
+                  {currentStepData?.tvInterfaceId ? (
+                    <TVInterfaceDisplay
+                      tvInterfaceId={currentStepData.tvInterfaceId}
+                      stepId={currentStepData.id}
+                      tvAreaPosition={currentStepData.tvAreaPosition}
+                      tvAreaRect={currentStepData.tvAreaRect}
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gray-800 flex items-center justify-center relative">
+                      {/* Default TV Interface */}
+                      <div className="w-full h-full bg-gradient-to-b from-gray-700 to-gray-900 p-6">
+                        <div className="flex items-center justify-between mb-6">
+                          <div className="flex items-center text-white">
+                            <div className="w-6 h-6 mr-3">
+                              <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                              </svg>
+                            </div>
+                            <span className="text-lg font-medium">Главное меню</span>
+                          </div>
+                          <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                            Шаг 1
+                          </div>
+                        </div>
+                        
+                        <div className="grid grid-cols-3 gap-4">
+                          <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
+                            <div className="w-8 h-8 mx-auto mb-2 text-red-500">
+                              <svg viewBox="0 0 24 24" fill="currentColor">
+                                <circle cx="12" cy="12" r="3"/>
+                                <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                              </svg>
+                            </div>
+                            <div className="font-medium text-sm">Прямой эфир</div>
+                          </div>
+                          
+                          <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
+                            <div className="w-8 h-8 mx-auto mb-2 text-blue-500">
+                              <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+                              </svg>
+                            </div>
+                            <div className="font-medium text-sm">Настройки</div>
+                          </div>
+                          
+                          <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
+                            <div className="w-8 h-8 mx-auto mb-2 text-green-500">
+                              <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+                              </svg>
+                            </div>
+                            <div className="font-medium text-sm">Приложения</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </CardContent>
+            </Card>
+
+            {/* Navigation Buttons - Under TV */}
+            <div className="flex items-center justify-between mt-6" style={{ width: '400px' }}>
               <Button
                 onClick={handlePrevStep}
                 disabled={currentStepNumber <= 1}
@@ -310,97 +379,9 @@ const DiagnosticPage = () => {
               </Button>
             </div>
 
-            {/* TV Display - Large and High Quality */}
-            <div className="order-1 lg:order-1">
-              <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-                <CardContent className="p-0">
-                  <div className="aspect-video bg-gray-900 rounded-xl overflow-hidden">
-                    {currentStepData?.tvInterfaceId ? (
-                      <TVInterfaceDisplay
-                        tvInterfaceId={currentStepData.tvInterfaceId}
-                        stepId={currentStepData.id}
-                        tvAreaPosition={currentStepData.tvAreaPosition}
-                        tvAreaRect={currentStepData.tvAreaRect}
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-800 flex items-center justify-center relative">
-                        {/* Default TV Interface */}
-                        <div className="w-full h-full bg-gradient-to-b from-gray-700 to-gray-900 p-8">
-                          <div className="flex items-center justify-between mb-8">
-                            <div className="flex items-center text-white">
-                              <div className="w-6 h-6 mr-3">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
-                                </svg>
-                              </div>
-                              <span className="text-lg font-medium">Главное меню</span>
-                            </div>
-                            <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm">
-                              Шаг 1
-                            </div>
-                          </div>
-                          
-                          <div className="grid grid-cols-3 gap-6 max-w-4xl">
-                            <div className="bg-gray-600 rounded-lg p-6 text-center text-white hover:bg-gray-500 transition-colors">
-                              <div className="w-12 h-12 mx-auto mb-3 text-red-500">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                  <circle cx="12" cy="12" r="3"/>
-                                  <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
-                                </svg>
-                              </div>
-                              <div className="font-medium">Прямой эфир</div>
-                            </div>
-                            
-                            <div className="bg-gray-600 rounded-lg p-6 text-center text-white hover:bg-gray-500 transition-colors">
-                              <div className="w-12 h-12 mx-auto mb-3 text-blue-500">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
-                                </svg>
-                              </div>
-                              <div className="font-medium">Настройки</div>
-                            </div>
-                            
-                            <div className="bg-gray-600 rounded-lg p-6 text-center text-white hover:bg-gray-500 transition-colors">
-                              <div className="w-12 h-12 mx-auto mb-3 text-green-500">
-                                <svg viewBox="0 0 24 24" fill="currentColor">
-                                  <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
-                                </svg>
-                              </div>
-                              <div className="font-medium">Приложения</div>
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Remote Control - Properly Sized */}
-            <div className="order-2 lg:order-2 flex justify-center">
-              <div className="max-w-xs w-full">
-                <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-                  <CardContent className="p-6">
-                    <RemoteControl
-                      remote={remote}
-                      highlightButton={currentStepData?.highlightRemoteButton || "power"}
-                      showButtonPosition={currentStepData?.buttonPosition}
-                      onButtonClick={handleManualProgress}
-                    />
-                  </CardContent>
-                </Card>
-              </div>
-            </div>
-          </div>
-
-          {/* Instructions */}
-          <div className="mt-8 text-center">
-            <p className="text-gray-600">
-              Красная точка на пульте показывает точное место для нажатия
-            </p>
+            {/* Instructions - Under TV */}
             {currentStepData && (
-              <div className="mt-4 max-w-2xl mx-auto">
+              <div className="mt-6" style={{ width: '400px' }}>
                 <Card className="bg-blue-50 border border-blue-200">
                   <CardContent className="p-6">
                     <h3 className="font-semibold text-gray-900 mb-2">
@@ -420,6 +401,30 @@ const DiagnosticPage = () => {
                 </Card>
               </div>
             )}
+
+            {/* Hint text - Under TV */}
+            <div className="mt-4 text-center" style={{ width: '400px' }}>
+              <p className="text-gray-600 text-sm">
+                Красная точка на пульте показывает точное место для нажатия
+              </p>
+            </div>
+          </div>
+
+          {/* Remote Control - Right Column, Exact 130px × 410px */}
+          <div className="flex justify-center">
+            <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+              <CardContent className="p-4">
+                <div style={{ width: '130px', height: '410px' }}>
+                  <RemoteControl
+                    remote={remote}
+                    highlightButton={currentStepData?.highlightRemoteButton || "power"}
+                    showButtonPosition={currentStepData?.buttonPosition}
+                    onButtonClick={handleManualProgress}
+                    className="w-full h-full"
+                  />
+                </div>
+              </CardContent>
+            </Card>
           </div>
         </div>
 
