@@ -180,10 +180,10 @@ const Index = () => {
                 return (
                   <Card
                     key={device.id}
-                    className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow"
+                    className="text-center bg-card border border-border rounded-2xl shadow-sm hover:shadow-md transition-shadow"
                   >
                     <CardContent className="p-8">
-                      <div className="w-24 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                      <div className="w-24 h-16 bg-muted rounded-lg flex items-center justify-center mx-auto mb-6">
                         {device.imageUrl ? (
                           <img
                             src={device.imageUrl}
