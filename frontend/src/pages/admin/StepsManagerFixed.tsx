@@ -417,7 +417,7 @@ const StepFormFields = React.memo<{
             id={isEdit ? "edit-hint" : "hint"}
             value={formData.hint}
             onChange={handleHintChange}
-            placeholder="Дополнит��льная подсказка для пользователя"
+            placeholder="Дополнительная подсказка для пользователя"
           />
         </div>
 
@@ -927,7 +927,7 @@ const StepsManagerFixed = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">Загрузка данных...</span>
+        <span className="text-lg">За��рузка данных...</span>
       </div>
     );
   }
@@ -1365,6 +1365,21 @@ const StepsManagerFixed = () => {
               onMouseLeave={handleCanvasMouseLeave}
             />
 
+            {/* Hover indicator - показывается при наведении */}
+            {isPickingButton && hoverPosition && (
+              <div
+                className="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-70 transition-all duration-75"
+                style={{
+                  left: `${hoverPosition.x * 100}%`,
+                  top: `${hoverPosition.y * 100}%`,
+                  zIndex: 999,
+                }}
+              >
+                <div className="absolute inset-0 bg-blue-400 rounded-full animate-pulse opacity-50"></div>
+              </div>
+            )}
+
+            {/* Выбранная позиция - постоянный индикатор */}
             {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
               <div
                 className="absolute w-5 h-5 bg-red-500 rounded-full border-3 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse shadow-lg"
@@ -1758,7 +1773,7 @@ const StepsManagerFixed = () => {
               Шаги не найд��ны
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
-              Создайте первый шаг ��иагностики или измените пар��метры фильтрации
+              Создайте первый шаг диагностики или измените пар��метры фильтрации
             </p>
           </CardContent>
         </Card>
