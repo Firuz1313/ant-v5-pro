@@ -107,8 +107,13 @@ const DiagnosticPage = () => {
           console.log(`✅ Successfully loaded default remote for device ${deviceId}:`, defaultRemote?.name || defaultRemote?.id);
           setRemote(defaultRemote);
           return;
-        } catch (defaultError) {
-          console.warn(`⚠️ No default remote found for device ${deviceId}:`, defaultError.message);
+        } catch (defaultError: any) {
+          // Expected 404 error when no default remote exists
+          if (defaultError.message?.includes('NO_DEFAULT_REMOTE_FOR_DEVICE')) {
+            console.log(`ℹ️ No default remote configured for device ${deviceId} (expected)`);
+          } else {
+            console.warn(`⚠️ Error loading default remote for device ${deviceId}:`, defaultError.message);
+          }
 
           // Third priority: any remote for device
           console.log(`📱 Attempting to load any remote for device: ${deviceId}`);
@@ -205,7 +210,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или проблема не найдены</p>
+          <p>Ус��ройство или проблема не найдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
