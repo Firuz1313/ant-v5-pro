@@ -14,9 +14,9 @@ import {
   ArrowRight,
   CheckCircle,
   AlertCircle,
-  Lightbulb,
-  Tv,
   Loader2,
+  ChevronLeft,
+  ChevronRight,
 } from "lucide-react";
 
 const DiagnosticPage = () => {
@@ -134,8 +134,8 @@ const DiagnosticPage = () => {
 
   if (devicesLoading || problemsLoading || loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600">
-        <div className="text-center text-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center text-gray-900">
           <Loader2 className="h-8 w-8 animate-spin mx-auto mb-4" />
           <p>Загрузка диагностики...</p>
         </div>
@@ -145,8 +145,8 @@ const DiagnosticPage = () => {
 
   if (!device || !problem) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600">
-        <div className="text-center text-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
           <p>Устройство или проблема не найдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
@@ -159,8 +159,8 @@ const DiagnosticPage = () => {
 
   if (steps.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-800 to-blue-600">
-        <div className="text-center text-white">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
           <p>Шаги диагностики не найдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
@@ -172,143 +172,266 @@ const DiagnosticPage = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-      <div className="container mx-auto px-4 py-6">
-        {/* Header */}
-        <div className="flex items-center justify-between mb-6">
-          <Button
-            onClick={handleBack}
-            variant="ghost"
-            className="text-white hover:bg-white/10"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Назад
-          </Button>
-          <div className="text-center text-white">
-            <h1 className="text-xl font-semibold">{device.name}</h1>
-            <p className="text-blue-200 text-sm">{problem.title}</p>
+    <div className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <header className="bg-white border-b border-gray-200">
+        <div className="container mx-auto px-4 py-4">
+          <div className="flex items-center">
+            <Button
+              onClick={handleBack}
+              variant="ghost"
+              size="icon"
+              className="text-gray-600 hover:bg-gray-100 mr-4"
+            >
+              <ArrowLeft className="h-5 w-5" />
+            </Button>
+            <div>
+              <h1 className="text-xl font-semibold text-gray-900">{device.name || "OpenBox"}</h1>
+              <p className="text-gray-600 text-sm">{problem.title || "Диагностика"}</p>
+            </div>
           </div>
-          <div className="w-20"></div>
         </div>
+      </header>
 
-        {/* Progress */}
-        <div className="mb-6">
-          <div className="text-white text-sm mb-2 text-center">
-            Шаг {currentStepNumber} из {steps.length}
+      <main className="container mx-auto px-4 py-8">
+        {/* Progress Bar */}
+        <div className="max-w-4xl mx-auto mb-8">
+          <div className="flex items-center justify-center mb-4">
+            {Array.from({ length: steps.length }, (_, index) => (
+              <React.Fragment key={index}>
+                <div
+                  className={`w-4 h-4 rounded-full border-2 ${
+                    index + 1 <= currentStepNumber
+                      ? "bg-gray-900 border-gray-900"
+                      : index + 1 === currentStepNumber
+                      ? "bg-white border-gray-900"
+                      : "bg-white border-gray-300"
+                  }`}
+                />
+                {index < steps.length - 1 && (
+                  <div
+                    className={`w-16 h-0.5 ${
+                      index + 1 < currentStepNumber ? "bg-gray-900" : "bg-gray-300"
+                    }`}
+                  />
+                )}
+              </React.Fragment>
+            ))}
           </div>
-          <Progress value={progress} className="h-2" />
+          <div className="text-center text-gray-600 text-sm">
+            Шаг {currentStepNumber}
+          </div>
         </div>
 
         {/* Main Content */}
-        <div className="grid lg:grid-cols-2 gap-6">
-          {/* Left side - TV Display and Instructions */}
-          <div className="space-y-6">
-            {/* TV Display */}
-            <Card className="bg-black/50 border-gray-700">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <Tv className="h-5 w-5 text-blue-400 mr-2" />
-                  <h3 className="font-semibold text-white">Экран ТВ</h3>
-                </div>
+        <div className="max-w-7xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-12 items-start">
+            {/* Left Navigation Arrow */}
+            <div className="lg:col-span-2 flex items-center justify-between mb-4">
+              <Button
+                onClick={handlePrevStep}
+                disabled={currentStepNumber <= 1}
+                variant="ghost"
+                size="icon"
+                className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+              >
+                <ChevronLeft className="h-8 w-8" />
+              </Button>
+              
+              <Button
+                onClick={handleNextStep}
+                variant="ghost"
+                size="icon"
+                className="text-gray-400 hover:text-gray-600"
+              >
+                <ChevronRight className="h-8 w-8" />
+              </Button>
+            </div>
 
-                {currentStepData?.tvInterfaceId ? (
-                  <TVInterfaceDisplay
-                    tvInterfaceId={currentStepData.tvInterfaceId}
-                    stepId={currentStepData.id}
-                    tvAreaPosition={currentStepData.tvAreaPosition}
-                    tvAreaRect={currentStepData.tvAreaRect}
-                  />
-                ) : (
-                  <TVDisplay />
-                )}
-              </CardContent>
-            </Card>
+            {/* TV Display - Large and High Quality */}
+            <div className="order-1 lg:order-1">
+              <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+                <CardContent className="p-0">
+                  <div className="aspect-video bg-gray-900 rounded-xl overflow-hidden">
+                    {currentStepData?.tvInterfaceId ? (
+                      <TVInterfaceDisplay
+                        tvInterfaceId={currentStepData.tvInterfaceId}
+                        stepId={currentStepData.id}
+                        tvAreaPosition={currentStepData.tvAreaPosition}
+                        tvAreaRect={currentStepData.tvAreaRect}
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-800 flex items-center justify-center relative">
+                        {/* Default TV Interface */}
+                        <div className="w-full h-full bg-gradient-to-b from-gray-700 to-gray-900 p-8">
+                          <div className="flex items-center justify-between mb-8">
+                            <div className="flex items-center text-white">
+                              <div className="w-6 h-6 mr-3">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M10 20v-6h4v6h5v-8h3L12 3 2 12h3v8z"/>
+                                </svg>
+                              </div>
+                              <span className="text-lg font-medium">Главное меню</span>
+                            </div>
+                            <div className="bg-blue-600 text-white px-3 py-1 rounded text-sm">
+                              Шаг 1
+                            </div>
+                          </div>
+                          
+                          <div className="grid grid-cols-3 gap-6 max-w-4xl">
+                            <div className="bg-gray-600 rounded-lg p-6 text-center text-white hover:bg-gray-500 transition-colors">
+                              <div className="w-12 h-12 mx-auto mb-3 text-red-500">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <circle cx="12" cy="12" r="3"/>
+                                  <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
+                                </svg>
+                              </div>
+                              <div className="font-medium">Прямой эфир</div>
+                            </div>
+                            
+                            <div className="bg-gray-600 rounded-lg p-6 text-center text-white hover:bg-gray-500 transition-colors">
+                              <div className="w-12 h-12 mx-auto mb-3 text-blue-500">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
+                                </svg>
+                              </div>
+                              <div className="font-medium">Настройки</div>
+                            </div>
+                            
+                            <div className="bg-gray-600 rounded-lg p-6 text-center text-white hover:bg-gray-500 transition-colors">
+                              <div className="w-12 h-12 mx-auto mb-3 text-green-500">
+                                <svg viewBox="0 0 24 24" fill="currentColor">
+                                  <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
+                                </svg>
+                              </div>
+                              <div className="font-medium">Приложения</div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
 
-            {/* Instructions */}
-            <Card className="bg-white/10 border-gray-700">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <Lightbulb className="h-5 w-5 text-yellow-400 mr-2" />
-                  <h3 className="font-semibold text-white">Инструкция</h3>
-                </div>
+            {/* Remote Control - Properly Sized */}
+            <div className="order-2 lg:order-2 flex justify-center">
+              <div className="max-w-xs w-full">
+                <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+                  <CardContent className="p-6">
+                    {remote ? (
+                      <RemoteControl
+                        remote={remote}
+                        highlightButton={currentStepData?.highlightRemoteButton}
+                        showButtonPosition={currentStepData?.buttonPosition}
+                        onButtonClick={handleManualProgress}
+                      />
+                    ) : (
+                      <div className="w-full">
+                        {/* Default OpenBox Remote */}
+                        <div className="bg-gray-900 rounded-2xl p-4 w-48 mx-auto relative">
+                          {/* Power button with red dot */}
+                          <div className="flex justify-center mb-4 relative">
+                            <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
+                              <div className="w-4 h-4 bg-white rounded-full relative">
+                                {/* Red dot indicator */}
+                                <div className="absolute -top-2 -right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></div>
+                              </div>
+                            </div>
+                          </div>
 
-                {currentStepData ? (
-                  <div className="text-white space-y-3">
-                    <h4 className="font-medium text-lg">
-                      {currentStepData.title}
-                    </h4>
-                    <p className="text-blue-100 leading-relaxed">
-                      {currentStepData.instruction}
+                          {/* Number pad */}
+                          <div className="grid grid-cols-3 gap-2 mb-4">
+                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
+                              <button
+                                key={num}
+                                className="w-8 h-8 bg-gray-700 text-white text-sm rounded flex items-center justify-center hover:bg-gray-600"
+                                onClick={handleManualProgress}
+                              >
+                                {num}
+                              </button>
+                            ))}
+                          </div>
+
+                          {/* Additional buttons */}
+                          <div className="space-y-2">
+                            <div className="flex justify-center space-x-2">
+                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">LANG</button>
+                              <button className="w-8 h-8 bg-gray-700 text-white text-sm rounded">0</button>
+                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">LIST</button>
+                            </div>
+                            
+                            <div className="flex justify-center space-x-2">
+                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">BACK</button>
+                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">INFO</button>
+                            </div>
+
+                            <div className="flex justify-center space-x-2">
+                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">MENU</button>
+                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">EXIT</button>
+                            </div>
+
+                            {/* Navigation circle */}
+                            <div className="flex justify-center">
+                              <div className="relative w-20 h-20">
+                                <button className="absolute top-0 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-gray-700 text-white text-xs rounded">▲</button>
+                                <button className="absolute left-0 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-gray-700 text-white text-xs rounded">◄</button>
+                                <button className="absolute right-0 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-gray-700 text-white text-xs rounded">►</button>
+                                <button className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-gray-700 text-white text-xs rounded">▼</button>
+                                <button className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-gray-600 text-white text-xs rounded-full">OK</button>
+                              </div>
+                            </div>
+
+                            {/* Color buttons */}
+                            <div className="flex justify-center space-x-1 mt-4">
+                              <button className="w-6 h-6 bg-red-500 rounded"></button>
+                              <button className="w-6 h-6 bg-green-500 rounded"></button>
+                              <button className="w-6 h-6 bg-yellow-500 rounded"></button>
+                              <button className="w-6 h-6 bg-blue-500 rounded"></button>
+                            </div>
+                          </div>
+
+                          {/* OpenBox label */}
+                          <div className="text-center mt-4">
+                            <span className="text-white text-sm font-bold">OPENBOX</span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              </div>
+            </div>
+          </div>
+
+          {/* Instructions */}
+          <div className="mt-8 text-center">
+            <p className="text-gray-600">
+              Красная точка на пульте показывает точное место для нажатия
+            </p>
+            {currentStepData && (
+              <div className="mt-4 max-w-2xl mx-auto">
+                <Card className="bg-blue-50 border border-blue-200">
+                  <CardContent className="p-6">
+                    <h3 className="font-semibold text-gray-900 mb-2">
+                      {currentStepData.title || "Инструкция"}
+                    </h3>
+                    <p className="text-gray-700">
+                      {currentStepData.instruction || "Следуйте указаниям на экране"}
                     </p>
-
                     {currentStepData.hint && (
-                      <div className="bg-blue-500/20 p-3 rounded-lg">
-                        <p className="text-blue-200 text-sm">
+                      <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
+                        <p className="text-yellow-800 text-sm">
                           💡 {currentStepData.hint}
                         </p>
                       </div>
                     )}
-
-                    {currentStepData.warningText && (
-                      <div className="bg-yellow-500/20 p-3 rounded-lg">
-                        <p className="text-yellow-200 text-sm">
-                          ⚠️ {currentStepData.warningText}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  <p className="text-white">Инструкция не найдена</p>
-                )}
-              </CardContent>
-            </Card>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
-
-          {/* Right side - Remote Control */}
-          <div>
-            <Card className="bg-black/50 border-gray-700">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-4">
-                  <div className="h-5 w-5 bg-red-500 rounded-full mr-2"></div>
-                  <h3 className="font-semibold text-white">Пульт управления</h3>
-                </div>
-
-                {remote ? (
-                  <RemoteControl
-                    remote={remote}
-                    highlightButton={currentStepData?.highlightRemoteButton}
-                    showButtonPosition={currentStepData?.buttonPosition}
-                    onButtonClick={handleManualProgress}
-                  />
-                ) : (
-                  <div className="text-center text-gray-400 py-8">
-                    <p>Пульт не найден</p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <div className="flex justify-between items-center mt-8">
-          <Button
-            onClick={handlePrevStep}
-            disabled={currentStepNumber <= 1}
-            variant="outline"
-            className="bg-white/10 border-gray-600 text-white hover:bg-white/20"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Предыдущий шаг
-          </Button>
-
-          <Button
-            onClick={handleNextStep}
-            className="bg-blue-600 hover:bg-blue-700 text-white"
-          >
-            {currentStepNumber < steps.length ? "Следующий шаг" : "Завершить"}
-            <ArrowRight className="h-4 w-4 ml-2" />
-          </Button>
         </div>
 
         {/* Manual Progress Indicator */}
@@ -318,7 +441,7 @@ const DiagnosticPage = () => {
             Действие выполнено!
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };
