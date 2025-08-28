@@ -162,7 +162,12 @@ export const remotesApi = {
     try {
       const response = await apiClient.get<any>(`/remotes/device/${deviceId}`);
       return response?.data ?? response;
-    } catch (error) {
+    } catch (error: any) {
+      // Handle 404 gracefully - no remotes found for device
+      if (error?.response?.status === 404 || error?.status === 404) {
+        console.log(`No remotes found for device ${deviceId} (404 - expected)`);
+        return [];
+      }
       throw handleApiError(
         error,
         `Failed to fetch remotes for device ${deviceId}`,
@@ -179,7 +184,12 @@ export const remotesApi = {
         `/remotes/device/${deviceId}/default`,
       );
       return response?.data ?? response;
-    } catch (error) {
+    } catch (error: any) {
+      // Handle 404 gracefully - no default remote found for device
+      if (error?.response?.status === 404 || error?.status === 404) {
+        console.log(`No default remote found for device ${deviceId} (404 - expected)`);
+        throw new Error(`NO_DEFAULT_REMOTE_FOR_DEVICE_${deviceId}`);
+      }
       throw handleApiError(
         error,
         `Failed to fetch default remote for device ${deviceId}`,
@@ -188,7 +198,7 @@ export const remotesApi = {
   },
 
   /**
-   * Установка пульта как default для устройства
+   * У��тановка пульта как default для устройства
    */
   async setAsDefault(remoteId: string, deviceId: string): Promise<void> {
     try {
