@@ -149,15 +149,21 @@ const RemoteControl = ({
         {/* Top Section */}
         <div className="space-y-3 lg:space-y-4 flex-shrink-0">
           {/* Power Button */}
-          <button
-            onClick={() => handleButtonClick("power")}
-            className={getButtonClass(
-              "power",
-              "w-10 h-10 lg:w-12 lg:h-12 bg-red-600 hover:bg-red-700 text-white rounded-full mx-auto block",
-            )}
-          >
-            <Power className="h-5 w-5" />
-          </button>
+          <div className="relative flex justify-center">
+            <button
+              onClick={() => handleButtonClick("power")}
+              className={getButtonClass(
+                "power",
+                "w-10 h-10 lg:w-12 lg:h-12 bg-red-600 hover:bg-red-700 text-white rounded-full relative",
+              )}
+            >
+              <Power className="h-5 w-5" />
+              {/* Red dot indicator */}
+              {highlightButton === "power" && (
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse z-10"></div>
+              )}
+            </button>
+          </div>
 
           {/* Number Buttons */}
           <div className="grid grid-cols-3 gap-1 lg:gap-2">
