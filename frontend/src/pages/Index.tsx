@@ -244,17 +244,9 @@ const Index = () => {
           <h2 className="text-3xl font-bold text-white mb-6">
             Готовы решить проблему с вашей приставкой?
           </h2>
-          <p className="text-xl text-blue-100 mb-8">
+          <p className="text-xl text-blue-100">
             Начните диагностику прямо сейчас и получите решение за несколько минут
           </p>
-          <Button
-            size="lg"
-            onClick={handleStartDiagnostic}
-            className="bg-white text-blue-600 hover:bg-gray-100 px-8 py-4 text-lg font-medium rounded-xl"
-          >
-            Начать диагностику
-            <ArrowRight className="h-5 w-5 ml-2" />
-          </Button>
         </div>
       </section>
 
