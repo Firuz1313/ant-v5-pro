@@ -179,7 +179,7 @@ const DiagnosticPage = () => {
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
           <p>Шаги диагностики не найдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
-            Вернуться назад
+            Вернуться на��ад
           </Button>
         </div>
       </div>
@@ -246,11 +246,11 @@ const DiagnosticPage = () => {
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-0">
                 <div
-                  className="bg-gray-900 rounded-xl overflow-hidden"
+                  className="bg-gray-900 rounded-xl overflow-hidden w-full max-w-[560px] aspect-video lg:aspect-[560/320]"
                   style={{
-                    width: window.innerWidth < 1024 ? '90vw' : '560px',
+                    width: '90vw',
                     maxWidth: '560px',
-                    height: window.innerWidth < 1024 ? 'calc(90vw * 320/560)' : '320px',
+                    height: 'calc(90vw * 320/560)',
                     maxHeight: '320px'
                   }}
                 >
