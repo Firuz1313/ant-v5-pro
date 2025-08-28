@@ -254,12 +254,12 @@ const DiagnosticPage = () => {
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-0">
                 <div
-                  className="bg-gray-900 rounded-xl overflow-hidden w-full max-w-[720px] aspect-video lg:aspect-[720/420]"
+                  className="bg-gray-900 rounded-xl overflow-hidden w-full max-w-[900px] aspect-video lg:aspect-[900/520]"
                   style={{
                     width: "90vw",
-                    maxWidth: "720px",
-                    height: "calc(90vw * 420/720)",
-                    maxHeight: "420px",
+                    maxWidth: "900px",
+                    height: "calc(90vw * 520/900)",
+                    maxHeight: "520px",
                   }}
                 >
                   {currentStepData?.tvInterfaceId ? (
@@ -327,8 +327,8 @@ const DiagnosticPage = () => {
 
             {/* Navigation Buttons - Directly Under TV */}
             <div
-              className="flex items-center justify-between mt-6 w-full max-w-[720px]"
-              style={{ width: "90vw", maxWidth: "720px" }}
+              className="flex items-center justify-between mt-6 w-full max-w-[900px]"
+              style={{ width: "90vw", maxWidth: "900px" }}
             >
               <Button
                 onClick={handlePrevStep}
@@ -352,8 +352,8 @@ const DiagnosticPage = () => {
 
             {/* Hint Text - Directly Under TV */}
             <div
-              className="mt-4 text-center w-full max-w-[720px]"
-              style={{ width: "90vw", maxWidth: "720px" }}
+              className="mt-4 text-center w-full max-w-[900px]"
+              style={{ width: "90vw", maxWidth: "900px" }}
             >
               <p className="text-gray-600 text-sm">
                 Красная точка на пульте показывает точное место для нажатия
