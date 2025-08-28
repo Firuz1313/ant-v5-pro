@@ -374,7 +374,7 @@ const RemoteControl = ({
         {/* Remote Brand */}
         <div className="text-center flex-shrink-0">
           <span className="text-gray-500 text-xs font-semibold">
-            {remote?.name || remote?.model || "UNIVERSAL REMOTE"}
+            {remote?.name || remote?.model || remote?.manufacturer || "OPENBOX"}
           </span>
         </div>
       </div>
