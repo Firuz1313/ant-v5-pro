@@ -43,7 +43,8 @@ const Index = () => {
             Быстрая диагностика проблем
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Пошаговое инструкции дл�� решения проблем с цифровыми ТВ-приставками.
+            Пошаговое инструкции дл�� решения проблем с цифровыми
+            ТВ-приставками.
             <br />
             Простой интерфейс, проф��ссиональные решения.
           </p>
@@ -102,7 +103,9 @@ const Index = () => {
                     {problemCount}
                   </div>
                 )}
-                <div className="text-muted-foreground font-medium">Готовых решений</div>
+                <div className="text-muted-foreground font-medium">
+                  Готовых решений
+                </div>
               </CardContent>
             </Card>
 
@@ -111,7 +114,9 @@ const Index = () => {
                 <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <CheckCircle className="h-8 w-8 text-primary" />
                 </div>
-                <div className="text-4xl font-bold text-foreground mb-2">95%</div>
+                <div className="text-4xl font-bold text-foreground mb-2">
+                  95%
+                </div>
                 <div className="text-muted-foreground font-medium">
                   Успешных решений
                 </div>
@@ -126,7 +131,9 @@ const Index = () => {
                 <div className="text-4xl font-bold text-foreground mb-2">
                   24/7
                 </div>
-                <div className="text-muted-foreground font-medium">Доступность</div>
+                <div className="text-muted-foreground font-medium">
+                  Доступность
+                </div>
               </CardContent>
             </Card>
           </div>
@@ -220,7 +227,9 @@ const Index = () => {
                   >
                     <CardContent className="p-8">
                       <div className="w-24 h-16 bg-border rounded-lg flex items-center justify-center mx-auto mb-6">
-                        <div className="text-muted-foreground text-xs">Скоро</div>
+                        <div className="text-muted-foreground text-xs">
+                          Скоро
+                        </div>
                       </div>
                       <h3 className="text-xl font-bold text-muted-foreground mb-2">
                         Новые устройства
@@ -296,7 +305,9 @@ const Index = () => {
                 <div className="w-6 h-4 bg-primary-foreground rounded-sm"></div>
               </div>
               <div>
-                <div className="font-bold text-lg text-foreground">ANT Support</div>
+                <div className="font-bold text-lg text-foreground">
+                  ANT Support
+                </div>
                 <div className="text-muted-foreground text-sm">
                   Служба поддержки ТВ-приставок
                 </div>
