@@ -219,13 +219,13 @@ const Index = () => {
                     className="text-center bg-muted border border-border border-dashed rounded-2xl shadow-sm"
                   >
                     <CardContent className="p-8">
-                      <div className="w-24 h-16 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-6">
-                        <div className="text-gray-400 text-xs">Скоро</div>
+                      <div className="w-24 h-16 bg-border rounded-lg flex items-center justify-center mx-auto mb-6">
+                        <div className="text-muted-foreground text-xs">Скоро</div>
                       </div>
-                      <h3 className="text-xl font-bold text-gray-400 mb-2">
+                      <h3 className="text-xl font-bold text-muted-foreground mb-2">
                         Новые устройства
                       </h3>
-                      <p className="text-gray-400 text-sm">
+                      <p className="text-muted-foreground text-sm">
                         Добавим поддержку новых моделей при��тавок
                       </p>
                     </CardContent>
