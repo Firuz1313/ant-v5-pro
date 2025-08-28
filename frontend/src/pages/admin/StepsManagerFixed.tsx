@@ -302,7 +302,7 @@ const StepFormFields = React.memo<{
             id={isEdit ? "edit-description" : "description"}
             value={formData.description}
             onChange={handleDescriptionChange}
-            placeholder="Краткое описание шаг��"
+            placeholder="Краткое описание шага"
           />
         </div>
 
@@ -334,7 +334,7 @@ const StepFormFields = React.memo<{
                 <SelectItem value="none">Без интерфейса</SelectItem>
                 {loadingTVInterfaces ? (
                   <SelectItem value="loading" disabled>
-                    Загрузка...
+                    Загруз��а...
                   </SelectItem>
                 ) : (
                   tvInterfaces.map((tvInterface) => (
@@ -372,7 +372,7 @@ const StepFormFields = React.memo<{
               onValueChange={handleRemoteChange}
             >
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Выбери��е пульт" />
+                <SelectValue placeholder="Выберите пульт" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Без пульта</SelectItem>
@@ -633,6 +633,7 @@ const StepsManagerFixed = () => {
   const [customRemoteImage, setCustomRemoteImage] = useState<string | null>(
     null,
   );
+  const [hoverPosition, setHoverPosition] = useState<{ x: number; y: number } | null>(null);
 
   // Form data state with proper initialization
   const [formData, setFormData] = useState({
@@ -899,7 +900,7 @@ const StepsManagerFixed = () => {
 
         toast({
           title: "Ошибка",
-          description: `Не удалось изменить порядок шагов: ${error?.message || "Неизвестная ошибка"}`,
+          description: `Не уд��лось изменить порядок шагов: ${error?.message || "Неизвестная ошибка"}`,
           variant: "destructive",
         });
       }
@@ -1188,7 +1189,7 @@ const StepsManagerFixed = () => {
 
       toast({
         title: "Ошибка удалени��",
-        description: `Не удалось удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
+        description: `Не удалос�� удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
         variant: "destructive",
       });
     }
@@ -1367,7 +1368,7 @@ const StepsManagerFixed = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingButton ? "Отменить выбор" : "Выбрать позицию"}
+                  {isPickingButton ? "Отменить в��бор" : "Выбрать позицию"}
                 </Button>
                 <Button
                   type="button"
