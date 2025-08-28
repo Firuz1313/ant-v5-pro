@@ -54,6 +54,32 @@ const RemoteControl = ({
   const dimensions = remote?.dimensions || { width: 260, height: 700 };
   const useCustomRemote = !!imageData;
 
+  // Функция для нормализации координат (конвертация старых пиксельных координат в нормализованные 0-1)
+  const normalizeButtonPosition = (position: { x: number; y: number } | undefined) => {
+    if (!position) return undefined;
+
+    // Если координаты уже нормализованы (0-1), используем их как есть
+    if (position.x <= 1 && position.y <= 1) {
+      return position;
+    }
+
+    // Иначе конвертируем старые пиксельные координаты
+    // Используем стандартные размеры canvas для пультов: 400x600
+    const canvasWidth = 400;
+    const canvasHeight = 600;
+
+    const normalizedX = Math.min(position.x / canvasWidth, 1);
+    const normalizedY = Math.min(position.y / canvasHeight, 1);
+
+    console.log('🔄 Converting old pixel coordinates:', {
+      original: position,
+      normalized: { x: normalizedX, y: normalizedY },
+      canvasSize: { width: canvasWidth, height: canvasHeight }
+    });
+
+    return { x: normalizedX, y: normalizedY };
+  };
+
   const handleButtonClick = (buttonId: string) => {
     if (onButtonClick) {
       onButtonClick(buttonId);
