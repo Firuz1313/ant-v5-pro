@@ -165,7 +165,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или проблема не найдены</p>
+          <p>Устройство или проблема не н��йдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -364,8 +364,8 @@ const DiagnosticPage = () => {
             </div>
           </div>
 
-          {/* Remote Control - Bottom on Mobile, Right on Desktop */}
-          <div className="flex justify-center lg:justify-start">
+          {/* Remote Control - Bottom on Mobile, Right on Desktop - Positioned lower */}
+          <div className="flex justify-center lg:justify-start lg:items-end lg:mt-20">
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-4">
                 <div className="w-[140px] h-[300px] lg:w-[160px] lg:h-[330px]">
