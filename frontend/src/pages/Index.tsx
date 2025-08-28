@@ -35,20 +35,11 @@ const Index = () => {
           <h1 className="text-5xl font-bold text-gray-900 mb-6">
             Быстрая диагностика проблем
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Пошаговое инструкции для решения проблем с цифровыми ТВ-приставками.
             <br />
             Простой интерфейс, профессиональные решения.
           </p>
-          
-          <Button
-            size="lg"
-            onClick={handleStartDiagnostic}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-medium rounded-xl"
-          >
-            Начать диагностику
-            <ArrowRight className="h-5 w-5 ml-2" />
-          </Button>
         </div>
       </section>
 
