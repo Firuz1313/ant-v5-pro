@@ -253,7 +253,7 @@ const Index = () => {
                 Надежность
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Проверенные решения от профессиональных техников с многолетним
+                Про��еренные решения от профессиональных техников с многолетним
                 опытом
               </p>
             </div>
@@ -280,7 +280,7 @@ const Index = () => {
                 Эффективность
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                95% проблем решаются с первого раза без вызова техника
+                95% пр��блем решаются с первого раза без вызова техника
               </p>
             </div>
           </div>
@@ -296,13 +296,13 @@ const Index = () => {
                 <div className="w-6 h-4 bg-primary-foreground rounded-sm"></div>
               </div>
               <div>
-                <div className="font-bold text-lg">ANT Support</div>
-                <div className="text-gray-400 text-sm">
+                <div className="font-bold text-lg text-foreground">ANT Support</div>
+                <div className="text-muted-foreground text-sm">
                   Служба поддержки ТВ-приставок
                 </div>
               </div>
             </div>
-            <div className="text-gray-400 text-sm">
+            <div className="text-muted-foreground text-sm">
               © 2025 ANT Support. Все права защищены.
             </div>
           </div>
