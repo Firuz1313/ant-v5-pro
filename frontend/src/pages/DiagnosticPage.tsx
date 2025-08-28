@@ -287,7 +287,7 @@ const DiagnosticPage = () => {
                                 <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
                               </svg>
                             </div>
-                            <div className="font-medium">Прямой э��ир</div>
+                            <div className="font-medium">Прямой эфир</div>
                           </div>
                           
                           <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
@@ -348,11 +348,11 @@ const DiagnosticPage = () => {
             </div>
           </div>
 
-          {/* Remote Control - Right Column, Narrower and Taller */}
-          <div className="flex justify-center">
+          {/* Remote Control - Bottom on Mobile, Right on Desktop */}
+          <div className="flex justify-center lg:justify-start">
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-4">
-                <div style={{ width: '140px', height: '420px' }}>
+                <div className="w-[120px] h-[380px] lg:w-[140px] lg:h-[420px]">
                   <RemoteControl
                     remote={remote}
                     highlightButton={currentStepData?.highlightRemoteButton || "power"}
