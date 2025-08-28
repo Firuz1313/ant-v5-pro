@@ -35,14 +35,14 @@ const Index = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-background">
       {/* Hero Section */}
-      <section className="bg-white py-20">
+      <section className="bg-card py-20">
         <div className="container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold text-gray-900 mb-6">
+          <h1 className="text-5xl font-bold text-foreground mb-6">
             Быстрая диагностика проблем
           </h1>
-          <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
+          <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
             Пошаговое инструкции для решения проблем с цифровыми ТВ-приставками.
             <br />
             Простой интерфейс, профессиональные решения.
@@ -51,7 +51,7 @@ const Index = () => {
           <Button
             size="lg"
             onClick={handleStartDiagnostic}
-            className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-4 text-lg font-medium rounded-xl"
+            className="bg-primary hover:bg-primary/90 text-primary-foreground px-8 py-4 text-lg font-medium rounded-xl"
           >
             Начать диагностику
             <ArrowRight className="h-5 w-5 ml-2" />
