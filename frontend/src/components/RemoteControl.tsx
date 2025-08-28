@@ -54,6 +54,34 @@ const RemoteControl = ({
   const dimensions = remote?.dimensions || { width: 260, height: 700 };
   const useCustomRemote = !!imageData;
 
+  // Функция для нормализации коор��инат (конвертация старых пиксельных координат в нормализованные 0-1)
+  const normalizeButtonPosition = (
+    position: { x: number; y: number } | undefined,
+  ) => {
+    if (!position) return undefined;
+
+    // Если координаты уже нормализованы (0-1), используем их как есть
+    if (position.x <= 1 && position.y <= 1) {
+      return position;
+    }
+
+    // Иначе кон��ертируем старые пиксельные координаты
+    // Используем стандартные размеры canvas для пультов: 400x600
+    const canvasWidth = 400;
+    const canvasHeight = 600;
+
+    const normalizedX = Math.min(position.x / canvasWidth, 1);
+    const normalizedY = Math.min(position.y / canvasHeight, 1);
+
+    console.log("🔄 Converting old pixel coordinates:", {
+      original: position,
+      normalized: { x: normalizedX, y: normalizedY },
+      canvasSize: { width: canvasWidth, height: canvasHeight },
+    });
+
+    return { x: normalizedX, y: normalizedY };
+  };
+
   const handleButtonClick = (buttonId: string) => {
     if (onButtonClick) {
       onButtonClick(buttonId);
@@ -119,15 +147,23 @@ const RemoteControl = ({
             ))}
 
             {/* Show button position indicator if provided */}
-            {showButtonPosition && (
-              <div
-                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
-                style={{
-                  left: `${(showButtonPosition.x / remote.dimensions.width) * 100}%`,
-                  top: `${(showButtonPosition.y / remote.dimensions.height) * 100}%`,
-                }}
-              />
-            )}
+            {(() => {
+              const normalizedPosition =
+                normalizeButtonPosition(showButtonPosition);
+              return (
+                normalizedPosition && (
+                  <div
+                    className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
+                    style={{
+                      left: `${normalizedPosition.x * 100}%`,
+                      top: `${normalizedPosition.y * 100}%`,
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                  </div>
+                )
+              );
+            })()}
           </div>
         </div>
 
@@ -383,15 +419,22 @@ const RemoteControl = ({
       </div>
 
       {/* Show button position indicator if provided */}
-      {showButtonPosition && (
-        <div
-          className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
-          style={{
-            left: `${showButtonPosition.x}px`,
-            top: `${showButtonPosition.y}px`,
-          }}
-        />
-      )}
+      {(() => {
+        const normalizedPosition = normalizeButtonPosition(showButtonPosition);
+        return (
+          normalizedPosition && (
+            <div
+              className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
+              style={{
+                left: `${normalizedPosition.x * 100}%`,
+                top: `${normalizedPosition.y * 100}%`,
+              }}
+            >
+              <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+            </div>
+          )
+        );
+      })()}
 
       {/* Highlight Effect */}
       {highlightButton && (

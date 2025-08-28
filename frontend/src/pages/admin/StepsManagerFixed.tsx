@@ -633,6 +633,10 @@ const StepsManagerFixed = () => {
   const [customRemoteImage, setCustomRemoteImage] = useState<string | null>(
     null,
   );
+  const [hoverPosition, setHoverPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   // Form data state with proper initialization
   const [formData, setFormData] = useState({
@@ -926,7 +930,7 @@ const StepsManagerFixed = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">Загрузка данных...</span>
+        <span className="text-lg">За��рузка данных...</span>
       </div>
     );
   }
@@ -1255,18 +1259,65 @@ const StepsManagerFixed = () => {
 
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
 
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
+    // Предотвращаем дефолтное поведение и всплытие для максимальной точности
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Используем более точные координаты с дробными значениями
+    const preciseX = event.clientX - rect.left;
+    const preciseY = event.clientY - rect.top;
+
+    // Нормализуем координаты к диапазону 0-1 для максимальной точности
+    const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
+    const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
+
+    console.log("🎯 ULTRA PRECISE Click coordinates:", {
+      raw: { clientX: event.clientX, clientY: event.clientY },
+      canvasRect: {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+      },
+      relative: { x: preciseX, y: preciseY },
+      normalized: { x: normalizedX, y: normalizedY },
+      percentage: {
+        x: (normalizedX * 100).toFixed(3),
+        y: (normalizedY * 100).toFixed(3),
+      },
+    });
 
     setFormData({
       ...formData,
-      buttonPosition: { x, y },
+      buttonPosition: { x: normalizedX, y: normalizedY },
     });
 
     setIsPickingButton(false);
+  };
+
+  const handleCanvasMouseMove = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+  ) => {
+    if (!isPickingButton || !canvasRef.current) {
+      setHoverPosition(null);
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+
+    const preciseX = event.clientX - rect.left;
+    const preciseY = event.clientY - rect.top;
+
+    const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
+    const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
+
+    setHoverPosition({ x: normalizedX, y: normalizedY });
+  };
+
+  const handleCanvasMouseLeave = () => {
+    setHoverPosition(null);
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1310,7 +1361,11 @@ const StepsManagerFixed = () => {
               ref={canvasRef}
               width={400}
               height={600}
-              className="border border-gray-300 dark:border-gray-600 rounded cursor-crosshair mx-auto"
+              className={`border border-gray-300 dark:border-gray-600 rounded mx-auto transition-all duration-200 ${
+                isPickingButton
+                  ? "cursor-crosshair border-blue-500 shadow-lg ring-2 ring-blue-200"
+                  : "cursor-pointer hover:border-gray-400"
+              }`}
               style={{
                 backgroundImage: remoteImage ? `url(${remoteImage})` : "none",
                 backgroundSize: "contain",
@@ -1319,16 +1374,39 @@ const StepsManagerFixed = () => {
                 backgroundColor: remoteImage ? "transparent" : "#f3f4f6",
               }}
               onClick={handleCanvasClick}
+              onMouseMove={handleCanvasMouseMove}
+              onMouseLeave={handleCanvasMouseLeave}
             />
 
+            {/* Hover indicator - показывается при наведении */}
+            {isPickingButton && hoverPosition && (
+              <div
+                className="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-70 transition-all duration-75"
+                style={{
+                  left: `${hoverPosition.x * 100}%`,
+                  top: `${hoverPosition.y * 100}%`,
+                  zIndex: 999,
+                }}
+              >
+                <div className="absolute inset-0 bg-blue-400 rounded-full animate-pulse opacity-50"></div>
+              </div>
+            )}
+
+            {/* Выбранная позиция - постоянный индикатор */}
             {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
               <div
-                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                className="absolute w-5 h-5 bg-red-500 rounded-full border-3 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse shadow-lg"
                 style={{
-                  left: `${(formData.buttonPosition.x / 400) * 100}%`,
-                  top: `${(formData.buttonPosition.y / 600) * 100}%`,
+                  left: `${formData.buttonPosition.x * 100}%`,
+                  top: `${formData.buttonPosition.y * 100}%`,
+                  boxShadow:
+                    "0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)",
+                  zIndex: 1000,
                 }}
-              />
+              >
+                <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                <div className="absolute inset-1 bg-white rounded-full opacity-40"></div>
+              </div>
             )}
           </div>
         </div>
