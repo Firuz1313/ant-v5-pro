@@ -633,7 +633,10 @@ const StepsManagerFixed = () => {
   const [customRemoteImage, setCustomRemoteImage] = useState<string | null>(
     null,
   );
-  const [hoverPosition, setHoverPosition] = useState<{ x: number; y: number } | null>(null);
+  const [hoverPosition, setHoverPosition] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
 
   // Form data state with proper initialization
   const [formData, setFormData] = useState({
@@ -1269,12 +1272,20 @@ const StepsManagerFixed = () => {
     const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
     const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
 
-    console.log('🎯 ULTRA PRECISE Click coordinates:', {
+    console.log("🎯 ULTRA PRECISE Click coordinates:", {
       raw: { clientX: event.clientX, clientY: event.clientY },
-      canvasRect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+      canvasRect: {
+        left: rect.left,
+        top: rect.top,
+        width: rect.width,
+        height: rect.height,
+      },
       relative: { x: preciseX, y: preciseY },
       normalized: { x: normalizedX, y: normalizedY },
-      percentage: { x: (normalizedX * 100).toFixed(3), y: (normalizedY * 100).toFixed(3) }
+      percentage: {
+        x: (normalizedX * 100).toFixed(3),
+        y: (normalizedY * 100).toFixed(3),
+      },
     });
 
     setFormData({
@@ -1285,7 +1296,9 @@ const StepsManagerFixed = () => {
     setIsPickingButton(false);
   };
 
-  const handleCanvasMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCanvasMouseMove = (
+    event: React.MouseEvent<HTMLCanvasElement>,
+  ) => {
     if (!isPickingButton || !canvasRef.current) {
       setHoverPosition(null);
       return;
@@ -1386,7 +1399,8 @@ const StepsManagerFixed = () => {
                 style={{
                   left: `${formData.buttonPosition.x * 100}%`,
                   top: `${formData.buttonPosition.y * 100}%`,
-                  boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)',
+                  boxShadow:
+                    "0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)",
                   zIndex: 1000,
                 }}
               >
