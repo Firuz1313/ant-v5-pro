@@ -60,31 +60,31 @@ const Index = () => {
       </section>
 
       {/* Statistics Section */}
-      <section className="py-16 bg-white">
+      <section className="py-16 bg-card">
         <div className="container mx-auto px-4">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <Card className="text-center bg-card border border-border rounded-2xl shadow-sm">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <div className="w-8 h-6 bg-blue-600 rounded-sm"></div>
+                <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="w-8 h-6 bg-primary rounded-sm"></div>
                 </div>
                 {devicesLoading ? (
                   <Skeleton className="h-12 w-12 mx-auto mb-2 rounded" />
                 ) : (
-                  <div className="text-4xl font-bold text-gray-900 mb-2">
+                  <div className="text-4xl font-bold text-foreground mb-2">
                     {deviceCount}
                   </div>
                 )}
-                <div className="text-gray-600 font-medium">
+                <div className="text-muted-foreground font-medium">
                   Поддерживаемых моделей
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <Card className="text-center bg-card border border-border rounded-2xl shadow-sm">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <div className="text-blue-600">
+                <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <div className="text-primary">
                     <svg
                       width="32"
                       height="32"
@@ -98,35 +98,35 @@ const Index = () => {
                 {problemsLoading ? (
                   <Skeleton className="h-12 w-12 mx-auto mb-2 rounded" />
                 ) : (
-                  <div className="text-4xl font-bold text-gray-900 mb-2">
+                  <div className="text-4xl font-bold text-foreground mb-2">
                     {problemCount}
                   </div>
                 )}
-                <div className="text-gray-600 font-medium">Готовых решений</div>
+                <div className="text-muted-foreground font-medium">Готовых решений</div>
               </CardContent>
             </Card>
 
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <Card className="text-center bg-card border border-border rounded-2xl shadow-sm">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <CheckCircle className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <CheckCircle className="h-8 w-8 text-primary" />
                 </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">95%</div>
-                <div className="text-gray-600 font-medium">
+                <div className="text-4xl font-bold text-foreground mb-2">95%</div>
+                <div className="text-muted-foreground font-medium">
                   Успешных решений
                 </div>
               </CardContent>
             </Card>
 
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+            <Card className="text-center bg-card border border-border rounded-2xl shadow-sm">
               <CardContent className="p-8">
-                <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
-                  <Clock className="h-8 w-8 text-blue-600" />
+                <div className="w-16 h-16 bg-primary/10 rounded-xl flex items-center justify-center mx-auto mb-4">
+                  <Clock className="h-8 w-8 text-primary" />
                 </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">
+                <div className="text-4xl font-bold text-foreground mb-2">
                   24/7
                 </div>
-                <div className="text-gray-600 font-medium">Доступность</div>
+                <div className="text-muted-foreground font-medium">Доступность</div>
               </CardContent>
             </Card>
           </div>
