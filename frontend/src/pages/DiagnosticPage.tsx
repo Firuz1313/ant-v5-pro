@@ -78,31 +78,52 @@ const DiagnosticPage = () => {
   // Load remote: prefer step-specific remote, fallback to device defaults
   useEffect(() => {
     const loadRemote = async () => {
-      if (!deviceId) return;
+      if (!deviceId) {
+        console.log('No deviceId provided, skipping remote loading');
+        return;
+      }
+
+      console.log(`🔄 Loading remote for device: ${deviceId}, step remoteId: ${currentStepData?.remoteId || 'none'}`);
 
       try {
+        // First priority: step-specific remote
         if (currentStepData?.remoteId) {
-          const stepRemote = await remotesApi.getById(currentStepData.remoteId);
-          setRemote(stepRemote);
-          return;
+          console.log(`📱 Attempting to load step-specific remote: ${currentStepData.remoteId}`);
+          try {
+            const stepRemote = await remotesApi.getById(currentStepData.remoteId);
+            console.log(`✅ Successfully loaded step-specific remote:`, stepRemote?.name || stepRemote?.id);
+            setRemote(stepRemote);
+            return;
+          } catch (stepError) {
+            console.warn(`⚠️ Failed to load step-specific remote ${currentStepData.remoteId}:`, stepError.message);
+            // Continue to device-specific fallback
+          }
         }
 
-        // Fallback: device default
+        // Second priority: device default remote
+        console.log(`📱 Attempting to load default remote for device: ${deviceId}`);
         try {
           const defaultRemote = await remotesApi.getDefaultForDevice(deviceId);
+          console.log(`✅ Successfully loaded default remote for device ${deviceId}:`, defaultRemote?.name || defaultRemote?.id);
           setRemote(defaultRemote);
-        } catch (error) {
-          console.log(`No default remote found for device ${deviceId}, trying to get any remote for device...`);
+          return;
+        } catch (defaultError) {
+          console.warn(`⚠️ No default remote found for device ${deviceId}:`, defaultError.message);
 
-          // Fallback: any remote for device
+          // Third priority: any remote for device
+          console.log(`📱 Attempting to load any remote for device: ${deviceId}`);
           try {
             const deviceRemotes = await remotesApi.getByDevice(deviceId);
-            if (deviceRemotes && deviceRemotes.length > 0) {
+            console.log(`📊 Found ${deviceRemotes?.length || 0} remotes for device ${deviceId}`);
+
+            if (deviceRemotes && Array.isArray(deviceRemotes) && deviceRemotes.length > 0) {
+              console.log(`✅ Using first available remote for device ${deviceId}:`, deviceRemotes[0]?.name || deviceRemotes[0]?.id);
               setRemote(deviceRemotes[0]);
+              return;
             } else {
-              console.log(`No remotes found for device ${deviceId}, using fallback remote`);
-              // Create a fallback remote object for display purposes
-              setRemote({
+              console.log(`⚠️ No remotes found for device ${deviceId}, creating fallback remote`);
+              // Create fallback remote object
+              const fallbackRemote = {
                 id: `fallback-${deviceId}`,
                 name: `${deviceId.toUpperCase()} Remote`,
                 manufacturer: deviceId.toUpperCase(),
@@ -112,39 +133,34 @@ const DiagnosticPage = () => {
                 is_default: false,
                 buttons: [],
                 dimensions: { width: 220, height: 580 }
-              });
+              };
+              console.log(`🔧 Created fallback remote:`, fallbackRemote.name);
+              setRemote(fallbackRemote);
+              return;
             }
           } catch (deviceError) {
-            console.error("Failed to load device remotes:", deviceError);
-            // Use fallback remote even on error
-            setRemote({
-              id: `fallback-${deviceId}`,
-              name: `${deviceId.toUpperCase()} Remote`,
-              manufacturer: deviceId.toUpperCase(),
-              model: "Universal",
-              device_id: deviceId,
-              layout: "standard",
-              is_default: false,
-              buttons: [],
-              dimensions: { width: 220, height: 580 }
-            });
+            console.error(`❌ Failed to load device remotes for ${deviceId}:`, deviceError.message);
+            // Fallback to generated remote
           }
         }
-      } catch (e) {
-        console.error("Failed to load remote:", e);
-        // Use fallback remote on any error
-        setRemote({
-          id: `fallback-${deviceId}`,
-          name: `${deviceId.toUpperCase()} Remote`,
-          manufacturer: deviceId.toUpperCase(),
-          model: "Universal",
-          device_id: deviceId,
-          layout: "standard",
-          is_default: false,
-          buttons: [],
-          dimensions: { width: 220, height: 580 }
-        });
+      } catch (generalError) {
+        console.error(`❌ General error loading remote for device ${deviceId}:`, generalError.message);
       }
+
+      // Final fallback: always provide a working remote
+      console.log(`🔧 Using final fallback remote for device: ${deviceId}`);
+      const finalFallbackRemote = {
+        id: `fallback-${deviceId}`,
+        name: `${deviceId.toUpperCase()} Remote`,
+        manufacturer: deviceId.toUpperCase(),
+        model: "Universal",
+        device_id: deviceId,
+        layout: "standard",
+        is_default: false,
+        buttons: [],
+        dimensions: { width: 220, height: 580 }
+      };
+      setRemote(finalFallbackRemote);
     };
 
     loadRemote();
