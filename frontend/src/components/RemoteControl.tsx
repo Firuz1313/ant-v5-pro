@@ -54,7 +54,7 @@ const RemoteControl = ({
   const dimensions = remote?.dimensions || { width: 260, height: 700 };
   const useCustomRemote = !!imageData;
 
-  // Функция для нормализации координат (конвертация старых пиксельных координат в нормализованные 0-1)
+  // Функция для нормализации коор��инат (конвертация старых пиксельных координат в нормализованные 0-1)
   const normalizeButtonPosition = (position: { x: number; y: number } | undefined) => {
     if (!position) return undefined;
 
@@ -145,15 +145,20 @@ const RemoteControl = ({
             ))}
 
             {/* Show button position indicator if provided */}
-            {showButtonPosition && (
-              <div
-                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
-                style={{
-                  left: `${(showButtonPosition.x / remote.dimensions.width) * 100}%`,
-                  top: `${(showButtonPosition.y / remote.dimensions.height) * 100}%`,
-                }}
-              />
-            )}
+            {(() => {
+              const normalizedPosition = normalizeButtonPosition(showButtonPosition);
+              return normalizedPosition && (
+                <div
+                  className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
+                  style={{
+                    left: `${normalizedPosition.x * 100}%`,
+                    top: `${normalizedPosition.y * 100}%`,
+                  }}
+                >
+                  <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                </div>
+              );
+            })()}
           </div>
         </div>
 
