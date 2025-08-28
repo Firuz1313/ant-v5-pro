@@ -361,85 +361,12 @@ const DiagnosticPage = () => {
               <div className="max-w-xs w-full">
                 <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
                   <CardContent className="p-6">
-                    {remote ? (
-                      <RemoteControl
-                        remote={remote}
-                        highlightButton={currentStepData?.highlightRemoteButton}
-                        showButtonPosition={currentStepData?.buttonPosition}
-                        onButtonClick={handleManualProgress}
-                      />
-                    ) : (
-                      <div className="w-full">
-                        {/* Default OpenBox Remote */}
-                        <div className="bg-gray-900 rounded-2xl p-4 w-48 mx-auto relative">
-                          {/* Power button with red dot */}
-                          <div className="flex justify-center mb-4 relative">
-                            <div className="w-8 h-8 bg-red-600 rounded-full flex items-center justify-center">
-                              <div className="w-4 h-4 bg-white rounded-full relative">
-                                {/* Red dot indicator */}
-                                <div className="absolute -top-2 -right-2 w-3 h-3 bg-red-500 rounded-full border-2 border-white animate-pulse"></div>
-                              </div>
-                            </div>
-                          </div>
-
-                          {/* Number pad */}
-                          <div className="grid grid-cols-3 gap-2 mb-4">
-                            {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((num) => (
-                              <button
-                                key={num}
-                                className="w-8 h-8 bg-gray-700 text-white text-sm rounded flex items-center justify-center hover:bg-gray-600"
-                                onClick={handleManualProgress}
-                              >
-                                {num}
-                              </button>
-                            ))}
-                          </div>
-
-                          {/* Additional buttons */}
-                          <div className="space-y-2">
-                            <div className="flex justify-center space-x-2">
-                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">LANG</button>
-                              <button className="w-8 h-8 bg-gray-700 text-white text-sm rounded">0</button>
-                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">LIST</button>
-                            </div>
-                            
-                            <div className="flex justify-center space-x-2">
-                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">BACK</button>
-                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">INFO</button>
-                            </div>
-
-                            <div className="flex justify-center space-x-2">
-                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">MENU</button>
-                              <button className="px-3 py-1 bg-gray-700 text-white text-xs rounded">EXIT</button>
-                            </div>
-
-                            {/* Navigation circle */}
-                            <div className="flex justify-center">
-                              <div className="relative w-20 h-20">
-                                <button className="absolute top-0 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-gray-700 text-white text-xs rounded">▲</button>
-                                <button className="absolute left-0 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-gray-700 text-white text-xs rounded">◄</button>
-                                <button className="absolute right-0 top-1/2 transform -translate-y-1/2 w-6 h-6 bg-gray-700 text-white text-xs rounded">►</button>
-                                <button className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-6 h-6 bg-gray-700 text-white text-xs rounded">▼</button>
-                                <button className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-8 h-8 bg-gray-600 text-white text-xs rounded-full">OK</button>
-                              </div>
-                            </div>
-
-                            {/* Color buttons */}
-                            <div className="flex justify-center space-x-1 mt-4">
-                              <button className="w-6 h-6 bg-red-500 rounded"></button>
-                              <button className="w-6 h-6 bg-green-500 rounded"></button>
-                              <button className="w-6 h-6 bg-yellow-500 rounded"></button>
-                              <button className="w-6 h-6 bg-blue-500 rounded"></button>
-                            </div>
-                          </div>
-
-                          {/* OpenBox label */}
-                          <div className="text-center mt-4">
-                            <span className="text-white text-sm font-bold">OPENBOX</span>
-                          </div>
-                        </div>
-                      </div>
-                    )}
+                    <RemoteControl
+                      remote={remote}
+                      highlightButton={currentStepData?.highlightRemoteButton}
+                      showButtonPosition={currentStepData?.buttonPosition}
+                      onButtonClick={handleManualProgress}
+                    />
                   </CardContent>
                 </Card>
               </div>
