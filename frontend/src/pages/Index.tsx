@@ -229,17 +229,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Call to Action */}
-      <section className="py-16 bg-blue-600">
-        <div className="container mx-auto px-4 text-center">
-          <h2 className="text-3xl font-bold text-white mb-6">
-            Готовы решить проблему с вашей приставкой?
-          </h2>
-          <p className="text-xl text-blue-100">
-            Начните диагностику прямо сейчас и получите решение за несколько минут
-          </p>
-        </div>
-      </section>
 
       {/* Footer */}
       <footer className="bg-gray-900 text-white py-8">
