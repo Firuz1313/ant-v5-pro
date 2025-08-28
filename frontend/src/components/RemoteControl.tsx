@@ -80,7 +80,7 @@ const RemoteControl = ({
         <div className="relative w-full h-full flex items-center justify-center">
           {/* Remote background image */}
           <div
-            className="relative w-full max-w-[260px] h-full min-h-[600px] lg:min-h-[700px] bg-cover bg-center bg-no-repeat rounded-3xl shadow-2xl border-4 border-gray-700"
+            className="relative w-full max-w-[260px] h-full min-h-[530px] lg:min-h-[600px] bg-cover bg-center bg-no-repeat rounded-3xl shadow-2xl border-4 border-gray-700"
             style={{
               backgroundImage: `url(${imageData})`,
             }}
