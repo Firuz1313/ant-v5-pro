@@ -302,7 +302,7 @@ const StepFormFields = React.memo<{
             id={isEdit ? "edit-description" : "description"}
             value={formData.description}
             onChange={handleDescriptionChange}
-            placeholder="Краткое описание шага"
+            placeholder="Краткое описание шаг��"
           />
         </div>
 
@@ -372,7 +372,7 @@ const StepFormFields = React.memo<{
               onValueChange={handleRemoteChange}
             >
               <SelectTrigger className="flex-1">
-                <SelectValue placeholder="Выберите пульт" />
+                <SelectValue placeholder="Выбери��е пульт" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="none">Без пульта</SelectItem>
@@ -1338,12 +1338,17 @@ const StepsManagerFixed = () => {
 
             {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
               <div
-                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                className="absolute w-5 h-5 bg-red-500 rounded-full border-3 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse shadow-lg"
                 style={{
-                  left: `${(formData.buttonPosition.x / 400) * 100}%`,
-                  top: `${(formData.buttonPosition.y / 600) * 100}%`,
+                  left: `${formData.buttonPosition.x * 100}%`,
+                  top: `${formData.buttonPosition.y * 100}%`,
+                  boxShadow: '0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)',
+                  zIndex: 1000,
                 }}
-              />
+              >
+                <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                <div className="absolute inset-1 bg-white rounded-full opacity-40"></div>
+              </div>
             )}
           </div>
         </div>
