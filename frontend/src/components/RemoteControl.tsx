@@ -145,7 +145,7 @@ const RemoteControl = ({
   return (
     <div className={cn("relative h-full", className)}>
       {/* Remote Frame */}
-      <div className="bg-gray-900 p-2 rounded-2xl shadow-xl border-2 border-gray-700 w-full h-full flex flex-col justify-between" style={{ maxWidth: '130px', minHeight: '410px' }}>
+      <div className="bg-gray-900 p-3 rounded-2xl shadow-xl border-2 border-gray-700 w-full h-full flex flex-col justify-between" style={{ maxWidth: '140px', minHeight: '420px' }}>
         {/* Top Section */}
         <div className="space-y-2 flex-shrink-0">
           {/* Power Button */}
