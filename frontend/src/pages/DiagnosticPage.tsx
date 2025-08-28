@@ -238,16 +238,21 @@ const DiagnosticPage = () => {
           </div>
         </div>
 
-        {/* Main Content - Exact Mockup Layout */}
-        <div className="flex items-start justify-center gap-8 lg:gap-12">
-          {/* TV Section - Left Column */}
+        {/* Main Content - Responsive Mockup Layout */}
+        <div className="flex flex-col lg:flex-row items-start justify-center gap-8 lg:gap-12">
+          {/* TV Section - Top on Mobile, Left on Desktop */}
           <div className="flex flex-col items-center">
-            {/* TV Display - Wider and Shorter to Match Mockup */}
+            {/* TV Display - Responsive Sizing */}
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-0">
-                <div 
+                <div
                   className="bg-gray-900 rounded-xl overflow-hidden"
-                  style={{ width: '560px', height: '320px' }}
+                  style={{
+                    width: window.innerWidth < 1024 ? '90vw' : '560px',
+                    maxWidth: '560px',
+                    height: window.innerWidth < 1024 ? 'calc(90vw * 320/560)' : '320px',
+                    maxHeight: '320px'
+                  }}
                 >
                   {currentStepData?.tvInterfaceId ? (
                     <TVInterfaceDisplay
