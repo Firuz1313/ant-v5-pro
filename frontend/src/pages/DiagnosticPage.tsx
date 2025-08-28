@@ -179,7 +179,7 @@ const DiagnosticPage = () => {
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
           <p>Шаги диагностики не найдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
-            Вернуться на��ад
+            Вернуться назад
           </Button>
         </div>
       </div>
@@ -287,7 +287,7 @@ const DiagnosticPage = () => {
                                 <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
                               </svg>
                             </div>
-                            <div className="font-medium">Прямой эфир</div>
+                            <div className="font-medium">Прямой э��ир</div>
                           </div>
                           
                           <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
@@ -316,7 +316,7 @@ const DiagnosticPage = () => {
             </Card>
 
             {/* Navigation Buttons - Directly Under TV */}
-            <div className="flex items-center justify-between mt-6" style={{ width: '560px' }}>
+            <div className="flex items-center justify-between mt-6 w-full max-w-[560px]" style={{ width: '90vw', maxWidth: '560px' }}>
               <Button
                 onClick={handlePrevStep}
                 disabled={currentStepNumber <= 1}
@@ -326,7 +326,7 @@ const DiagnosticPage = () => {
               >
                 <ChevronLeft className="h-8 w-8" />
               </Button>
-              
+
               <Button
                 onClick={handleNextStep}
                 variant="ghost"
@@ -338,7 +338,7 @@ const DiagnosticPage = () => {
             </div>
 
             {/* Hint Text - Directly Under TV */}
-            <div className="mt-4 text-center" style={{ width: '560px' }}>
+            <div className="mt-4 text-center w-full max-w-[560px]" style={{ width: '90vw', maxWidth: '560px' }}>
               <p className="text-gray-600 text-sm">
                 Красная точка на пульте показывает точное место для нажатия
               </p>
