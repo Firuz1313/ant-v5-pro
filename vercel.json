@@ -17,10 +17,5 @@
       "src": "/(.*)",
       "dest": "/index.html"
     }
-  ],
-  "functions": {
-    "frontend/dist/**": {
-      "includeFiles": "frontend/dist/**"
-    }
-  }
+  ]
 }
