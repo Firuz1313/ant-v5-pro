@@ -4,8 +4,9 @@
   "description": "ANT Support - Full Stack Application",
   "scripts": {
     "install:all": "cd frontend && npm install && cd ../backend && npm install",
-    "install": "cd frontend && npm install",
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
+    "install": "npm run install:all",
+    "postinstall": "npm run install:all",
+    "dev": "npm run install:all && concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "cd frontend && npm run dev",
     "dev:backend": "cd backend && npm run dev",
     "build": "cd frontend && npm run build",
