@@ -200,10 +200,10 @@ const Index = () => {
                           </div>
                         )}
                       </div>
-                      <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      <h3 className="text-xl font-bold text-foreground mb-2">
                         {device.name}
                       </h3>
-                      <p className="text-gray-600 text-sm">
+                      <p className="text-muted-foreground text-sm">
                         {device.description ||
                           `${device.brand} ${device.model}`}
                       </p>
@@ -216,7 +216,7 @@ const Index = () => {
                 [...Array(4 - devices.length)].map((_, index) => (
                   <Card
                     key={`placeholder-${index}`}
-                    className="text-center bg-gray-50 border border-gray-200 border-dashed rounded-2xl shadow-sm"
+                    className="text-center bg-muted border border-border border-dashed rounded-2xl shadow-sm"
                   >
                     <CardContent className="p-8">
                       <div className="w-24 h-16 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-6">
