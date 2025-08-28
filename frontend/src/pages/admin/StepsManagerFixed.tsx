@@ -334,7 +334,7 @@ const StepFormFields = React.memo<{
                 <SelectItem value="none">Без интерфейса</SelectItem>
                 {loadingTVInterfaces ? (
                   <SelectItem value="loading" disabled>
-                    Загруз��а...
+                    Загрузка...
                   </SelectItem>
                 ) : (
                   tvInterfaces.map((tvInterface) => (
@@ -900,7 +900,7 @@ const StepsManagerFixed = () => {
 
         toast({
           title: "Ошибка",
-          description: `Не уд��лось изменить порядок шагов: ${error?.message || "Неизвестная ошибка"}`,
+          description: `Не удалось изменить порядок шагов: ${error?.message || "Неизвестная ошибка"}`,
           variant: "destructive",
         });
       }
@@ -1141,7 +1141,7 @@ const StepsManagerFixed = () => {
 
       toast({
         title: "Успех",
-        description: "Ш��г успешно обновлен",
+        description: "Ш����г успешно обновлен",
         variant: "default",
       });
     } catch (error) {
@@ -1188,8 +1188,8 @@ const StepsManagerFixed = () => {
       setStepToDelete(null);
 
       toast({
-        title: "Ошибка удалени��",
-        description: `Не удалос�� удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
+        title: "Ошибка у��алени��",
+        description: `Не удалось удалить шаг: ${error?.message || "Неизвестн��я ошибка"}`,
         variant: "destructive",
       });
     }
@@ -1265,7 +1265,7 @@ const StepsManagerFixed = () => {
     const preciseX = event.clientX - rect.left;
     const preciseY = event.clientY - rect.top;
 
-    // Нормализуем координаты к диапазону 0-1 для максимальной точности
+    // Нормализуем координаты к ди��пазону 0-1 для максимальной точности
     const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
     const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
 
@@ -1283,6 +1283,28 @@ const StepsManagerFixed = () => {
     });
 
     setIsPickingButton(false);
+  };
+
+  const handleCanvasMouseMove = (event: React.MouseEvent<HTMLCanvasElement>) => {
+    if (!isPickingButton || !canvasRef.current) {
+      setHoverPosition(null);
+      return;
+    }
+
+    const canvas = canvasRef.current;
+    const rect = canvas.getBoundingClientRect();
+
+    const preciseX = event.clientX - rect.left;
+    const preciseY = event.clientY - rect.top;
+
+    const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
+    const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
+
+    setHoverPosition({ x: normalizedX, y: normalizedY });
+  };
+
+  const handleCanvasMouseLeave = () => {
+    setHoverPosition(null);
   };
 
   const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -1368,7 +1390,7 @@ const StepsManagerFixed = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingButton ? "Отменить в��бор" : "Выбрать позицию"}
+                  {isPickingButton ? "Отменить выбор" : "Выбрать позицию"}
                 </Button>
                 <Button
                   type="button"
