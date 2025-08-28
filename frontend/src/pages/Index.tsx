@@ -1,5 +1,3 @@
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useDevices } from "@/hooks/useDevices";
@@ -8,24 +6,17 @@ import {
   Shield,
   Clock,
   CheckCircle,
-  Users,
-  ArrowRight,
   Zap,
   BarChart3,
 } from "lucide-react";
 
 const Index = () => {
-  const navigate = useNavigate();
   const { data: devicesResponse, isLoading: devicesLoading } = useDevices(1, 50, { status: "active" });
   const { data: problemsResponse, isLoading: problemsLoading } = useProblems(1, 50, { status: "published" });
 
   const deviceCount = devicesResponse?.data?.length || 0;
   const problemCount = problemsResponse?.data?.length || 0;
   const devices = devicesResponse?.data || [];
-
-  const handleStartDiagnostic = () => {
-    navigate("/devices");
-  };
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -38,7 +29,7 @@ const Index = () => {
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
             Пошаговое инструкции для решения проблем с цифровыми ТВ-приставками.
             <br />
-            Простой интерфейс, профессиональные решения.
+            Простой инте��фейс, профессиональные решения.
           </p>
         </div>
       </section>
