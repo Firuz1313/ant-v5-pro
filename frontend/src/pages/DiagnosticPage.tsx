@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { Progress } from "@/components/ui/progress";
-import TVDisplay from "@/components/TVDisplay";
 import TVInterfaceDisplay from "@/components/TVInterfaceDisplay";
 import RemoteControl from "@/components/RemoteControl";
 import { useDevices } from "@/hooks/useDevices";
@@ -11,7 +9,6 @@ import { useProblems } from "@/hooks/useProblems";
 import { remotesApi, stepsApi } from "@/api";
 import {
   ArrowLeft,
-  ArrowRight,
   CheckCircle,
   AlertCircle,
   Loader2,
@@ -51,8 +48,6 @@ const DiagnosticPage = () => {
   const currentStepData = steps.find(
     (step) => step.stepNumber === currentStepNumber,
   );
-  const progress =
-    steps.length > 0 ? (currentStepNumber / steps.length) * 100 : 0;
 
   // Load steps when component mounts
   useEffect(() => {
@@ -61,8 +56,6 @@ const DiagnosticPage = () => {
 
       try {
         setLoading(true);
-
-        // Load steps for the problem
         const stepsResponse = await stepsApi.getStepsByProblem(problemId);
         setSteps(stepsResponse?.data || []);
       } catch (error) {
@@ -75,97 +68,57 @@ const DiagnosticPage = () => {
     loadData();
   }, [problemId, deviceId]);
 
-  // Load remote: prefer step-specific remote, fallback to device defaults
+  // Load remote
   useEffect(() => {
     const loadRemote = async () => {
-      if (!deviceId) {
-        console.log('No deviceId provided, skipping remote loading');
-        return;
-      }
-
-      console.log(`🔄 Loading remote for device: ${deviceId}, step remoteId: ${currentStepData?.remoteId || 'none'}`);
+      if (!deviceId) return;
 
       try {
-        // First priority: step-specific remote
+        // Try step-specific remote first
         if (currentStepData?.remoteId) {
-          console.log(`📱 Attempting to load step-specific remote: ${currentStepData.remoteId}`);
           try {
             const stepRemote = await remotesApi.getById(currentStepData.remoteId);
-            console.log(`✅ Successfully loaded step-specific remote:`, stepRemote?.name || stepRemote?.id);
             setRemote(stepRemote);
             return;
           } catch (stepError) {
-            console.warn(`⚠️ Failed to load step-specific remote ${currentStepData.remoteId}:`, stepError.message);
-            // Continue to device-specific fallback
+            console.warn(`Failed to load step-specific remote`, stepError);
           }
         }
 
-        // Second priority: device default remote
-        console.log(`📱 Attempting to load default remote for device: ${deviceId}`);
+        // Try device default remote
         try {
           const defaultRemote = await remotesApi.getDefaultForDevice(deviceId);
-          console.log(`✅ Successfully loaded default remote for device ${deviceId}:`, defaultRemote?.name || defaultRemote?.id);
           setRemote(defaultRemote);
           return;
         } catch (defaultError: any) {
-          // Expected 404 error when no default remote exists
-          if (defaultError.message?.includes('NO_DEFAULT_REMOTE_FOR_DEVICE')) {
-            console.log(`ℹ️ No default remote configured for device ${deviceId} (expected)`);
-          } else {
-            console.warn(`⚠️ Error loading default remote for device ${deviceId}:`, defaultError.message);
-          }
-
-          // Third priority: any remote for device
-          console.log(`📱 Attempting to load any remote for device: ${deviceId}`);
+          // Try any remote for device
           try {
             const deviceRemotes = await remotesApi.getByDevice(deviceId);
-            console.log(`📊 Found ${deviceRemotes?.length || 0} remotes for device ${deviceId}`);
-
-            if (deviceRemotes && Array.isArray(deviceRemotes) && deviceRemotes.length > 0) {
-              console.log(`✅ Using first available remote for device ${deviceId}:`, deviceRemotes[0]?.name || deviceRemotes[0]?.id);
+            if (deviceRemotes && deviceRemotes.length > 0) {
               setRemote(deviceRemotes[0]);
-              return;
-            } else {
-              console.log(`⚠️ No remotes found for device ${deviceId}, creating fallback remote`);
-              // Create fallback remote object
-              const fallbackRemote = {
-                id: `fallback-${deviceId}`,
-                name: `${deviceId.toUpperCase()} Remote`,
-                manufacturer: deviceId.toUpperCase(),
-                model: "Universal",
-                device_id: deviceId,
-                layout: "standard",
-                is_default: false,
-                buttons: [],
-                dimensions: { width: 220, height: 580 }
-              };
-              console.log(`🔧 Created fallback remote:`, fallbackRemote.name);
-              setRemote(fallbackRemote);
               return;
             }
           } catch (deviceError) {
-            console.error(`❌ Failed to load device remotes for ${deviceId}:`, deviceError.message);
-            // Fallback to generated remote
+            console.error(`Failed to load device remotes`, deviceError);
           }
         }
-      } catch (generalError) {
-        console.error(`❌ General error loading remote for device ${deviceId}:`, generalError.message);
-      }
 
-      // Final fallback: always provide a working remote
-      console.log(`🔧 Using final fallback remote for device: ${deviceId}`);
-      const finalFallbackRemote = {
-        id: `fallback-${deviceId}`,
-        name: `${deviceId.toUpperCase()} Remote`,
-        manufacturer: deviceId.toUpperCase(),
-        model: "Universal",
-        device_id: deviceId,
-        layout: "standard",
-        is_default: false,
-        buttons: [],
-        dimensions: { width: 220, height: 580 }
-      };
-      setRemote(finalFallbackRemote);
+        // Final fallback
+        const fallbackRemote = {
+          id: `fallback-${deviceId}`,
+          name: `${deviceId.toUpperCase()} Remote`,
+          manufacturer: deviceId.toUpperCase(),
+          model: "Universal",
+          device_id: deviceId,
+          layout: "standard",
+          is_default: false,
+          buttons: [],
+          dimensions: { width: 140, height: 420 }
+        };
+        setRemote(fallbackRemote);
+      } catch (error) {
+        console.error(`Error loading remote`, error);
+      }
     };
 
     loadRemote();
@@ -285,16 +238,16 @@ const DiagnosticPage = () => {
           </div>
         </div>
 
-        {/* Main Content - TV left, Remote right, exact sizing */}
-        <div className="flex items-start justify-center gap-12">
+        {/* Main Content - Exact Mockup Layout */}
+        <div className="flex items-start justify-center gap-8 lg:gap-12">
           {/* TV Section - Left Column */}
           <div className="flex flex-col items-center">
-            {/* TV Display - Exact 400px × 300px */}
+            {/* TV Display - Wider and Shorter to Match Mockup */}
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-0">
                 <div 
                   className="bg-gray-900 rounded-xl overflow-hidden"
-                  style={{ width: '400px', height: '300px' }}
+                  style={{ width: '560px', height: '320px' }}
                 >
                   {currentStepData?.tvInterfaceId ? (
                     <TVInterfaceDisplay
@@ -305,7 +258,7 @@ const DiagnosticPage = () => {
                     />
                   ) : (
                     <div className="w-full h-full bg-gray-800 flex items-center justify-center relative">
-                      {/* Default TV Interface */}
+                      {/* Default TV Interface - Mockup Style */}
                       <div className="w-full h-full bg-gradient-to-b from-gray-700 to-gray-900 p-6">
                         <div className="flex items-center justify-between mb-6">
                           <div className="flex items-center text-white">
@@ -321,33 +274,33 @@ const DiagnosticPage = () => {
                           </div>
                         </div>
                         
-                        <div className="grid grid-cols-3 gap-4">
+                        <div className="grid grid-cols-3 gap-6">
                           <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
-                            <div className="w-8 h-8 mx-auto mb-2 text-red-500">
+                            <div className="w-10 h-10 mx-auto mb-3 text-red-500">
                               <svg viewBox="0 0 24 24" fill="currentColor">
                                 <circle cx="12" cy="12" r="3"/>
                                 <path d="M12 1v6m0 6v6m11-7h-6m-6 0H1"/>
                               </svg>
                             </div>
-                            <div className="font-medium text-sm">Прямой эфир</div>
+                            <div className="font-medium">Прямой эфир</div>
                           </div>
                           
                           <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
-                            <div className="w-8 h-8 mx-auto mb-2 text-blue-500">
+                            <div className="w-10 h-10 mx-auto mb-3 text-blue-500">
                               <svg viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M12 15.5A3.5 3.5 0 0 1 8.5 12A3.5 3.5 0 0 1 12 8.5a3.5 3.5 0 0 1 3.5 3.5 3.5 3.5 0 0 1-3.5 3.5m7.43-2.53c.04-.32.07-.64.07-.97 0-.33-.03-.66-.07-1l2.11-1.63c.19-.15.24-.42.12-.64l-2-3.46c-.12-.22-.39-.31-.61-.22l-2.49 1c-.52-.39-1.06-.73-1.69-.98l-.37-2.65A.506.506 0 0 0 14 2h-4c-.25 0-.46.18-.5.42l-.37 2.65c-.63.25-1.17.59-1.69.98l-2.49-1c-.22-.09-.49 0-.61.22l-2 3.46c-.13.22-.07.49.12.64L4.57 11c-.04.34-.07.67-.07 1 0 .33.03.65.07.97l-2.11 1.66c-.19.15-.25.42-.12.64l2 3.46c.12.22.39.3.61.22l2.49-1.01c.52.4 1.06.74 1.69.99l.37 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.37-2.65c.63-.26 1.17-.59 1.69-.99l2.49 1.01c.22.08.49 0 .61-.22l2-3.46c.12-.22.07-.49-.12-.64l-2.11-1.66Z"/>
                               </svg>
                             </div>
-                            <div className="font-medium text-sm">Настройки</div>
+                            <div className="font-medium">Настройки</div>
                           </div>
                           
                           <div className="bg-gray-600 rounded-lg p-4 text-center text-white hover:bg-gray-500 transition-colors">
-                            <div className="w-8 h-8 mx-auto mb-2 text-green-500">
+                            <div className="w-10 h-10 mx-auto mb-3 text-green-500">
                               <svg viewBox="0 0 24 24" fill="currentColor">
                                 <path d="M4 6H2v14c0 1.1.9 2 2 2h14v-2H4V6zm16-4H8c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-1 9H9V9h10v2zm-4 4H9v-2h6v2zm4-8H9V5h10v2z"/>
                               </svg>
                             </div>
-                            <div className="font-medium text-sm">Приложения</div>
+                            <div className="font-medium">Приложения</div>
                           </div>
                         </div>
                       </div>
@@ -357,8 +310,8 @@ const DiagnosticPage = () => {
               </CardContent>
             </Card>
 
-            {/* Navigation Buttons - Under TV */}
-            <div className="flex items-center justify-between mt-6" style={{ width: '400px' }}>
+            {/* Navigation Buttons - Directly Under TV */}
+            <div className="flex items-center justify-between mt-6" style={{ width: '560px' }}>
               <Button
                 onClick={handlePrevStep}
                 disabled={currentStepNumber <= 1}
@@ -379,42 +332,22 @@ const DiagnosticPage = () => {
               </Button>
             </div>
 
-            {/* Instructions - Under TV */}
-            {currentStepData && (
-              <div className="mt-6" style={{ width: '400px' }}>
-                <Card className="bg-blue-50 border border-blue-200">
-                  <CardContent className="p-6">
-                    <h3 className="font-semibold text-gray-900 mb-2">
-                      {currentStepData.title || "Инструкция"}
-                    </h3>
-                    <p className="text-gray-700">
-                      {currentStepData.instruction || "Следуйте указаниям на экране"}
-                    </p>
-                    {currentStepData.hint && (
-                      <div className="mt-3 p-3 bg-yellow-50 border border-yellow-200 rounded-lg">
-                        <p className="text-yellow-800 text-sm">
-                          💡 {currentStepData.hint}
-                        </p>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              </div>
-            )}
-
-            {/* Hint text - Under TV */}
-            <div className="mt-4 text-center" style={{ width: '400px' }}>
+            {/* Hint Text - Directly Under TV */}
+            <div className="mt-4 text-center" style={{ width: '560px' }}>
+              <p className="text-gray-600 text-sm">
+                Красная точка на пульте показывает точное место для нажатия
+              </p>
               <p className="text-gray-600 text-sm">
                 Красная точка на пульте показывает точное место для нажатия
               </p>
             </div>
           </div>
 
-          {/* Remote Control - Right Column, Exact 130px × 410px */}
+          {/* Remote Control - Right Column, Narrower and Taller */}
           <div className="flex justify-center">
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-4">
-                <div style={{ width: '130px', height: '410px' }}>
+                <div style={{ width: '140px', height: '420px' }}>
                   <RemoteControl
                     remote={remote}
                     highlightButton={currentStepData?.highlightRemoteButton || "power"}
