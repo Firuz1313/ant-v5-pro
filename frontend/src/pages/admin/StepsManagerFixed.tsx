@@ -1255,15 +1255,30 @@ const StepsManagerFixed = () => {
 
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
-    const scaleX = canvas.width / rect.width;
-    const scaleY = canvas.height / rect.height;
 
-    const x = (event.clientX - rect.left) * scaleX;
-    const y = (event.clientY - rect.top) * scaleY;
+    // Предотвращаем дефолтное поведение и всплытие для максимальной точности
+    event.preventDefault();
+    event.stopPropagation();
+
+    // Используем более точные координаты с дробными значениями
+    const preciseX = event.clientX - rect.left;
+    const preciseY = event.clientY - rect.top;
+
+    // Нормализуем координаты к диапазону 0-1 для максимальной точности
+    const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
+    const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
+
+    console.log('🎯 ULTRA PRECISE Click coordinates:', {
+      raw: { clientX: event.clientX, clientY: event.clientY },
+      canvasRect: { left: rect.left, top: rect.top, width: rect.width, height: rect.height },
+      relative: { x: preciseX, y: preciseY },
+      normalized: { x: normalizedX, y: normalizedY },
+      percentage: { x: (normalizedX * 100).toFixed(3), y: (normalizedY * 100).toFixed(3) }
+    });
 
     setFormData({
       ...formData,
-      buttonPosition: { x, y },
+      buttonPosition: { x: normalizedX, y: normalizedY },
     });
 
     setIsPickingButton(false);
