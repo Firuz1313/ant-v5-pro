@@ -36,7 +36,7 @@ const Index = () => {
             Быстрая диагностика проблем
           </h1>
           <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-            Пошаговое ин��трукции для решения проблем с цифровыми ТВ-приставками.
+            Пошаговое инструкции для решения проблем с цифровыми ТВ-приставками.
             <br />
             Простой интерфейс, профессиональные решения.
           </p>
@@ -61,7 +61,11 @@ const Index = () => {
                 <div className="w-16 h-16 bg-blue-100 rounded-xl flex items-center justify-center mx-auto mb-4">
                   <div className="w-8 h-6 bg-blue-600 rounded-sm"></div>
                 </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">4</div>
+                {devicesLoading ? (
+                  <Skeleton className="h-12 w-12 mx-auto mb-2 rounded" />
+                ) : (
+                  <div className="text-4xl font-bold text-gray-900 mb-2">{deviceCount}</div>
+                )}
                 <div className="text-gray-600 font-medium">Поддерживаемых моделей</div>
               </CardContent>
             </Card>
@@ -75,7 +79,11 @@ const Index = () => {
                     </svg>
                   </div>
                 </div>
-                <div className="text-4xl font-bold text-gray-900 mb-2">1</div>
+                {problemsLoading ? (
+                  <Skeleton className="h-12 w-12 mx-auto mb-2 rounded" />
+                ) : (
+                  <div className="text-4xl font-bold text-gray-900 mb-2">{problemCount}</div>
+                )}
                 <div className="text-gray-600 font-medium">Готовых решений</div>
               </CardContent>
             </Card>
@@ -110,67 +118,79 @@ const Index = () => {
             Поддерживаемые устройства
           </h2>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
-            {/* OpenBox */}
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-8">
-                <div className="w-24 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
-                  <div className="w-16 h-10 bg-black rounded-sm flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">OPENBOX</span>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">OpenBox</h3>
-                <p className="text-gray-600 text-sm">
-                  Стандартные приставки OpenBox для цифрового телевидения
-                </p>
-              </CardContent>
-            </Card>
+          {devicesLoading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+              {[...Array(4)].map((_, index) => (
+                <Card key={index} className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm">
+                  <CardContent className="p-8">
+                    <Skeleton className="w-24 h-16 mx-auto mb-6 rounded-lg" />
+                    <Skeleton className="h-6 w-24 mx-auto mb-2" />
+                    <Skeleton className="h-4 w-full" />
+                    <Skeleton className="h-4 w-3/4 mx-auto mt-1" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 max-w-6xl mx-auto">
+              {devices.slice(0, 4).map((device) => {
+                const getDeviceIcon = (brand) => {
+                  const brandLower = brand.toLowerCase();
+                  if (brandLower.includes('openbox') && brandLower.includes('gold')) {
+                    return "bg-gradient-to-r from-orange-400 to-orange-600";
+                  } else if (brandLower.includes('openbox')) {
+                    return "bg-black";
+                  } else if (brandLower.includes('uclan')) {
+                    return "bg-gray-800";
+                  } else if (brandLower.includes('hdbox')) {
+                    return "bg-black";
+                  } else {
+                    return "bg-gray-700";
+                  }
+                };
 
-            {/* UCLAN */}
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-8">
-                <div className="w-24 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
-                  <div className="w-16 h-10 bg-gray-800 rounded-sm flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">UCLAN</span>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">UCLAN</h3>
-                <p className="text-gray-600 text-sm">
-                  Высококачественные HD приставки UCLAN
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* HDBox */}
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-8">
-                <div className="w-24 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
-                  <div className="w-16 h-10 bg-black rounded-sm flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">HDBOX</span>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">HDBox</h3>
-                <p className="text-gray-600 text-sm">
-                  Профессиональные приставки HDBox
-                </p>
-              </CardContent>
-            </Card>
-
-            {/* OpenBox Gold */}
-            <Card className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
-              <CardContent className="p-8">
-                <div className="w-24 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
-                  <div className="w-16 h-10 bg-gradient-to-r from-orange-400 to-orange-600 rounded-sm flex items-center justify-center">
-                    <span className="text-white text-xs font-bold">GOLD</span>
-                  </div>
-                </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-2">OpenBox Gold</h3>
-                <p className="text-gray-600 text-sm">
-                  Премиум приставки OpenBox Gold с расширенными возможностями
-                </p>
-              </CardContent>
-            </Card>
-          </div>
+                return (
+                  <Card key={device.id} className="text-center bg-white border border-gray-200 rounded-2xl shadow-sm hover:shadow-md transition-shadow">
+                    <CardContent className="p-8">
+                      <div className="w-24 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-6">
+                        {device.imageUrl ? (
+                          <img
+                            src={device.imageUrl}
+                            alt={device.name}
+                            className="w-16 h-10 object-contain rounded-sm"
+                          />
+                        ) : (
+                          <div className={`w-16 h-10 rounded-sm flex items-center justify-center ${getDeviceIcon(device.brand)}`}>
+                            <span className="text-white text-xs font-bold">
+                              {device.brand.toUpperCase().substring(0, 8)}
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                      <h3 className="text-xl font-bold text-gray-900 mb-2">{device.name}</h3>
+                      <p className="text-gray-600 text-sm">
+                        {device.description || `${device.brand} ${device.model}`}
+                      </p>
+                    </CardContent>
+                  </Card>
+                );
+              })}
+              {/* Show placeholder cards if we have fewer than 4 devices */}
+              {devices.length < 4 && [...Array(4 - devices.length)].map((_, index) => (
+                <Card key={`placeholder-${index}`} className="text-center bg-gray-50 border border-gray-200 border-dashed rounded-2xl shadow-sm">
+                  <CardContent className="p-8">
+                    <div className="w-24 h-16 bg-gray-200 rounded-lg flex items-center justify-center mx-auto mb-6">
+                      <div className="text-gray-400 text-xs">Скоро</div>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-400 mb-2">Новые устройства</h3>
+                    <p className="text-gray-400 text-sm">
+                      Добавим поддержку новых моделей при��тавок
+                    </p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          )}
         </div>
       </section>
 
