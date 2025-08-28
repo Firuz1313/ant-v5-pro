@@ -28,7 +28,7 @@ export function Layout({
   };
 
   return (
-    <div className="min-h-screen bg-dark-gradient">
+    <div className="min-h-screen bg-background">
       {/* Navigation Header */}
       <motion.header
         className="fixed top-0 left-0 right-0 z-50 glass border-b border-white/10 backdrop-blur-md"
