@@ -104,7 +104,7 @@ const RemoteControl = ({
   ) => {
     if (!position) return undefined;
 
-    // Если координаты уже нормали��ованы (0-1), используем их как есть
+    // Если координаты уже нормализованы (0-1), используем их как есть
     if (position.x <= 1 && position.y <= 1) {
       return position;
     }
@@ -210,11 +210,6 @@ const RemoteControl = ({
         </div>
 
         {/* Highlight Effect */}
-        {highlightButton && (
-          <div className="absolute inset-0 pointer-events-none">
-            <div className="absolute inset-0 bg-blue-500/10 rounded-3xl animate-pulse" />
-          </div>
-        )}
       </div>
     );
   }
@@ -479,11 +474,6 @@ const RemoteControl = ({
       })()}
 
       {/* Highlight Effect */}
-      {highlightButton && (
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute inset-0 bg-blue-500/10 rounded-3xl animate-pulse" />
-        </div>
-      )}
     </div>
   );
 };
