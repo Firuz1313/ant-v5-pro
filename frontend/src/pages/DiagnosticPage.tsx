@@ -166,7 +166,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или проблема не н��йдены</p>
+          <p>Устройство или проблема н�� н��йдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -326,7 +326,22 @@ const DiagnosticPage = () => {
               </CardContent>
             </Card>
 
-            {/* Navigation Buttons - Directly Under TV */}
+            {/* Hint Text - Under TV with icon */}
+            <div
+              className="mt-4 w-full max-w-[900px] flex justify-center"
+              style={{ width: "90vw", maxWidth: "900px" }}
+            >
+              <div className="inline-flex items-center gap-2 text-gray-600 text-sm">
+                <Lightbulb className="h-4 w-4 text-yellow-500" />
+                <span className="font-medium">Подсказка:</span>
+                <span>
+                  {currentStepData?.hint ??
+                    "Красная точка на пульте показывает точное место для нажатия"}
+                </span>
+              </div>
+            </div>
+
+            {/* Navigation Buttons - Below hint */}
             <div
               className="flex items-center justify-between mt-6 w-full max-w-[900px]"
               style={{ width: "90vw", maxWidth: "900px" }}
@@ -336,7 +351,7 @@ const DiagnosticPage = () => {
                 disabled={currentStepNumber <= 1}
                 variant="ghost"
                 size="icon"
-                className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                className="w-12 h-12 rounded-full text-gray-400 hover:text-gray-600 disabled:opacity-30"
               >
                 <ChevronLeft className="h-8 w-8" />
               </Button>
@@ -345,24 +360,10 @@ const DiagnosticPage = () => {
                 onClick={handleNextStep}
                 variant="ghost"
                 size="icon"
-                className="text-gray-400 hover:text-gray-600"
+                className="w-12 h-12 rounded-full text-gray-400 hover:text-gray-600"
               >
                 <ChevronRight className="h-8 w-8" />
               </Button>
-            </div>
-
-            {/* Hint Text - Directly Under TV */}
-            <div
-              className="mt-4 text-center w-full max-w-[900px]"
-              style={{ width: "90vw", maxWidth: "900px" }}
-            >
-              {currentStepData?.hint ? (
-                <p className="text-gray-600 text-sm">{currentStepData.hint}</p>
-              ) : (
-                <p className="text-gray-600 text-sm">
-                  Красная точка на пульте показывает точное место для нажатия
-                </p>
-              )}
             </div>
           </div>
 
