@@ -320,7 +320,7 @@ const StepFormFields = React.memo<{
 
         <div>
           <Label htmlFor={isEdit ? "edit-tvInterfaceId" : "tvInterfaceId"}>
-            Интерфейс ТВ
+            Ин��ерфейс ТВ
           </Label>
           <div className="flex space-x-2">
             <Select
@@ -530,8 +530,8 @@ const SortableStepItem = React.memo<{
               )}
               {step.buttonPosition && (
                 <span>
-                  Позиция: ({Math.round(step.buttonPosition.x)},{" "}
-                  {Math.round(step.buttonPosition.y)})
+                  Позиция: ({(step.buttonPosition.x * 100).toFixed(1)}%,{" "}
+                  {(step.buttonPosition.y * 100).toFixed(1)}%)
                 </span>
               )}
               {step.tvInterfaceId && (
@@ -1084,7 +1084,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обяза��ельные поля: устройство, проблема, название и инст��ук��ия",
+          "Заполните все обяза��ельные п��ля: устройство, проблема, название и инст��ук��ия",
         variant: "destructive",
       });
       return;
@@ -1428,7 +1428,7 @@ const StepsManagerFixed = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingButton ? "Отмен��ть выбор" : "Выбрать позицию"}
+                  {isPickingButton ? "Отмен����ть выбор" : "Выбрать позицию"}
                 </Button>
                 <Button
                   type="button"
@@ -1657,7 +1657,7 @@ const StepsManagerFixed = () => {
                     </Badge>
                   </CardTitle>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    💡 Используйте иконку ��� для изменения порядка шагов методом
+                    💡 Используйте иконку ��� ��ля изменения порядка шагов методом
                     перетаскивания
                   </p>
                 </CardHeader>
@@ -1691,7 +1691,7 @@ const StepsManagerFixed = () => {
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle>
-              ��ыбор позиции на пульте: {selectedRemote?.name}
+              ���ыбор позиции на пульте: {selectedRemote?.name}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">{renderRemoteEditor()}</div>
