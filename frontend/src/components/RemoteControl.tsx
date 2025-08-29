@@ -98,7 +98,7 @@ const RemoteControl = ({
     return { left: left * 100, top: top * 100 };
   };
 
-  // Функция для нормализации координат (конвертация старых пиксельных координат в нормализованные 0-1)
+  // Функция для нормализации коорди��ат (конвертация старых пиксельных координат в нормализованные 0-1)
   const normalizeButtonPosition = (
     position: { x: number; y: number } | undefined,
   ) => {
@@ -151,11 +151,12 @@ const RemoteControl = ({
       <div className={cn("relative h-full group transform-gpu", className)}>
         <div className="relative w-full h-full flex items-center justify-center">
           {/* Subtle base shadow ellipse */}
-          <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-2/3 h-3 bg-black/20 blur-md rounded-full opacity-60"></div>
+          <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-2/3 h-3 bg-black/25 blur-lg rounded-full opacity-80 transition-all duration-700 ease-out group-hover:w-3/4 group-hover:opacity-90"></div>
+          <div className="pointer-events-none absolute bottom-0.5 left-1/2 -translate-x-1/2 w-1/2 h-2 bg-black/20 blur-md rounded-full opacity-70"></div>
           {/* Remote background image */}
           <div
             ref={containerRef}
-            className="relative z-10 w-full h-full bg-contain bg-center bg-no-repeat transition-transform duration-500 hover:-translate-y-1"
+            className="relative z-10 w-full h-full bg-contain bg-center bg-no-repeat transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1 group-hover:scale-[1.02] filter drop-shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
             style={{
               backgroundImage: `url(${imageData})`,
             }}
