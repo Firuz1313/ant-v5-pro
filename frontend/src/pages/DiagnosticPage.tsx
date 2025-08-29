@@ -369,7 +369,7 @@ const DiagnosticPage = () => {
           <div className="flex justify-center lg:justify-start lg:items-end lg:mt-20">
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-4">
-                <div className="w-[140px] h-[300px] lg:w-[160px] lg:h-[330px]">
+                <div className="w-[220px] h-[480px] sm:w-[240px] sm:h-[520px] lg:w-[300px] lg:h-[620px]">
                   <RemoteControl
                     remote={remote}
                     highlightButton={
