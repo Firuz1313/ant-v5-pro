@@ -1414,10 +1414,13 @@ const StepsManagerFixed = () => {
                 const topPercent = ((box.top + hoverPosition.y * box.height) / 600) * 100;
                 return (
                   <div
-                    className="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-70 transition-all duration-75"
+                    className="absolute pointer-events-none"
                     style={{ left: `${leftPercent}%`, top: `${topPercent}%`, zIndex: 999 }}
                   >
-                    <div className="absolute inset-0 bg-blue-400 rounded-full animate-pulse opacity-50"></div>
+                    <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]">
+                      <div className="absolute -inset-1 bg-pink-500/30 blur-sm rounded-full animate-pulse"></div>
+                      <div className="text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none">👆</div>
+                    </div>
                   </div>
                 );
               })()}
@@ -1429,17 +1432,17 @@ const StepsManagerFixed = () => {
                 const topPercent = ((box.top + formData.buttonPosition.y * box.height) / 600) * 100;
                 return (
                   <div
-                    className="absolute w-5 h-5 bg-red-500 rounded-full border-3 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse shadow-lg"
+                    className="absolute pointer-events-none"
                     style={{
                       left: `${leftPercent}%`,
                       top: `${topPercent}%`,
-                      boxShadow:
-                        "0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)",
                       zIndex: 1000,
                     }}
                   >
-                    <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
-                    <div className="absolute inset-1 bg-white rounded-full opacity-40"></div>
+                    <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]">
+                      <div className="absolute -inset-1 bg-pink-500/35 blur-md rounded-full animate-pulse"></div>
+                      <div className="text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">👆</div>
+                    </div>
                   </div>
                 );
               })()}
@@ -1450,7 +1453,7 @@ const StepsManagerFixed = () => {
         <div className="w-full lg:w-80 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Выбор позиции</CardTitle>
+              <CardTitle className="text-lg">Выбор ��озиции</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
