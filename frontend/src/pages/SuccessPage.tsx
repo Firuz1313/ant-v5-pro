@@ -64,9 +64,6 @@ const SuccessPage = () => {
     navigate("/");
   };
 
-  const handleStarClick = (value: number) => {
-    setRating(value);
-  };
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 relative overflow-hidden">
