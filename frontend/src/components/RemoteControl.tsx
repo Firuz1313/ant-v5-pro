@@ -58,6 +58,8 @@ const RemoteControl = ({
   // Top-level refs/effects for custom remote mapping (avoid conditional hooks)
   const containerRef = React.useRef<HTMLDivElement>(null);
   const [naturalSize, setNaturalSize] = React.useState<{ width: number; height: number } | null>(null);
+  const overlayRef = React.useRef<HTMLDivElement>(null);
+  const [overlaySize, setOverlaySize] = React.useState<{ width: number; height: number }>({ width: 0, height: 0 });
 
   React.useEffect(() => {
     if (!imageData) {
@@ -86,10 +88,20 @@ const RemoteControl = ({
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") closeZoom();
     };
+    const onResize = () => {
+      if (overlayRef.current) {
+        const r = overlayRef.current.getBoundingClientRect();
+        setOverlaySize({ width: r.width, height: r.height });
+      }
+    };
     window.addEventListener("keydown", onKey);
+    window.addEventListener("resize", onResize);
+    // first measure on next frame
+    requestAnimationFrame(onResize);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener("keydown", onKey);
+      window.removeEventListener("resize", onResize);
     };
   }, [zoom.open]);
 
@@ -100,7 +112,7 @@ const RemoteControl = ({
     const rect = containerRef.current.getBoundingClientRect();
     const vw = window.innerWidth;
     const vh = window.innerHeight;
-    const scale = Math.min((vw * 0.96) / rect.width, (vh * 0.96) / rect.height);
+    const scale = Math.min((vw * 0.98) / rect.width, (vh * 0.98) / rect.height);
     const dx = vw / 2 - (rect.left + rect.width / 2);
     const dy = vh / 2 - (rect.top + rect.height / 2);
     setZoom({ open: true, rect, scale, dx, dy, apply: false });
@@ -262,7 +274,7 @@ const RemoteControl = ({
             {/* Backdrop */}
             <div
               className={cn(
-                "absolute inset-0 bg-black/55 backdrop-blur-sm transition-opacity duration-500",
+                "absolute inset-0 bg-black/60 backdrop-blur-md transition-opacity duration-500",
                 zoom.apply ? "opacity-100" : "opacity-0",
               )}
               onClick={closeZoom}
@@ -280,16 +292,33 @@ const RemoteControl = ({
                 width: zoom.rect.width,
                 height: zoom.rect.height,
                 transform: `translate(${zoom.apply ? zoom.dx : 0}px, ${zoom.apply ? zoom.dy : 0}px) scale(${zoom.apply ? zoom.scale : 1})`,
-                transition: "transform 650ms cubic-bezier(0.22,1,0.36,1)",
+                transition: "transform 750ms cubic-bezier(0.16,1,0.3,1)",
               }}
             >
-              <div className="w-full h-full bg-black/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
+              <div ref={overlayRef} className="relative w-full h-full bg-black/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
                 <img
                   src={imageData}
                   alt={remote?.name || "Remote"}
                   className="w-full h-full object-contain select-none"
                   draggable={false}
+                  decoding="async"
+                  loading="eager"
                 />
+                {(() => {
+                  const normalizedPosition = normalizeButtonPosition(showButtonPosition);
+                  if (!normalizedPosition || overlaySize.width === 0 || overlaySize.height === 0) return null;
+                  const box = getImageBox(overlaySize.width, overlaySize.height);
+                  const leftPercent = ((box.left + normalizedPosition.x * box.width) / overlaySize.width) * 100;
+                  const topPercent = ((box.top + normalizedPosition.y * box.height) / overlaySize.height) * 100;
+                  return (
+                    <div
+                      className="absolute w-5 h-5 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 z-20 shadow-md"
+                      style={{ left: `${leftPercent}%`, top: `${topPercent}%` }}
+                    >
+                      <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-60"></div>
+                    </div>
+                  );
+                })()}
               </div>
               {/* Close button */}
               <button
