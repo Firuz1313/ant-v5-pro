@@ -600,6 +600,7 @@ const StepsManagerFixed = () => {
   // Extract data arrays from API responses - MUST be before other hooks that depend on them
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
+  const isLoadingAll = loading || devicesLoading || problemsLoading;
 
   // Local state for steps and remotes
   const [steps, setSteps] = useState<DiagnosticStep[]>([]);
@@ -929,15 +930,6 @@ const StepsManagerFixed = () => {
     setIsTVInterfaceEditorOpen(true);
   }, []);
 
-  // Show loading state while data is being fetched - AFTER all hooks
-  if (loading || devicesLoading || problemsLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">За��рузка данных...</span>
-      </div>
-    );
-  }
 
   const loadTVInterfacesForDevice = async (deviceId: string) => {
     setLoadingTVInterfaces(true);
@@ -984,15 +976,6 @@ const StepsManagerFixed = () => {
     }
   };
 
-  // Show loading state while data is being fetched
-  if (loading || devicesLoading || problemsLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">Загрузка данных...</span>
-      </div>
-    );
-  }
 
   const handleCreate = async () => {
     console.log("🔄 Creating step with form data:", formData);
@@ -1152,7 +1135,7 @@ const StepsManagerFixed = () => {
         variant: "default",
       });
     } catch (error) {
-      console.error("❌ Error updating step:", error);
+      console.error("�� Error updating step:", error);
       toast({
         title: "Ошибка обновления",
         description: `Не удалось обновить шаг: ${error?.message || "Неизвестная ошибка"}`,
@@ -1531,6 +1514,15 @@ const StepsManagerFixed = () => {
     );
   };
 
+  if (isLoadingAll) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+        <span className="text-lg">Загрузка данных...</span>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       {/* Header */}
@@ -1808,7 +1800,7 @@ const StepsManagerFixed = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Удал��ть шаг?</AlertDialogTitle>
             <AlertDialogDescription>
-              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из базы данных?
+              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из баз�� данных?
               Это действие нельзя отменить! Шаг "{stepToDelete?.title}" будет
               удален навсегда.
             </AlertDialogDescription>
