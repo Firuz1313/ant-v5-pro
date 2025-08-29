@@ -156,49 +156,6 @@ const SuccessPage = () => {
               </p>
             </div>
 
-            {/* Rating Section */}
-            <div
-              className={`transition-all duration-1000 delay-700 ${
-                showAnimation
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-8 opacity-0"
-              }`}
-            >
-              <Card className="backdrop-blur-md bg-white/70 border border-gray-200/50 rounded-2xl mb-8 max-w-md mx-auto shadow-lg">
-                <CardContent className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-4">
-                    Оцените качество помощи
-                  </h3>
-                  <div className="flex justify-center space-x-2 mb-4">
-                    {Array.from({ length: 5 }, (_, i) => (
-                      <button
-                        key={i}
-                        onClick={() => handleStarClick(i + 1)}
-                        onMouseEnter={() => setHoveredStar(i + 1)}
-                        onMouseLeave={() => setHoveredStar(0)}
-                        className="w-8 h-8 text-yellow-400 hover:text-yellow-500 transition-all duration-200 transform hover:scale-110"
-                      >
-                        <Star 
-                          className={`w-full h-full transition-all duration-200 ${
-                            i < (hoveredStar || rating) 
-                              ? "fill-current" 
-                              : "fill-none"
-                          }`} 
-                        />
-                      </button>
-                    ))}
-                  </div>
-                  {rating > 0 && (
-                    <div className="text-green-600 text-sm font-medium mb-2">
-                      Спасибо за вашу оценку!
-                    </div>
-                  )}
-                  <p className="text-gray-500 text-sm">
-                    Ваша оценка поможет нам улучшить сервис
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
 
             {/* Action Buttons */}
             <div
@@ -258,7 +215,7 @@ const SuccessPage = () => {
                 </h3>
                 <p className="text-gray-600 mb-6">
                   Если проблема повторится или у вас возникнут другие вопросы,
-                  мы всегда готовы помочь.
+                  мы всегда ��отовы помочь.
                 </p>
                 <div className="flex flex-col sm:flex-row gap-3 justify-center">
                   <Button
