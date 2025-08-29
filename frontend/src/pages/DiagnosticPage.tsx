@@ -348,7 +348,7 @@ const DiagnosticPage = () => {
                     <Lightbulb className="h-10 w-10 -ml-4 text-yellow-400 animate-pulse drop-shadow" />
                     <span className="block min-w-0 max-w-full">
                       {currentStepData?.hint ??
-                        "Красная точка на пульте показывает точное место для нажатия"}
+                        "Красная ��очка на пульте показывает точное место для нажатия"}
                     </span>
                   </div>
                 </div>
@@ -367,7 +367,7 @@ const DiagnosticPage = () => {
 
           {/* Remote Control - Bottom on Mobile, Right on Desktop - Positioned lower */}
           <div className="flex justify-center lg:justify-start lg:items-start lg:mt-0">
-            <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
+            <Card className="bg-transparent border-0 shadow-none rounded-none">
               <CardContent className="p-0">
                 <div className="w-[220px] h-[480px] sm:w-[240px] sm:h-[520px] lg:w-[300px] lg:h-[620px]">
                   <RemoteControl
