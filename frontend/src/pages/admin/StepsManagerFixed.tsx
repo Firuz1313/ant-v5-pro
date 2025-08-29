@@ -268,7 +268,7 @@ const StepFormFields = React.memo<{
               onValueChange={handleProblemChange}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Выберите проблему" />
+                <SelectValue placeholder="Вы��ерите проблему" />
               </SelectTrigger>
               <SelectContent>
                 {availableProblems.map((problem) => (
@@ -331,7 +331,7 @@ const StepFormFields = React.memo<{
                 <SelectValue placeholder="Выберите интерфейс" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Бе�� интерфейса</SelectItem>
+                <SelectItem value="none">Без интерфейса</SelectItem>
                 {loadingTVInterfaces ? (
                   <SelectItem value="loading" disabled>
                     Загрузка...
@@ -375,7 +375,7 @@ const StepFormFields = React.memo<{
                 <SelectValue placeholder="Выберите пульт" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Без пульта</SelectItem>
+                <SelectItem value="none">��ез пульта</SelectItem>
                 {availableRemotes.map((remote) => {
                   const device = devices.find((d) => d.id === remote.deviceId);
                   return (
@@ -1317,8 +1317,12 @@ const StepsManagerFixed = () => {
     const preciseX = event.clientX - rect.left;
     const preciseY = event.clientY - rect.top;
 
-    const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
-    const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
+    const box = getImageBox(rect.width, rect.height);
+    const xInImg = preciseX - box.left;
+    const yInImg = preciseY - box.top;
+
+    const normalizedX = Math.max(0, Math.min(1, xInImg / box.width));
+    const normalizedY = Math.max(0, Math.min(1, yInImg / box.height));
 
     setHoverPosition({ x: normalizedX, y: normalizedY });
   };
