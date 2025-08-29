@@ -345,10 +345,10 @@ const DiagnosticPage = () => {
 
                 <div className="min-w-0 flex justify-center px-2">
                   <div className="inline-flex items-start gap-2 text-gray-600 text-base leading-snug text-center break-words whitespace-pre-line max-w-full">
-                    <Lightbulb className="h-10 w-10 text-yellow-400 animate-pulse drop-shadow" />
+                    <Lightbulb className="h-10 w-10 -ml-2 text-yellow-400 animate-pulse drop-shadow" />
                     <span className="block min-w-0 max-w-full">
                       {currentStepData?.hint ??
-                        "Красная точка на пульте показывает точное место для нажатия"}
+                        "Красная точка на пу��ьте показывает точное место для нажатия"}
                     </span>
                   </div>
                 </div>
