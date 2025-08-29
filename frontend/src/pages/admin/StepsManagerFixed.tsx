@@ -331,7 +331,7 @@ const StepFormFields = React.memo<{
                 <SelectValue placeholder="Выберите интерфейс" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">Без интерфейса</SelectItem>
+                <SelectItem value="none">Бе�� интерфейса</SelectItem>
                 {loadingTVInterfaces ? (
                   <SelectItem value="loading" disabled>
                     Загрузка...
@@ -934,7 +934,7 @@ const StepsManagerFixed = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">За��рузка данн��х...</span>
+        <span className="text-lg">За��рузка данных...</span>
       </div>
     );
   }
@@ -1272,9 +1272,12 @@ const StepsManagerFixed = () => {
     const preciseX = event.clientX - rect.left;
     const preciseY = event.clientY - rect.top;
 
-    // Нормализуем координаты к диапазону 0-1 для максимальной точности
-    const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
-    const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
+    // Нормализуем координаты к диапазону 0-1 относительно области изображения (учёт letterbox)
+    const box = getImageBox(rect.width, rect.height);
+    const xInImg = preciseX - box.left;
+    const yInImg = preciseY - box.top;
+    const normalizedX = Math.max(0, Math.min(1, xInImg / box.width));
+    const normalizedY = Math.max(0, Math.min(1, yInImg / box.height));
 
     console.log("🎯 ULTRA PRECISE Click coordinates:", {
       raw: { clientX: event.clientX, clientY: event.clientY },
