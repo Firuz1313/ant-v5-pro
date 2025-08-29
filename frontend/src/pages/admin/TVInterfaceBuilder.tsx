@@ -135,7 +135,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error loading TV interfaces:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка пр�� загрузке TV интерфейсов",
+        description: "Произошла ошибка при загрузке TV интерфейсов",
         variant: "destructive",
       });
     } finally {
@@ -480,7 +480,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error cleaning up TV interfaces:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при очистке TV интер��ейсов",
+        description: "Произошла ошибка при очистке TV интерфейсов",
         variant: "destructive",
       });
     } finally {
