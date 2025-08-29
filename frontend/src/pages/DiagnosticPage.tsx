@@ -326,44 +326,42 @@ const DiagnosticPage = () => {
               </CardContent>
             </Card>
 
-            {/* Hint Text - Under TV with icon */}
+            {/* Navigation + Hint row */}
             <div
-              className="mt-4 w-full max-w-[900px] flex justify-center"
+              className="mt-6 w-full max-w-[900px]"
               style={{ width: "90vw", maxWidth: "900px" }}
             >
-              <div className="inline-flex items-center gap-2 text-gray-600 text-sm">
-                <Lightbulb className="h-4 w-4 text-yellow-500" />
-                <span className="font-medium">Подсказка:</span>
-                <span>
-                  {currentStepData?.hint ??
-                    "Красная точка на пульте показывает точное место для нажатия"}
-                </span>
+              <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
+                <Button
+                  onClick={handlePrevStep}
+                  disabled={currentStepNumber <= 1}
+                  variant="ghost"
+                  size="icon"
+                  className="w-16 h-16 rounded-full text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                >
+                  <ChevronLeft className="h-10 w-10" />
+                </Button>
+
+                <div className="flex justify-center">
+                  <div className="inline-flex items-center gap-2 text-gray-600 text-base leading-snug text-center whitespace-pre-line break-words">
+                    <Lightbulb className="h-5 w-5 text-yellow-500" />
+                    <span className="font-medium">Подсказка:</span>
+                    <span>
+                      {currentStepData?.hint ??
+                        "Красная точка на пульте показывает точное место для нажатия"}
+                    </span>
+                  </div>
+                </div>
+
+                <Button
+                  onClick={handleNextStep}
+                  variant="ghost"
+                  size="icon"
+                  className="w-16 h-16 rounded-full text-gray-400 hover:text-gray-600"
+                >
+                  <ChevronRight className="h-10 w-10" />
+                </Button>
               </div>
-            </div>
-
-            {/* Navigation Buttons - Below hint */}
-            <div
-              className="flex items-center justify-between mt-6 w-full max-w-[900px]"
-              style={{ width: "90vw", maxWidth: "900px" }}
-            >
-              <Button
-                onClick={handlePrevStep}
-                disabled={currentStepNumber <= 1}
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12 rounded-full text-gray-400 hover:text-gray-600 disabled:opacity-30"
-              >
-                <ChevronLeft className="h-8 w-8" />
-              </Button>
-
-              <Button
-                onClick={handleNextStep}
-                variant="ghost"
-                size="icon"
-                className="w-12 h-12 rounded-full text-gray-400 hover:text-gray-600"
-              >
-                <ChevronRight className="h-8 w-8" />
-              </Button>
             </div>
           </div>
 
