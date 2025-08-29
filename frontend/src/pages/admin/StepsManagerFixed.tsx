@@ -268,7 +268,7 @@ const StepFormFields = React.memo<{
               onValueChange={handleProblemChange}
             >
               <SelectTrigger>
-                <SelectValue placeholder="Вы��ерите проблему" />
+                <SelectValue placeholder="Выберите проблему" />
               </SelectTrigger>
               <SelectContent>
                 {availableProblems.map((problem) => (
@@ -375,7 +375,7 @@ const StepFormFields = React.memo<{
                 <SelectValue placeholder="Выберите пульт" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="none">��ез пульта</SelectItem>
+                <SelectItem value="none">Без пульта</SelectItem>
                 {availableRemotes.map((remote) => {
                   const device = devices.find((d) => d.id === remote.deviceId);
                   return (
@@ -1426,35 +1426,41 @@ const StepsManagerFixed = () => {
               />
 
               {/* Hover indicator - показывается при наведении (relative to canvas) */}
-              {isPickingButton && hoverPosition && (
-                <div
-                  className="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-70 transition-all duration-75"
-                  style={{
-                    left: `${hoverPosition.x * 100}%`,
-                    top: `${hoverPosition.y * 100}%`,
-                    zIndex: 999,
-                  }}
-                >
-                  <div className="absolute inset-0 bg-blue-400 rounded-full animate-pulse opacity-50"></div>
-                </div>
-              )}
+              {isPickingButton && hoverPosition && (() => {
+                const box = getImageBox(400, 600);
+                const leftPercent = ((box.left + hoverPosition.x * box.width) / 400) * 100;
+                const topPercent = ((box.top + hoverPosition.y * box.height) / 600) * 100;
+                return (
+                  <div
+                    className="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-70 transition-all duration-75"
+                    style={{ left: `${leftPercent}%`, top: `${topPercent}%`, zIndex: 999 }}
+                  >
+                    <div className="absolute inset-0 bg-blue-400 rounded-full animate-pulse opacity-50"></div>
+                  </div>
+                );
+              })()}
 
               {/* Выбранная позиция - постоянный индикатор (relative to canvas) */}
-              {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
-                <div
-                  className="absolute w-5 h-5 bg-red-500 rounded-full border-3 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse shadow-lg"
-                  style={{
-                    left: `${formData.buttonPosition.x * 100}%`,
-                    top: `${formData.buttonPosition.y * 100}%`,
-                    boxShadow:
-                      "0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)",
-                    zIndex: 1000,
-                  }}
-                >
-                  <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
-                  <div className="absolute inset-1 bg-white rounded-full opacity-40"></div>
-                </div>
-              )}
+              {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (() => {
+                const box = getImageBox(400, 600);
+                const leftPercent = ((box.left + formData.buttonPosition.x * box.width) / 400) * 100;
+                const topPercent = ((box.top + formData.buttonPosition.y * box.height) / 600) * 100;
+                return (
+                  <div
+                    className="absolute w-5 h-5 bg-red-500 rounded-full border-3 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse shadow-lg"
+                    style={{
+                      left: `${leftPercent}%`,
+                      top: `${topPercent}%`,
+                      boxShadow:
+                        "0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)",
+                      zIndex: 1000,
+                    }}
+                  >
+                    <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                    <div className="absolute inset-1 bg-white rounded-full opacity-40"></div>
+                  </div>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -1499,7 +1505,7 @@ const StepsManagerFixed = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Кликните на изображение пульта, ��тобы указать позицию
+                      Кликните на из��бражение пульта, ��тобы указать позицию
                       кнопки
                     </p>
                   </AlertDescription>
