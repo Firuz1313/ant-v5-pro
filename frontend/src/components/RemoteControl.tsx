@@ -682,7 +682,7 @@ const RemoteControl = ({
                 {pointerVariant === "diagnostic" && (
                   <>
                     <span className="absolute w-3 h-3 rounded-full border-2 border-fuchsia-400 left-[7px] top-[2px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
-                    <span className="absolute w-3 h-3 rounded-full border-2 border-fuchsia-400 left-[7px] top={[2px]} -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
+                    <span className="absolute w-3 h-3 rounded-full border-2 border-fuchsia-400 left-[7px] top-[2px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
                   </>
                 )}
                 <div
