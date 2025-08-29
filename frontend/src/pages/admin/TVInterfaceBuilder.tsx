@@ -134,7 +134,7 @@ const TVInterfaceBuilder = () => {
     } catch (error) {
       console.error("Error loading TV interfaces:", error);
       toast({
-        title: "Оши��ка",
+        title: "Ошибка",
         description: "Произошла ошибка при загрузке TV интерфейсов",
         variant: "destructive",
       });
@@ -763,7 +763,7 @@ const TVInterfaceBuilder = () => {
                   <SelectValue placeholder="Фильтр по устройству" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все устройства</SelectItem>
+                  <SelectItem value="all">Вс�� устройства</SelectItem>
                   {devices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
@@ -778,7 +778,7 @@ const TVInterfaceBuilder = () => {
                 onValueChange={setSelectedTypeFilter}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Ф��льтр ��о типу" />
+                  <SelectValue placeholder="Фильтр по типу" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все типы</SelectItem>
