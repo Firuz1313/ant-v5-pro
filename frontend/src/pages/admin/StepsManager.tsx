@@ -1051,7 +1051,7 @@ const StepsManager = () => {
             {/* Show selected position */}
             {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
               <div
-                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                className="absolute w-3 h-3 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                 style={{
                   left: `${(formData.buttonPosition.x / 400) * 100}%`,
                   top: `${(formData.buttonPosition.y / 600) * 100}%`,
