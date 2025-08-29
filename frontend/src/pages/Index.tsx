@@ -43,7 +43,7 @@ const Index = () => {
             Быстрая диагностика проблем
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Пошаговые инструкции для решения проблем с цифровыми
+            Пошаговые инструкции для решения проблем с цифр��выми
             ТВ-приставками.
             <br />
             Простой интерфейс, профессиональные решения.
@@ -144,7 +144,7 @@ const Index = () => {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
-            Поддер��иваемые устройства
+            Поддерживаемые устройства
           </h2>
 
           {devicesLoading ? (
@@ -263,7 +263,7 @@ const Index = () => {
               </h3>
               <p className="text-muted-foreground leading-relaxed">
                 Про��еренные решения от профессиональных техников с многолетним
-                опыто��
+                опытом
               </p>
             </div>
 
