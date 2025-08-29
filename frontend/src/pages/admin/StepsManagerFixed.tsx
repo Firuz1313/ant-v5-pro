@@ -566,7 +566,7 @@ const SortableStepItem = React.memo<{
               className="text-red-600"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Удалить
+              Удали��ь
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -1260,7 +1260,7 @@ const StepsManagerFixed = () => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
 
-    // Предотвращаем дефолтное поведение и всплытие для максимальной точности
+    // Пре��отвращаем дефолтное поведение и всплытие для максимальной точности
     event.preventDefault();
     event.stopPropagation();
 
@@ -1356,58 +1356,61 @@ const StepsManagerFixed = () => {
     return (
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1">
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 relative">
-            <canvas
-              ref={canvasRef}
-              width={400}
-              height={600}
-              className={`border border-gray-300 dark:border-gray-600 rounded mx-auto transition-all duration-200 ${
-                isPickingButton
-                  ? "cursor-crosshair border-blue-500 shadow-lg ring-2 ring-blue-200"
-                  : "cursor-pointer hover:border-gray-400"
-              }`}
-              style={{
-                backgroundImage: remoteImage ? `url(${remoteImage})` : "none",
-                backgroundSize: "contain",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-                backgroundColor: remoteImage ? "transparent" : "#f3f4f6",
-              }}
-              onClick={handleCanvasClick}
-              onMouseMove={handleCanvasMouseMove}
-              onMouseLeave={handleCanvasMouseLeave}
-            />
-
-            {/* Hover indicator - показывается при наведении */}
-            {isPickingButton && hoverPosition && (
-              <div
-                className="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-70 transition-all duration-75"
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+            {/* Precise overlay wrapper exactly matching canvas */}
+            <div className="relative mx-auto" style={{ width: 400, height: 600 }}>
+              <canvas
+                ref={canvasRef}
+                width={400}
+                height={600}
+                className={`absolute inset-0 border border-gray-300 dark:border-gray-600 rounded transition-all duration-200 ${
+                  isPickingButton
+                    ? "cursor-crosshair border-blue-500 shadow-lg ring-2 ring-blue-200"
+                    : "cursor-pointer hover:border-gray-400"
+                }`}
                 style={{
-                  left: `${hoverPosition.x * 100}%`,
-                  top: `${hoverPosition.y * 100}%`,
-                  zIndex: 999,
+                  backgroundImage: remoteImage ? `url(${remoteImage})` : "none",
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                  backgroundColor: remoteImage ? "transparent" : "#f3f4f6",
                 }}
-              >
-                <div className="absolute inset-0 bg-blue-400 rounded-full animate-pulse opacity-50"></div>
-              </div>
-            )}
+                onClick={handleCanvasClick}
+                onMouseMove={handleCanvasMouseMove}
+                onMouseLeave={handleCanvasMouseLeave}
+              />
 
-            {/* Выбранная позиция - постоянный индикатор */}
-            {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
-              <div
-                className="absolute w-5 h-5 bg-red-500 rounded-full border-3 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse shadow-lg"
-                style={{
-                  left: `${formData.buttonPosition.x * 100}%`,
-                  top: `${formData.buttonPosition.y * 100}%`,
-                  boxShadow:
-                    "0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)",
-                  zIndex: 1000,
-                }}
-              >
-                <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
-                <div className="absolute inset-1 bg-white rounded-full opacity-40"></div>
-              </div>
-            )}
+              {/* Hover indicator - показывается при наведении (relative to canvas) */}
+              {isPickingButton && hoverPosition && (
+                <div
+                  className="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-70 transition-all duration-75"
+                  style={{
+                    left: `${hoverPosition.x * 100}%`,
+                    top: `${hoverPosition.y * 100}%`,
+                    zIndex: 999,
+                  }}
+                >
+                  <div className="absolute inset-0 bg-blue-400 rounded-full animate-pulse opacity-50"></div>
+                </div>
+              )}
+
+              {/* Выбранная позиция - постоянный индикатор (relative to canvas) */}
+              {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
+                <div
+                  className="absolute w-5 h-5 bg-red-500 rounded-full border-3 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse shadow-lg"
+                  style={{
+                    left: `${formData.buttonPosition.x * 100}%`,
+                    top: `${formData.buttonPosition.y * 100}%`,
+                    boxShadow:
+                      "0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)",
+                    zIndex: 1000,
+                  }}
+                >
+                  <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                  <div className="absolute inset-1 bg-white rounded-full opacity-40"></div>
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
