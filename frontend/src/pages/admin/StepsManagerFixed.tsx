@@ -600,7 +600,6 @@ const StepsManagerFixed = () => {
   // Extract data arrays from API responses - MUST be before other hooks that depend on them
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
-  const isLoadingAll = loading || devicesLoading || problemsLoading;
 
   // Local state for steps and remotes
   const [steps, setSteps] = useState<DiagnosticStep[]>([]);
@@ -1513,6 +1512,8 @@ const StepsManagerFixed = () => {
       </div>
     );
   };
+
+  const isLoadingAll = loading || devicesLoading || problemsLoading;
 
   if (isLoadingAll) {
     return (
