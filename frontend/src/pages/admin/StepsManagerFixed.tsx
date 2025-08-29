@@ -637,6 +637,10 @@ const StepsManagerFixed = () => {
     x: number;
     y: number;
   } | null>(null);
+  const [remoteNaturalSize, setRemoteNaturalSize] = useState<{
+    width: number;
+    height: number;
+  } | null>(null);
 
   // Form data state with proper initialization
   const [formData, setFormData] = useState({
@@ -1084,7 +1088,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обяза��ельные п��ля: устройство, проблема, название и инст��ук��ия",
+          "Заполните все обяза��ельные п��ля: у��тройство, проблема, название и инст��ук��ия",
         variant: "destructive",
       });
       return;
@@ -1566,7 +1570,7 @@ const StepsManagerFixed = () => {
                   <SelectValue placeholder="Приставка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все приставки</SelectItem>
+                  <SelectItem value="all">Все ��риставки</SelectItem>
                   {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       <div className="flex items-center">
@@ -1657,7 +1661,7 @@ const StepsManagerFixed = () => {
                     </Badge>
                   </CardTitle>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    💡 Используйте иконку ��� ��ля изменения порядка шагов методом
+                    💡 Используйте иконку ��� ��ля изменения порядка шагов мет��дом
                     перетаскивания
                   </p>
                 </CardHeader>
