@@ -300,8 +300,16 @@ interface DiagnosticStep {
 }
 
 const StepsManager = () => {
-  const { data: devicesResponse, isLoading: devicesLoading, error: devicesError } = useDevices();
-  const { data: problemsResponse, isLoading: problemsLoading, error: problemsError } = useProblems();
+  const {
+    data: devicesResponse,
+    isLoading: devicesLoading,
+    error: devicesError,
+  } = useDevices();
+  const {
+    data: problemsResponse,
+    isLoading: problemsLoading,
+    error: problemsError,
+  } = useProblems();
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
@@ -316,7 +324,7 @@ const StepsManager = () => {
     devicesLoading,
     problemsLoading,
     devicesError,
-    problemsError
+    problemsError,
   });
 
   // Local state for steps and remotes
@@ -439,7 +447,11 @@ const StepsManager = () => {
       deviceId,
       totalProblems: problems.length,
       deviceProblems: deviceProblems.length,
-      allProblems: problems.map(p => ({id: p.id, deviceId: p.deviceId, title: p.title}))
+      allProblems: problems.map((p) => ({
+        id: p.id,
+        deviceId: p.deviceId,
+        title: p.title,
+      })),
     });
     return deviceProblems;
   };
@@ -450,15 +462,23 @@ const StepsManager = () => {
       deviceId,
       totalRemotes: remotes.length,
       deviceRemotes: deviceRemotes.length,
-      allRemotes: remotes.map(r => ({id: r.id, deviceId: r.deviceId, name: r.name}))
+      allRemotes: remotes.map((r) => ({
+        id: r.id,
+        deviceId: r.deviceId,
+        name: r.name,
+      })),
     });
     return deviceRemotes;
   };
   const getDefaultRemoteForDevice = (deviceId: string) => {
-    const defaultRemote = remotes.find((r: any) => r.deviceId === deviceId && r.isDefault);
+    const defaultRemote = remotes.find(
+      (r: any) => r.deviceId === deviceId && r.isDefault,
+    );
     console.log("🔍 getDefaultRemoteForDevice called:", {
       deviceId,
-      defaultRemote: defaultRemote ? {id: defaultRemote.id, name: defaultRemote.name} : null
+      defaultRemote: defaultRemote
+        ? { id: defaultRemote.id, name: defaultRemote.name }
+        : null,
     });
     return defaultRemote;
   };
@@ -1051,7 +1071,7 @@ const StepsManager = () => {
             {/* Show selected position */}
             {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
               <div
-                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                className="absolute w-3 h-3 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                 style={{
                   left: `${(formData.buttonPosition.x / 400) * 100}%`,
                   top: `${(formData.buttonPosition.y / 600) * 100}%`,

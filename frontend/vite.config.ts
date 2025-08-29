@@ -36,7 +36,7 @@ export default defineConfig(({ mode }) => {
       logOverride: { "this-is-undefined-in-esm": "silent" },
     },
     server: {
-      host: "::",
+      host: "0.0.0.0",
       port: 8081,
       // 🔧 FIX: Enable HMR but configure it properly
       hmr: {
