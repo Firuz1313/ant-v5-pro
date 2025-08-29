@@ -151,7 +151,7 @@ const SuccessPage = () => {
 
             {/* Action Buttons */}
             <div
-              className={`transition-all duration-1000 delay-1000 ${
+              className={`transition-all duration-1000 delay-700 ${
                 showAnimation
                   ? "translate-y-0 opacity-100"
                   : "translate-y-8 opacity-0"
