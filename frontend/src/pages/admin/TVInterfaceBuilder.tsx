@@ -135,7 +135,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error loading TV interfaces:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при загрузке TV интерфейсов",
+        description: "Произош��а ошибка при загрузке TV интерфейсов",
         variant: "destructive",
       });
     } finally {
@@ -269,7 +269,7 @@ const TVInterfaceBuilder = () => {
       if (response.success) {
         toast({
           title: "Успех",
-          description: response.message || "TV интерфейс создан",
+          description: response.message || "TV интерфейс созд��н",
         });
         setIsCreateDialogOpen(false);
         resetForm();
@@ -386,8 +386,8 @@ const TVInterfaceBuilder = () => {
     } catch (error) {
       console.error("Error deleting TV interface:", error);
       toast({
-        title: "Ошибк��",
-        description: "Произошла ошибка при удалении TV интерфейса",
+        title: "Ошибка",
+        description: "Про��зошла ошибка при удалении TV интерфейса",
         variant: "destructive",
       });
     } finally {
@@ -683,7 +683,7 @@ const TVInterfaceBuilder = () => {
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <Upload className="h-4 w-4 mr-2" />
-                        Загрузит�� файл
+                        Загрузить файл
                       </Button>
                       <Button
                         type="button"
@@ -1140,7 +1140,7 @@ const TVInterfaceBuilder = () => {
               </Button>
               <Button onClick={handleEdit} disabled={isLoading}>
                 <Save className="h-4 w-4 mr-2" />
-                Со��ранить
+                Сохранить
               </Button>
             </div>
           </div>
