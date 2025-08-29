@@ -260,9 +260,9 @@ const RemoteControl = ({
                     className="absolute pointer-events-none z-20"
                     style={{ left: `${mapped.left}%`, top: `${mapped.top}%` }}
                   >
-                    <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[18px] -translate-y-[28px] rotate-[-28deg]">
-                      <div className="absolute -inset-2 bg-pink-500/30 blur-md rounded-full animate-pulse"></div>
-                      <div className="text-[44px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">
+                    <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]">
+                      <div className="absolute -inset-1 bg-pink-500/30 blur-sm rounded-full animate-pulse"></div>
+                      <div className="text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none">
                         👆
                       </div>
                     </div>
@@ -317,9 +317,9 @@ const RemoteControl = ({
                   const topPercent = ((box.top + normalizedPosition.y * box.height) / overlaySize.height) * 100;
                   return (
                     <div className="absolute pointer-events-none z-20" style={{ left: `${leftPercent}%`, top: `${topPercent}%` }}>
-                      <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[22px] -translate-y-[34px] rotate-[-28deg]">
-                        <div className="absolute -inset-2 bg-pink-500/35 blur-lg rounded-full animate-pulse"></div>
-                        <div className="text-[52px] leading-none drop-shadow-[0_8px_16px_rgba(0,0,0,0.4)] select-none">
+                      <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]">
+                        <div className="absolute -inset-1 bg-pink-500/35 blur-md rounded-full animate-pulse"></div>
+                        <div className="text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">
                           👆
                         </div>
                       </div>
@@ -592,9 +592,9 @@ const RemoteControl = ({
         return (
           normalizedPosition && (
             <div className="absolute pointer-events-none z-20" style={{ left: `${normalizedPosition.x * 100}%`, top: `${normalizedPosition.y * 100}%` }}>
-              <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[16px] -translate-y-[26px] rotate-[-28deg]">
-                <div className="absolute -inset-2 bg-pink-500/30 blur-md rounded-full animate-pulse"></div>
-                <div className="text-[40px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">👆</div>
+              <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[10px] -translate-y-[18px] rotate-[-28deg]">
+                <div className="absolute -inset-1 bg-pink-500/30 blur-sm rounded-full animate-pulse"></div>
+                <div className="text-[28px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none">👆</div>
               </div>
             </div>
           )
