@@ -198,41 +198,6 @@ const SuccessPage = () => {
               </div>
             </div>
 
-            {/* Additional Help */}
-            <div
-              className={`mt-12 transition-all duration-1000 delay-1200 ${
-                showAnimation
-                  ? "translate-y-0 opacity-100"
-                  : "translate-y-8 opacity-0"
-              }`}
-            >
-              <div className="backdrop-blur-md bg-white/70 border border-gray-200/50 rounded-2xl p-8 max-w-2xl mx-auto shadow-lg">
-                <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Tv className="h-6 w-6 text-blue-600" />
-                </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                  Нужна дополнительная помощь?
-                </h3>
-                <p className="text-gray-600 mb-6">
-                  Если проблема повторится или у вас возникнут другие вопросы,
-                  мы всегда ��отовы помочь.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-3 justify-center">
-                  <Button
-                    variant="outline"
-                    className="border-blue-300 text-blue-700 hover:bg-blue-50 hover:border-blue-400 rounded-xl"
-                  >
-                    Связаться с поддержкой
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-xl"
-                  >
-                    Часто задаваемые вопросы
-                  </Button>
-                </div>
-              </div>
-            </div>
 
             {/* Decorative elements */}
             <div className="mt-16 flex justify-center space-x-8 opacity-20">
