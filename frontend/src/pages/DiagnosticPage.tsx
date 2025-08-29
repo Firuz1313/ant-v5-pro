@@ -14,6 +14,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Lightbulb,
 } from "lucide-react";
 
 const DiagnosticPage = () => {
