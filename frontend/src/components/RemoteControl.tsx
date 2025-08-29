@@ -148,7 +148,7 @@ const RemoteControl = ({
   // Render custom remote if available
   if (useCustomRemote && remote) {
     return (
-      <div className={cn("relative h-full", className)}>
+      <div className={cn("relative h-full group transform-gpu", className)}>
         <div className="relative w-full h-full flex items-center justify-center">
           {/* Subtle base shadow ellipse */}
           <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-2/3 h-3 bg-black/20 blur-md rounded-full opacity-60"></div>
