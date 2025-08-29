@@ -257,10 +257,15 @@ const RemoteControl = ({
               return (
                 normalizedPosition && mapped && (
                   <div
-                    className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
+                    className="absolute pointer-events-none z-20"
                     style={{ left: `${mapped.left}%`, top: `${mapped.top}%` }}
                   >
-                    <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+                    <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[18px] -translate-y-[28px] rotate-[-28deg]">
+                      <div className="absolute -inset-2 bg-pink-500/30 blur-md rounded-full animate-pulse"></div>
+                      <div className="text-[44px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">
+                        👆
+                      </div>
+                    </div>
                   </div>
                 )
               );
@@ -311,11 +316,13 @@ const RemoteControl = ({
                   const leftPercent = ((box.left + normalizedPosition.x * box.width) / overlaySize.width) * 100;
                   const topPercent = ((box.top + normalizedPosition.y * box.height) / overlaySize.height) * 100;
                   return (
-                    <div
-                      className="absolute w-5 h-5 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 z-20 shadow-md"
-                      style={{ left: `${leftPercent}%`, top: `${topPercent}%` }}
-                    >
-                      <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-60"></div>
+                    <div className="absolute pointer-events-none z-20" style={{ left: `${leftPercent}%`, top: `${topPercent}%` }}>
+                      <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[22px] -translate-y-[34px] rotate-[-28deg]">
+                        <div className="absolute -inset-2 bg-pink-500/35 blur-lg rounded-full animate-pulse"></div>
+                        <div className="text-[52px] leading-none drop-shadow-[0_8px_16px_rgba(0,0,0,0.4)] select-none">
+                          👆
+                        </div>
+                      </div>
                     </div>
                   );
                 })()}
@@ -584,14 +591,11 @@ const RemoteControl = ({
         const normalizedPosition = normalizeButtonPosition(showButtonPosition);
         return (
           normalizedPosition && (
-            <div
-              className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
-              style={{
-                left: `${normalizedPosition.x * 100}%`,
-                top: `${normalizedPosition.y * 100}%`,
-              }}
-            >
-              <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
+            <div className="absolute pointer-events-none z-20" style={{ left: `${normalizedPosition.x * 100}%`, top: `${normalizedPosition.y * 100}%` }}>
+              <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[16px] -translate-y-[26px] rotate-[-28deg]">
+                <div className="absolute -inset-2 bg-pink-500/30 blur-md rounded-full animate-pulse"></div>
+                <div className="text-[40px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">👆</div>
+              </div>
             </div>
           )
         );
