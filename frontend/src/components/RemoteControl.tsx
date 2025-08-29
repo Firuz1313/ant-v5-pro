@@ -191,16 +191,13 @@ const RemoteControl = ({
 
             {/* Show button position indicator if provided */}
             {(() => {
-              const normalizedPosition =
-                normalizeButtonPosition(showButtonPosition);
+              const normalizedPosition = normalizeButtonPosition(showButtonPosition);
+              const mapped = mapToPercent(normalizedPosition);
               return (
-                normalizedPosition && (
+                normalizedPosition && mapped && (
                   <div
                     className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse z-20"
-                    style={{
-                      left: `${normalizedPosition.x * 100}%`,
-                      top: `${normalizedPosition.y * 100}%`,
-                    }}
+                    style={{ left: `${mapped.left}%`, top: `${mapped.top}%` }}
                   >
                     <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
                   </div>
