@@ -362,7 +362,6 @@ const DiagnosticPage = () => {
                   <ChevronRight className="h-12 w-12" />
                 </Button>
               </div>
-
             </div>
           </div>
 
