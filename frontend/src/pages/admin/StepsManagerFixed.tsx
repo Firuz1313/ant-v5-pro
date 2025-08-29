@@ -426,8 +426,8 @@ const StepFormFields = React.memo<{
             <Target className="h-4 w-4" />
             <AlertDescription>
               <p className="text-sm text-green-700 dark:text-green-300">
-                Позиция кнопки: ({(formData.buttonPosition.x * 100).toFixed(1)}%,{" "}
-                {(formData.buttonPosition.y * 100).toFixed(1)}%)
+                Позиция кнопки: ({(formData.buttonPosition.x * 100).toFixed(1)}
+                %, {(formData.buttonPosition.y * 100).toFixed(1)}%)
               </p>
             </AlertDescription>
           </Alert>
@@ -929,7 +929,6 @@ const StepsManagerFixed = () => {
     setIsTVInterfaceEditorOpen(true);
   }, []);
 
-
   const loadTVInterfacesForDevice = async (deviceId: string) => {
     setLoadingTVInterfaces(true);
     try {
@@ -974,7 +973,6 @@ const StepsManagerFixed = () => {
       setLoadingTVInterfaces(false);
     }
   };
-
 
   const handleCreate = async () => {
     console.log("🔄 Creating step with form data:", formData);
@@ -1325,23 +1323,33 @@ const StepsManagerFixed = () => {
   };
 
   useEffect(() => {
-    const src = customRemoteImage || selectedRemote?.imageData || selectedRemote?.image_data || null;
+    const src =
+      customRemoteImage ||
+      selectedRemote?.imageData ||
+      selectedRemote?.image_data ||
+      null;
     if (!src) {
       setRemoteNaturalSize(null);
       return;
     }
     const img = new Image();
     img.onload = () => {
-      setRemoteNaturalSize({ width: img.naturalWidth || 0, height: img.naturalHeight || 0 });
+      setRemoteNaturalSize({
+        width: img.naturalWidth || 0,
+        height: img.naturalHeight || 0,
+      });
     };
     img.src = src;
   }, [customRemoteImage, selectedRemote]);
 
   const getImageBox = (containerW: number, containerH: number) => {
     const canvasAR = containerW / containerH;
-    const imgAR = remoteNaturalSize && remoteNaturalSize.width > 0 && remoteNaturalSize.height > 0
-      ? remoteNaturalSize.width / remoteNaturalSize.height
-      : canvasAR;
+    const imgAR =
+      remoteNaturalSize &&
+      remoteNaturalSize.width > 0 &&
+      remoteNaturalSize.height > 0
+        ? remoteNaturalSize.width / remoteNaturalSize.height
+        : canvasAR;
 
     if (canvasAR > imgAR) {
       const imgH = containerH;
@@ -1385,7 +1393,10 @@ const StepsManagerFixed = () => {
         <div className="flex-1">
           <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
             {/* Precise overlay wrapper exactly matching canvas */}
-            <div className="relative mx-auto" style={{ width: 400, height: 600 }}>
+            <div
+              className="relative mx-auto"
+              style={{ width: 400, height: 600 }}
+            >
               <canvas
                 ref={canvasRef}
                 width={400}
@@ -1408,44 +1419,62 @@ const StepsManagerFixed = () => {
               />
 
               {/* Hover indicator - показывается при наведении (relative to canvas) */}
-              {isPickingButton && hoverPosition && (() => {
-                const box = getImageBox(400, 600);
-                const leftPercent = ((box.left + hoverPosition.x * box.width) / 400) * 100;
-                const topPercent = ((box.top + hoverPosition.y * box.height) / 600) * 100;
-                return (
-                  <div
-                    className="absolute pointer-events-none"
-                    style={{ left: `${leftPercent}%`, top: `${topPercent}%`, zIndex: 999 }}
-                  >
-                    <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]">
-                      <div className="absolute -inset-1 bg-pink-500/30 blur-sm rounded-full"></div>
-                      <div className="text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none">👆</div>
+              {isPickingButton &&
+                hoverPosition &&
+                (() => {
+                  const box = getImageBox(400, 600);
+                  const leftPercent =
+                    ((box.left + hoverPosition.x * box.width) / 400) * 100;
+                  const topPercent =
+                    ((box.top + hoverPosition.y * box.height) / 600) * 100;
+                  return (
+                    <div
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: `${leftPercent}%`,
+                        top: `${topPercent}%`,
+                        zIndex: 999,
+                      }}
+                    >
+                      <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]">
+                        <div className="absolute -inset-1 bg-pink-500/30 blur-sm rounded-full"></div>
+                        <div className="text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none">
+                          👆
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                );
-              })()}
+                  );
+                })()}
 
               {/* Выбранная позиция - постоянный индикатор (relative to canvas) */}
-              {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (() => {
-                const box = getImageBox(400, 600);
-                const leftPercent = ((box.left + formData.buttonPosition.x * box.width) / 400) * 100;
-                const topPercent = ((box.top + formData.buttonPosition.y * box.height) / 600) * 100;
-                return (
-                  <div
-                    className="absolute pointer-events-none"
-                    style={{
-                      left: `${leftPercent}%`,
-                      top: `${topPercent}%`,
-                      zIndex: 1000,
-                    }}
-                  >
-                    <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]">
-                      <div className="absolute -inset-1 bg-pink-500/35 blur-md rounded-full"></div>
-                      <div className="text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">👆</div>
+              {formData.buttonPosition.x > 0 &&
+                formData.buttonPosition.y > 0 &&
+                (() => {
+                  const box = getImageBox(400, 600);
+                  const leftPercent =
+                    ((box.left + formData.buttonPosition.x * box.width) / 400) *
+                    100;
+                  const topPercent =
+                    ((box.top + formData.buttonPosition.y * box.height) / 600) *
+                    100;
+                  return (
+                    <div
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: `${leftPercent}%`,
+                        top: `${topPercent}%`,
+                        zIndex: 1000,
+                      }}
+                    >
+                      <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]">
+                        <div className="absolute -inset-1 bg-pink-500/35 blur-md rounded-full"></div>
+                        <div className="text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">
+                          👆
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                );
-              })()}
+                  );
+                })()}
             </div>
           </div>
         </div>
@@ -1503,7 +1532,8 @@ const StepsManagerFixed = () => {
                     <Target className="h-4 w-4" />
                     <AlertDescription>
                       <p className="text-sm text-green-700 dark:text-green-300">
-                        Позиция выбрана: ({(formData.buttonPosition.x * 100).toFixed(1)}%,{" "}
+                        Позиция выбрана: (
+                        {(formData.buttonPosition.x * 100).toFixed(1)}%,{" "}
                         {(formData.buttonPosition.y * 100).toFixed(1)}%)
                       </p>
                     </AlertDescription>
@@ -1704,8 +1734,8 @@ const StepsManagerFixed = () => {
                     </Badge>
                   </CardTitle>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    💡 Используйте иконку ��� ��ля изменения порядка шагов методом
-                    перетаскивания
+                    💡 Используйте иконку ��� ��ля изменения порядка шагов
+                    методом перетаскивания
                   </p>
                 </CardHeader>
                 <CardContent>

@@ -59,9 +59,15 @@ const RemoteControl = ({
 
   // Top-level refs/effects for custom remote mapping (avoid conditional hooks)
   const containerRef = React.useRef<HTMLDivElement>(null);
-  const [naturalSize, setNaturalSize] = React.useState<{ width: number; height: number } | null>(null);
+  const [naturalSize, setNaturalSize] = React.useState<{
+    width: number;
+    height: number;
+  } | null>(null);
   const overlayRef = React.useRef<HTMLDivElement>(null);
-  const [overlaySize, setOverlaySize] = React.useState<{ width: number; height: number }>({ width: 0, height: 0 });
+  const [overlaySize, setOverlaySize] = React.useState<{
+    width: number;
+    height: number;
+  }>({ width: 0, height: 0 });
 
   React.useEffect(() => {
     if (!imageData) {
@@ -69,7 +75,11 @@ const RemoteControl = ({
       return;
     }
     const img = new Image();
-    img.onload = () => setNaturalSize({ width: img.naturalWidth || 0, height: img.naturalHeight || 0 });
+    img.onload = () =>
+      setNaturalSize({
+        width: img.naturalWidth || 0,
+        height: img.naturalHeight || 0,
+      });
     img.src = imageData as string;
   }, [imageData]);
 
@@ -123,14 +133,26 @@ const RemoteControl = ({
 
   const closeZoom = () => {
     setZoom((z) => ({ ...z, apply: false }));
-    setTimeout(() => setZoom({ open: false, rect: null, scale: 1, dx: 0, dy: 0, apply: false }), 650);
+    setTimeout(
+      () =>
+        setZoom({
+          open: false,
+          rect: null,
+          scale: 1,
+          dx: 0,
+          dy: 0,
+          apply: false,
+        }),
+      650,
+    );
   };
 
   const getImageBox = (containerW: number, containerH: number) => {
     const containerAR = containerW / containerH;
-    const imgAR = naturalSize && naturalSize.width > 0 && naturalSize.height > 0
-      ? naturalSize.width / naturalSize.height
-      : containerAR;
+    const imgAR =
+      naturalSize && naturalSize.width > 0 && naturalSize.height > 0
+        ? naturalSize.width / naturalSize.height
+        : containerAR;
     if (containerAR > imgAR) {
       const imgH = containerH;
       const imgW = imgAR * imgH;
@@ -254,19 +276,36 @@ const RemoteControl = ({
 
             {/* Show button position indicator if provided */}
             {(() => {
-              const normalizedPosition = normalizeButtonPosition(showButtonPosition);
+              const normalizedPosition =
+                normalizeButtonPosition(showButtonPosition);
               const mapped = mapToPercent(normalizedPosition);
               return (
-                normalizedPosition && mapped && (
-                  <div className="absolute pointer-events-none z-20" style={{ left: `${mapped.left}%`, top: `${mapped.top}%` }}>
-                    <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]" data-rc-marker>
+                normalizedPosition &&
+                mapped && (
+                  <div
+                    className="absolute pointer-events-none z-20"
+                    style={{ left: `${mapped.left}%`, top: `${mapped.top}%` }}
+                  >
+                    <div
+                      className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]"
+                      data-rc-marker
+                    >
                       {pointerVariant === "diagnostic" && (
                         <>
                           <span className="absolute w-3 h-3 rounded-full border-2 border-pink-500 left-[6px] top-[-2px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
                           <span className="absolute w-3 h-3 rounded-full border-2 border-pink-500 left-[6px] top-[-2px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
                         </>
                       )}
-                      <div className={cn("text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none", pointerVariant === "diagnostic" ? "animate-tap-bounce" : "")}>👆</div>
+                      <div
+                        className={cn(
+                          "text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none",
+                          pointerVariant === "diagnostic"
+                            ? "animate-tap-bounce"
+                            : "",
+                        )}
+                      >
+                        👆
+                      </div>
                     </div>
                   </div>
                 )
@@ -302,7 +341,10 @@ const RemoteControl = ({
                 transition: "transform 750ms cubic-bezier(0.16,1,0.3,1)",
               }}
             >
-              <div ref={overlayRef} className="relative w-full h-full bg-black/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
+              <div
+                ref={overlayRef}
+                className="relative w-full h-full bg-black/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10"
+              >
                 <img
                   src={imageData}
                   alt={remote?.name || "Remote"}
@@ -312,21 +354,51 @@ const RemoteControl = ({
                   loading="eager"
                 />
                 {(() => {
-                  const normalizedPosition = normalizeButtonPosition(showButtonPosition);
-                  if (!normalizedPosition || overlaySize.width === 0 || overlaySize.height === 0) return null;
-                  const box = getImageBox(overlaySize.width, overlaySize.height);
-                  const leftPercent = ((box.left + normalizedPosition.x * box.width) / overlaySize.width) * 100;
-                  const topPercent = ((box.top + normalizedPosition.y * box.height) / overlaySize.height) * 100;
+                  const normalizedPosition =
+                    normalizeButtonPosition(showButtonPosition);
+                  if (
+                    !normalizedPosition ||
+                    overlaySize.width === 0 ||
+                    overlaySize.height === 0
+                  )
+                    return null;
+                  const box = getImageBox(
+                    overlaySize.width,
+                    overlaySize.height,
+                  );
+                  const leftPercent =
+                    ((box.left + normalizedPosition.x * box.width) /
+                      overlaySize.width) *
+                    100;
+                  const topPercent =
+                    ((box.top + normalizedPosition.y * box.height) /
+                      overlaySize.height) *
+                    100;
                   return (
-                    <div className="absolute pointer-events-none z-20" style={{ left: `${leftPercent}%`, top: `${topPercent}%` }}>
-                      <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]" data-rc-marker-overlay>
+                    <div
+                      className="absolute pointer-events-none z-20"
+                      style={{ left: `${leftPercent}%`, top: `${topPercent}%` }}
+                    >
+                      <div
+                        className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]"
+                        data-rc-marker-overlay
+                      >
                         {pointerVariant === "diagnostic" && (
                           <>
                             <span className="absolute w-3.5 h-3.5 rounded-full border-2 border-pink-500 left-[8px] top-[-4px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
                             <span className="absolute w-3.5 h-3.5 rounded-full border-2 border-pink-500 left-[8px] top-[-4px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
                           </>
                         )}
-                        <div className={cn("text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none", pointerVariant === "diagnostic" ? "animate-tap-bounce" : "")}>👆</div>
+                        <div
+                          className={cn(
+                            "text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none",
+                            pointerVariant === "diagnostic"
+                              ? "animate-tap-bounce"
+                              : "",
+                          )}
+                        >
+                          👆
+                        </div>
                       </div>
                     </div>
                   );
@@ -596,15 +668,31 @@ const RemoteControl = ({
         const normalizedPosition = normalizeButtonPosition(showButtonPosition);
         return (
           normalizedPosition && (
-            <div className="absolute pointer-events-none z-20" style={{ left: `${normalizedPosition.x * 100}%`, top: `${normalizedPosition.y * 100}%` }}>
-              <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[10px] -translate-y-[18px] rotate-[-28deg]" data-rc-marker-default>
+            <div
+              className="absolute pointer-events-none z-20"
+              style={{
+                left: `${normalizedPosition.x * 100}%`,
+                top: `${normalizedPosition.y * 100}%`,
+              }}
+            >
+              <div
+                className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[10px] -translate-y-[18px] rotate-[-28deg]"
+                data-rc-marker-default
+              >
                 {pointerVariant === "diagnostic" && (
                   <>
                     <span className="absolute w-2.5 h-2.5 rounded-full border-2 border-pink-500 left-[5px] top-[-3px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
                     <span className="absolute w-2.5 h-2.5 rounded-full border-2 border-pink-500 left-[5px] top-[-3px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
                   </>
                 )}
-                <div className={cn("text-[28px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none", pointerVariant === "diagnostic" ? "animate-tap-bounce" : "")}>👆</div>
+                <div
+                  className={cn(
+                    "text-[28px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none",
+                    pointerVariant === "diagnostic" ? "animate-tap-bounce" : "",
+                  )}
+                >
+                  👆
+                </div>
               </div>
             </div>
           )

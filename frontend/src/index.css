@@ -174,17 +174,40 @@
 
 @layer utilities {
   @keyframes tap-bounce {
-    0%, 60%, 100% { transform: translate3d(0,0,0) rotate(-28deg) scale(1); }
-    20% { transform: translate3d(-1px,-2px,0) rotate(-28deg) scale(0.98); }
-    40% { transform: translate3d(0,0,0) rotate(-28deg) scale(1.02); }
+    0%,
+    60%,
+    100% {
+      transform: translate3d(0, 0, 0) rotate(-28deg) scale(1);
+    }
+    20% {
+      transform: translate3d(-1px, -2px, 0) rotate(-28deg) scale(0.98);
+    }
+    40% {
+      transform: translate3d(0, 0, 0) rotate(-28deg) scale(1.02);
+    }
   }
-  .animate-tap-bounce { animation: tap-bounce 1.6s cubic-bezier(0.16,1,0.3,1) infinite; }
+  .animate-tap-bounce {
+    animation: tap-bounce 1.6s cubic-bezier(0.16, 1, 0.3, 1) infinite;
+  }
 
   @keyframes tap-ripple {
-    0% { transform: translate(-50%,-50%) scale(0.6); opacity: .8; }
-    70% { transform: translate(-50%,-50%) scale(1.8); opacity: 0; }
-    100% { transform: translate(-50%,-50%) scale(2); opacity: 0; }
+    0% {
+      transform: translate(-50%, -50%) scale(0.6);
+      opacity: 0.8;
+    }
+    70% {
+      transform: translate(-50%, -50%) scale(1.8);
+      opacity: 0;
+    }
+    100% {
+      transform: translate(-50%, -50%) scale(2);
+      opacity: 0;
+    }
   }
-  .animate-tap-ripple { animation: tap-ripple 1.6s ease-out infinite; }
-  .animate-tap-ripple-delayed { animation: tap-ripple 1.6s ease-out infinite .4s; }
+  .animate-tap-ripple {
+    animation: tap-ripple 1.6s ease-out infinite;
+  }
+  .animate-tap-ripple-delayed {
+    animation: tap-ripple 1.6s ease-out infinite 0.4s;
+  }
 }
