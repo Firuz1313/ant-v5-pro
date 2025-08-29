@@ -366,7 +366,7 @@ const DiagnosticPage = () => {
           </div>
 
           {/* Remote Control - Bottom on Mobile, Right on Desktop - Positioned lower */}
-          <div className="flex justify-center lg:justify-start lg:items-start lg:mt-2">
+          <div className="flex justify-center lg:justify-start lg:items-start lg:mt-0">
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
               <CardContent className="p-4">
                 <div className="w-[220px] h-[480px] sm:w-[240px] sm:h-[520px] lg:w-[300px] lg:h-[620px]">
