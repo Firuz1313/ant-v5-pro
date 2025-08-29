@@ -435,7 +435,7 @@ const TVInterfaceBuilder = () => {
       if (response.success) {
         toast({
           title: "Успех",
-          description: response.message || "TV интерфейс дубл����рован",
+          description: response.message || "TV интерфейс дублирован",
         });
         loadTVInterfaces();
       } else {
@@ -819,7 +819,7 @@ const TVInterfaceBuilder = () => {
               selectedDeviceFilter !== "all" ||
               selectedTypeFilter !== "all"
                 ? "Попробуйте изменить фильтры поиска"
-                : "Соз��айте пер��ый TV интерфейс для начала ��аботы"}
+                : "Соз��айте первый TV интерфейс для начала ��аботы"}
             </p>
             {!searchTerm &&
               selectedDeviceFilter === "all" &&
@@ -846,9 +846,9 @@ const TVInterfaceBuilder = () => {
                   ) : tvInterfaceUtils.hasScreenshot(tvInterface) ? (
                     <div className="text-center">
                       <ImageIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                      <p className="text-sm text-gray-500">Скриншот есть</p>
+                      <p className="text-sm text-gray-500">Скриншот ��сть</p>
                       <p className="text-xs text-gray-400">
-                        Открыть для просмотр��
+                        Открыть для просмотра
                       </p>
                     </div>
                   ) : (
@@ -969,7 +969,7 @@ const TVInterfaceBuilder = () => {
                           <AlertDialogAction
                             onClick={() => handleDelete(tvInterface.id)}
                           >
-                            Уда��ить
+                            Удалить
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -1136,7 +1136,7 @@ const TVInterfaceBuilder = () => {
                   resetForm();
                 }}
               >
-                ���тмена
+                ��тмена
               </Button>
               <Button onClick={handleEdit} disabled={isLoading}>
                 <Save className="h-4 w-4 mr-2" />
