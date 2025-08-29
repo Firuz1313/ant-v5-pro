@@ -103,11 +103,54 @@ const RemoteControl = ({
 
   // Render custom remote if available
   if (useCustomRemote && remote) {
+    const containerRef = React.useRef<HTMLDivElement>(null);
+    const [naturalSize, setNaturalSize] = React.useState<{ width: number; height: number } | null>(null);
+
+    React.useEffect(() => {
+      if (!imageData) {
+        setNaturalSize(null);
+        return;
+      }
+      const img = new Image();
+      img.onload = () => setNaturalSize({ width: img.naturalWidth || 0, height: img.naturalHeight || 0 });
+      img.src = imageData;
+    }, [imageData]);
+
+    const getImageBox = (containerW: number, containerH: number) => {
+      const containerAR = containerW / containerH;
+      const imgAR = naturalSize && naturalSize.width > 0 && naturalSize.height > 0
+        ? naturalSize.width / naturalSize.height
+        : containerAR;
+      if (containerAR > imgAR) {
+        const imgH = containerH;
+        const imgW = imgAR * imgH;
+        const left = (containerW - imgW) / 2;
+        const top = 0;
+        return { left, top, width: imgW, height: imgH };
+      } else {
+        const imgW = containerW;
+        const imgH = imgW / imgAR;
+        const left = 0;
+        const top = (containerH - imgH) / 2;
+        return { left, top, width: imgW, height: imgH };
+      }
+    };
+
+    const mapToPercent = (pos?: { x: number; y: number }) => {
+      if (!pos || !containerRef.current) return undefined;
+      const rect = containerRef.current.getBoundingClientRect();
+      const box = getImageBox(rect.width, rect.height);
+      const left = (box.left + pos.x * box.width) / rect.width;
+      const top = (box.top + pos.y * box.height) / rect.height;
+      return { left: left * 100, top: top * 100 };
+    };
+
     return (
       <div className={cn("relative h-full", className)}>
         <div className="relative w-full h-full flex items-center justify-center">
           {/* Remote background image */}
           <div
+            ref={containerRef}
             className="relative w-full max-w-[280px] h-full min-h-[480px] lg:min-h-[550px] bg-contain bg-center bg-no-repeat rounded-3xl shadow-2xl border-4 border-gray-700"
             style={{
               backgroundImage: `url(${imageData})`,
