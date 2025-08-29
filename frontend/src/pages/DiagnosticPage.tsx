@@ -166,7 +166,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или проблема н�� н��йдены</p>
+          <p>Устройство или проблема не найдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -348,7 +348,7 @@ const DiagnosticPage = () => {
                     <Lightbulb className="h-10 w-10 -ml-4 text-yellow-400 animate-pulse drop-shadow" />
                     <span className="block min-w-0 max-w-full">
                       {currentStepData?.hint ??
-                        "Красная точка на ��ульте показывает точное место для нажатия"}
+                        "Красная точка на пульте показывает точное место для нажатия"}
                     </span>
                   </div>
                 </div>
