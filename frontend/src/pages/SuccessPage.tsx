@@ -26,8 +26,6 @@ const SuccessPage = () => {
   const problemId =
     paramProblemId || searchParams.get("problemId") || undefined;
   const [showAnimation, setShowAnimation] = useState(false);
-  const [rating, setRating] = useState(0);
-  const [hoveredStar, setHoveredStar] = useState(0);
 
   useEffect(() => {
     // Trigger animation after component mounts
