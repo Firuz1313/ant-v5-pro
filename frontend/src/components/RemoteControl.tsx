@@ -150,10 +150,12 @@ const RemoteControl = ({
     return (
       <div className={cn("relative h-full", className)}>
         <div className="relative w-full h-full flex items-center justify-center">
+          {/* Subtle base shadow ellipse */}
+          <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-2/3 h-3 bg-black/20 blur-md rounded-full opacity-60"></div>
           {/* Remote background image */}
           <div
             ref={containerRef}
-            className="relative w-full h-full bg-contain bg-center bg-no-repeat"
+            className="relative z-10 w-full h-full bg-contain bg-center bg-no-repeat transition-transform duration-500 hover:-translate-y-1"
             style={{
               backgroundImage: `url(${imageData})`,
             }}
