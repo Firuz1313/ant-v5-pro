@@ -64,7 +64,7 @@ import {
 const TVInterfaceBuilder = () => {
   const { data: devicesResponse } = useDevices();
 
-  // Извлекаем мас��ивы данных из ответа API
+  // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
   const { toast } = useToast();
 
@@ -357,7 +357,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error updating TV interface:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при обновлении TV ин��ерфейса",
+        description: "Произошла ошибка при обновлении TV интерфейса",
         variant: "destructive",
       });
     } finally {
@@ -465,14 +465,14 @@ const TVInterfaceBuilder = () => {
         toast({
           title: "Успех",
           description:
-            response.data?.message || "Все TV интерфейс�� успешно удалены",
+            response.data?.message || "Все TV интерфейсы успешно удалены",
         });
         loadTVInterfaces();
       } else {
         toast({
           title: "Ошибка",
           description:
-            response.error || "Не ��далось выполнить очистку TV интерфейсов",
+            response.error || "Не удалось выполнить очистку TV интерфейсов",
           variant: "destructive",
         });
       }
@@ -819,7 +819,7 @@ const TVInterfaceBuilder = () => {
               selectedDeviceFilter !== "all" ||
               selectedTypeFilter !== "all"
                 ? "Попробуйте изменить фильтры поиска"
-                : "Соз��айте первый TV интерфейс для нач��ла ��аботы"}
+                : "Соз��айте пер��ый TV интерфейс для начала ��аботы"}
             </p>
             {!searchTerm &&
               selectedDeviceFilter === "all" &&
@@ -848,7 +848,7 @@ const TVInterfaceBuilder = () => {
                       <ImageIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
                       <p className="text-sm text-gray-500">Скриншот есть</p>
                       <p className="text-xs text-gray-400">
-                        Открыть для просмотра
+                        Открыть для просмотр��
                       </p>
                     </div>
                   ) : (
@@ -969,7 +969,7 @@ const TVInterfaceBuilder = () => {
                           <AlertDialogAction
                             onClick={() => handleDelete(tvInterface.id)}
                           >
-                            Удалить
+                            Уда��ить
                           </AlertDialogAction>
                         </AlertDialogFooter>
                       </AlertDialogContent>
@@ -1071,7 +1071,7 @@ const TVInterfaceBuilder = () => {
             </div>
 
             <div>
-              <Label htmlFor="edit-screenshot">Ск��иншот интерфейса</Label>
+              <Label htmlFor="edit-screenshot">Скриншот интерфейса</Label>
               <div className="space-y-4">
                 <div className="flex items-center space-x-2">
                   <Button
@@ -1136,7 +1136,7 @@ const TVInterfaceBuilder = () => {
                   resetForm();
                 }}
               >
-                ��тмена
+                ���тмена
               </Button>
               <Button onClick={handleEdit} disabled={isLoading}>
                 <Save className="h-4 w-4 mr-2" />
