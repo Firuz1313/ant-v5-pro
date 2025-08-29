@@ -472,7 +472,7 @@ const TVInterfaceBuilder = () => {
         toast({
           title: "Ошибка",
           description:
-            response.error || "Не удалось выполнить очист��у TV интерфейсов",
+            response.error || "Не удалось выполнить очистку TV интерфейсов",
           variant: "destructive",
         });
       }
@@ -579,7 +579,7 @@ const TVInterfaceBuilder = () => {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Созда��ь новый TV интерфейс</DialogTitle>
+                <DialogTitle>Создать новый TV интерфейс</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -763,7 +763,7 @@ const TVInterfaceBuilder = () => {
                   <SelectValue placeholder="Фильт�� по устройству" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все устройства</SelectItem>
+                  <SelectItem value="all">Все устр��йства</SelectItem>
                   {devices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
