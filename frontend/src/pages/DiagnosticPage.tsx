@@ -166,7 +166,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или пробл��ма н�� н��йдены</p>
+          <p>Устройство или проблема н�� н��йдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -343,7 +343,15 @@ const DiagnosticPage = () => {
                   <ChevronLeft className="h-12 w-12" />
                 </Button>
 
-                <div />
+                <div className="min-w-0 flex justify-center px-2">
+                  <div className="inline-flex items-start gap-2 text-gray-600 text-base leading-snug text-center break-words whitespace-pre-line max-w-full">
+                    <Lightbulb className="h-7 w-7 text-yellow-400 animate-pulse drop-shadow" />
+                    <span className="block min-w-0 max-w-full">
+                      {currentStepData?.hint ??
+                        "Красная точка на пульте показывает точное место для нажатия"}
+                    </span>
+                  </div>
+                </div>
 
                 <Button
                   onClick={handleNextStep}
@@ -355,16 +363,6 @@ const DiagnosticPage = () => {
                 </Button>
               </div>
 
-              {/* Bottom row: hint with lamp at left; wraps under, width limited between buttons */}
-              <div className="mt-2 text-center px-20">
-                <div className="inline-flex items-start justify-center gap-2 text-base text-gray-600 leading-snug">
-                  <Lightbulb className="h-7 w-7 text-yellow-400 animate-pulse drop-shadow" />
-                  <span className="block break-words whitespace-pre-line">
-                    {currentStepData?.hint ??
-                      "Красная точка на пульте показывает точное место для нажатия"}
-                  </span>
-                </div>
-              </div>
             </div>
           </div>
 
