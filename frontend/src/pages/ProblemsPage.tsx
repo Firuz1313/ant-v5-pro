@@ -54,18 +54,27 @@ const ProblemsPage = () => {
   const { deviceId } = useParams<{ deviceId: string }>();
 
   const { data: devicesResponse } = useDevices();
-  const { data: problemsResponse } = useProblems();
+  // Запрашиваем проблемы только для выбранной приставки
+  const { data: problemsResponse } = useProblems(1, 50, {
+    deviceId,
+    status: "published",
+  });
 
   // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
-  const problems = problemsResponse?.data || [];
+  const apiProblems = problemsResponse?.data || [];
 
   const device = devices.find((d: any) => d.id === deviceId);
 
-  // Use API problems if available, otherwise use default OpenBox problems
+  // Явная фильтрация по deviceId на случай, если бэкенд вернул смешанные данные
+  const filteredProblems = apiProblems.filter(
+    (p: any) => p.deviceId === deviceId || p.device_id === deviceId,
+  );
+
+  // Используем отфильтрованные проблемы, иначе дефолтные только для OpenBox
   const displayProblems =
-    problems.length > 0
-      ? problems
+    filteredProblems.length > 0
+      ? filteredProblems
       : deviceId === "openbox"
         ? defaultOpenBoxProblems
         : [];
