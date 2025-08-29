@@ -320,7 +320,7 @@ const StepFormFields = React.memo<{
 
         <div>
           <Label htmlFor={isEdit ? "edit-tvInterfaceId" : "tvInterfaceId"}>
-            Интерфейс ТВ
+            Ин��ерфейс ТВ
           </Label>
           <div className="flex space-x-2">
             <Select
@@ -417,7 +417,7 @@ const StepFormFields = React.memo<{
             id={isEdit ? "edit-hint" : "hint"}
             value={formData.hint}
             onChange={handleHintChange}
-            placeholder="Дополнительная подсказка для пользователя"
+            placeholder="Дополнительная подсказка для пользовате��я"
           />
         </div>
 
@@ -426,8 +426,8 @@ const StepFormFields = React.memo<{
             <Target className="h-4 w-4" />
             <AlertDescription>
               <p className="text-sm text-green-700 dark:text-green-300">
-                Позиция кнопки: ({Math.round(formData.buttonPosition.x)},{" "}
-                {Math.round(formData.buttonPosition.y)})
+                Позиция кнопки: ({(formData.buttonPosition.x * 100).toFixed(1)}
+                %, {(formData.buttonPosition.y * 100).toFixed(1)}%)
               </p>
             </AlertDescription>
           </Alert>
@@ -530,8 +530,8 @@ const SortableStepItem = React.memo<{
               )}
               {step.buttonPosition && (
                 <span>
-                  Позиция: ({Math.round(step.buttonPosition.x)},{" "}
-                  {Math.round(step.buttonPosition.y)})
+                  Позиция: ({(step.buttonPosition.x * 100).toFixed(1)}%,{" "}
+                  {(step.buttonPosition.y * 100).toFixed(1)}%)
                 </span>
               )}
               {step.tvInterfaceId && (
@@ -566,7 +566,7 @@ const SortableStepItem = React.memo<{
               className="text-red-600"
             >
               <Trash2 className="h-4 w-4 mr-2" />
-              Удалить
+              Удали��ь
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -636,6 +636,10 @@ const StepsManagerFixed = () => {
   const [hoverPosition, setHoverPosition] = useState<{
     x: number;
     y: number;
+  } | null>(null);
+  const [remoteNaturalSize, setRemoteNaturalSize] = useState<{
+    width: number;
+    height: number;
   } | null>(null);
 
   // Form data state with proper initialization
@@ -925,16 +929,6 @@ const StepsManagerFixed = () => {
     setIsTVInterfaceEditorOpen(true);
   }, []);
 
-  // Show loading state while data is being fetched - AFTER all hooks
-  if (loading || devicesLoading || problemsLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">За��рузка данных...</span>
-      </div>
-    );
-  }
-
   const loadTVInterfacesForDevice = async (deviceId: string) => {
     setLoadingTVInterfaces(true);
     try {
@@ -959,7 +953,7 @@ const StepsManagerFixed = () => {
 
         setTVInterfaces(normalizedInterfaces);
         console.log(
-          `✅ Loaded ${normalizedInterfaces.length} TV interfaces:`,
+          `�� Loaded ${normalizedInterfaces.length} TV interfaces:`,
           normalizedInterfaces,
         );
       } else {
@@ -980,16 +974,6 @@ const StepsManagerFixed = () => {
     }
   };
 
-  // Show loading state while data is being fetched
-  if (loading || devicesLoading || problemsLoading) {
-    return (
-      <div className="flex items-center justify-center py-12">
-        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">Загрузка данных...</span>
-      </div>
-    );
-  }
-
   const handleCreate = async () => {
     console.log("🔄 Creating step with form data:", formData);
 
@@ -1003,7 +987,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обязательные поля: устройство, проблема, название и инстр��кция",
+          "Заполн��те все обязательные поля: устройство, проблема, название и инстр��кция",
         variant: "destructive",
       });
       return;
@@ -1084,7 +1068,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обяза��ельные поля: устройство, проблема, название и инст��ук��ия",
+          "Заполните все обяза��ельные п��ля: устройство, проблема, название и инст��ук��ия",
         variant: "destructive",
       });
       return;
@@ -1148,7 +1132,7 @@ const StepsManagerFixed = () => {
         variant: "default",
       });
     } catch (error) {
-      console.error("❌ Error updating step:", error);
+      console.error("�� Error updating step:", error);
       toast({
         title: "Ошибка обновления",
         description: `Не удалось обновить шаг: ${error?.message || "Неизвестная ошибка"}`,
@@ -1260,7 +1244,7 @@ const StepsManagerFixed = () => {
     const canvas = canvasRef.current;
     const rect = canvas.getBoundingClientRect();
 
-    // Предотвращаем дефолтное поведение и всплытие для максимальной точности
+    // Пре��отвращаем дефолтное поведение и всплытие для максимальной точности
     event.preventDefault();
     event.stopPropagation();
 
@@ -1268,9 +1252,12 @@ const StepsManagerFixed = () => {
     const preciseX = event.clientX - rect.left;
     const preciseY = event.clientY - rect.top;
 
-    // Нормализуем координаты к диапазону 0-1 для максимальной точности
-    const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
-    const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
+    // Нормализуем координаты к диапазону 0-1 относительно области изображения (учёт letterbox)
+    const box = getImageBox(rect.width, rect.height);
+    const xInImg = preciseX - box.left;
+    const yInImg = preciseY - box.top;
+    const normalizedX = Math.max(0, Math.min(1, xInImg / box.width));
+    const normalizedY = Math.max(0, Math.min(1, yInImg / box.height));
 
     console.log("🎯 ULTRA PRECISE Click coordinates:", {
       raw: { clientX: event.clientX, clientY: event.clientY },
@@ -1310,8 +1297,12 @@ const StepsManagerFixed = () => {
     const preciseX = event.clientX - rect.left;
     const preciseY = event.clientY - rect.top;
 
-    const normalizedX = Math.max(0, Math.min(1, preciseX / rect.width));
-    const normalizedY = Math.max(0, Math.min(1, preciseY / rect.height));
+    const box = getImageBox(rect.width, rect.height);
+    const xInImg = preciseX - box.left;
+    const yInImg = preciseY - box.top;
+
+    const normalizedX = Math.max(0, Math.min(1, xInImg / box.width));
+    const normalizedY = Math.max(0, Math.min(1, yInImg / box.height));
 
     setHoverPosition({ x: normalizedX, y: normalizedY });
   };
@@ -1328,6 +1319,50 @@ const StepsManagerFixed = () => {
         setCustomRemoteImage(e.target?.result as string);
       };
       reader.readAsDataURL(file);
+    }
+  };
+
+  useEffect(() => {
+    const src =
+      customRemoteImage ||
+      selectedRemote?.imageData ||
+      selectedRemote?.image_data ||
+      null;
+    if (!src) {
+      setRemoteNaturalSize(null);
+      return;
+    }
+    const img = new Image();
+    img.onload = () => {
+      setRemoteNaturalSize({
+        width: img.naturalWidth || 0,
+        height: img.naturalHeight || 0,
+      });
+    };
+    img.src = src;
+  }, [customRemoteImage, selectedRemote]);
+
+  const getImageBox = (containerW: number, containerH: number) => {
+    const canvasAR = containerW / containerH;
+    const imgAR =
+      remoteNaturalSize &&
+      remoteNaturalSize.width > 0 &&
+      remoteNaturalSize.height > 0
+        ? remoteNaturalSize.width / remoteNaturalSize.height
+        : canvasAR;
+
+    if (canvasAR > imgAR) {
+      const imgH = containerH;
+      const imgW = imgAR * imgH;
+      const left = (containerW - imgW) / 2;
+      const top = 0;
+      return { left, top, width: imgW, height: imgH };
+    } else {
+      const imgW = containerW;
+      const imgH = imgW / imgAR;
+      const left = 0;
+      const top = (containerH - imgH) / 2;
+      return { left, top, width: imgW, height: imgH };
     }
   };
 
@@ -1356,58 +1391,91 @@ const StepsManagerFixed = () => {
     return (
       <div className="flex flex-col lg:flex-row gap-6">
         <div className="flex-1">
-          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4 relative">
-            <canvas
-              ref={canvasRef}
-              width={400}
-              height={600}
-              className={`border border-gray-300 dark:border-gray-600 rounded mx-auto transition-all duration-200 ${
-                isPickingButton
-                  ? "cursor-crosshair border-blue-500 shadow-lg ring-2 ring-blue-200"
-                  : "cursor-pointer hover:border-gray-400"
-              }`}
-              style={{
-                backgroundImage: remoteImage ? `url(${remoteImage})` : "none",
-                backgroundSize: "contain",
-                backgroundRepeat: "no-repeat",
-                backgroundPosition: "center",
-                backgroundColor: remoteImage ? "transparent" : "#f3f4f6",
-              }}
-              onClick={handleCanvasClick}
-              onMouseMove={handleCanvasMouseMove}
-              onMouseLeave={handleCanvasMouseLeave}
-            />
-
-            {/* Hover indicator - показывается при наведении */}
-            {isPickingButton && hoverPosition && (
-              <div
-                className="absolute w-4 h-4 bg-blue-400 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none opacity-70 transition-all duration-75"
+          <div className="bg-gray-100 dark:bg-gray-800 rounded-lg p-4">
+            {/* Precise overlay wrapper exactly matching canvas */}
+            <div
+              className="relative mx-auto"
+              style={{ width: 400, height: 600 }}
+            >
+              <canvas
+                ref={canvasRef}
+                width={400}
+                height={600}
+                className={`absolute inset-0 border border-gray-300 dark:border-gray-600 rounded transition-all duration-200 ${
+                  isPickingButton
+                    ? "cursor-crosshair border-blue-500 shadow-lg ring-2 ring-blue-200"
+                    : "cursor-pointer hover:border-gray-400"
+                }`}
                 style={{
-                  left: `${hoverPosition.x * 100}%`,
-                  top: `${hoverPosition.y * 100}%`,
-                  zIndex: 999,
+                  backgroundImage: remoteImage ? `url(${remoteImage})` : "none",
+                  backgroundSize: "contain",
+                  backgroundRepeat: "no-repeat",
+                  backgroundPosition: "center",
+                  backgroundColor: remoteImage ? "transparent" : "#f3f4f6",
                 }}
-              >
-                <div className="absolute inset-0 bg-blue-400 rounded-full animate-pulse opacity-50"></div>
-              </div>
-            )}
+                onClick={handleCanvasClick}
+                onMouseMove={handleCanvasMouseMove}
+                onMouseLeave={handleCanvasMouseLeave}
+              />
 
-            {/* Выбранная позиция - постоянный индикатор */}
-            {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
-              <div
-                className="absolute w-5 h-5 bg-red-500 rounded-full border-3 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none animate-pulse shadow-lg"
-                style={{
-                  left: `${formData.buttonPosition.x * 100}%`,
-                  top: `${formData.buttonPosition.y * 100}%`,
-                  boxShadow:
-                    "0 0 0 2px rgba(255, 255, 255, 0.8), 0 0 10px rgba(239, 68, 68, 0.6)",
-                  zIndex: 1000,
-                }}
-              >
-                <div className="absolute inset-0 bg-red-500 rounded-full animate-ping opacity-75"></div>
-                <div className="absolute inset-1 bg-white rounded-full opacity-40"></div>
-              </div>
-            )}
+              {/* Hover indicator - показывается при наведении (relative to canvas) */}
+              {isPickingButton &&
+                hoverPosition &&
+                (() => {
+                  const box = getImageBox(400, 600);
+                  const leftPercent =
+                    ((box.left + hoverPosition.x * box.width) / 400) * 100;
+                  const topPercent =
+                    ((box.top + hoverPosition.y * box.height) / 600) * 100;
+                  return (
+                    <div
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: `${leftPercent}%`,
+                        top: `${topPercent}%`,
+                        zIndex: 999,
+                      }}
+                    >
+                      <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]">
+                        <div className="absolute -inset-1 bg-pink-500/30 blur-sm rounded-full"></div>
+                        <div className="text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none">
+                          👆
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+
+              {/* Выбранная позиция - постоянный индикатор (relative to canvas) */}
+              {formData.buttonPosition.x > 0 &&
+                formData.buttonPosition.y > 0 &&
+                (() => {
+                  const box = getImageBox(400, 600);
+                  const leftPercent =
+                    ((box.left + formData.buttonPosition.x * box.width) / 400) *
+                    100;
+                  const topPercent =
+                    ((box.top + formData.buttonPosition.y * box.height) / 600) *
+                    100;
+                  return (
+                    <div
+                      className="absolute pointer-events-none"
+                      style={{
+                        left: `${leftPercent}%`,
+                        top: `${topPercent}%`,
+                        zIndex: 1000,
+                      }}
+                    >
+                      <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]">
+                        <div className="absolute -inset-1 bg-pink-500/35 blur-md rounded-full"></div>
+                        <div className="text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">
+                          👆
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })()}
+            </div>
           </div>
         </div>
 
@@ -1425,7 +1493,7 @@ const StepsManagerFixed = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingButton ? "Отменить выбор" : "Выбрать позицию"}
+                  {isPickingButton ? "Отмен����ть выбор" : "Выбрать позицию"}
                 </Button>
                 <Button
                   type="button"
@@ -1451,7 +1519,7 @@ const StepsManagerFixed = () => {
                   <Target className="h-4 w-4" />
                   <AlertDescription>
                     <p className="text-sm text-blue-700 dark:text-blue-300">
-                      Кликните на изображение пульта, ��тобы указать позицию
+                      Кликните на из��бражение пульта, ��тобы указать позицию
                       кнопки
                     </p>
                   </AlertDescription>
@@ -1464,9 +1532,9 @@ const StepsManagerFixed = () => {
                     <Target className="h-4 w-4" />
                     <AlertDescription>
                       <p className="text-sm text-green-700 dark:text-green-300">
-                        Пози��ия выбрана: (
-                        {Math.round(formData.buttonPosition.x)},{" "}
-                        {Math.round(formData.buttonPosition.y)})
+                        Позиция выбрана: (
+                        {(formData.buttonPosition.x * 100).toFixed(1)}%,{" "}
+                        {(formData.buttonPosition.y * 100).toFixed(1)}%)
                       </p>
                     </AlertDescription>
                   </Alert>
@@ -1477,6 +1545,17 @@ const StepsManagerFixed = () => {
       </div>
     );
   };
+
+  const isLoadingAll = loading || devicesLoading || problemsLoading;
+
+  if (isLoadingAll) {
+    return (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
+        <span className="text-lg">Загрузка данных...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -1655,8 +1734,8 @@ const StepsManagerFixed = () => {
                     </Badge>
                   </CardTitle>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    💡 Используйте иконку ☰ для изменения порядка шагов методом
-                    перетаскивания
+                    💡 Используйте иконку ��� ��ля изменения порядка шагов
+                    методом перетаскивания
                   </p>
                 </CardHeader>
                 <CardContent>
@@ -1689,7 +1768,7 @@ const StepsManagerFixed = () => {
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle>
-              Выбор позиции на пульте: {selectedRemote?.name}
+              ���ыбор позиции на пульте: {selectedRemote?.name}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">{renderRemoteEditor()}</div>
@@ -1743,7 +1822,7 @@ const StepsManagerFixed = () => {
                 !formData.instruction
               }
             >
-              Сохранить
+              Сох��анить
             </Button>
           </div>
         </DialogContent>
@@ -1755,7 +1834,7 @@ const StepsManagerFixed = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Удал��ть шаг?</AlertDialogTitle>
             <AlertDialogDescription>
-              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из базы данных?
+              Вы уверены, что хотите ПОЛНОСТЬЮ УДАЛИТЬ этот шаг из баз�� данных?
               Это действие нельзя отменить! Шаг "{stepToDelete?.title}" будет
               удален навсегда.
             </AlertDialogDescription>

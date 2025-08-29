@@ -253,9 +253,10 @@ const DiagnosticPage = () => {
           <div className="flex flex-col items-center">
             {/* TV Display - Responsive Sizing */}
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-              <CardContent className="p-0">
+              <CardContent className="p-0 relative">
+                <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 w-3/4 max-w-[700px] h-5 bg-black/35 blur-xl rounded-full opacity-80"></div>
                 <div
-                  className="bg-gray-900 rounded-xl overflow-hidden w-full max-w-[900px] aspect-video lg:aspect-[900/520]"
+                  className="relative bg-gray-900 rounded-2xl overflow-hidden w-full max-w-[900px] aspect-video lg:aspect-[900/520] shadow-2xl shadow-black/50 ring-1 ring-black/10 transform-gpu transition-transform duration-700 ease-out hover:-translate-y-1"
                   style={{
                     width: "90vw",
                     maxWidth: "900px",
@@ -348,7 +349,7 @@ const DiagnosticPage = () => {
                     <Lightbulb className="h-10 w-10 -ml-4 text-yellow-400 animate-pulse drop-shadow" />
                     <span className="block min-w-0 max-w-full">
                       {currentStepData?.hint ??
-                        "Красная точка на пульте показывает точное место для нажатия"}
+                        "Красная ��очка на пульте показывает точное место для нажатия"}
                     </span>
                   </div>
                 </div>
@@ -366,10 +367,10 @@ const DiagnosticPage = () => {
           </div>
 
           {/* Remote Control - Bottom on Mobile, Right on Desktop - Positioned lower */}
-          <div className="flex justify-center lg:justify-start lg:items-end lg:mt-20">
-            <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-              <CardContent className="p-4">
-                <div className="w-[140px] h-[300px] lg:w-[160px] lg:h-[330px]">
+          <div className="flex justify-center lg:justify-start lg:items-start lg:mt-0">
+            <Card className="bg-transparent border-0 shadow-none rounded-none">
+              <CardContent className="p-0">
+                <div className="w-[220px] h-[480px] sm:w-[240px] sm:h-[520px] lg:w-[300px] lg:h-[620px]">
                   <RemoteControl
                     remote={remote}
                     highlightButton={
@@ -378,6 +379,7 @@ const DiagnosticPage = () => {
                     showButtonPosition={currentStepData?.buttonPosition}
                     onButtonClick={handleManualProgress}
                     className="w-full h-full"
+                    pointerVariant="diagnostic"
                   />
                 </div>
               </CardContent>
