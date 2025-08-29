@@ -304,7 +304,7 @@ const TVInterfaceBuilder = () => {
 
     setIsLoading(true);
     try {
-      // Подготавливаем данные для обновления, включая только измененные поля
+      // Подготавливаем данные для обновления, включая толь��о измененные поля
       const updateData: any = {
         name: formData.name,
         description: formData.description,
@@ -341,7 +341,7 @@ const TVInterfaceBuilder = () => {
         setIsEditDialogOpen(false);
         resetForm();
 
-        // Форсированная перезагрузка через небольшую задержку
+        // Форсированная перезагрузка через небольшую задерж��у
         setTimeout(() => {
           console.log("🔄 Force reloading interfaces after update...");
           loadTVInterfaces();
@@ -763,7 +763,7 @@ const TVInterfaceBuilder = () => {
                   <SelectValue placeholder="Фильтр по устройству" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Вс�� устройства</SelectItem>
+                  <SelectItem value="all">Все устройства</SelectItem>
                   {devices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
@@ -819,7 +819,7 @@ const TVInterfaceBuilder = () => {
               selectedDeviceFilter !== "all" ||
               selectedTypeFilter !== "all"
                 ? "Попробуйте изменить фильтры поиска"
-                : "Соз��айте первый TV интерфейс для начала ��аботы"}
+                : "Создавайте первый TV интерфейс для начала работы"}
             </p>
             {!searchTerm &&
               selectedDeviceFilter === "all" &&
