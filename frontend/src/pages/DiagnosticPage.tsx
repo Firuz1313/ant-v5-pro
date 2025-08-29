@@ -331,6 +331,7 @@ const DiagnosticPage = () => {
               className="mt-6 w-full max-w-[900px]"
               style={{ width: "90vw", maxWidth: "900px" }}
             >
+              {/* Top row: fixed buttons and animated lamp only */}
               <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
                 <Button
                   onClick={handlePrevStep}
@@ -342,16 +343,8 @@ const DiagnosticPage = () => {
                   <ChevronLeft className="h-12 w-12" />
                 </Button>
 
-                <div className="flex justify-center px-2">
-                  <div className="flex items-start gap-2 text-gray-600 text-base leading-snug text-center whitespace-normal break-words">
-                    <div className="relative">
-                      <Lightbulb className="h-6 w-6 text-yellow-400 animate-bounce-gentle drop-shadow" />
-                    </div>
-                    <span className="block max-w-full">
-                      {currentStepData?.hint ??
-                        "Красная точка на пульте показывает точное место для нажатия"}
-                    </span>
-                  </div>
+                <div className="flex justify-center">
+                  <Lightbulb className="h-7 w-7 text-yellow-400 animate-pulse drop-shadow" />
                 </div>
 
                 <Button
@@ -362,6 +355,12 @@ const DiagnosticPage = () => {
                 >
                   <ChevronRight className="h-12 w-12" />
                 </Button>
+              </div>
+
+              {/* Bottom row: full hint text wrapping under, visually between buttons via padding */}
+              <div className="mt-2 text-center text-base text-gray-600 leading-snug break-words whitespace-pre-line px-20">
+                {currentStepData?.hint ??
+                  "Красная точка на пульте показывает точное место для нажатия"}
               </div>
             </div>
           </div>
