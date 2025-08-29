@@ -472,7 +472,7 @@ const TVInterfaceBuilder = () => {
         toast({
           title: "Ошибка",
           description:
-            response.error || "Не удалось выполнить очистку TV интерфейсов",
+            response.error || "Не удалось выполнить очист��у TV интерфейсов",
           variant: "destructive",
         });
       }
@@ -555,7 +555,7 @@ const TVInterfaceBuilder = () => {
                 <AlertDialogTitle>Очистить все TV интерфейсы?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Это действие удалит все существующие TV интерфейсы. После
-                  очистки вы сможете создавать св��и со��с��венные интерфейсы
+                  очистки вы сможете создавать свои собственные интерфейсы
                   вручную чере�� UI.
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -1037,7 +1037,7 @@ const TVInterfaceBuilder = () => {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Выбери��е устройство" />
+                  <SelectValue placeholder="Выбери����е устройство" />
                 </SelectTrigger>
                 <SelectContent>
                   {devices.map((device) => (
