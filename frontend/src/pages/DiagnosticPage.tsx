@@ -337,15 +337,14 @@ const DiagnosticPage = () => {
                   disabled={currentStepNumber <= 1}
                   variant="ghost"
                   size="icon"
-                  className="w-16 h-16 rounded-full text-gray-400 hover:text-gray-600 disabled:opacity-30"
+                  className="w-20 h-20 rounded-full text-gray-400 hover:text-gray-600 disabled:opacity-30"
                 >
-                  <ChevronLeft className="h-10 w-10" />
+                  <ChevronLeft className="h-12 w-12" />
                 </Button>
 
-                <div className="flex justify-center">
-                  <div className="inline-flex items-center gap-2 text-gray-600 text-base leading-snug text-center whitespace-pre-line break-words">
-                    <Lightbulb className="h-5 w-5 text-yellow-500" />
-                    <span className="font-medium">Подсказка:</span>
+                <div className="flex justify-center px-2">
+                  <div className="inline-flex items-start gap-2 text-gray-600 text-base leading-snug text-center whitespace-pre-line break-words">
+                    <Lightbulb className="h-6 w-6 text-yellow-500 animate-glow" />
                     <span>
                       {currentStepData?.hint ??
                         "Красная точка на пульте показывает точное место для нажатия"}
@@ -357,9 +356,9 @@ const DiagnosticPage = () => {
                   onClick={handleNextStep}
                   variant="ghost"
                   size="icon"
-                  className="w-16 h-16 rounded-full text-gray-400 hover:text-gray-600"
+                  className="w-20 h-20 rounded-full text-gray-400 hover:text-gray-600"
                 >
-                  <ChevronRight className="h-10 w-10" />
+                  <ChevronRight className="h-12 w-12" />
                 </Button>
               </div>
             </div>
