@@ -97,7 +97,7 @@ const ProblemsManager = () => {
   const { data: devicesResponse } = useDevices();
   const { data: problemsResponse } = useProblems(1, 20, { admin: true });
 
-  // Извлекаем массивы данных из отв��та API
+  // Извлекаем массивы данных из ответа API
   const devices = devicesResponse?.data || [];
   const problems = problemsResponse?.data || [];
 
@@ -239,7 +239,7 @@ const ProblemsManager = () => {
 
   const getDeviceName = (deviceId: string) => {
     const device = devices.find((d) => d.id === deviceId);
-    return device?.name || "Неизвестна�� приставка";
+    return device?.name || "Неизвестная приставка";
   };
 
   const getCategoryInfo = (category: string) => {
@@ -263,7 +263,7 @@ const ProblemsManager = () => {
     });
 
     if (!formData.title) {
-      alert("Пожалуйста, введите назв��ние проблемы");
+      alert("Пожалуйста, введите название проблемы");
       return;
     }
 
@@ -308,7 +308,7 @@ const ProblemsManager = () => {
       setCreatedProblemTitle(problemData.title);
       setIsSuccessModalOpen(true);
     } catch (error) {
-      console.error("❌ Ошибка при создании проблемы:", error);
+      console.error("❌ Ошибка при создании проблем��:", error);
       console.error("❌ Дет��ли ошибки:", {
         message: (error as any)?.message,
         response: (error as any)?.response,
@@ -321,14 +321,14 @@ const ProblemsManager = () => {
       if (errorResponse?.errorType === "RATE_LIMIT") {
         const retryAfter = errorResponse.retryAfter || 5;
         alert(
-          `Слишком частые попытки ��оздания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
+          `Слишком частые попытки создания проблем.\n\nПожалуйста, подождите ${retryAfter} секунд${retryAfter > 1 && retryAfter < 5 ? "ы" : ""} перед следующей попыткой.`,
         );
       } else if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         const suggestions = errorResponse.details?.suggestions || [];
 
         let alertMessage = `Проблема с таким названием уже существует для этого устройства.\n\n`;
-        alertMessage += `��уществующая проблема:\n`;
+        alertMessage += `Существующая проблема:\n`;
         alertMessage += `• Название: "${existingProblem?.title}"\n`;
         alertMessage += `• Статус: ${existingProblem?.status}\n`;
         alertMessage += `• Создана: ${existingProblem?.created_at ? new Date(existingProblem.created_at).toLocaleDateString() : "н/д"}\n\n`;
@@ -343,7 +343,7 @@ const ProblemsManager = () => {
           "Проблема с таким названием уже существует для этого устройства. Попробуйте другое название.",
         );
       } else {
-        alert("Ошибка при со��дании проблемы: " + errorMessage);
+        alert("Ошибка при создании проблемы: " + errorMessage);
       }
     }
   };
@@ -429,7 +429,7 @@ const ProblemsManager = () => {
     } catch (error) {
       console.error("Error toggling problem status:", error);
       alert(
-        "Ош��бка при изменении статуса проблемы: " + (error as any)?.message,
+        "Ошибка при изменении статуса проблемы: " + (error as any)?.message,
       );
     }
   };
@@ -443,17 +443,17 @@ const ProblemsManager = () => {
       });
       console.log("✅ Проблема успешно продублирована");
     } catch (error) {
-      console.error("�� Ошибка при дублировании проблемы:", error);
+      console.error("Ошибка при дублировании проблемы:", error);
 
       const errorResponse = (error as any)?.response?.data;
       if (errorResponse?.errorType === "DUPLICATE_ERROR") {
         const existingProblem = errorResponse.existingProblem;
         alert(
-          `Не удалось создать копию: проблема �� названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую п��облему вручную.`,
+          `Не удалось создать копию: проблема с названием "${existingProblem?.title} (копия)" уже существует ��ля этого устройства.\n\nПопробуйте переименовать существующую копию или создать новую п��облему вручную.`,
         );
       } else {
         alert(
-          "Ошибка ��ри дублировании проблемы: " +
+          "Ошибка при дублировании проблемы: " +
             ((error as any)?.message || "Неизвестная ошибка"),
         );
       }
@@ -516,7 +516,7 @@ const ProblemsManager = () => {
   const handleClearAllProblems = async () => {
     if (
       !confirm(
-        "Вы ув��рены, что хотите удалить ВСЕ проблемы? Это действие нельзя отменить!",
+        "Вы уверены, что хотите удалить ВСЕ проблемы? Это действие нельзя отменить!",
       )
     )
       return;
@@ -527,7 +527,7 @@ const ProblemsManager = () => {
         await deleteProblemMutation.mutateAsync({ id: problem.id });
       }
 
-      alert("Вс�� проблемы удалены!");
+      alert("Все проблемы удалены!");
     } catch (error) {
       console.error("Error clearing problems:", error);
       alert("Ошибка при удалении проблем: " + (error as any)?.message);
@@ -550,7 +550,7 @@ const ProblemsManager = () => {
           <Button
             variant="outline"
             onClick={() => {
-              console.log("🧪 Тест��рование API создания проблемы");
+              console.log("🧪 Тестирование API создания проблемы");
 
               // Генерируем действительно уникальный ID
               const timestamp = Date.now();
@@ -563,7 +563,7 @@ const ProblemsManager = () => {
               // Проверяем уникальность на клиенте
               while (checkForDuplicateTitle(testTitle, "openbox")) {
                 console.warn(
-                  `⚠️  Назва��ие ${testTitle} уже существует, генерируем новое`,
+                  `⚠️  Название ${testTitle} уже существует, генерируем новое`,
                 );
                 const newRandom = Math.random().toString(36).substring(2, 11);
                 testTitle = `TEST-${timestamp}_${newRandom}_${Date.now().toString().slice(-4)}`;
@@ -643,7 +643,7 @@ const ProblemsManager = () => {
 
                 alert(`Удалено ${testProblems.length} тестовых проблем`);
               } catch (error) {
-                console.error("О��ибка при удалении тестовых проблем:", error);
+                console.error("Ошибка при удалении тестовых проблем:", error);
                 alert("Ошибка при удалении тестовых проблем");
               }
             }}
@@ -666,7 +666,7 @@ const ProblemsManager = () => {
             className="text-red-600 hover:text-red-700 hover:bg-red-50"
           >
             <Trash2 className="h-4 w-4 mr-2" />
-            О��истить всё
+            Очистить всё
           </Button>
           <Button variant="outline">
             <Upload className="h-4 w-4 mr-2" />
@@ -684,7 +684,7 @@ const ProblemsManager = () => {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader>
-                <DialogTitle>С��здать новую проблему</DialogTitle>
+                <DialogTitle>Создать новую проблему</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div>
@@ -876,10 +876,10 @@ const ProblemsManager = () => {
             <div className="flex gap-2">
               <Select value={filterDevice} onValueChange={setFilterDevice}>
                 <SelectTrigger className="w-48">
-                  <SelectValue placeholder="Прис��авка" />
+                  <SelectValue placeholder="Приставка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все пристав��и</SelectItem>
+                  <SelectItem value="all">Все приставки</SelectItem>
                   {getActiveDevices().map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
@@ -890,7 +890,7 @@ const ProblemsManager = () => {
 
               <Select value={filterCategory} onValueChange={setFilterCategory}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Катег��рия" />
+                  <SelectValue placeholder="Категория" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все категории</SelectItem>
@@ -1083,7 +1083,7 @@ const ProblemsManager = () => {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Выберите прис��авку" />
+                  <SelectValue placeholder="Выберите приставку" />
                 </SelectTrigger>
                 <SelectContent>
                   {getActiveDevices().map((device) => (
@@ -1120,7 +1120,7 @@ const ProblemsManager = () => {
                 onChange={(e) =>
                   setFormData({ ...formData, description: e.target.value })
                 }
-                placeholder="Подр��бное описание проблемы"
+                placeholder="Подробное описание проблемы"
               />
             </div>
 

@@ -178,7 +178,7 @@ const AdminDashboard = () => {
             Панель управления
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Общий обзор системы диагностики ТВ-приставок
+            Общий обзор системы диагностики ТВ‑приставок
           </p>
         </div>
         <div className="flex space-x-2">
@@ -190,7 +190,7 @@ const AdminDashboard = () => {
             <RefreshCw
               className={`h-4 w-4 mr-2 ${isLoading ? "animate-spin" : ""}`}
             />
-            Обновить
+            Обновит��
           </Button>
           <Button variant="outline" onClick={handleExport}>
             <Download className="h-4 w-4 mr-2" />
@@ -317,7 +317,7 @@ const AdminDashboard = () => {
         <Card>
           <CardHeader>
             <CardTitle className="text-lg font-semibold">
-              Среднее вр��мя решения
+              Среднее время решения
             </CardTitle>
           </CardHeader>
           <CardContent>
@@ -527,7 +527,7 @@ const AdminDashboard = () => {
               </Button>
               <Button className="w-full justify-start" variant="outline">
                 <Download className="h-4 w-4 mr-2" />
-                Экспорт резервной копии
+                Экспорт резервно�� копии
               </Button>
 
               <div className="border-t pt-3 mt-4">
@@ -540,7 +540,7 @@ const AdminDashboard = () => {
                   size="sm"
                 >
                   <Settings className="h-4 w-4 mr-2" />
-                  Общие настройк��
+                  Общие настройки
                 </Button>
                 <Button
                   className="w-full justify-start"

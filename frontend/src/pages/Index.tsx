@@ -43,10 +43,9 @@ const Index = () => {
             Быстрая диагностика проблем
           </h1>
           <p className="text-xl text-muted-foreground mb-8 max-w-3xl mx-auto">
-            Пошаговое инструкции дл�� решения проблем с цифровыми
-            ТВ-приставками.
+            Пошаговые инструкции для решения проблем с цифровыми ТВ-приставками.
             <br />
-            Простой интерфейс, проф��ссиональные решения.
+            Простой интерфейс, профессиональные решения.
           </p>
 
           <Button
@@ -144,7 +143,7 @@ const Index = () => {
       <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
           <h2 className="text-4xl font-bold text-center text-gray-900 mb-12">
-            Поддер��иваемые устройства
+            Поддерживаемые устройства
           </h2>
 
           {devicesLoading ? (
@@ -235,7 +234,7 @@ const Index = () => {
                         Новые устройства
                       </h3>
                       <p className="text-muted-foreground text-sm">
-                        Добавим поддержку новых моделей при��тавок
+                        Добавим поддержку новых моделей приставок
                       </p>
                     </CardContent>
                   </Card>
@@ -262,7 +261,7 @@ const Index = () => {
                 Надежность
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                Про��еренные решения от профессиональных техников с многолетним
+                Проверенные решения от профессиональных техников с многолетним
                 опытом
               </p>
             </div>
@@ -289,7 +288,7 @@ const Index = () => {
                 Эффективность
               </h3>
               <p className="text-muted-foreground leading-relaxed">
-                95% пр��блем решаются с первого раза без вызова техника
+                95% проблем решаются с первого раза без вызова техника
               </p>
             </div>
           </div>

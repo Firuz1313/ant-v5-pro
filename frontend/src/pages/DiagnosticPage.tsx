@@ -14,6 +14,7 @@ import {
   Loader2,
   ChevronLeft,
   ChevronRight,
+  Lightbulb,
 } from "lucide-react";
 
 const DiagnosticPage = () => {
@@ -165,7 +166,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или проблема не н��йдены</p>
+          <p>Устройство или проблема не найдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -325,42 +326,42 @@ const DiagnosticPage = () => {
               </CardContent>
             </Card>
 
-            {/* Navigation Buttons - Directly Under TV */}
+            {/* Navigation + Hint row */}
             <div
-              className="flex items-center justify-between mt-6 w-full max-w-[900px]"
+              className="mt-6 w-full max-w-[900px]"
               style={{ width: "90vw", maxWidth: "900px" }}
             >
-              <Button
-                onClick={handlePrevStep}
-                disabled={currentStepNumber <= 1}
-                variant="ghost"
-                size="icon"
-                className="text-gray-400 hover:text-gray-600 disabled:opacity-30"
-              >
-                <ChevronLeft className="h-8 w-8" />
-              </Button>
+              {/* Top row: fixed buttons only */}
+              <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
+                <Button
+                  onClick={handlePrevStep}
+                  disabled={currentStepNumber <= 1}
+                  variant="ghost"
+                  size="icon"
+                  className="w-20 h-20 rounded-full text-gray-400 hover:text-gray-600 disabled:opacity-30 [&_svg]:!size-12"
+                >
+                  <ChevronLeft className="h-12 w-12" />
+                </Button>
 
-              <Button
-                onClick={handleNextStep}
-                variant="ghost"
-                size="icon"
-                className="text-gray-400 hover:text-gray-600"
-              >
-                <ChevronRight className="h-8 w-8" />
-              </Button>
-            </div>
+                <div className="min-w-0 flex justify-center px-2">
+                  <div className="inline-flex items-start gap-2 text-gray-600 text-base leading-snug text-center break-words whitespace-pre-line max-w-full">
+                    <Lightbulb className="h-10 w-10 -ml-4 text-yellow-400 animate-pulse drop-shadow" />
+                    <span className="block min-w-0 max-w-full">
+                      {currentStepData?.hint ??
+                        "Красная точка на пульте показывает точное место для нажатия"}
+                    </span>
+                  </div>
+                </div>
 
-            {/* Hint Text - Directly Under TV */}
-            <div
-              className="mt-4 text-center w-full max-w-[900px]"
-              style={{ width: "90vw", maxWidth: "900px" }}
-            >
-              <p className="text-gray-600 text-sm">
-                Красная точка на пульте показывает точное место для нажатия
-              </p>
-              <p className="text-gray-600 text-sm">
-                Красная точка на пульте показывает точное место для нажатия
-              </p>
+                <Button
+                  onClick={handleNextStep}
+                  variant="ghost"
+                  size="icon"
+                  className="w-20 h-20 rounded-full text-gray-400 hover:text-gray-600 [&_svg]:!size-12"
+                >
+                  <ChevronRight className="h-12 w-12" />
+                </Button>
+              </div>
             </div>
           </div>
 

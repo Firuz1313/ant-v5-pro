@@ -236,7 +236,7 @@ const TVInterfaceBuilder = () => {
     if (!formData.name.trim()) {
       toast({
         title: "Ошибка",
-        description: "Введите название интер��ейса",
+        description: "Введите название интерфейса",
         variant: "destructive",
       });
       return;
@@ -304,7 +304,7 @@ const TVInterfaceBuilder = () => {
 
     setIsLoading(true);
     try {
-      // Подготавливаем данные для обновления, включая только измененные поля
+      // Подготавливаем данные для обновления, включая толь��о измененные поля
       const updateData: any = {
         name: formData.name,
         description: formData.description,
@@ -341,7 +341,7 @@ const TVInterfaceBuilder = () => {
         setIsEditDialogOpen(false);
         resetForm();
 
-        // Форсированная перезагрузка через небольшую задержку
+        // Форсированная перезагрузка через небольшую задерж��у
         setTimeout(() => {
           console.log("🔄 Force reloading interfaces after update...");
           loadTVInterfaces();
@@ -357,7 +357,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error updating TV interface:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при обновлении TV ин��ерфейса",
+        description: "Произошла ошибка при обновлении TV интерфейса",
         variant: "destructive",
       });
     } finally {
@@ -408,7 +408,7 @@ const TVInterfaceBuilder = () => {
         loadTVInterfaces();
       } else {
         toast({
-          title: "��шибка",
+          title: "Ошибка",
           description: response.error || "Не удалось изменить статус",
           variant: "destructive",
         });
@@ -435,7 +435,7 @@ const TVInterfaceBuilder = () => {
       if (response.success) {
         toast({
           title: "Успех",
-          description: response.message || "TV интерфейс дубл����рован",
+          description: response.message || "TV интерфейс дублирован",
         });
         loadTVInterfaces();
       } else {
@@ -480,7 +480,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error cleaning up TV interfaces:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при очистке TV интер��ейсов",
+        description: "Произошла ошибка при очистке TV интерфейсов",
         variant: "destructive",
       });
     } finally {
@@ -555,7 +555,7 @@ const TVInterfaceBuilder = () => {
                 <AlertDialogTitle>Очистить все TV интерфейсы?</AlertDialogTitle>
                 <AlertDialogDescription>
                   Это действие удалит все существующие TV интерфейсы. После
-                  очистки вы сможете создавать св��и со��с��венные интерфейсы
+                  очистки вы сможете создавать свои собственные интерфейсы
                   вручную чере�� UI.
                 </AlertDialogDescription>
               </AlertDialogHeader>
@@ -579,12 +579,12 @@ const TVInterfaceBuilder = () => {
             </DialogTrigger>
             <DialogContent className="max-w-2xl">
               <DialogHeader>
-                <DialogTitle>Созда��ь новый TV интерфейс</DialogTitle>
+                <DialogTitle>Создать новый TV интерфейс</DialogTitle>
               </DialogHeader>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name">Назван��е</Label>
+                    <Label htmlFor="name">Название</Label>
                     <Input
                       id="name"
                       value={formData.name}
@@ -683,7 +683,7 @@ const TVInterfaceBuilder = () => {
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <Upload className="h-4 w-4 mr-2" />
-                        Загрузит�� файл
+                        Загрузить файл
                       </Button>
                       <Button
                         type="button"
@@ -760,7 +760,7 @@ const TVInterfaceBuilder = () => {
                 onValueChange={setSelectedDeviceFilter}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Фильт�� по устройству" />
+                  <SelectValue placeholder="Фильтр по устройству" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все устройства</SelectItem>
@@ -778,7 +778,7 @@ const TVInterfaceBuilder = () => {
                 onValueChange={setSelectedTypeFilter}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Ф��льтр ��о типу" />
+                  <SelectValue placeholder="Фильтр по типу" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все типы</SelectItem>
@@ -819,7 +819,7 @@ const TVInterfaceBuilder = () => {
               selectedDeviceFilter !== "all" ||
               selectedTypeFilter !== "all"
                 ? "Попробуйте изменить фильтры поиска"
-                : "Соз��айте первый TV интерфейс для начала ��аботы"}
+                : "Создавайте первый TV интерфейс для начала работы"}
             </p>
             {!searchTerm &&
               selectedDeviceFilter === "all" &&
