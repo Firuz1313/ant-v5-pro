@@ -166,7 +166,7 @@ const DiagnosticPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center text-gray-900">
           <AlertCircle className="h-8 w-8 mx-auto mb-4" />
-          <p>Устройство или проблема н�� н��йдены</p>
+          <p>Устройство или пробл��ма н�� н��йдены</p>
           <Button onClick={handleBack} className="mt-4" variant="outline">
             Вернуться назад
           </Button>
@@ -331,7 +331,7 @@ const DiagnosticPage = () => {
               className="mt-6 w-full max-w-[900px]"
               style={{ width: "90vw", maxWidth: "900px" }}
             >
-              {/* Top row: fixed buttons and animated lamp only */}
+              {/* Top row: fixed buttons only */}
               <div className="grid grid-cols-[auto_1fr_auto] items-center gap-4">
                 <Button
                   onClick={handlePrevStep}
@@ -343,9 +343,7 @@ const DiagnosticPage = () => {
                   <ChevronLeft className="h-12 w-12" />
                 </Button>
 
-                <div className="flex justify-center">
-                  <Lightbulb className="h-7 w-7 text-yellow-400 animate-pulse drop-shadow" />
-                </div>
+                <div />
 
                 <Button
                   onClick={handleNextStep}
@@ -357,10 +355,15 @@ const DiagnosticPage = () => {
                 </Button>
               </div>
 
-              {/* Bottom row: full hint text wrapping under, visually between buttons via padding */}
-              <div className="mt-2 text-center text-base text-gray-600 leading-snug break-words whitespace-pre-line px-20">
-                {currentStepData?.hint ??
-                  "Красная точка на пульте показывает точное место для нажатия"}
+              {/* Bottom row: hint with lamp at left; wraps under, width limited between buttons */}
+              <div className="mt-2 text-center px-20">
+                <div className="inline-flex items-start justify-center gap-2 text-base text-gray-600 leading-snug">
+                  <Lightbulb className="h-7 w-7 text-yellow-400 animate-pulse drop-shadow" />
+                  <span className="block break-words whitespace-pre-line">
+                    {currentStepData?.hint ??
+                      "Красная точка на пульте показывает точное место для нажатия"}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
