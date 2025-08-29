@@ -417,7 +417,7 @@ const StepFormFields = React.memo<{
             id={isEdit ? "edit-hint" : "hint"}
             value={formData.hint}
             onChange={handleHintChange}
-            placeholder="Дополнительная подсказка для пользователя"
+            placeholder="Дополнительная подсказка для пользовате��я"
           />
         </div>
 
@@ -1467,9 +1467,8 @@ const StepsManagerFixed = () => {
                     <Target className="h-4 w-4" />
                     <AlertDescription>
                       <p className="text-sm text-green-700 dark:text-green-300">
-                        Пози��ия выбрана: (
-                        {Math.round(formData.buttonPosition.x)},{" "}
-                        {Math.round(formData.buttonPosition.y)})
+                        Позиция выбрана: ({(formData.buttonPosition.x * 100).toFixed(1)}%,{" "}
+                        {(formData.buttonPosition.y * 100).toFixed(1)}%)
                       </p>
                     </AlertDescription>
                   </Alert>
