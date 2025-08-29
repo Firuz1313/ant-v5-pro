@@ -426,8 +426,8 @@ const StepFormFields = React.memo<{
             <Target className="h-4 w-4" />
             <AlertDescription>
               <p className="text-sm text-green-700 dark:text-green-300">
-                Позиция кнопки: ({Math.round(formData.buttonPosition.x)},{" "}
-                {Math.round(formData.buttonPosition.y)})
+                Позиция кнопки: ({(formData.buttonPosition.x * 100).toFixed(1)}%,{" "}
+                {(formData.buttonPosition.y * 100).toFixed(1)}%)
               </p>
             </AlertDescription>
           </Alert>
@@ -1003,7 +1003,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обязательные поля: устройство, проблема, название и инстр��кция",
+          "Заполн��те все обязательные поля: устройство, проблема, название и инстр��кция",
         variant: "destructive",
       });
       return;
@@ -1428,7 +1428,7 @@ const StepsManagerFixed = () => {
                   className="w-full"
                 >
                   <Target className="h-4 w-4 mr-2" />
-                  {isPickingButton ? "Отменить выбор" : "Выбрать позицию"}
+                  {isPickingButton ? "Отмен��ть выбор" : "Выбрать позицию"}
                 </Button>
                 <Button
                   type="button"
@@ -1658,7 +1658,7 @@ const StepsManagerFixed = () => {
                     </Badge>
                   </CardTitle>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    💡 Используйте иконку ☰ для изменения порядка шагов методом
+                    💡 Используйте иконку ��� для изменения порядка шагов методом
                     перетаскивания
                   </p>
                 </CardHeader>
@@ -1692,7 +1692,7 @@ const StepsManagerFixed = () => {
         <DialogContent className="max-w-6xl max-h-[90vh] overflow-hidden">
           <DialogHeader>
             <DialogTitle>
-              Выбор позиции на пульте: {selectedRemote?.name}
+              ��ыбор позиции на пульте: {selectedRemote?.name}
             </DialogTitle>
           </DialogHeader>
           <div className="flex-1 overflow-hidden">{renderRemoteEditor()}</div>
