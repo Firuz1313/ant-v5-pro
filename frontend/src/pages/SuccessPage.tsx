@@ -64,7 +64,6 @@ const SuccessPage = () => {
     navigate("/");
   };
 
-
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 relative overflow-hidden">
       {/* Background Effects */}
@@ -80,8 +79,14 @@ const SuccessPage = () => {
         />
         {/* Floating particles */}
         <div className="absolute top-20 left-20 w-2 h-2 bg-green-400/20 rounded-full animate-float" />
-        <div className="absolute top-40 right-32 w-1 h-1 bg-blue-400/30 rounded-full animate-bounce-gentle" style={{ animationDelay: "1s" }} />
-        <div className="absolute bottom-32 left-1/3 w-3 h-3 bg-violet-400/15 rounded-full animate-float" style={{ animationDelay: "3s" }} />
+        <div
+          className="absolute top-40 right-32 w-1 h-1 bg-blue-400/30 rounded-full animate-bounce-gentle"
+          style={{ animationDelay: "1s" }}
+        />
+        <div
+          className="absolute bottom-32 left-1/3 w-3 h-3 bg-violet-400/15 rounded-full animate-float"
+          style={{ animationDelay: "3s" }}
+        />
       </div>
 
       {/* Header */}
@@ -126,7 +131,10 @@ const SuccessPage = () => {
                     <Sparkles className="h-6 w-6 text-yellow-400 animate-pulse" />
                   </div>
                   <div className="absolute -bottom-2 -left-2">
-                    <Sparkles className="h-4 w-4 text-green-400 animate-pulse" style={{ animationDelay: "1s" }} />
+                    <Sparkles
+                      className="h-4 w-4 text-green-400 animate-pulse"
+                      style={{ animationDelay: "1s" }}
+                    />
                   </div>
                 </div>
               </div>
@@ -147,7 +155,6 @@ const SuccessPage = () => {
                 {problemId && getSolutionMessage(problemId)}
               </p>
             </div>
-
 
             {/* Action Buttons */}
             <div
@@ -190,14 +197,25 @@ const SuccessPage = () => {
               </div>
             </div>
 
-
             {/* Decorative elements */}
             <div className="mt-12 flex justify-center space-x-8 opacity-20">
               <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" />
-              <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
-              <div className="w-3 h-3 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
-              <div className="w-2 h-2 bg-green-400 rounded-full animate-bounce" style={{ animationDelay: "0.6s" }} />
-              <div className="w-3 h-3 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.8s" }} />
+              <div
+                className="w-2 h-2 bg-blue-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0.2s" }}
+              />
+              <div
+                className="w-3 h-3 bg-violet-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0.4s" }}
+              />
+              <div
+                className="w-2 h-2 bg-green-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0.6s" }}
+              />
+              <div
+                className="w-3 h-3 bg-blue-400 rounded-full animate-bounce"
+                style={{ animationDelay: "0.8s" }}
+              />
             </div>
           </div>
         </div>
