@@ -7,10 +7,7 @@ import {
   AlertTriangle,
   Home,
   ArrowRight,
-  Tv,
-  Star,
   Sparkles,
-  Heart,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 
