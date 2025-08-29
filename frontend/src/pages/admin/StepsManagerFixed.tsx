@@ -954,7 +954,7 @@ const StepsManagerFixed = () => {
 
         setTVInterfaces(normalizedInterfaces);
         console.log(
-          `✅ Loaded ${normalizedInterfaces.length} TV interfaces:`,
+          `�� Loaded ${normalizedInterfaces.length} TV interfaces:`,
           normalizedInterfaces,
         );
       } else {
@@ -1418,7 +1418,7 @@ const StepsManagerFixed = () => {
                     style={{ left: `${leftPercent}%`, top: `${topPercent}%`, zIndex: 999 }}
                   >
                     <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]">
-                      <div className="absolute -inset-1 bg-pink-500/30 blur-sm rounded-full animate-pulse"></div>
+                      <div className="absolute -inset-1 bg-pink-500/30 blur-sm rounded-full"></div>
                       <div className="text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none">👆</div>
                     </div>
                   </div>
@@ -1440,7 +1440,7 @@ const StepsManagerFixed = () => {
                     }}
                   >
                     <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]">
-                      <div className="absolute -inset-1 bg-pink-500/35 blur-md rounded-full animate-pulse"></div>
+                      <div className="absolute -inset-1 bg-pink-500/35 blur-md rounded-full"></div>
                       <div className="text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">👆</div>
                     </div>
                   </div>
@@ -1453,7 +1453,7 @@ const StepsManagerFixed = () => {
         <div className="w-full lg:w-80 space-y-4">
           <Card>
             <CardHeader>
-              <CardTitle className="text-lg">Выбор ��озиции</CardTitle>
+              <CardTitle className="text-lg">Выбор позиции</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="grid grid-cols-1 gap-2">
@@ -1792,7 +1792,7 @@ const StepsManagerFixed = () => {
                 !formData.instruction
               }
             >
-              Сохранить
+              Сох��анить
             </Button>
           </div>
         </DialogContent>
