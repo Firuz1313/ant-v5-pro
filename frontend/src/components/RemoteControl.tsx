@@ -262,8 +262,8 @@ const RemoteControl = ({
                     <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]" data-rc-marker>
                       {pointerVariant === "diagnostic" && (
                         <>
-                          <span className="absolute w-3 h-3 rounded-full border-2 border-pink-500 left-[22px] top-[26px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
-                          <span className="absolute w-3 h-3 rounded-full border-2 border-pink-500 left-[22px] top-[26px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
+                          <span className="absolute w-3 h-3 rounded-full border-2 border-pink-500 left-[6px] top-[-2px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
+                          <span className="absolute w-3 h-3 rounded-full border-2 border-pink-500 left-[6px] top-[-2px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
                         </>
                       )}
                       <div className={cn("text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none", pointerVariant === "diagnostic" ? "animate-tap-bounce" : "")}>👆</div>
@@ -322,8 +322,8 @@ const RemoteControl = ({
                       <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]" data-rc-marker-overlay>
                         {pointerVariant === "diagnostic" && (
                           <>
-                            <span className="absolute w-3.5 h-3.5 rounded-full border-2 border-pink-500 left-[26px] top-[30px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
-                            <span className="absolute w-3.5 h-3.5 rounded-full border-2 border-pink-500 left-[26px] top-[30px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
+                            <span className="absolute w-3.5 h-3.5 rounded-full border-2 border-pink-500 left-[8px] top-[-4px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
+                            <span className="absolute w-3.5 h-3.5 rounded-full border-2 border-pink-500 left-[8px] top-[-4px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
                           </>
                         )}
                         <div className={cn("text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none", pointerVariant === "diagnostic" ? "animate-tap-bounce" : "")}>👆</div>
@@ -600,8 +600,8 @@ const RemoteControl = ({
               <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[10px] -translate-y-[18px] rotate-[-28deg]" data-rc-marker-default>
                 {pointerVariant === "diagnostic" && (
                   <>
-                    <span className="absolute w-2.5 h-2.5 rounded-full border-2 border-pink-500 left-[18px] top-[22px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
-                    <span className="absolute w-2.5 h-2.5 rounded-full border-2 border-pink-500 left-[18px] top-[22px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
+                    <span className="absolute w-2.5 h-2.5 rounded-full border-2 border-pink-500 left-[5px] top-[-3px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
+                    <span className="absolute w-2.5 h-2.5 rounded-full border-2 border-pink-500 left-[5px] top-[-3px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
                   </>
                 )}
                 <div className={cn("text-[28px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none", pointerVariant === "diagnostic" ? "animate-tap-bounce" : "")}>👆</div>
