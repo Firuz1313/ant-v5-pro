@@ -69,6 +69,49 @@ const RemoteControl = ({
     img.src = imageData as string;
   }, [imageData]);
 
+  // Zoom overlay state and helpers
+  const [zoom, setZoom] = React.useState<{
+    open: boolean;
+    rect: DOMRect | null;
+    scale: number;
+    dx: number;
+    dy: number;
+    apply: boolean;
+  }>({ open: false, rect: null, scale: 1, dx: 0, dy: 0, apply: false });
+
+  React.useEffect(() => {
+    if (!zoom.open) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeZoom();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [zoom.open]);
+
+  const openZoom = (e: React.MouseEvent) => {
+    if (!useCustomRemote || !containerRef.current) return;
+    const target = e.target as HTMLElement;
+    if (target.closest("button")) return;
+    const rect = containerRef.current.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+    const scale = Math.min((vw * 0.96) / rect.width, (vh * 0.96) / rect.height);
+    const dx = vw / 2 - (rect.left + rect.width / 2);
+    const dy = vh / 2 - (rect.top + rect.height / 2);
+    setZoom({ open: true, rect, scale, dx, dy, apply: false });
+    requestAnimationFrame(() => setZoom((z) => ({ ...z, apply: true })));
+  };
+
+  const closeZoom = () => {
+    setZoom((z) => ({ ...z, apply: false }));
+    setTimeout(() => setZoom({ open: false, rect: null, scale: 1, dx: 0, dy: 0, apply: false }), 650);
+  };
+
   const getImageBox = (containerW: number, containerH: number) => {
     const containerAR = containerW / containerH;
     const imgAR = naturalSize && naturalSize.width > 0 && naturalSize.height > 0
@@ -156,7 +199,8 @@ const RemoteControl = ({
           {/* Remote background image */}
           <div
             ref={containerRef}
-            className="relative z-10 w-full h-full bg-contain bg-center bg-no-repeat transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1 group-hover:scale-[1.02] filter drop-shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
+            onClick={openZoom}
+            className="relative z-10 w-full h-full bg-contain bg-center bg-no-repeat transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1 group-hover:scale-[1.02] filter drop-shadow-[0_18px_50px_rgba(0,0,0,0.35)] cursor-zoom-in"
             style={{
               backgroundImage: `url(${imageData})`,
             }}
@@ -212,7 +256,52 @@ const RemoteControl = ({
           </div>
         </div>
 
-        {/* Highlight Effect */}
+        {/* Zoom Overlay */}
+        {useCustomRemote && zoom.open && zoom.rect && (
+          <div className="fixed inset-0 z-[9999]">
+            {/* Backdrop */}
+            <div
+              className={cn(
+                "absolute inset-0 bg-black/55 backdrop-blur-sm transition-opacity duration-500",
+                zoom.apply ? "opacity-100" : "opacity-0",
+              )}
+              onClick={closeZoom}
+            />
+
+            {/* Zoomed image (FLIP) */}
+            <div
+              className={cn(
+                "fixed will-change-transform transition-opacity duration-500",
+                zoom.apply ? "opacity-100" : "opacity-0",
+              )}
+              style={{
+                left: zoom.rect.left,
+                top: zoom.rect.top,
+                width: zoom.rect.width,
+                height: zoom.rect.height,
+                transform: `translate(${zoom.apply ? zoom.dx : 0}px, ${zoom.apply ? zoom.dy : 0}px) scale(${zoom.apply ? zoom.scale : 1})`,
+                transition: "transform 650ms cubic-bezier(0.22,1,0.36,1)",
+              }}
+            >
+              <div className="w-full h-full bg-black/5 rounded-2xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
+                <img
+                  src={imageData}
+                  alt={remote?.name || "Remote"}
+                  className="w-full h-full object-contain select-none"
+                  draggable={false}
+                />
+              </div>
+              {/* Close button */}
+              <button
+                onClick={closeZoom}
+                className="absolute -top-12 right-0 text-white/90 hover:text-white transition-colors text-2xl leading-none"
+                aria-label="Закрыть увеличенный пульт"
+              >
+                ×
+              </button>
+            </div>
+          </div>
+        )}
       </div>
     );
   }
