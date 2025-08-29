@@ -934,7 +934,7 @@ const StepsManagerFixed = () => {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin h-8 w-8 border-4 border-blue-500 border-t-transparent rounded-full mr-3" />
-        <span className="text-lg">За��рузка данных...</span>
+        <span className="text-lg">За��рузка данн��х...</span>
       </div>
     );
   }
@@ -1088,7 +1088,7 @@ const StepsManagerFixed = () => {
       toast({
         title: "Ошибка валидации",
         description:
-          "Заполните все обяза��ельные п��ля: у��тройство, проблема, название и инст��ук��ия",
+          "Заполните все обяза��ельные п��ля: устройство, проблема, название и инст��ук��ия",
         variant: "destructive",
       });
       return;
@@ -1335,6 +1335,40 @@ const StepsManagerFixed = () => {
     }
   };
 
+  useEffect(() => {
+    const src = customRemoteImage || selectedRemote?.imageData || selectedRemote?.image_data || null;
+    if (!src) {
+      setRemoteNaturalSize(null);
+      return;
+    }
+    const img = new Image();
+    img.onload = () => {
+      setRemoteNaturalSize({ width: img.naturalWidth || 0, height: img.naturalHeight || 0 });
+    };
+    img.src = src;
+  }, [customRemoteImage, selectedRemote]);
+
+  const getImageBox = (containerW: number, containerH: number) => {
+    const canvasAR = containerW / containerH;
+    const imgAR = remoteNaturalSize && remoteNaturalSize.width > 0 && remoteNaturalSize.height > 0
+      ? remoteNaturalSize.width / remoteNaturalSize.height
+      : canvasAR;
+
+    if (canvasAR > imgAR) {
+      const imgH = containerH;
+      const imgW = imgAR * imgH;
+      const left = (containerW - imgW) / 2;
+      const top = 0;
+      return { left, top, width: imgW, height: imgH };
+    } else {
+      const imgW = containerW;
+      const imgH = imgW / imgAR;
+      const left = 0;
+      const top = (containerH - imgH) / 2;
+      return { left, top, width: imgW, height: imgH };
+    }
+  };
+
   const resetForm = () => {
     setFormData({
       deviceId: "",
@@ -1570,7 +1604,7 @@ const StepsManagerFixed = () => {
                   <SelectValue placeholder="Приставка" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все ��риставки</SelectItem>
+                  <SelectItem value="all">Все приставки</SelectItem>
                   {activeDevices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       <div className="flex items-center">
@@ -1661,7 +1695,7 @@ const StepsManagerFixed = () => {
                     </Badge>
                   </CardTitle>
                   <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
-                    💡 Используйте иконку ��� ��ля изменения порядка шагов мет��дом
+                    💡 Используйте иконку ��� ��ля изменения порядка шагов методом
                     перетаскивания
                   </p>
                 </CardHeader>
