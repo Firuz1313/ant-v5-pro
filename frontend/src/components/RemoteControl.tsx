@@ -104,7 +104,7 @@ const RemoteControl = ({
   ) => {
     if (!position) return undefined;
 
-    // Если координаты уже нормализованы (0-1), используем их как есть
+    // Если координаты уже нормали��ованы (0-1), используем их как есть
     if (position.x <= 1 && position.y <= 1) {
       return position;
     }
@@ -153,7 +153,7 @@ const RemoteControl = ({
           {/* Remote background image */}
           <div
             ref={containerRef}
-            className="relative w-full max-w-[280px] h-full min-h-[480px] lg:min-h-[550px] bg-contain bg-center bg-no-repeat rounded-3xl shadow-2xl border-4 border-gray-700"
+            className="relative w-full h-full bg-contain bg-center bg-no-repeat"
             style={{
               backgroundImage: `url(${imageData})`,
             }}
