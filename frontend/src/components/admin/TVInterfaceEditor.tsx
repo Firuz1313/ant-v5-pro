@@ -313,7 +313,7 @@ const TVInterfaceEditor: React.FC<TVInterfaceEditorProps> = ({
     ctx.lineWidth = 1;
     ctx.globalAlpha = 1;
 
-    const handleSize = 6 / scale; // Scale handles inversely to zoom
+    const handleSize = 3 / scale; // Scale handles inversely to zoom (reduced from 6 to match diagnostic page)
 
     if (mark.shape === "rectangle") {
       const pos = mark.position;
