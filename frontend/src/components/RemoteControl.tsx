@@ -219,9 +219,11 @@ const RemoteControl = ({
   // Render default remote if no custom remote is available
   return (
     <div className={cn("relative h-full", className)}>
+      {/* Subtle base shadow ellipse */}
+      <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-2/3 h-3 bg-black/20 blur-md rounded-full opacity-60"></div>
       {/* Remote Frame */}
       <div
-        className="bg-transparent p-0 rounded-none shadow-none border-0 w-full h-full flex flex-col justify-between"
+        className="relative z-10 bg-transparent p-0 rounded-xl shadow-md shadow-black/20 border-0 w-full h-full flex flex-col justify-between transition-transform duration-500 hover:-translate-y-1"
         style={{ maxWidth: "160px", minHeight: "330px" }}
       >
         {/* Top Section */}
