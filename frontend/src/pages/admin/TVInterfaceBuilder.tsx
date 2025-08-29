@@ -386,7 +386,7 @@ const TVInterfaceBuilder = () => {
     } catch (error) {
       console.error("Error deleting TV interface:", error);
       toast({
-        title: "Ошибка",
+        title: "Ошибк��",
         description: "Произошла ошибка при удалении TV интерфейса",
         variant: "destructive",
       });
@@ -584,7 +584,7 @@ const TVInterfaceBuilder = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <Label htmlFor="name">Назван��е</Label>
+                    <Label htmlFor="name">Название</Label>
                     <Input
                       id="name"
                       value={formData.name}
@@ -763,7 +763,7 @@ const TVInterfaceBuilder = () => {
                   <SelectValue placeholder="Фильт�� по устройству" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Все устр��йства</SelectItem>
+                  <SelectItem value="all">Все устройства</SelectItem>
                   {devices.map((device) => (
                     <SelectItem key={device.id} value={device.id}>
                       {device.name}
@@ -1037,7 +1037,7 @@ const TVInterfaceBuilder = () => {
                 }
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Выбери����е устройство" />
+                  <SelectValue placeholder="Выбери��е устройство" />
                 </SelectTrigger>
                 <SelectContent>
                   {devices.map((device) => (
@@ -1140,7 +1140,7 @@ const TVInterfaceBuilder = () => {
               </Button>
               <Button onClick={handleEdit} disabled={isLoading}>
                 <Save className="h-4 w-4 mr-2" />
-                Сохранить
+                Со��ранить
               </Button>
             </div>
           </div>
