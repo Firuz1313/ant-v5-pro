@@ -191,7 +191,7 @@ const RemoteControl = ({
   // Render custom remote if available
   if (useCustomRemote && remote) {
     return (
-      <div className={cn("relative h-full group transform-gpu", className)}>
+      <div className={cn("relative h-full group", className)}>
         <div className="relative w-full h-full flex items-center justify-center">
           {/* Subtle base shadow ellipse */}
           <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-2/3 h-3 bg-black/25 blur-lg rounded-full opacity-80 transition-all duration-700 ease-out group-hover:w-3/4 group-hover:opacity-90"></div>
@@ -308,7 +308,7 @@ const RemoteControl = ({
 
   // Render default remote if no custom remote is available
   return (
-    <div className={cn("relative h-full group transform-gpu", className)}>
+    <div className={cn("relative h-full group", className)}>
       {/* Subtle base shadow ellipse */}
       <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-2/3 h-3 bg-black/25 blur-lg rounded-full opacity-80 transition-all duration-700 ease-out group-hover:w-3/4 group-hover:opacity-90"></div>
       <div className="pointer-events-none absolute bottom-1 left-1/2 -translate-x-1/2 w-1/2 h-2 bg-black/20 blur-md rounded-full opacity-70"></div>
