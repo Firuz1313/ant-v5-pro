@@ -154,10 +154,6 @@ const SuccessPage = () => {
               <p className="text-xl text-gray-600 mb-8 max-w-2xl mx-auto">
                 {problemId && getSolutionMessage(problemId)}
               </p>
-              <div className="inline-flex items-center space-x-2 bg-green-100 text-green-800 px-4 py-2 rounded-full text-sm font-medium">
-                <Heart className="h-4 w-4" />
-                <span>Спасибо за использование нашего сервиса</span>
-              </div>
             </div>
 
             {/* Rating Section */}
