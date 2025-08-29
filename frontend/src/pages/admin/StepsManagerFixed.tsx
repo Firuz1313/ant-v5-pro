@@ -1437,8 +1437,9 @@ const StepsManagerFixed = () => {
                       }}
                     >
                       <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[12px] -translate-y-[20px] rotate-[-28deg]">
-                        <div className="absolute -inset-1 bg-pink-500/30 blur-sm rounded-full"></div>
-                        <div className="text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none">
+                        <span className="absolute w-3.5 h-3.5 rounded-full border-2 border-cyan-300 left-[0px] top-[0px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
+                        <span className="absolute w-3.5 h-3.5 rounded-full border-2 border-cyan-300 left-[0px] top-[0px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
+                        <div className="text-[30px] leading-none drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)] select-none animate-tap-bounce">
                           👆
                         </div>
                       </div>
@@ -1467,8 +1468,9 @@ const StepsManagerFixed = () => {
                       }}
                     >
                       <div className="relative -translate-x-1/2 -translate-y-1/2 -translate-x-[14px] -translate-y-[24px] rotate-[-28deg]">
-                        <div className="absolute -inset-1 bg-pink-500/35 blur-md rounded-full"></div>
-                        <div className="text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none">
+                        <span className="absolute w-4 h-4 rounded-full border-2 border-cyan-300 left-[2px] top-[0px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple"></span>
+                        <span className="absolute w-4 h-4 rounded-full border-2 border-cyan-300 left-[2px] top-[0px] -translate-x-1/2 -translate-y-1/2 animate-tap-ripple-delayed"></span>
+                        <div className="text-[36px] leading-none drop-shadow-[0_6px_12px_rgba(0,0,0,0.35)] select-none animate-tap-bounce">
                           👆
                         </div>
                       </div>
