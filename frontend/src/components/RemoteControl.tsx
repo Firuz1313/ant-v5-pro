@@ -98,7 +98,7 @@ const RemoteControl = ({
     return { left: left * 100, top: top * 100 };
   };
 
-  // Функция для нормализации коорди��ат (конвертация старых пиксельных координат в нормализованные 0-1)
+  // Функция для нормализации координат (конвертация старых пиксельных координат в нормализованные 0-1)
   const normalizeButtonPosition = (
     position: { x: number; y: number } | undefined,
   ) => {
@@ -219,12 +219,13 @@ const RemoteControl = ({
 
   // Render default remote if no custom remote is available
   return (
-    <div className={cn("relative h-full", className)}>
+    <div className={cn("relative h-full group transform-gpu", className)}>
       {/* Subtle base shadow ellipse */}
-      <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-2/3 h-3 bg-black/20 blur-md rounded-full opacity-60"></div>
+      <div className="pointer-events-none absolute bottom-2 left-1/2 -translate-x-1/2 w-2/3 h-3 bg-black/25 blur-lg rounded-full opacity-80 transition-all duration-700 ease-out group-hover:w-3/4 group-hover:opacity-90"></div>
+      <div className="pointer-events-none absolute bottom-1 left-1/2 -translate-x-1/2 w-1/2 h-2 bg-black/20 blur-md rounded-full opacity-70"></div>
       {/* Remote Frame */}
       <div
-        className="relative z-10 bg-transparent p-0 rounded-xl shadow-md shadow-black/20 border-0 w-full h-full flex flex-col justify-between transition-transform duration-500 hover:-translate-y-1"
+        className="relative z-10 bg-transparent p-0 rounded-2xl shadow-xl shadow-black/40 border-0 w-full h-full flex flex-col justify-between transition-transform duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] group-hover:-translate-y-1 group-hover:scale-[1.02] filter drop-shadow-[0_18px_50px_rgba(0,0,0,0.35)]"
         style={{ maxWidth: "160px", minHeight: "330px" }}
       >
         {/* Top Section */}
