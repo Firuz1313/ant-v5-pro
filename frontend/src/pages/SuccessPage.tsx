@@ -192,7 +192,7 @@ const SuccessPage = () => {
 
 
             {/* Decorative elements */}
-            <div className="mt-16 flex justify-center space-x-8 opacity-20">
+            <div className="mt-12 flex justify-center space-x-8 opacity-20">
               <div className="w-3 h-3 bg-green-400 rounded-full animate-bounce" />
               <div className="w-2 h-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: "0.2s" }} />
               <div className="w-3 h-3 bg-violet-400 rounded-full animate-bounce" style={{ animationDelay: "0.4s" }} />
