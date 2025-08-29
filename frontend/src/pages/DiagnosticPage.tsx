@@ -253,9 +253,10 @@ const DiagnosticPage = () => {
           <div className="flex flex-col items-center">
             {/* TV Display - Responsive Sizing */}
             <Card className="bg-white border border-gray-200 rounded-xl shadow-sm">
-              <CardContent className="p-0">
+              <CardContent className="p-0 relative">
+                <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 w-3/4 max-w-[700px] h-5 bg-black/35 blur-xl rounded-full opacity-80"></div>
                 <div
-                  className="bg-gray-900 rounded-xl overflow-hidden w-full max-w-[900px] aspect-video lg:aspect-[900/520]"
+                  className="relative bg-gray-900 rounded-2xl overflow-hidden w-full max-w-[900px] aspect-video lg:aspect-[900/520] shadow-2xl shadow-black/50 ring-1 ring-black/10 transform-gpu transition-transform duration-700 ease-out hover:-translate-y-1"
                   style={{
                     width: "90vw",
                     maxWidth: "900px",
