@@ -135,7 +135,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error loading TV interfaces:", error);
       toast({
         title: "Ошибка",
-        description: "Произошла ошибка при загрузке TV интерфейсов",
+        description: "Произошла ошибка пр�� загрузке TV интерфейсов",
         variant: "destructive",
       });
     } finally {
@@ -408,7 +408,7 @@ const TVInterfaceBuilder = () => {
         loadTVInterfaces();
       } else {
         toast({
-          title: "��шибка",
+          title: "Ошибка",
           description: response.error || "Не удалось изменить статус",
           variant: "destructive",
         });
@@ -846,7 +846,7 @@ const TVInterfaceBuilder = () => {
                   ) : tvInterfaceUtils.hasScreenshot(tvInterface) ? (
                     <div className="text-center">
                       <ImageIcon className="h-12 w-12 mx-auto text-gray-400 mb-2" />
-                      <p className="text-sm text-gray-500">Скриншот ��сть</p>
+                      <p className="text-sm text-gray-500">Скриншот есть</p>
                       <p className="text-xs text-gray-400">
                         Открыть для просмотра
                       </p>
