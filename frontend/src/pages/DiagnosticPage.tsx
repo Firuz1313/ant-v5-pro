@@ -379,6 +379,7 @@ const DiagnosticPage = () => {
                     showButtonPosition={currentStepData?.buttonPosition}
                     onButtonClick={handleManualProgress}
                     className="w-full h-full"
+                    pointerVariant="diagnostic"
                   />
                 </div>
               </CardContent>
