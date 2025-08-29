@@ -134,8 +134,8 @@ const TVInterfaceBuilder = () => {
     } catch (error) {
       console.error("Error loading TV interfaces:", error);
       toast({
-        title: "Ошибка",
-        description: "Произош��а ошибка при загрузке TV интерфейсов",
+        title: "Оши��ка",
+        description: "Произошла ошибка при загрузке TV интерфейсов",
         variant: "destructive",
       });
     } finally {
@@ -269,7 +269,7 @@ const TVInterfaceBuilder = () => {
       if (response.success) {
         toast({
           title: "Успех",
-          description: response.message || "TV интерфейс созд��н",
+          description: response.message || "TV интерфейс создан",
         });
         setIsCreateDialogOpen(false);
         resetForm();
@@ -387,7 +387,7 @@ const TVInterfaceBuilder = () => {
       console.error("Error deleting TV interface:", error);
       toast({
         title: "Ошибка",
-        description: "Про��зошла ошибка при удалении TV интерфейса",
+        description: "Произошла ошибка при удалении TV интерфейса",
         variant: "destructive",
       });
     } finally {
@@ -760,7 +760,7 @@ const TVInterfaceBuilder = () => {
                 onValueChange={setSelectedDeviceFilter}
               >
                 <SelectTrigger>
-                  <SelectValue placeholder="Фильт�� по устройству" />
+                  <SelectValue placeholder="Фильтр по устройству" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Все устройства</SelectItem>
