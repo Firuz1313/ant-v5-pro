@@ -79,7 +79,7 @@ interface DiagnosticStep {
   remoteId?: string;
   buttonPosition?: { x: number; y: number };
   tvAreaPosition?: { x: number; y: number }; // Позиция на ТВ
-  tvAreaRect?: { x: number; y: number; width: number; height: number }; // Прямоугольник на ТВ
+  tvAreaRect?: { x: number; y: number; width: number; height: number }; // П��ямоугольник на ТВ
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -191,7 +191,7 @@ const StepsManagerNew = () => {
   const saveTVInterfaceMarks = async (marks: TVInterfaceMark[]) => {
     try {
       // Здесь можно реализ��вать ло��ику сохранения всех отметок
-      // Для простоты сейчас просто обновляем локальное состояние
+      // Для простоты сейчас пр��сто обновляем локальное состояние
 
       // Если есть выбранный шаг, связываем отметки с эт��м шагом
       if (selectedStep?.id) {
@@ -764,7 +764,7 @@ const StepsManagerNew = () => {
 
             {formData.buttonPosition.x > 0 && formData.buttonPosition.y > 0 && (
               <div
-                className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
+                className="absolute w-3 h-3 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 pointer-events-none"
                 style={{
                   left: `${(formData.buttonPosition.x / 400) * 100}%`,
                   top: `${(formData.buttonPosition.y / 600) * 100}%`,
@@ -797,7 +797,7 @@ const StepsManagerNew = () => {
                   className="w-full"
                 >
                   <ImageIcon className="h-4 w-4 mr-2" />
-                  Загрузить изображение
+                  Загр��зить изображение
                 </Button>
               </div>
 
@@ -917,7 +917,7 @@ const StepsManagerNew = () => {
               formData.tvAreaPosition.x > 0 &&
               formData.tvAreaPosition.y > 0 && (
                 <div
-                  className="absolute w-4 h-4 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse shadow-lg pointer-events-none z-10"
+                  className="absolute w-3 h-3 bg-red-500 rounded-full border-2 border-white transform -translate-x-1/2 -translate-y-1/2 animate-pulse shadow-lg pointer-events-none z-10"
                   style={{
                     left: `${(formData.tvAreaPosition.x / 800) * 100}%`,
                     top: `${(formData.tvAreaPosition.y / 450) * 100}%`,
