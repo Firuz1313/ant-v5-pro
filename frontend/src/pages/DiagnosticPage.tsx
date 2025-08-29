@@ -355,12 +355,13 @@ const DiagnosticPage = () => {
               className="mt-4 text-center w-full max-w-[900px]"
               style={{ width: "90vw", maxWidth: "900px" }}
             >
-              <p className="text-gray-600 text-sm">
-                Красная точка на пульте показывает точное место для нажатия
-              </p>
-              <p className="text-gray-600 text-sm">
-                Красная точка на пульте показывает точное место для нажатия
-              </p>
+              {currentStepData?.hint ? (
+                <p className="text-gray-600 text-sm">{currentStepData.hint}</p>
+              ) : (
+                <p className="text-gray-600 text-sm">
+                  Красная точка на пульте показывает точное место для нажатия
+                </p>
+              )}
             </div>
           </div>
 
